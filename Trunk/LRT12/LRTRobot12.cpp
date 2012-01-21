@@ -8,13 +8,18 @@ LRTRobot12::LRTRobot12() :
 					"\n\n\n---------------------------------------------------------\n"
 						"Begin LRTRobot Constructor\n",
 					"LRTRobot Destroyed\n\n"), brain(), dc_CANBus_("CANbus\n")
-			, config(Config::GetInstance()), ds(*DriverStation::GetInstance())
+			, config(Config::GetInstance())
 			, prevState(DISABLED), lastMember_("LRTRobot.LastMember\n") //trace constructor.
 
 {
+    ds = DriverStation::GetInstance();
 	components = Component::CreateComponents();
 
 	mainLoopWatchDog = wdCreate();
+	
+	//set priority above default so that we get hgiher priority than default
+	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority 
+	
 	printf("---- Robot Initialized ----\n\n");
 }
 
@@ -60,7 +65,7 @@ void LRTRobot12::MainLoop()
 	wdStart(mainLoopWatchDog, sysClkRateGet() / 50, ExecutionNotify, 0);
 	
 	GameState gameState = DetermineState();
-
+	
 	//iterate though and output components
 	for (list<ComponentWithData>::iterator iter = components->begin(); iter
 			!= components->end(); iter++)
@@ -69,7 +74,7 @@ void LRTRobot12::MainLoop()
 		if (gameState != DISABLED || !((*iter).second.RequiresEnabledState))
 		{
 			int DIO = (*iter).second.DS_DIOToDisableComponent;
-			if (DIO == ComponentData::NO_DS_DISABLE_DIO || ds.GetDigitalIn(DIO))
+			if (DIO == ComponentData::NO_DS_DISABLE_DIO || ds->GetDigitalIn(DIO))
 			{
 				ProfiledSection ps("Outputting " + (*iter).first->GetName());
 				(*iter).first->Output();
@@ -99,8 +104,8 @@ GameState LRTRobot12::DetermineState()
 	return state;
 }
 
-/*
- * FRC_UserProgram_StartupLibraryInit()
+/*!
+ * @brief FRC_UserProgram_StartupLibraryInit()
  *  is the entry point of the program, like main().
  *
  * The FRC_UserProgram_StartupLibraryInit() calls RobotBase::startRobotTask((FUNCPTR)FRC_userClassFactory)
@@ -110,20 +115,23 @@ GameState LRTRobot12::DetermineState()
  * -> LRTRobotBase::StartCompetition();
  * This VxWorks task is named "FRC_RobotTask"
  * See WPILIB Robotbase.cpp
- * -D.Giandomenico (description of WPLIB start code)
+ * @author D.Giandomenico (description of WPLIB start code)
+ * @author Brian Axelrod
+ * @author Robert Ying
+ * @author WPI
  */
 
 //START_ROBOT_CLASS(LRTRobot12); //Expand the macro as below:
-RobotBase* FRC_userClassFactory()
-{
-	return new LRTRobot12();
-}
-extern "C"
-{
-INT32 FRC_UserProgram_StartupLibraryInit()
-{
-	RobotBase::startRobotTask((FUNCPTR) FRC_userClassFactory);
-	return 0;
-}
+
+RobotBase *FRC_userClassFactory() 
+{ 
+	return new LRTRobot12(); 
+} 
+extern "C" { 
+	INT32 FRC_UserProgram_StartupLibraryInit() 
+	{ 
+		RobotBase::startRobotTask((FUNCPTR)FRC_userClassFactory); 
+		return 0; 
+	} 
 }
 

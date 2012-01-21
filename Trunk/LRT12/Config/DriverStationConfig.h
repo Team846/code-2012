@@ -4,8 +4,8 @@
 class DriverStationConfig
 {
 public:
-    const static int NUM_JOYSTICK_BUTTONS = 16;
-    const static int NUM_JOYSTICK_AXES = 6;
+	const static int NUM_JOYSTICK_BUTTONS = 16;
+	const static int NUM_JOYSTICK_AXES = 6;
 };
 
 #endif

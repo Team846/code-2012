@@ -7,13 +7,19 @@
 /*       -fdollars-in-identifiers flag.                   */
 
 
+void _GLOBAL__I__ZN10LRTRobot12C2Ev();
+
 void _GLOBAL__I__ZN12ConfigurableC2Ev();
 
 void _GLOBAL__I__ZN12LRTRobotBaseC2Ev();
 
+void _GLOBAL__I__ZN17DebouncedJoystickC2Ejii();
+
 void _GLOBAL__I__ZN19AsynchronousPrinter8InstanceEv();
 
 void _GLOBAL__I__ZN3LCD8instanceE();
+
+void _GLOBAL__I__ZN5BrainC2Ev();
 
 void _GLOBAL__I__ZN5Build6NUMBERE();
 
@@ -44,10 +50,13 @@ void _GLOBAL__I_AxisCamera_debugFlag();
 extern void (*_ctors[])();
 void (*_ctors[])() =
     {
+    _GLOBAL__I__ZN10LRTRobot12C2Ev,
     _GLOBAL__I__ZN12ConfigurableC2Ev,
     _GLOBAL__I__ZN12LRTRobotBaseC2Ev,
+    _GLOBAL__I__ZN17DebouncedJoystickC2Ejii,
     _GLOBAL__I__ZN19AsynchronousPrinter8InstanceEv,
     _GLOBAL__I__ZN3LCD8instanceE,
+    _GLOBAL__I__ZN5BrainC2Ev,
     _GLOBAL__I__ZN5Build6NUMBERE,
     _GLOBAL__I__ZN6Config8instanceE,
     _GLOBAL__I__ZN7Console8instanceE,
@@ -64,13 +73,19 @@ void (*_ctors[])() =
     0
     };
 
+void _GLOBAL__D__ZN10LRTRobot12C2Ev();
+
 void _GLOBAL__D__ZN12ConfigurableC2Ev();
 
 void _GLOBAL__D__ZN12LRTRobotBaseC2Ev();
 
+void _GLOBAL__D__ZN17DebouncedJoystickC2Ejii();
+
 void _GLOBAL__D__ZN19AsynchronousPrinter8InstanceEv();
 
 void _GLOBAL__D__ZN3LCD8instanceE();
+
+void _GLOBAL__D__ZN5BrainC2Ev();
 
 void _GLOBAL__D__ZN5Build6NUMBERE();
 
@@ -97,10 +112,13 @@ void _GLOBAL__D_AxisCamera_debugFlag();
 extern void (*_dtors[])();
 void (*_dtors[])() =
     {
+    _GLOBAL__D__ZN10LRTRobot12C2Ev,
     _GLOBAL__D__ZN12ConfigurableC2Ev,
     _GLOBAL__D__ZN12LRTRobotBaseC2Ev,
+    _GLOBAL__D__ZN17DebouncedJoystickC2Ejii,
     _GLOBAL__D__ZN19AsynchronousPrinter8InstanceEv,
     _GLOBAL__D__ZN3LCD8instanceE,
+    _GLOBAL__D__ZN5BrainC2Ev,
     _GLOBAL__D__ZN5Build6NUMBERE,
     _GLOBAL__D__ZN6Config8instanceE,
     _GLOBAL__D__ZN7Console8instanceE,

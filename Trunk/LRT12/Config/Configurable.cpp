@@ -3,7 +3,7 @@
 
 Configurable::Configurable()
 {
-    Config::RegisterConfigurable(this);
+	Config::RegisterConfigurable(this);
 }
 
 Configurable::~Configurable()

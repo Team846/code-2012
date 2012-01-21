@@ -24,5 +24,10 @@
 			<type>2</type>
 			<location>C:/WindRiver/workspace/Documentation</location>
 		</link>
+		<link>
+			<name>WPILib</name>
+			<type>2</type>
+			<location>C:/WindRiver/WPILib</location>
+		</link>
 	</linkedResources>
 </projectDescription>

@@ -28,7 +28,7 @@ private:
 
 	Config& config;
 
-	DriverStation& ds;
+	DriverStation* ds;
 
 	GameState prevState;
 	GameState DetermineState();

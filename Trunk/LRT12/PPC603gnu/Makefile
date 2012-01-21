@@ -162,6 +162,10 @@ LRT12_partialImage/$(MODE_DIR)/% : LIBPATH =
 LRT12_partialImage/$(MODE_DIR)/% : LIBS = 
 LRT12_partialImage/$(MODE_DIR)/% : OBJ_DIR := LRT12_partialImage/$(MODE_DIR)
 
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.o : $(PRJ_ROOT_DIR)/Brain/Brain.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.o : $(PRJ_ROOT_DIR)/Config/Build.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
@@ -175,6 +179,10 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.o : $(PRJ_ROOT_
 
 
 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.o : $(PRJ_ROOT_DIR)/Config/DriverStationButtons.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.o : $(PRJ_ROOT_DIR)/DriverInputs/DebouncedJoystick.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
@@ -198,6 +206,10 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.o : $(PRJ_ROOT_DIR)/Util/L
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PIDController.o : $(PRJ_ROOT_DIR)/Util/PIDController.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.o : $(PRJ_ROOT_DIR)/Util/PrintInConstructor.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
@@ -210,15 +222,18 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.o : $(PRJ_ROOT_DIR)/Util/
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
-OBJECTS_LRT12_partialImage = LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.o \
+OBJECTS_LRT12_partialImage = LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsynchronousPrinter.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PIDController.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.o
@@ -235,9 +250,10 @@ LRT12_partialImage/$(MODE_DIR)/LRT12_partialImage_clean :
 
 force : 
 
-DEP_FILES := LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsynchronousPrinter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d \
+DEP_FILES := LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsynchronousPrinter.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PIDController.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.d
 -include $(DEP_FILES)
 
