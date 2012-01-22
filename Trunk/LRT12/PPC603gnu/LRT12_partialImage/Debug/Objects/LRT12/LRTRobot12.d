@@ -325,6 +325,9 @@ LRT12_partialImage/Debug/Objects/LRT12/LRTRobot12.o:  \
   C:/WindRiver/vxworks-6.3/target/h/WPILib/WPIErrors.h \
   C:/WindRiver/workspace/LRT12/Util\AsynchronousPrinter.h \
   C:/WindRiver/workspace/LRT12/Brain/Brain.h \
+  C:/WindRiver/workspace/LRT12/Brain/../ActionData/ActionData.h \
+  C:/WindRiver/workspace/LRT12/Brain/../DriverInputs/DebouncedJoystick.h \
+  C:/WindRiver/vxworks-6.3/target/h/WPILib/Joystick.h \
   C:/WindRiver/workspace/LRT12/Components/Component.h \
   C:/WindRiver/workspace/LRT12/Components/..\ActionData\ActionData.h \
   C:/WindRiver/workspace/LRT12/Config/Config.h \
@@ -996,6 +999,12 @@ C:/WindRiver/vxworks-6.3/target/h/WPILib/WPIErrors.h:
 C:/WindRiver/workspace/LRT12/Util\AsynchronousPrinter.h:
 
 C:/WindRiver/workspace/LRT12/Brain/Brain.h:
+
+C:/WindRiver/workspace/LRT12/Brain/../ActionData/ActionData.h:
+
+C:/WindRiver/workspace/LRT12/Brain/../DriverInputs/DebouncedJoystick.h:
+
+C:/WindRiver/vxworks-6.3/target/h/WPILib/Joystick.h:
 
 C:/WindRiver/workspace/LRT12/Components/Component.h:
 

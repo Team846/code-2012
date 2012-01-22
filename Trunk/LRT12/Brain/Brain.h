@@ -12,7 +12,7 @@
  * @author Robert Ying
  */
 
-#warning STUB
+#warning incomplete
 
 class Brain
 {
