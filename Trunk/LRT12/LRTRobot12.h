@@ -33,7 +33,7 @@ private:
 	GameState prevState;
 	GameState DetermineState();
 
-	list<ComponentWithData>* components;
+	list<Component::ComponentWithData>* components;
 
 	//    AnalogChannel armPot;
 	WDOG_ID mainLoopWatchDog;

@@ -62,19 +62,19 @@ IDE_DEFINES =
 
 #BuildTool flags
 ifeq ($(DEBUG_MODE),1)
-DEBUGFLAGS_C-Compiler = -g
 DEBUGFLAGS_C++-Compiler = -g
 DEBUGFLAGS_Linker = -g
 DEBUGFLAGS_Partial-Image-Linker = 
 DEBUGFLAGS_Librarian = 
 DEBUGFLAGS_Assembler = -g
+DEBUGFLAGS_C-Compiler = -g
 else
-DEBUGFLAGS_C-Compiler = -O2 -fstrength-reduce -fno-builtin
 DEBUGFLAGS_C++-Compiler = -O2 -fstrength-reduce -fno-builtin
 DEBUGFLAGS_Linker = -O2 -fstrength-reduce -fno-builtin
 DEBUGFLAGS_Partial-Image-Linker = 
 DEBUGFLAGS_Librarian = 
 DEBUGFLAGS_Assembler = -O2 -fstrength-reduce -fno-builtin
+DEBUGFLAGS_C-Compiler = -O2 -fstrength-reduce -fno-builtin
 endif
 
 
@@ -87,19 +87,19 @@ PROJECT_TARGETS = LRT12/$(MODE_DIR)/LRT12.out \
 
 # LRT12
 ifeq ($(DEBUG_MODE),1)
-LRT12/$(MODE_DIR)/% : DEBUGFLAGS_C-Compiler = -g
 LRT12/$(MODE_DIR)/% : DEBUGFLAGS_C++-Compiler = -g
 LRT12/$(MODE_DIR)/% : DEBUGFLAGS_Linker = -g
 LRT12/$(MODE_DIR)/% : DEBUGFLAGS_Partial-Image-Linker = 
 LRT12/$(MODE_DIR)/% : DEBUGFLAGS_Librarian = 
 LRT12/$(MODE_DIR)/% : DEBUGFLAGS_Assembler = -g
+LRT12/$(MODE_DIR)/% : DEBUGFLAGS_C-Compiler = -g
 else
-LRT12/$(MODE_DIR)/% : DEBUGFLAGS_C-Compiler = -O2 -fstrength-reduce -fno-builtin
 LRT12/$(MODE_DIR)/% : DEBUGFLAGS_C++-Compiler = -O2 -fstrength-reduce -fno-builtin
 LRT12/$(MODE_DIR)/% : DEBUGFLAGS_Linker = -O2 -fstrength-reduce -fno-builtin
 LRT12/$(MODE_DIR)/% : DEBUGFLAGS_Partial-Image-Linker = 
 LRT12/$(MODE_DIR)/% : DEBUGFLAGS_Librarian = 
 LRT12/$(MODE_DIR)/% : DEBUGFLAGS_Assembler = -O2 -fstrength-reduce -fno-builtin
+LRT12/$(MODE_DIR)/% : DEBUGFLAGS_C-Compiler = -O2 -fstrength-reduce -fno-builtin
 endif
 LRT12/$(MODE_DIR)/% : IDE_INCLUDES = -I$(WIND_BASE)/target/h/wrn/coreip -I$(WIND_BASE)/target/h/WPILib -I$(WIND_BASE)/target/h 
 LRT12/$(MODE_DIR)/% : IDE_LIBRARIES = $(WIND_BASE)/target/lib/WPILib.a 
@@ -132,19 +132,19 @@ LRT12/$(MODE_DIR)/LRT12_clean :
 
 # LRT12_partialImage
 ifeq ($(DEBUG_MODE),1)
-LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_C-Compiler = -g
 LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_C++-Compiler = -g
 LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_Linker = -g
 LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_Partial-Image-Linker = 
 LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_Librarian = 
 LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_Assembler = -g
+LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_C-Compiler = -g
 else
-LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_C-Compiler = -O2 -fstrength-reduce -fno-builtin
 LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_C++-Compiler = -O2 -fstrength-reduce -fno-builtin
 LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_Linker = -O2 -fstrength-reduce -fno-builtin
 LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_Partial-Image-Linker = 
 LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_Librarian = 
 LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_Assembler = -O2 -fstrength-reduce -fno-builtin
+LRT12_partialImage/$(MODE_DIR)/% : DEBUGFLAGS_C-Compiler = -O2 -fstrength-reduce -fno-builtin
 endif
 LRT12_partialImage/$(MODE_DIR)/% : IDE_INCLUDES = -I$(WIND_BASE)/target/h/wrn/coreip -I$(WIND_BASE)/target/h/WPILib -I$(WIND_BASE)/target/h 
 LRT12_partialImage/$(MODE_DIR)/% : IDE_LIBRARIES = $(WIND_BASE)/target/lib/WPILib.a 
@@ -162,7 +162,19 @@ LRT12_partialImage/$(MODE_DIR)/% : LIBPATH =
 LRT12_partialImage/$(MODE_DIR)/% : LIBS = 
 LRT12_partialImage/$(MODE_DIR)/% : OBJ_DIR := LRT12_partialImage/$(MODE_DIR)
 
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.o : $(PRJ_ROOT_DIR)/ActionData/ActionData.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.o : $(PRJ_ROOT_DIR)/Brain/Brain.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Component.o : $(PRJ_ROOT_DIR)/Components/Component.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/ConfigLoader.o : $(PRJ_ROOT_DIR)/Components/ConfigLoader.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
@@ -222,7 +234,10 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.o : $(PRJ_ROOT_DIR)/Util/
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
-OBJECTS_LRT12_partialImage = LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.o \
+OBJECTS_LRT12_partialImage = LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Component.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/ConfigLoader.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.o \
@@ -250,7 +265,8 @@ LRT12_partialImage/$(MODE_DIR)/LRT12_partialImage_clean :
 
 force : 
 
-DEP_FILES := LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.d \
+DEP_FILES := LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Component.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/ConfigLoader.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsynchronousPrinter.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PIDController.d \

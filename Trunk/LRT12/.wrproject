@@ -38,12 +38,12 @@
             <stringAttribute key="BLD::Info|Macro|TOOL|value|PPC603gnu" value="gnu"/>
             <stringAttribute key="BLD::Info|Macro|VX_CPU_FAMILY|value|PPC603gnu" value="ppc"/>
             <listAttribute key="BLD::Info|Tools">
-                <stringAttribute value="C-Compiler"/>
                 <stringAttribute value="C++-Compiler"/>
                 <stringAttribute value="Linker"/>
                 <stringAttribute value="Partial Image Linker"/>
                 <stringAttribute value="Librarian"/>
                 <stringAttribute value="Assembler"/>
+                <stringAttribute value="C-Compiler"/>
             </listAttribute>
             <stringAttribute key="BLD::Info|Tool|Assembler|cmd|PPC603gnu" value="echo &quot;building $@&quot;;%assemblerprefix% $(TOOL_PATH)ccppc %DebugModeFlags% %ToolFlags% $(ADDED_CFLAGS) %Includes% $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o %OutFile% -c %InFile%"/>
             <stringAttribute key="BLD::Info|Tool|Assembler|dbgFlags|PPC603gnu" value="-g"/>

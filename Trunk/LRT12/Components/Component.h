@@ -8,13 +8,6 @@ using namespace std;
 
 class Component;
 
-typedef struct ComponentData
-{
-	bool RequiresEnabledState;
-	const static int NO_DS_DISABLE_DIO = -1;
-	int DS_DIOToDisableComponent;
-};
-typedef pair<Component*, ComponentData> ComponentWithData;
 
 /*
  * \brief the abstract class upon which all components are based. Contains a reference to the ActionData  and defines an output method that is called once every time the main loop iterates through. 
@@ -27,6 +20,13 @@ protected:
 	 */
 	ActionData* action;
 public:
+typedef struct ComponentData
+{
+	bool RequiresEnabledState;
+	const static int NO_DS_DISABLE_DIO = -1;
+	int DS_DIOToDisableComponent;
+};
+typedef pair<Component*, ComponentData> ComponentWithData;
 	Component() :
 		action(ActionData::GetInstance())
 	{

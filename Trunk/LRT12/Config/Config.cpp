@@ -7,7 +7,7 @@
 Config* Config::instance = NULL;
 vector<Configurable*> Config::configurables;
 bool Config::hasRun = false;
-const string Config::CONFIG_FILE_PATH = "/LRTConfig11.conf";
+const string Config::CONFIG_FILE_PATH = "/LRT12.conf";
 const string Config::COMMENT_DELIMITERS = "#;";
 
 Config& Config::GetInstance()
@@ -246,7 +246,11 @@ template void Config::Set<string>(string section, string key, string val);
 
 template<typename T> void Config::Set(string sectionName, string key, T val)
 {
-	printf("start set\n");
+	int condition = sectionName == "Build" && key == "Number";
+	if (condition)
+	{
+		printf("start set %s %s\n", sectionName.c_str(), key.c_str());
+	}
 	string newVal = Util::ToString<T>(val);
 
 	if (ValueExists(sectionName, key)) // need to add in the value in such a way that preserves whitespace and comments
@@ -266,6 +270,7 @@ template<typename T> void Config::Set(string sectionName, string key, T val)
 		// if section does not yet exist add it to the end of the file
 		if (newConfigData->find(sectionName) == newConfigData->end())
 		{
+			printf("adding new section: %s\n", sectionName.c_str());
 			configFile->push_back(string("[") + sectionName + "]");
 			list<string>::iterator sectionLocation = configFile->end();
 			sectionLocation--;

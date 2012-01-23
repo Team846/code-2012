@@ -44,9 +44,9 @@ void LRTRobot12::RobotInit()
 	config.ConfigureAll();
 
 	const char* build =
-			(Util::ToString<int>(config.Get<int> ("Build", "BuildNumber", -1))
+			(Util::ToString<int>(config.Get<int> ("Build", "BuildNumber", 1))
 					+ "-" + Util::ToString<int>(
-					config.Get<int> ("Build", "RunNumber", -1))).c_str();
+					config.Get<int> ("Build", "RunNumber", 0))).c_str();
 
 	AsynchronousPrinter::Printf(build);
 }
@@ -67,14 +67,14 @@ void LRTRobot12::MainLoop()
 	GameState gameState = DetermineState();
 	
 	//iterate though and output components
-	for (list<ComponentWithData>::iterator iter = components->begin(); iter
+	for (list<Component::ComponentWithData>::iterator iter = components->begin(); iter
 			!= components->end(); iter++)
 	{
 		// if we are enabled or the Component does not require the enabled state
 		if (gameState != DISABLED || !((*iter).second.RequiresEnabledState))
 		{
 			int DIO = (*iter).second.DS_DIOToDisableComponent;
-			if (DIO == ComponentData::NO_DS_DISABLE_DIO || ds->GetDigitalIn(DIO))
+			if (DIO == Component::ComponentData::NO_DS_DISABLE_DIO || ds->GetDigitalIn(DIO))
 			{
 				ProfiledSection ps("Outputting " + (*iter).first->GetName());
 				(*iter).first->Output();

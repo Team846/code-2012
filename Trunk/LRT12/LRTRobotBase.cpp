@@ -38,9 +38,11 @@ void LRTRobotBase::StartCompetition()
 	// must allow a negative value in case loop runs over 20ms
 	INT32 sleepTime_us = 0;
 
+	AsynchronousPrinter::Printf("starting synchronizer");
 	loopSynchronizer.StartPeriodic(1.0 / 50.0); //arg is period in seconds
 
 	// loop until we are quitting -- must be set by the destructor of the derived class.
+	
 	while (!quitting_)
 	{
 		cycleCount++;
@@ -78,6 +80,7 @@ void LRTRobotBase::StartCompetition()
 //called by interupt on timer. This structure with the semaphores is to avoid the restrictions of running an ISR.
 void LRTRobotBase::releaseLoop(void* param)
 {
+	AsynchronousPrinter::Printf("%d\n", GetFPGATime());
 	semGive(((LRTRobotBase*) param)->loopSemaphore);
 	Wait(0.01); //give the thread up to 1 ms to start
 	//taskDelay(sysClkRateGet()/50/5);//check that this is at least 1 tick
