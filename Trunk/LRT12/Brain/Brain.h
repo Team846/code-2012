@@ -21,12 +21,12 @@ public:
 	 * @brief Constructs the brain.
 	 */
 	Brain();
-	
+
 	/*!
 	 * @brief starts teleop task
 	 */
 	void startTeleop();
-	
+
 	/*!
 	 * @brief starts the auton task
 	 */
@@ -36,17 +36,17 @@ private:
 	 * @brief processes the input
 	 */
 	void process();
-	
+
 	/*!
 	 * @brief the autonomous task
 	 */
 	void autonTask();
-	
+
 	/*!
 	 * @brief the teleop task
 	 */
 	void teleopTask();
-	
+
 	/*!
 	 * 
 	 * @param BrainPtr
@@ -60,17 +60,17 @@ private:
 	 * @return 0
 	 */
 	static int teleopTaskEntryPoint(uint32_t autonTaskPtr);
-	
+
 	Task m_teleop_task;
 	Task m_auton_task;
 	semaphore* actionSemaphore;
-	
+
 	ActionData *actionData;
-	
+
 	DriverStation *m_ds;
 	DebouncedJoystick m_driver_stick;
 	DebouncedJoystick m_operator_stick;
-	
+
 	uint32_t missedPackets;
 	bool isTeleop;
 };

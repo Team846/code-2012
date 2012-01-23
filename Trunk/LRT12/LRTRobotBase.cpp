@@ -42,7 +42,7 @@ void LRTRobotBase::StartCompetition()
 	loopSynchronizer.StartPeriodic(1.0 / 50.0); //arg is period in seconds
 
 	// loop until we are quitting -- must be set by the destructor of the derived class.
-	
+
 	while (!quitting_)
 	{
 		cycleCount++;
@@ -73,7 +73,7 @@ void LRTRobotBase::StartCompetition()
 
 		//        for(int i = 0; i < ProxiedCANJaguar::jaguars.num; i++)
 		//           ProxiedCANJaguar::jaguars.j[i]->BeginComm();
-
+		int8_t * ptr = NULL;
 	}
 }
 

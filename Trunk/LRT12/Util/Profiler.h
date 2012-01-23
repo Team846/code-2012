@@ -10,84 +10,82 @@
 #ifndef LRT_PROFILER_H_
 #define LRT_PROFILER_H_
 
-
 #include <map>
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include "AsynchronousPrinter.h"
 
-class Profiler : public SensorBase
+class Profiler: public SensorBase
 {
 public:
-    const static int reportPeriod = 50 * 5;
-    const static int reportLimit = 10;
+	const static int reportPeriod = 50 * 5;
+	const static int reportLimit = 10;
 
-    virtual ~Profiler()
-    {
-    }
-    static Profiler& GetInstance();
+	virtual ~Profiler()
+	{
+	}
+	static Profiler& GetInstance();
 
-    void StartNewCycle();
-    void Log(std::string name, double timeTaken);
-    void ClearLogBuffer();
+	void StartNewCycle();
+	void Log(std::string name, double timeTaken);
+	void ClearLogBuffer();
 
 protected:
-    Profiler();
-    DISALLOW_COPY_AND_ASSIGN(Profiler);
+	Profiler();DISALLOW_COPY_AND_ASSIGN(Profiler);
 
 private:
-    static Profiler* instance;
+	static Profiler* instance;
 
-    map<string, int> loggedCounts;
-    map<string, double> loggedMins;
-    map<string, double> loggedMaxs;
-    map<string, double> loggedSums;
+	map<string, int> loggedCounts;
+	map<string, double> loggedMins;
+	map<string, double> loggedMaxs;
+	map<string, double> loggedSums;
 
-    int cycleIndex;
+	int cycleIndex;
 };
 
 class ProfiledSection
 {
 public:
-    ProfiledSection(std::string name) :
-        name(name), start(Timer::GetFPGATimestamp())
-    {
-    }
+	ProfiledSection(std::string name) :
+		name(name), start(Timer::GetFPGATimestamp())
+	{
+	}
 
-    ~ProfiledSection()
-    {
-        double ms = (Timer::GetFPGATimestamp() - start) * 1000;
-        Profiler::GetInstance().Log(name, ms);
-    }
+	~ProfiledSection()
+	{
+		double ms = (Timer::GetFPGATimestamp() - start) * 1000;
+		Profiler::GetInstance().Log(name, ms);
+	}
 
 protected:
-    string name;
-    double start;
+	string name;
+	double start;
 };
 
 class ProfilerHelper
 {
 public:
-    ProfilerHelper()
-    {
-    }
+	ProfilerHelper()
+	{
+	}
 
-    void Start(string name)
-    {
-        name = name;
-        start = Timer::GetFPGATimestamp();
-    }
+	void Start(string name)
+	{
+		name = name;
+		start = Timer::GetFPGATimestamp();
+	}
 
-    void Finish()
-    {
-        double ms = (Timer::GetFPGATimestamp() - start) * 1000;
-        Profiler::GetInstance().Log(name, ms);
-    }
+	void Finish()
+	{
+		double ms = (Timer::GetFPGATimestamp() - start) * 1000;
+		Profiler::GetInstance().Log(name, ms);
+	}
 
 protected:
-    string name;
-    double start;
+	string name;
+	double start;
 };
 
 #endif

@@ -20,6 +20,7 @@ public:
 		float proportional_gain;
 		float integral_gain;
 		float derivative_gain;
+		float feedforward_gain;
 		float integral_decay;
 		float input;
 		float output;

@@ -8,14 +8,14 @@
 class PrintInConstructor
 {
 public:
-    PrintInConstructor(const char* ctor_dtor_message);
-    PrintInConstructor(const char* ctor_message, const char* dtor_message);
-    ~PrintInConstructor();
+	PrintInConstructor(const char* ctor_dtor_message);
+	PrintInConstructor(const char* ctor_message, const char* dtor_message);
+	~PrintInConstructor();
 
 protected:
-    void Initialize(const char* ctor_message, const char* dtor_message);
+	void Initialize(const char* ctor_message, const char* dtor_message);
 
 public:
-    std::string destructorMessage_;
+	std::string destructorMessage_;
 };
 #endif //PRINT_IN_CONSTRUCTOR_H_

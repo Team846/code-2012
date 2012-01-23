@@ -5,16 +5,16 @@
 
 class Config;
 
-class ConfigLoader : public Component
+class ConfigLoader: public Component
 {
 public:
-    ConfigLoader();
-    virtual ~ConfigLoader();
+	ConfigLoader();
+	virtual ~ConfigLoader();
 
-    virtual void Output();
-    virtual string GetName();
+	virtual void Output();
+	virtual string GetName();
 private:
-    Config& config;
+	Config& config;
 };
 
 #endif

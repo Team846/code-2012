@@ -28,7 +28,8 @@ float PIDController::update(float dt)
 	if (m_is_feed_forward)
 	{
 		// feed-forward PID
-		m_params->output = m_params->setpoint + PID_output;
+		m_params->output = m_params->setpoint * m_params->feedforward_gain
+				+ PID_output;
 	}
 	else
 	{

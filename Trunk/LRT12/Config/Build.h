@@ -5,32 +5,31 @@
 #include <string>
 
 /*!
- * \brief the class that contains the build time and build number.
+ * @brief the class that contains the build time and build number.
  */
 class Build
 {
 public:
 	/*!
-	 * \brief public accessor for the build number. 
+	 * @brief public accessor for the build number. 
 	 */
-    static int GetNumber()
-    {
-        return NUMBER;
-    }
+	static int GetNumber()
+	{
+		return NUMBER;
+	}
 
-    /*!
-     * \brief Public accessor for the time of the last build.
-     */
-    static std::string GetTime()
-    {
-        return TIME;
-    }
+	/*!
+	 * @brief Public accessor for the time of the last build.
+	 */
+	static std::string GetTime()
+	{
+		return TIME;
+	}
 
 private:
-    const static int NUMBER;
-    const static std::string TIME;
+	const static int NUMBER;
+	const static std::string TIME;
 };
-
 
 #endif
 

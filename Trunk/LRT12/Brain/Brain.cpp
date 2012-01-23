@@ -1,22 +1,22 @@
 #include "Brain.h"
 #include "../Config/DriverStationConfig.h"
 
-Brain::Brain()
-: m_teleop_task("Teleop", 
-		(FUNCPTR) Brain::teleopTaskEntryPoint)
-, m_auton_task("Auton", 
-		(FUNCPTR) Brain::autonTaskEntryPoint)
-, m_driver_stick(1, DriverStationConfig::NUM_JOYSTICK_BUTTONS, DriverStationConfig::NUM_JOYSTICK_AXES)
-, m_operator_stick(2, DriverStationConfig::NUM_JOYSTICK_BUTTONS, DriverStationConfig::NUM_JOYSTICK_AXES)
+Brain::Brain() :
+			m_teleop_task("Teleop", (FUNCPTR) Brain::teleopTaskEntryPoint),
+			m_auton_task("Auton", (FUNCPTR) Brain::autonTaskEntryPoint),
+			m_driver_stick(1, DriverStationConfig::NUM_JOYSTICK_BUTTONS,
+					DriverStationConfig::NUM_JOYSTICK_AXES),
+			m_operator_stick(2, DriverStationConfig::NUM_JOYSTICK_BUTTONS,
+					DriverStationConfig::NUM_JOYSTICK_AXES)
 {
 	m_ds = DriverStation::GetInstance();
 	missedPackets = 0;
 	isTeleop = false;
-	
+
 	actionData = ActionData::GetInstance();
 
 	m_auton_task.Start((uint32_t) this);
-	m_teleop_task.Start((int32_t)this);
+	m_teleop_task.Start((int32_t) this);
 }
 
 void Brain::startAuton()
@@ -49,15 +49,15 @@ void Brain::teleopTask()
 			if (m_ds->GetPacketNumber() != lastPacketNum + 1)
 			{
 				//we missed a packet
-				missedPackets+= m_ds->GetPacketNumber() - lastPacketNum - 1;
+				missedPackets += m_ds->GetPacketNumber() - lastPacketNum - 1;
 			}
 		}
-		
+
 		m_driver_stick.Update();
 		m_operator_stick.Update();
-		
+
 		process();
-		
+
 		lastPacketNum = m_ds->GetPacketNumber();
 		//TODO check that this is not a busy wait
 		m_ds->WaitForData();
@@ -84,9 +84,9 @@ void Brain::process()
 	//This heuristic may eventually have to change
 	if (m_ds->IsAutonomous())
 	{
-		
+
 	}
-	else if(m_ds->IsOperatorControl())
+	else if (m_ds->IsOperatorControl())
 	{
 	}
 }

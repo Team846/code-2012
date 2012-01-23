@@ -7,19 +7,19 @@ LRTRobot12::LRTRobot12() :
 			firstMember_(
 					"\n\n\n---------------------------------------------------------\n"
 						"Begin LRTRobot Constructor\n",
-					"LRTRobot Destroyed\n\n"), brain(), dc_CANBus_("CANbus\n")
-			, config(Config::GetInstance())
-			, prevState(DISABLED), lastMember_("LRTRobot.LastMember\n") //trace constructor.
+					"LRTRobot Destroyed\n\n"), brain(), dc_CANBus_("CANbus\n"),
+			config(Config::GetInstance()), prevState(DISABLED),
+			lastMember_("LRTRobot.LastMember\n") //trace constructor.
 
 {
-    ds = DriverStation::GetInstance();
+	ds = DriverStation::GetInstance();
 	components = Component::CreateComponents();
 
 	mainLoopWatchDog = wdCreate();
-	
+
 	//set priority above default so that we get hgiher priority than default
 	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority 
-	
+
 	printf("---- Robot Initialized ----\n\n");
 }
 
@@ -54,7 +54,7 @@ void LRTRobot12::RobotInit()
 static int ExecutionNotify(...)
 {
 	printf("mainexec >20\r\n");
-    return 0;
+	return 0;
 }
 
 void LRTRobot12::MainLoop()
@@ -63,18 +63,19 @@ void LRTRobot12::MainLoop()
 	// setup a watchdog to warn us if our loop takes too long
 	// sysClkRateGet returns the number of ticks per cycle at the current clock rate.
 	wdStart(mainLoopWatchDog, sysClkRateGet() / 50, ExecutionNotify, 0);
-	
+
 	GameState gameState = DetermineState();
-	
+
 	//iterate though and output components
-	for (list<Component::ComponentWithData>::iterator iter = components->begin(); iter
-			!= components->end(); iter++)
+	for (list<Component::ComponentWithData>::iterator iter =
+			components->begin(); iter != components->end(); iter++)
 	{
 		// if we are enabled or the Component does not require the enabled state
 		if (gameState != DISABLED || !((*iter).second.RequiresEnabledState))
 		{
 			int DIO = (*iter).second.DS_DIOToDisableComponent;
-			if (DIO == Component::ComponentData::NO_DS_DISABLE_DIO || ds->GetDigitalIn(DIO))
+			if (DIO == Component::ComponentData::NO_DS_DISABLE_DIO
+					|| ds->GetDigitalIn(DIO))
 			{
 				ProfiledSection ps("Outputting " + (*iter).first->GetName());
 				(*iter).first->Output();
@@ -123,15 +124,16 @@ GameState LRTRobot12::DetermineState()
 
 //START_ROBOT_CLASS(LRTRobot12); //Expand the macro as below:
 
-RobotBase *FRC_userClassFactory() 
-{ 
-	return new LRTRobot12(); 
-} 
-extern "C" { 
-	INT32 FRC_UserProgram_StartupLibraryInit() 
-	{ 
-		RobotBase::startRobotTask((FUNCPTR)FRC_userClassFactory); 
-		return 0; 
-	} 
+RobotBase *FRC_userClassFactory()
+{
+	return new LRTRobot12();
+}
+extern "C"
+{
+INT32 FRC_UserProgram_StartupLibraryInit()
+{
+	RobotBase::startRobotTask((FUNCPTR) FRC_userClassFactory);
+	return 0;
+}
 }
 
