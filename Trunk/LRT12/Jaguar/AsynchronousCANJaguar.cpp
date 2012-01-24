@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "../LRTRobotBase.h"
-#include "../Jaguar/ProxiedCANJaguar.h"
+#include "../Jaguar/AsynchronousCANJaguar.h"
 
 #define DISABLE_SETPOINT_CACHING 0
 
@@ -244,7 +244,7 @@ void AsynchronousCANJaguar::CommTask()
 
 void AsynchronousCANJaguar::BeginComm()
 {
-	semGive(m_comm_semaphore);
+	semGive( m_comm_semaphore);
 }
 
 //Set() is ambiguous, since it doesn't include the mode.
