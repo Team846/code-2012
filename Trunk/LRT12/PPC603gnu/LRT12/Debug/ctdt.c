@@ -21,6 +21,8 @@ void _GLOBAL__I__ZN17DebouncedJoystickC2Ejii();
 
 void _GLOBAL__I__ZN19AsynchronousPrinter8InstanceEv();
 
+void _GLOBAL__I__ZN21AsynchronousCANJaguar12m_game_stateE();
+
 void _GLOBAL__I__ZN3LCD8instanceE();
 
 void _GLOBAL__I__ZN5BrainC2Ev();
@@ -63,6 +65,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN12LRTRobotBaseC2Ev,
     _GLOBAL__I__ZN17DebouncedJoystickC2Ejii,
     _GLOBAL__I__ZN19AsynchronousPrinter8InstanceEv,
+    _GLOBAL__I__ZN21AsynchronousCANJaguar12m_game_stateE,
     _GLOBAL__I__ZN3LCD8instanceE,
     _GLOBAL__I__ZN5BrainC2Ev,
     _GLOBAL__I__ZN5Build6NUMBERE,
@@ -95,6 +98,8 @@ void _GLOBAL__D__ZN12LRTRobotBaseC2Ev();
 void _GLOBAL__D__ZN17DebouncedJoystickC2Ejii();
 
 void _GLOBAL__D__ZN19AsynchronousPrinter8InstanceEv();
+
+void _GLOBAL__D__ZN21AsynchronousCANJaguar12m_game_stateE();
 
 void _GLOBAL__D__ZN3LCD8instanceE();
 
@@ -134,6 +139,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN12LRTRobotBaseC2Ev,
     _GLOBAL__D__ZN17DebouncedJoystickC2Ejii,
     _GLOBAL__D__ZN19AsynchronousPrinter8InstanceEv,
+    _GLOBAL__D__ZN21AsynchronousCANJaguar12m_game_stateE,
     _GLOBAL__D__ZN3LCD8instanceE,
     _GLOBAL__D__ZN5BrainC2Ev,
     _GLOBAL__D__ZN5Build6NUMBERE,

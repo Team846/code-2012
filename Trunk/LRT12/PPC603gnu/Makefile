@@ -198,6 +198,10 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.o : 
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/ProxiedCANJaguar.o : $(PRJ_ROOT_DIR)/Jaguar/ProxiedCANJaguar.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.o : $(PRJ_ROOT_DIR)/LRTRobot12.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
@@ -207,6 +211,10 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.o : $(PRJ_ROOT_DIR)/LR
 
 
 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsynchronousPrinter.o : $(PRJ_ROOT_DIR)/Util/AsynchronousPrinter.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/CachedValue.o : $(PRJ_ROOT_DIR)/Util/CachedValue.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
@@ -243,9 +251,11 @@ OBJECTS_LRT12_partialImage = LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Action
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/ProxiedCANJaguar.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsynchronousPrinter.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/CachedValue.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PIDController.o \
@@ -268,9 +278,10 @@ force :
 DEP_FILES := LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Component.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/ConfigLoader.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsynchronousPrinter.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PIDController.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.d
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/ProxiedCANJaguar.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsynchronousPrinter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/CachedValue.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PIDController.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.d
 -include $(DEP_FILES)
 
 

@@ -73,7 +73,6 @@ void LRTRobotBase::StartCompetition()
 
 		//        for(int i = 0; i < ProxiedCANJaguar::jaguars.num; i++)
 		//           ProxiedCANJaguar::jaguars.j[i]->BeginComm();
-		int8_t * ptr = NULL;
 	}
 }
 
