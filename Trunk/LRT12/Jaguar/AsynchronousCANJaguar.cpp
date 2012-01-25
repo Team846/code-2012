@@ -18,10 +18,7 @@ AsynchronousCANJaguar::AsynchronousCANJaguar(UINT8 channel, char* name) :
 			m_setpoint(0.0),
 			m_should_disable_control(false),
 			m_should_disable_position_limits(false),
-			m_current(0.0),
-			m_should_collect_current(false),
-			m_pot_value(0.0),
-			m_should_collect_pot_value(false),
+			m_collection_flags(0),
 			m_last_game_state(DISABLED),
 			//    : controller(CANBusController::GetInstance())
 			//    , index(jaguars.num)
@@ -37,7 +34,11 @@ AsynchronousCANJaguar::AsynchronousCANJaguar(UINT8 channel, char* name) :
 	if (m_name == NULL)
 		m_name = "?";
 	m_comm_task.Start((UINT32) this);
+
+	m_enable_control.disableCaching();
+
 	printf("Created Jaguar %2d: %s\n", channel, m_name);
+
 }
 
 AsynchronousCANJaguar::~AsynchronousCANJaguar()
@@ -62,26 +63,6 @@ void AsynchronousCANJaguar::StopBackgroundTask()
 	}
 }
 
-void AsynchronousCANJaguar::ShouldCollectCurrent(bool shouldCollect)
-{
-	m_should_collect_current = shouldCollect;
-}
-
-void AsynchronousCANJaguar::ShouldCollectPotValue(bool shouldCollect)
-{
-	m_should_collect_pot_value = shouldCollect;
-}
-
-float AsynchronousCANJaguar::GetCurrent()
-{
-	return m_current;
-}
-
-float AsynchronousCANJaguar::GetPotValue()
-{
-	return m_pot_value;
-}
-
 int AsynchronousCANJaguar::CommTaskWrapper(UINT32 proxiedCANJaguarPointer)
 {
 	AsynchronousCANJaguar* jaguar =
@@ -104,16 +85,18 @@ void AsynchronousCANJaguar::CommTask()
 		if (m_is_quitting)
 			break;
 
+		// set data
 		// if game state has changed, uncache all cached values
 		if (m_last_game_state != m_game_state)
 		{
 			ResetCache();
+			// TODO: FINISH UP HERE, reset appropriate flags
 		}
 
 		// check what we can still cache
 		// modes and setpoints should be automatically refreshed
 		m_neutral_mode.incrementCounter();
-		m_control_mode.incrementCounter();
+		// m_control_mode.incrementCounter(); do not resend control mode periodically
 		m_setpoint.incrementCounter();
 
 		// if any of the modes or setpoints have changed
@@ -133,17 +116,20 @@ void AsynchronousCANJaguar::CommTask()
 		if (m_control_mode.hasNewValue())
 		{
 			CANJaguar::ChangeControlMode(m_control_mode.getValue());
-		}
 
-		if (m_enable_control.hasNewValue())
-		{
-			CANJaguar::EnableControl(m_enable_control.getValue());
-		}
-
-		if (m_should_disable_control)
-		{
-			CANJaguar::DisableControl();
-			m_should_disable_control = false;
+			m_setpoint.uncache();
+			m_neutral_mode.uncache();
+			m_pid_p.uncache();
+			m_pid_i.uncache();
+			m_pid_d.uncache();
+			m_position_reference.uncache();
+			m_speed_reference.uncache();
+			m_enable_control.uncache();
+			m_voltage_ramp_rate.uncache();
+			m_fault_time.uncache();
+			m_encoder_codes_per_rev.uncache();
+			m_potentiometer_turns.uncache();
+			m_max_output_voltage.uncache();
 		}
 
 		if (m_position_reference.hasNewValue())
@@ -209,6 +195,17 @@ void AsynchronousCANJaguar::CommTask()
 					m_reverse_limit_position.getValue());
 		}
 
+		if (m_enable_control.hasNewValue())
+		{
+			CANJaguar::EnableControl(m_enable_control.getValue());
+		}
+
+		if (m_should_disable_control)
+		{
+			CANJaguar::DisableControl();
+			m_should_disable_control = false;
+		}
+
 		//change the mode, then do the set point.
 		if (m_neutral_mode.hasNewValue())
 		{
@@ -220,22 +217,155 @@ void AsynchronousCANJaguar::CommTask()
 			CANJaguar::Set(m_setpoint.getValue());
 		}
 
-		if (m_should_collect_current)
+		// collect data	
+		if (m_collection_flags & OUTVOLT)
+		{
+			float v = CANJaguar::GetOutputVoltage();
+			if (StatusOK())
+				m_output_voltage = v;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid output voltage; not storing\n");
+		}
+
+		if (m_collection_flags & OUTCURR)
 		{
 			float current = CANJaguar::GetOutputCurrent();
 			if (StatusOK())
-				this->m_current = current;
+				m_output_current = current;
 			else
 				AsynchronousPrinter::Printf("Invalid current; not storing\n");
 		}
 
-		if (m_should_collect_pot_value)
+		if (m_collection_flags & POS)
 		{
-			float potValue = CANJaguar::GetPosition();
+			float pos = CANJaguar::GetPosition();
 			if (StatusOK())
-				this->m_pot_value = potValue;
+				m_position = pos;
 			else
-				AsynchronousPrinter::Printf("Invalid pot value; not storing\n");
+				AsynchronousPrinter::Printf(
+						"Invalid position value; not storing\n");
+		}
+
+		if (m_collection_flags & PID)
+		{
+			float p = CANJaguar::GetP();
+			if (StatusOK())
+				m_p = p;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid proportional gain; not storing\n");
+			float i = CANJaguar::GetI();
+			if (StatusOK())
+				m_i = i;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid integral gain; not storing\n");
+			float d = CANJaguar::GetD();
+			if (StatusOK())
+				m_d = d;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid derivative gain; not storing\n");
+		}
+
+		if (m_collection_flags & SPEEDREF)
+		{
+			SpeedReference s = CANJaguar::GetSpeedReference();
+			if (StatusOK())
+				m_speed_ref = s;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid speed reference; not storing\n");
+		}
+
+		if (m_collection_flags & POSREF)
+		{
+			PositionReference p = CANJaguar::GetPositionReference();
+			if (StatusOK())
+				m_position_ref = p;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid position reference; not storing");
+		}
+
+		if (m_collection_flags & CTRLMODE)
+		{
+			ControlMode c = CANJaguar::GetControlMode();
+			if (StatusOK())
+				m_ctrl_mode = c;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid control mode; not storing\n");
+		}
+
+		if (m_collection_flags & BUSVOLT)
+		{
+			float v = CANJaguar::GetBusVoltage();
+			if (StatusOK())
+				m_bus_voltage = v;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid bus voltage; not storing\n");
+		}
+
+		if (m_collection_flags & TEMP)
+		{
+			float t = CANJaguar::GetTemperature();
+			if (StatusOK())
+				m_temperature = t;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid temperature; not storing\n");
+		}
+
+		if (m_collection_flags & SPEED)
+		{
+			float s = CANJaguar::GetSpeed();
+			if (StatusOK())
+				m_speed = s;
+			else
+				AsynchronousPrinter::Printf("Invalid speed; not storing\n");
+		}
+
+		if (m_collection_flags & FWDLIMOK)
+		{
+			bool b = CANJaguar::GetForwardLimitOK();
+			if (StatusOK())
+				m_fwd_limit_ok = b;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid forward limit status, not storing\n");
+		}
+
+		if (m_collection_flags & REVLIMOK)
+		{
+			bool b = CANJaguar::GetReverseLimitOK();
+			if (StatusOK())
+				m_rev_limit_ok = b;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid reverse limit status, not storing\n");
+		}
+
+		if (m_collection_flags & PWRCYCLE)
+		{
+			bool b = CANJaguar::GetPowerCycled();
+			if (StatusOK())
+				m_pwr_cyc = b;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid power cycle status, not storing\n");
+		}
+
+		if (m_collection_flags & EXPIRE)
+		{
+			float e = CANJaguar::GetExpiration();
+			if (StatusOK())
+				m_expire = e;
+			else
+				AsynchronousPrinter::Printf(
+						"Invalid expiration time, not storing\n");
 		}
 
 		m_last_game_state = m_game_state;
@@ -245,18 +375,20 @@ void AsynchronousCANJaguar::CommTask()
 
 void AsynchronousCANJaguar::BeginComm()
 {
-	semGive( m_comm_semaphore);
+	semGive(m_comm_semaphore);
 }
 
 //Set() is ambiguous, since it doesn't include the mode.
 //We've replaced them with specific command.  They are still in progress.  TODO -dg
 void AsynchronousCANJaguar::SetDutyCycle(float duty_cycle)
 {
+	m_control_mode.setValue(kPercentVbus);
 	m_setpoint.setValue(duty_cycle);
 }
 
 void AsynchronousCANJaguar::SetPosition(float position)
 {
+	m_control_mode.setValue(kPosition);
 	m_setpoint.setValue(position);
 }
 
@@ -361,4 +493,19 @@ void AsynchronousCANJaguar::ResetCache()
 bool AsynchronousCANJaguar::StatusOK()
 {
 	return GetFaults() == 0;
+}
+
+void AsynchronousCANJaguar::removeCollectionFlags(uint32_t flags)
+{
+	m_collection_flags &= ~(flags);
+}
+
+void AsynchronousCANJaguar::addCollectionFlags(uint32_t flags)
+{
+	m_collection_flags |= flags;
+}
+
+void AsynchronousCANJaguar::setCollectionFlags(uint32_t flags)
+{
+	m_collection_flags = flags;
 }

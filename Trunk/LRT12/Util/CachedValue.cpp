@@ -7,6 +7,7 @@ CachedValue<T>::CachedValue(T initialValue, int cacheCycles)
 	m_cache_cycles = cacheCycles;
 	enableCaching(cacheCycles);
 	uncache();
+	m_has_been_set = true;
 }
 
 template<class T>
@@ -14,11 +15,13 @@ CachedValue<T>::CachedValue()
 {
 	enableCaching(25);
 	m_has_new_value = false;
+	m_has_been_set = false;
 }
 
 template<class T>
 void CachedValue<T>::setValue(T newValue)
 {
+	m_has_been_set = true;
 	// value is already cached, ignore input
 	if (m_previous_value == newValue)
 	{
@@ -74,7 +77,7 @@ void CachedValue<T>::disableCaching()
 template<class T>
 bool CachedValue<T>::hasNewValue()
 {
-	return m_has_new_value || !m_is_caching;
+	return m_has_been_set && (m_has_new_value || !m_is_caching);
 }
 
 template<class T>
