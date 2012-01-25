@@ -198,6 +198,7 @@ void AsynchronousCANJaguar::CommTask()
 		if (m_should_disable_position_limits)
 		{
 			CANJaguar::DisableSoftPositionLimits();
+			m_should_disable_position_limits = false;
 		}
 
 		if (m_forward_limit_position.hasNewValue()
@@ -332,7 +333,7 @@ void AsynchronousCANJaguar::ConfigSoftPositionLimits(
 
 void AsynchronousCANJaguar::DisableSoftPositionLimits()
 {
-	m_should_disable_position_limits = false;
+	m_should_disable_position_limits = true;
 }
 
 void AsynchronousCANJaguar::ConfigMaxOutputVoltage(double voltage)
