@@ -42,16 +42,5 @@ const uint32_t ENCODER_RIGHT_A = CHANGEME;
 const uint32_t ENCODER_RIGHT_B = CHANGEME;
 }
 
-namespace CAN //ports 1-16 (2CAN limitation)
-{
-const uint32_t DRIVE_LEFT = CHANGEME;
-const uint32_t DRIVE_RIGHT = CHANGEME;
-
-const uint32_t ROLLER_TOP = CHANGEME;
-const uint32_t ROLLER_BOTTOM = CHANGEME;
-
-const uint32_t ARM_ = CHANGEME;
-const uint32_t DEPLOYER = CHANGEME;
-const uint32_t LIFT = CHANGEME;
 }
-}
+#endif
