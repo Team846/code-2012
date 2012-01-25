@@ -68,8 +68,8 @@ public:
 	bool isCaching();
 
 private:
-	T m_value;
-	T m_previous_value;
+	volatile T m_value;
+	volatile T m_previous_value;
 	bool m_has_new_value;
 	bool m_is_caching;
 	bool m_has_been_set;

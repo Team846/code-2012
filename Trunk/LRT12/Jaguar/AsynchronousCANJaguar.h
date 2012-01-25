@@ -44,28 +44,28 @@ private:
 	int m_channel;
 	char* m_name;
 
-	CachedValue<volatile float> m_setpoint;
-	CachedValue<volatile NeutralMode> m_neutral_mode;
-	CachedValue<volatile ControlMode> m_control_mode;
-	CachedValue<volatile PositionReference> m_position_reference;
-	CachedValue<volatile SpeedReference> m_speed_reference;
+	CachedValue<float> m_setpoint;
+	CachedValue<NeutralMode> m_neutral_mode;
+	CachedValue<ControlMode> m_control_mode;
+	CachedValue<PositionReference> m_position_reference;
+	CachedValue<SpeedReference> m_speed_reference;
 
-	CachedValue<volatile double> m_pid_p;
-	CachedValue<volatile double> m_pid_i;
-	CachedValue<volatile double> m_pid_d;
+	CachedValue<double> m_pid_p;
+	CachedValue<double> m_pid_i;
+	CachedValue<double> m_pid_d;
 
-	CachedValue<volatile double> m_enable_control;
-	volatile bool m_should_disable_control;
+	CachedValue<double> m_enable_control;
+	bool m_should_disable_control;
 
-	CachedValue<volatile double> m_voltage_ramp_rate;
-	CachedValue<volatile double> m_max_output_voltage;
-	CachedValue<volatile float> m_fault_time;
-	CachedValue<volatile float> m_expiration;
-	CachedValue<volatile UINT16> m_encoder_codes_per_rev;
-	CachedValue<volatile UINT16> m_potentiometer_turns;
+	CachedValue<double> m_voltage_ramp_rate;
+	CachedValue<double> m_max_output_voltage;
+	CachedValue<float> m_fault_time;
+	CachedValue<float> m_expiration;
+	CachedValue<UINT16> m_encoder_codes_per_rev;
+	CachedValue<UINT16> m_potentiometer_turns;
 
-	CachedValue<volatile double> m_forward_limit_position;
-	CachedValue<volatile double> m_reverse_limit_position;
+	CachedValue<double> m_forward_limit_position;
+	CachedValue<double> m_reverse_limit_position;
 	volatile bool m_should_disable_position_limits;
 
 	volatile uint32_t m_collection_flags;

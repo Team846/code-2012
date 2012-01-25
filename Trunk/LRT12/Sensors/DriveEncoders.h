@@ -43,16 +43,16 @@ public:
 	 */
 	virtual ~DriveEncoders();
 
-	static float PULSES_PER_REVOLUTION; // pulses per wheel revolution [BA]
+	const float PULSES_PER_REVOLUTION; // pulses per wheel revolution [BA]
 
-	static float ENCODER_RATE_HIGH_GEAR;
-	static float MAX_TURNING_RATE;
+	const float ENCODER_RATE_HIGH_GEAR;
+	const float MAX_TURNING_RATE;
 
-	static float TICKS_PER_FULL_TURN;
-	static float WHEEL_DIAMETER; // in
+	const float TICKS_PER_FULL_TURN;
+	const float WHEEL_DIAMETER; // in
 
 	// extrapolate max low gear speed
-	static float LOW_GEAR_MULTIPLIER;
+	const float LOW_GEAR_MULTIPLIER;
 
 	const static float PI = 3.14159;
 

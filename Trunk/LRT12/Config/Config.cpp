@@ -262,8 +262,18 @@ template<typename T> void Config::Set(string sectionName, string key, T val)
 
 		//the location of the first occurence of the old value after the equals sign
 		unsigned int indexOfStartOfOldValue = valueLocation->find(oldVal,
-				valueLocation->find('='));
-		valueLocation->replace(indexOfStartOfOldValue, oldVal.size(), newVal);
+				valueLocation->find(key));
+		unsigned int indexOfEquals = valueLocation->find(oldVal,
+				valueLocation->find("="));
+		string newString = valueLocation->substr(0, indexOfStartOfOldValue);
+		newString += key + "=";
+		newString += newVal;
+		newString += valueLocation->substr(min(indexOfEquals + oldVal.size(), valueLocation->size()));
+		//dies on next line
+		printf("Almost dead\n");
+		*valueLocation = newString;
+		printf("Not dead\n");
+//		valueLocation->replace(indexOfStartOfOldValue, oldVal.size(), newVal);
 	}
 	else //if the value doesn't yet exist add it
 	{

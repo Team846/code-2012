@@ -404,7 +404,7 @@ void AsynchronousCANJaguar::SetPositionReference(
 	m_position_reference.setValue(reference);
 }
 
-void AsynchronousCANJaguar::SetSpeedReference(SpeedReference reference)
+void AsynchronousCANJaguar::SetSpeedReference(CANJaguar::SpeedReference reference)
 {
 	m_speed_reference.setValue(reference);
 }
@@ -421,7 +421,7 @@ void AsynchronousCANJaguar::ConfigNeutralMode(NeutralMode mode)
 	m_neutral_mode.setValue(mode);
 }
 
-void AsynchronousCANJaguar::ChangeControlMode(CANJaguar::ControlMode mode)
+void AsynchronousCANJaguar::ChangeControlMode(ControlMode mode)
 {
 	m_control_mode.setValue(mode);
 }
