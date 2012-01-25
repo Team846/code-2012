@@ -348,7 +348,13 @@ LRT12_partialImage/Debug/Objects/LRT12/LRTRobot12.o:  \
   C:/WindRiver/vxworks-6.3/target/h/sioLibCommon.h \
   C:/WindRiver/vxworks-6.3/target/h/drv/timer/timerDev.h \
   C:/WindRiver/workspace/LRT12/Util/AsynchronousPrinter.h \
-  C:/WindRiver/workspace/LRT12/Util/PrintInConstructor.h
+  C:/WindRiver/workspace/LRT12/Util/PrintInConstructor.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/AsynchronousCANJaguar.h \
+  C:/WindRiver/vxworks-6.3/target/h/WPILib/CANJaguar.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/../LRTRobotBase.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/../Util/Util.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/../Util/PrintInConstructor.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/../Util/CachedValue.h
 
 C:/WindRiver/workspace/LRT12/LRTRobot12.h:
 
@@ -1047,3 +1053,15 @@ C:/WindRiver/vxworks-6.3/target/h/drv/timer/timerDev.h:
 C:/WindRiver/workspace/LRT12/Util/AsynchronousPrinter.h:
 
 C:/WindRiver/workspace/LRT12/Util/PrintInConstructor.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/AsynchronousCANJaguar.h:
+
+C:/WindRiver/vxworks-6.3/target/h/WPILib/CANJaguar.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/../LRTRobotBase.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/../Util/Util.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/../Util/PrintInConstructor.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/../Util/CachedValue.h:

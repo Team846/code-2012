@@ -9,6 +9,8 @@
 
 void _GLOBAL__I__ZN10ActionData8instanceE();
 
+void _GLOBAL__I__ZN10DrivetrainC2Ev();
+
 void _GLOBAL__I__ZN10LRTEncoderC2Ejjf();
 
 void _GLOBAL__I__ZN10LRTRobot12C2Ev();
@@ -21,11 +23,19 @@ void _GLOBAL__I__ZN12LRTRobotBaseC2Ev();
 
 void _GLOBAL__I__ZN13DriveEncoders10m_instanceE();
 
+void _GLOBAL__I__ZN14CANJaguarBrakeC2ER21AsynchronousCANJaguar();
+
 void _GLOBAL__I__ZN17DebouncedJoystickC2Ejii();
+
+void _GLOBAL__I__ZN18DitheredBrakeTrainC2Ev();
 
 void _GLOBAL__I__ZN19AsynchronousPrinter8InstanceEv();
 
+void _GLOBAL__I__ZN20ClosedLoopDrivetrainC2Ev();
+
 void _GLOBAL__I__ZN21AsynchronousCANJaguar12m_game_stateE();
+
+void _GLOBAL__I__ZN3Esc14CurrentLimiterC2Ev();
 
 void _GLOBAL__I__ZN3LCD8instanceE();
 
@@ -65,15 +75,20 @@ extern void (*_ctors[])();
 void (*_ctors[])() =
     {
     _GLOBAL__I__ZN10ActionData8instanceE,
+    _GLOBAL__I__ZN10DrivetrainC2Ev,
     _GLOBAL__I__ZN10LRTEncoderC2Ejjf,
     _GLOBAL__I__ZN10LRTRobot12C2Ev,
     _GLOBAL__I__ZN12ConfigLoaderC2Ev,
     _GLOBAL__I__ZN12ConfigurableC2Ev,
     _GLOBAL__I__ZN12LRTRobotBaseC2Ev,
     _GLOBAL__I__ZN13DriveEncoders10m_instanceE,
+    _GLOBAL__I__ZN14CANJaguarBrakeC2ER21AsynchronousCANJaguar,
     _GLOBAL__I__ZN17DebouncedJoystickC2Ejii,
+    _GLOBAL__I__ZN18DitheredBrakeTrainC2Ev,
     _GLOBAL__I__ZN19AsynchronousPrinter8InstanceEv,
+    _GLOBAL__I__ZN20ClosedLoopDrivetrainC2Ev,
     _GLOBAL__I__ZN21AsynchronousCANJaguar12m_game_stateE,
+    _GLOBAL__I__ZN3Esc14CurrentLimiterC2Ev,
     _GLOBAL__I__ZN3LCD8instanceE,
     _GLOBAL__I__ZN5BrainC2Ev,
     _GLOBAL__I__ZN5Build6NUMBERE,
@@ -96,6 +111,8 @@ void (*_ctors[])() =
 
 void _GLOBAL__D__ZN10ActionData8instanceE();
 
+void _GLOBAL__D__ZN10DrivetrainC2Ev();
+
 void _GLOBAL__D__ZN10LRTEncoderC2Ejjf();
 
 void _GLOBAL__D__ZN10LRTRobot12C2Ev();
@@ -108,11 +125,19 @@ void _GLOBAL__D__ZN12LRTRobotBaseC2Ev();
 
 void _GLOBAL__D__ZN13DriveEncoders10m_instanceE();
 
+void _GLOBAL__D__ZN14CANJaguarBrakeC2ER21AsynchronousCANJaguar();
+
 void _GLOBAL__D__ZN17DebouncedJoystickC2Ejii();
+
+void _GLOBAL__D__ZN18DitheredBrakeTrainC2Ev();
 
 void _GLOBAL__D__ZN19AsynchronousPrinter8InstanceEv();
 
+void _GLOBAL__D__ZN20ClosedLoopDrivetrainC2Ev();
+
 void _GLOBAL__D__ZN21AsynchronousCANJaguar12m_game_stateE();
+
+void _GLOBAL__D__ZN3Esc14CurrentLimiterC2Ev();
 
 void _GLOBAL__D__ZN3LCD8instanceE();
 
@@ -148,15 +173,20 @@ extern void (*_dtors[])();
 void (*_dtors[])() =
     {
     _GLOBAL__D__ZN10ActionData8instanceE,
+    _GLOBAL__D__ZN10DrivetrainC2Ev,
     _GLOBAL__D__ZN10LRTEncoderC2Ejjf,
     _GLOBAL__D__ZN10LRTRobot12C2Ev,
     _GLOBAL__D__ZN12ConfigLoaderC2Ev,
     _GLOBAL__D__ZN12ConfigurableC2Ev,
     _GLOBAL__D__ZN12LRTRobotBaseC2Ev,
     _GLOBAL__D__ZN13DriveEncoders10m_instanceE,
+    _GLOBAL__D__ZN14CANJaguarBrakeC2ER21AsynchronousCANJaguar,
     _GLOBAL__D__ZN17DebouncedJoystickC2Ejii,
+    _GLOBAL__D__ZN18DitheredBrakeTrainC2Ev,
     _GLOBAL__D__ZN19AsynchronousPrinter8InstanceEv,
+    _GLOBAL__D__ZN20ClosedLoopDrivetrainC2Ev,
     _GLOBAL__D__ZN21AsynchronousCANJaguar12m_game_stateE,
+    _GLOBAL__D__ZN3Esc14CurrentLimiterC2Ev,
     _GLOBAL__D__ZN3LCD8instanceE,
     _GLOBAL__D__ZN5BrainC2Ev,
     _GLOBAL__D__ZN5Build6NUMBERE,

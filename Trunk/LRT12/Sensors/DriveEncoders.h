@@ -77,7 +77,7 @@ public:
 	 * @brief Get normalized (by gear) average forward speed
 	 * @return forward speed
 	 */
-	double NormalizedForwardMotorSpeed(); //considers gear
+	double GetNormalizedForwardMotorSpeed(); //considers gear
 
 	/*!
 	 * @brief Get normalized turning speed assuming low gear

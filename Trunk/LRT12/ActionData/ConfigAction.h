@@ -4,8 +4,8 @@
 
 struct ConfigAction
 {
-    bool load;
-    bool save;
-    bool apply;
+	bool load;
+	bool save;
+	bool apply;
 };
 #endif //CONFIG_ACTION_H

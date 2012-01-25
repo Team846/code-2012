@@ -27,7 +27,7 @@
 				<pathentry kind="con" path="com.windriver.ide.core.build.model.WR_USERDEFINED_CONTAINER"/>
 			</storageModule>
 			<storageModule moduleId="userdefinedContainer">
-				<includePath path="%Proj-WPILib%"/>
+				<includePath path="$(PRJ_ROOT_DIR)/%Proj-WPILib%"/>
 				<indexAllFiles value="false"/>
 				<initialized value="true"/>
 			</storageModule>

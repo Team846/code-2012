@@ -8,6 +8,7 @@
  * @author Robert Ying
  */
 struct ConfigAction;
+struct DriveTrainAction;
 
 class ActionData
 {
@@ -31,6 +32,11 @@ public:
 	 * @brief contains commands and state info relevant to the configuration system. Is defined in ActionData\ConfigAction.h.
 	 */
 	ConfigAction* config;
+
+	/*!
+	 * @brief contains commands relevant to the drivetrain. Is defined in ActionData\DriveTrainAction.h
+	 */
+	DriveTrainAction* drivetrain;
 
 	/*!
 	 * @brief contains data that is relevant to all/many components.

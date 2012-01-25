@@ -14,16 +14,13 @@ DriveEncoders::DriveEncoders() :
 			m_config(Config::GetInstance()),
 			m_configsection("DriveEncoders"),
 			m_encoder_left(RobotConfig::DIGITAL_IO::ENCODER_LEFT_A,
-					RobotConfig::DIGITAL_IO::ENCODER_LEFT_B)
+					RobotConfig::DIGITAL_IO::ENCODER_LEFT_B),
 #ifndef VIRTUAL
-			,
-			m_useless_encoder(3, 6)
+			m_useless_encoder(3, 6),
 #endif
-
-			,
 			m_encoder_right(RobotConfig::DIGITAL_IO::ENCODER_RIGHT_A,
 					RobotConfig::DIGITAL_IO::ENCODER_RIGHT_B),
-					
+
 			PULSES_PER_REVOLUTION(
 					m_config.Get<float> (m_configsection,
 							"pulses_per_revolution", 100.0)),
@@ -60,7 +57,7 @@ DriveEncoders::~DriveEncoders()
 void DriveEncoders::Configure()
 {
 	//ne faire rien/don't do anything
-	
+
 }
 
 double DriveEncoders::RawForwardSpeed()
@@ -68,7 +65,7 @@ double DriveEncoders::RawForwardSpeed()
 	return (m_encoder_left.GetRate() + m_encoder_right.GetRate()) / 2;
 }
 
-double DriveEncoders::NormalizedForwardMotorSpeed()
+double DriveEncoders::GetNormalizedForwardMotorSpeed()
 {
 	double forwardSpeed = RawForwardSpeed() / ENCODER_RATE_HIGH_GEAR;
 

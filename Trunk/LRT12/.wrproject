@@ -56,7 +56,7 @@
             <stringAttribute key="BLD::Info|Tool|C++-Compiler|cmd|PPC603gnu" value="echo &quot;building $@&quot;;%cppcompilerprefix% $(TOOL_PATH)ccppc %DebugModeFlags% %ToolFlags% $(ADDED_C++FLAGS) %Includes% $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o %OutFile% -c %InFile%"/>
             <stringAttribute key="BLD::Info|Tool|C++-Compiler|dbgFlags|PPC603gnu" value="-g"/>
             <stringAttribute key="BLD::Info|Tool|C++-Compiler|derivedSigs|PPC603gnu" value="*.o"/>
-            <stringAttribute key="BLD::Info|Tool|C++-Compiler|flags|PPC603gnu" value="$(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall"/>
+            <stringAttribute key="BLD::Info|Tool|C++-Compiler|flags|PPC603gnu" value="$(CC_ARCH_SPEC) -ansi -Wall  -MD -MP -mlongcall -fimplicit-templates"/>
             <stringAttribute key="BLD::Info|Tool|C++-Compiler|nonDbgFlags|PPC603gnu" value="-O2 -fstrength-reduce -fno-builtin"/>
             <booleanAttribute key="BLD::Info|Tool|C++-Compiler|object" value="true"/>
             <booleanAttribute key="BLD::Info|Tool|C++-Compiler|passAble" value="false"/>

@@ -5,6 +5,8 @@
 
 #include "WPILib/CANJaguar.h"
 
+#include "../LRTRobotBase.h"
+
 #include "../Util/Util.h"
 #include "../Util/PrintInConstructor.h"
 #include "../Util/CachedValue.h"
@@ -427,5 +429,12 @@ public:
 	 */
 	void ResetCache();
 };
+
+template class CachedValue<AsynchronousCANJaguar::NeutralMode> ;
+template class CachedValue<AsynchronousCANJaguar::ControlMode> ;
+template class CachedValue<UINT16> ;
+template class CachedValue<double> ;
+template class CachedValue<AsynchronousCANJaguar::PositionReference> ;
+template class CachedValue<AsynchronousCANJaguar::SpeedReference> ;
 
 #endif /* PROXIED_CAN_JAGUAR_H_ */

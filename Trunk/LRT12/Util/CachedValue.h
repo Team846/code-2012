@@ -77,4 +77,7 @@ private:
 	int m_cache_cycles;
 };
 
+template class CachedValue<float> ;
+template class CachedValue<int> ;
+
 #endif
