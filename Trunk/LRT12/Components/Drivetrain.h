@@ -12,7 +12,7 @@
  * @brief Component that handles the drivetrain
  * @author Robert Ying
  */
-class Drivetrain: Component, Configurable
+class Drivetrain: public Component, Configurable
 {
 public:
 	/*!
@@ -36,6 +36,7 @@ private:
 	ClosedLoopDrivetrain m_drive_control;
 	DriveEncoders& m_encoders;
 	Esc * m_esc_left, *m_esc_right;
+	int NUM_CYCLES_TO_SYNC;
 };
 
 #endif

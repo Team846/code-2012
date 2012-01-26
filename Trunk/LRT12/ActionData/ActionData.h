@@ -9,6 +9,7 @@
  */
 struct ConfigAction;
 struct DriveTrainAction;
+struct ShifterAction;
 
 class ActionData
 {
@@ -37,6 +38,11 @@ public:
 	 * @brief contains commands relevant to the drivetrain. Is defined in ActionData\DriveTrainAction.h
 	 */
 	DriveTrainAction* drivetrain;
+
+	/*!
+	 * @brief contains commands relevant to the shifter. Is defined in ActionData\ShifterAction.h
+	 */
+	ShifterAction* shifter;
 
 	/*!
 	 * @brief contains data that is relevant to all/many components.

@@ -1,10 +1,10 @@
 #include "Drivetrain.h"
 #include "../Util/AsynchronousPrinter.h"
 #include "../ActionData/DriveTrainAction.h"
+#include "../ActionData/ShifterAction.h"
 
 Drivetrain::Drivetrain() :
-	Component(), m_name("Drive Train"),
-			m_encoders(DriveEncoders::GetInstance())
+	Component(), m_name("Drivetrain"), m_encoders(DriveEncoders::GetInstance())
 {
 	m_esc_left
 			= new Esc(RobotConfig::CAN::DRIVE_LEFT_A,
@@ -23,7 +23,7 @@ Drivetrain::~Drivetrain()
 
 void Drivetrain::Configure()
 {
-
+	Config::GetInstance().Get(m_name, "numCyclesToSync", 25);
 }
 
 std::string Drivetrain::GetName()
@@ -33,8 +33,17 @@ std::string Drivetrain::GetName()
 
 void Drivetrain::Output()
 {
+	bool isHighGear = action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR;
+	if (m_drive_control.getHighGear() != isHighGear)
+	{
+		action->drivetrain->synchronizedCyclesRemaining = NUM_CYCLES_TO_SYNC;
+	}
+
+	m_drive_control.setHighGear(isHighGear);
+
 	// only try new operation if previous one is complete, else discard
-	if (m_drive_control.driveOperationComplete())
+	if (m_drive_control.driveOperationComplete()
+			|| action->drivetrain->overrideOperationChecks)
 	{
 		if (action->drivetrain->rate.drive_control)
 		{
@@ -68,7 +77,8 @@ void Drivetrain::Output()
 	action->drivetrain->previousDriveOperationComplete
 			= m_drive_control.driveOperationComplete();
 
-	if (m_drive_control.turnOperationComplete())
+	if (m_drive_control.turnOperationComplete()
+			|| action->drivetrain->overrideOperationChecks)
 	{
 		if (action->drivetrain->rate.turn_control)
 		{
@@ -124,6 +134,13 @@ void Drivetrain::Output()
 	m_esc_right->SetDutyCycle(cmd.rightCommand.dutyCycle);
 	m_esc_left->SetBrake((int) (cmd.leftCommand.brakingDutyCycle * 8));
 	m_esc_right->SetBrake((int) (cmd.rightCommand.brakingDutyCycle * 8));
+
+	action->drivetrain->raw.leftDutyCycle = cmd.leftCommand.dutyCycle;
+	action->drivetrain->raw.leftBrakingDutyCycle
+			= cmd.leftCommand.brakingDutyCycle;
+	action->drivetrain->raw.rightDutyCycle = cmd.rightCommand.dutyCycle;
+	action->drivetrain->raw.rightBrakingDutyCycle
+			= cmd.rightCommand.brakingDutyCycle;
 
 	if (action->wasDisabled)
 	{

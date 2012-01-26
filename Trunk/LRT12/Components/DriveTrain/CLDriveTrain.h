@@ -131,6 +131,12 @@ public:
 	void setHighGear(bool isHighGear);
 
 	/*!
+	 * @brief gets the gear
+	 * @param returns true if high gear is engaged
+	 */
+	bool getHighGear();
+
+	/*!
 	 * @brief Resets PID integration
 	 */
 	void reset();

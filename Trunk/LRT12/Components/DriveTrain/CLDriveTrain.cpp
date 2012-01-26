@@ -236,6 +236,11 @@ void ClosedLoopDrivetrain::setHighGear(bool isHighGear)
 	}
 }
 
+bool ClosedLoopDrivetrain::getHighGear()
+{
+	return m_in_high_gear;
+}
+
 void ClosedLoopDrivetrain::setRelativeDrivePosition(float pos)
 {
 	setDriveControl(CL_POSITION);

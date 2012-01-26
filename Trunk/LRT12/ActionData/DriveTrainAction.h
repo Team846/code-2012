@@ -22,11 +22,21 @@ struct DriveTrainAction
 		float desiredRelativeTurnPosition;
 	} position;
 
+	struct
+	{
+		float leftDutyCycle;
+		float leftBrakingDutyCycle;
+		float rightDutyCycle;
+		float rightBrakingDutyCycle;
+	} raw;
+
 	bool previousDriveOperationComplete;
 	bool previousTurnOperationComplete;
 
 	bool setDriveOperation;
 	bool setTurnOperation;
+
+	bool overrideOperationChecks;
 
 	int synchronizedCyclesRemaining;
 };

@@ -1,5 +1,6 @@
 #include "ActionData.h"
 #include "DriveTrainAction.h"
+#include "ShifterAction.h"
 #include "ConfigAction.h"
 
 ActionData* ActionData::instance = NULL;
@@ -36,6 +37,11 @@ ActionData::ActionData()
 	drivetrain->previousTurnOperationComplete = true;
 	drivetrain->setDriveOperation = false;
 	drivetrain->setTurnOperation = false;
+	drivetrain->overrideOperationChecks = false;
+
+	shifter = (ShifterAction*) malloc(sizeof(ShifterAction));
+	shifter->force = false;
+	shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
 }
 
 ActionData::~ActionData()
