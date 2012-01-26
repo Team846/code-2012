@@ -10,6 +10,7 @@
 struct ConfigAction;
 struct DriveTrainAction;
 struct ShifterAction;
+struct LauncherAction;
 
 class ActionData
 {
@@ -43,6 +44,11 @@ public:
 	 * @brief contains commands relevant to the shifter. Is defined in ActionData\ShifterAction.h
 	 */
 	ShifterAction* shifter;
+
+	/*!
+	 * @brief contains commands relevant to the launcher. Is defined in ActionData\LauncherAction.h
+	 */
+	LauncherAction* launcher;
 
 	/*!
 	 * @brief contains data that is relevant to all/many components.

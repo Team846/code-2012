@@ -136,6 +136,12 @@ public:
 	 */
 	void SetPosition(float position);
 
+	/*!
+	 * @brief Set the output velocity of the Jaguar
+	 * @param velocity
+	 */
+	void SetVelocity(float velocity);
+
 private:
 	//don't let external objects control the ESC with the ambiguous Set() cmd
 	void Set(float setpoint, UINT8 syncGroup = 0);

@@ -115,21 +115,9 @@ void AsynchronousCANJaguar::CommTask()
 
 		if (m_control_mode.hasNewValue())
 		{
+			ResetCache();
 			CANJaguar::ChangeControlMode(m_control_mode.getValue());
-
-			m_setpoint.uncache();
-			m_neutral_mode.uncache();
-			m_pid_p.uncache();
-			m_pid_i.uncache();
-			m_pid_d.uncache();
-			m_position_reference.uncache();
-			m_speed_reference.uncache();
-			m_enable_control.uncache();
-			m_voltage_ramp_rate.uncache();
-			m_fault_time.uncache();
-			m_encoder_codes_per_rev.uncache();
-			m_potentiometer_turns.uncache();
-			m_max_output_voltage.uncache();
+			// note that m_control_mode should be uncached as of this point
 		}
 
 		if (m_position_reference.hasNewValue())
@@ -375,7 +363,7 @@ void AsynchronousCANJaguar::CommTask()
 
 void AsynchronousCANJaguar::BeginComm()
 {
-	semGive(m_comm_semaphore);
+	semGive( m_comm_semaphore);
 }
 
 //Set() is ambiguous, since it doesn't include the mode.
@@ -392,6 +380,12 @@ void AsynchronousCANJaguar::SetPosition(float position)
 	m_setpoint.setValue(position);
 }
 
+void AsynchronousCANJaguar::SetVelocity(float velocity)
+{
+	m_control_mode.setValue(kSpeed);
+	m_setpoint.setValue(velocity);
+}
+
 void AsynchronousCANJaguar::Set(float setpoint, UINT8 syncGroup)
 {
 	printf("ERROR: Calling Set() in ProxiedCANJaguar: %s\n;", m_name);
@@ -404,7 +398,8 @@ void AsynchronousCANJaguar::SetPositionReference(
 	m_position_reference.setValue(reference);
 }
 
-void AsynchronousCANJaguar::SetSpeedReference(CANJaguar::SpeedReference reference)
+void AsynchronousCANJaguar::SetSpeedReference(
+		CANJaguar::SpeedReference reference)
 {
 	m_speed_reference.setValue(reference);
 }
@@ -485,9 +480,20 @@ void AsynchronousCANJaguar::SetExpiration(float timeout)
 
 void AsynchronousCANJaguar::ResetCache()
 {
+	m_control_mode.uncache();
 	m_setpoint.uncache();
 	m_neutral_mode.uncache();
-	m_control_mode.uncache();
+	m_pid_p.uncache();
+	m_pid_i.uncache();
+	m_pid_d.uncache();
+	m_position_reference.uncache();
+	m_speed_reference.uncache();
+	m_enable_control.uncache();
+	m_voltage_ramp_rate.uncache();
+	m_fault_time.uncache();
+	m_encoder_codes_per_rev.uncache();
+	m_potentiometer_turns.uncache();
+	m_max_output_voltage.uncache();
 }
 
 bool AsynchronousCANJaguar::StatusOK()

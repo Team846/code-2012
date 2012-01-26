@@ -1,5 +1,6 @@
 #include "ActionData.h"
 #include "DriveTrainAction.h"
+#include "LauncherAction.h"
 #include "ShifterAction.h"
 #include "ConfigAction.h"
 
@@ -42,6 +43,11 @@ ActionData::ActionData()
 	shifter = (ShifterAction*) malloc(sizeof(ShifterAction));
 	shifter->force = false;
 	shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
+
+	launcher = (LauncherAction*) malloc(sizeof(LauncherAction));
+	launcher->state = ACTION::LAUNCHER::RUNNING;
+	launcher->bottomSpeed = 0.0;
+	launcher->topSpeed = 0.0;
 }
 
 ActionData::~ActionData()

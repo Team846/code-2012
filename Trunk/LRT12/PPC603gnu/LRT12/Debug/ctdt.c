@@ -51,6 +51,8 @@ void _GLOBAL__I__ZN7ShifterC2Ev();
 
 void _GLOBAL__I__ZN8LRTServoC2EjPc();
 
+void _GLOBAL__I__ZN8LauncherC2Ev();
+
 void _GLOBAL__I__ZN8Profiler8instanceE();
 
 void _GLOBAL__I__ZN9Component19createComponentDataEbi();
@@ -98,6 +100,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN7Console8instanceE,
     _GLOBAL__I__ZN7ShifterC2Ev,
     _GLOBAL__I__ZN8LRTServoC2EjPc,
+    _GLOBAL__I__ZN8LauncherC2Ev,
     _GLOBAL__I__ZN8Profiler8instanceE,
     _GLOBAL__I__ZN9Component19createComponentDataEbi,
     _GLOBAL__I__ZN12PrintCommandC2EPKc,
@@ -156,6 +159,8 @@ void _GLOBAL__D__ZN7ShifterC2Ev();
 
 void _GLOBAL__D__ZN8LRTServoC2EjPc();
 
+void _GLOBAL__D__ZN8LauncherC2Ev();
+
 void _GLOBAL__D__ZN8Profiler8instanceE();
 
 void _GLOBAL__D__ZN9Component19createComponentDataEbi();
@@ -199,6 +204,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN7Console8instanceE,
     _GLOBAL__D__ZN7ShifterC2Ev,
     _GLOBAL__D__ZN8LRTServoC2EjPc,
+    _GLOBAL__D__ZN8LauncherC2Ev,
     _GLOBAL__D__ZN8Profiler8instanceE,
     _GLOBAL__D__ZN9Component19createComponentDataEbi,
     _GLOBAL__D__ZN9Scheduler9_instanceE,
