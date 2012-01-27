@@ -5,6 +5,7 @@
 #include "../Config/Configurable.h"
 #include "../Config/RobotConfig.h"
 #include "../Config/Config.h"
+#include "../Log/Loggable.h"
 #include "../ActionData/LauncherAction.h"
 #include "../Jaguar/AsyncCANJaguar.h"
 
@@ -13,7 +14,7 @@
  * @author Robert Ying
  */
 
-class Launcher: public Component, Configurable
+class Launcher: public Component, public Configurable, public Loggable
 {
 public:
 	/*!
@@ -30,6 +31,7 @@ public:
 	virtual void Output();
 	virtual void Configure();
 	virtual std::string GetName();
+	virtual void log();
 private:
 	ACTION::LAUNCHER::launcherState m_prevstate;
 	AsyncCANJaguar *m_top_roller, *m_bottom_roller;

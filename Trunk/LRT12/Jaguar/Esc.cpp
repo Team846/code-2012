@@ -25,8 +25,7 @@ float Esc::CurrentLimiter::Limit(float targetSpeed, float robotSpeed)
 
 // Esc Class
 Esc::Esc(int channel, LRTEncoder& encoder, string name) :
-	AsyncCANJaguar(channel, "ESC?"),
-			CANJaguarBrake((*(AsyncCANJaguar*) this)),
+	AsyncCANJaguar(channel, "ESC?"), CANJaguarBrake((*(AsyncCANJaguar*) this)),
 			m_hasPartner(false), m_partner(NULL), m_encoder(encoder),
 			m_name(name), m_index(0), m_stopping_integrator(0),
 			m_error_running(0)
@@ -35,8 +34,7 @@ Esc::Esc(int channel, LRTEncoder& encoder, string name) :
 
 Esc::Esc(int channelA, int channelB, LRTEncoder& encoder, string name) :
 	AsyncCANJaguar(channelA, "ESC A?"),
-			CANJaguarBrake((*(AsyncCANJaguar*) this)),
-			m_hasPartner(true),
+			CANJaguarBrake((*(AsyncCANJaguar*) this)), m_hasPartner(true),
 			m_partner(new Esc(channelB, encoder, name + "B")),
 			m_encoder(encoder), m_name(name + "A"), m_index(0),
 			m_stopping_integrator(0), m_error_running(0)
@@ -68,7 +66,7 @@ void Esc::Stop()
 	if (m_hasPartner)
 		m_partner->Stop();
 
-	float RobotSpeed = DriveEncoders::GetInstance().GetNormalizedMotorSpeed(
+	float RobotSpeed = DriveEncoders::GetInstance().getNormalizedMotorSpeed(
 			m_encoder);
 	if (Util::Abs<double>(RobotSpeed) > 0.3)
 	{

@@ -5,8 +5,8 @@ Launcher::Launcher() :
 {
 	m_top_roller = new AsyncCANJaguar(RobotConfig::CAN::ROLLER_TOP,
 			"Top Roller");
-	m_bottom_roller = new AsyncCANJaguar(
-			RobotConfig::CAN::ROLLER_BOTTOM, "Bottom Roller");
+	m_bottom_roller = new AsyncCANJaguar(RobotConfig::CAN::ROLLER_BOTTOM,
+			"Bottom Roller");
 	m_prevstate = ACTION::LAUNCHER::DISABLED;
 	Configure();
 }
@@ -38,10 +38,8 @@ void Launcher::Output()
 		{
 		case ACTION::LAUNCHER::RUNNING:
 			m_top_roller->ChangeControlMode(AsyncCANJaguar::kSpeed);
-			m_top_roller->SetSpeedReference(
-					AsyncCANJaguar::kSpeedRef_Encoder);
-			m_top_roller->ConfigNeutralMode(
-					AsyncCANJaguar::kNeutralMode_Coast);
+			m_top_roller->SetSpeedReference(AsyncCANJaguar::kSpeedRef_Encoder);
+			m_top_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 			m_top_roller->SetPID(m_pid_top[PROPORTIONAL], m_pid_top[INTEGRAL],
 					m_pid_top[DERIVATIVE]);
 			m_bottom_roller->ChangeControlMode(AsyncCANJaguar::kSpeed);
@@ -54,10 +52,8 @@ void Launcher::Output()
 			break;
 		case ACTION::LAUNCHER::DISABLED:
 			m_top_roller->ChangeControlMode(AsyncCANJaguar::kPercentVbus);
-			m_top_roller->ConfigNeutralMode(
-					AsyncCANJaguar::kNeutralMode_Coast);
-			m_bottom_roller->ChangeControlMode(
-					AsyncCANJaguar::kPercentVbus);
+			m_top_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+			m_bottom_roller->ChangeControlMode(AsyncCANJaguar::kPercentVbus);
 			m_bottom_roller->ConfigNeutralMode(
 					AsyncCANJaguar::kNeutralMode_Coast);
 
@@ -79,4 +75,12 @@ void Launcher::Output()
 std::string Launcher::GetName()
 {
 	return m_name;
+}
+
+void Launcher::log()
+{
+	SmartDashboard::GetInstance()->PutString(
+			"Launcher State",
+			(action->launcher->state == ACTION::LAUNCHER::RUNNING) ? "Running"
+					: "Disabled");
 }

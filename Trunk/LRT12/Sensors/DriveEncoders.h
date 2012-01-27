@@ -7,6 +7,7 @@
 #include "..\Config\RobotConfig.h"
 #include "..\Util\Util.h"
 #include "../Util/AsyncPrinter.h"
+#include "../Log/Loggable.h"
 
 #define CHANGEME 0
 
@@ -19,12 +20,13 @@ class Config; // forward declare config
  * @brief Class to keep track of drivetrain encoders
  */
 
-class DriveEncoders: public Configurable
+class DriveEncoders: public Configurable, public Loggable
 {
 private:
 	static DriveEncoders* m_instance;
 	Config& m_config;
 	std::string m_configsection;
+
 	LRTEncoder m_encoder_left;
 	LRTEncoder m_useless_encoder;
 	LRTEncoder m_encoder_right;
@@ -60,79 +62,81 @@ public:
 	 * @brief sets the current gear ratio
 	 * @param isHighGear
 	 */
-	void SetHighGear(bool isHighGear);
+	void setHighGear(bool isHighGear);
 
 	/*!
 	 * @brief Configures overall settings
 	 */
 	void Configure();
 
+	void log();
+
 	/*!
 	 * @brief Get non-normalized average forward speed
 	 * @return forward speed
 	 */
-	double RawForwardSpeed(); //not normalized
+	double rawForwardSpeed(); //not normalized
 
 	/*!
 	 * @brief Get normalized (by gear) average forward speed
 	 * @return forward speed
 	 */
-	double GetNormalizedForwardMotorSpeed(); //considers gear
+	double getNormalizedForwardMotorSpeed(); //considers gear
 
 	/*!
 	 * @brief Get normalized turning speed assuming low gear
 	 * @return turning speed
 	 */
-	double GetNormalizedLowGearTurningSpeed();
+	double getNormalizedLowGearTurningSpeed();
 
 	/*!
 	 * @brief Get non-normalized turning speed
 	 * @return turning speed
 	 */
-	double GetTurningSpeed();
+	double getTurningSpeed();
 
 	/*!
 	 * @brief Get normalized turning speed assuming high gear
 	 * @return turning speed
 	 */
-	double GetNormalizedTurningSpeed();
+	double getNormalizedTurningSpeed();
 
 	/*!
 	 * @brief Get normalized turning speed based on current gear
 	 * @return turnign speed
 	 */
-	double GetNormalizedTurningMotorSpeed();
+	double getNormalizedTurningMotorSpeed();
 
 	/*!
 	 * @brief Get robot traveled distance in engineering units
 	 * @return distance
 	 */
-	double GetRobotDist();
+	double getRobotDist();
 
 	/*!
 	 * @brief Get number of ticks during turn
 	 * @return turn ticks
 	 */
-	int GetTurnTicks();
+	int getTurnTicks();
 
 	/*!
 	 * @brief Get number of revolutions during turn
 	 * @return turn revolutions
 	 */
-	double GetTurnRevolutions();
+	double getTurnRevolutions();
 
 	/*!
 	 * @brief Get calibrated turning angle
 	 * @return turn agnle
 	 */
-	double GetTurnAngle();
+	double getTurnAngle();
 
 	/*!
 	 * @brief Get the distance of a particular wheel
 	 * @param side LEFT or RIGHT
 	 * @return
 	 */
-	double GetWheelDist(int side);
+	double getWheelDist(int side);
 	//    double GetLeftWheelDist();
 	//   double GetRightWheelDist();
 
@@ -140,7 +144,7 @@ public:
 	 * @brief Get left wheel speed
 	 * @return speed
 	 */
-	double GetLeftSpeed();
+	double getLeftSpeed();
 
 	//    double GetNormalizedLeftSpeed();
 	//speed of the motor if it were engaged
@@ -150,13 +154,13 @@ public:
 	 * @brief Get normalized left encoder speed
 	 * @return encoder speed
 	 */
-	double GetNormalizedLeftOppositeGearMotorSpeed();
+	double getNormalizedLeftOppositeGearMotorSpeed();
 
 	/*!
 	 * @brief Get right enocder speed
 	 * @return encoder speed
 	 */
-	double GetRightSpeed();
+	double getRightSpeed();
 	//    double GetNormalizedRightSpeed();
 	//    double GetNormalizedRightMotorSpeed();
 
@@ -164,39 +168,39 @@ public:
 	 * @brief Get normalized right encoder speed
 	 * @return encoder speed
 	 */
-	double GetNormalizedRightOppositeGearMotorSpeed();
+	double getNormalizedRightOppositeGearMotorSpeed();
 
 	/*!
 	 * @brief Get the other motor's speed
 	 * @param encoder other encoder
 	 * @return the normalized speed of the non-active gear
 	 */
-	double GetNormalizedOpposingGearMotorSpeed(LRTEncoder& encoder);//gets the speed of the gear we are *NOT* in for shifting -BA
+	double getNormalizedOpposingGearMotorSpeed(LRTEncoder& encoder);//gets the speed of the gear we are *NOT* in for shifting -BA
 
 	/*!
 	 * @brief Normalized motor speed
 	 * @param encoder which motor
 	 * @return
 	 */
-	double GetNormalizedMotorSpeed(LRTEncoder& encoder);
+	double getNormalizedMotorSpeed(LRTEncoder& encoder);
 
 	/*!
 	 * @brief Determines which gear will be used for calculation
 	 * @return whether or not the robot is in high gear
 	 */
-	bool IsHighGear();
+	bool isHighGear();
 
 	/*!
 	 * @brief The left encoder
 	 * @return a reference to the left encoder
 	 */
-	LRTEncoder& GetLeftEncoder();
+	LRTEncoder& getLeftEncoder();
 
 	/*!
 	 * @brief The right encoder
 	 * @return a reference to the right encoder
 	 */
-	LRTEncoder& GetRightEncoder();
+	LRTEncoder& getRightEncoder();
 
 protected:
 	DriveEncoders();DISALLOW_COPY_AND_ASSIGN(DriveEncoders);

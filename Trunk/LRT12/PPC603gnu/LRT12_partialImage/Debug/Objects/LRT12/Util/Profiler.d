@@ -100,7 +100,7 @@ LRT12_partialImage/Debug/Objects/LRT12/Util/Profiler.o:  \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/xlocinfo.h \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/sstream \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/iomanip \
-  C:/WindRiver/workspace/LRT12/Util/AsynchronousPrinter.h \
+  C:/WindRiver/workspace/LRT12/Util/AsyncPrinter.h \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/queue \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/algorithm \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/deque \
@@ -520,7 +520,7 @@ c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/
 
 c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/iomanip:
 
-C:/WindRiver/workspace/LRT12/Util/AsynchronousPrinter.h:
+C:/WindRiver/workspace/LRT12/Util/AsyncPrinter.h:
 
 c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/queue:
 

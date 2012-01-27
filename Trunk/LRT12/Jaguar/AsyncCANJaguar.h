@@ -11,6 +11,8 @@
 #include "../Util/PrintInConstructor.h"
 #include "../Util/CachedValue.h"
 
+#include "../Log/Loggable.h"
+
 /*!
  * @brief Asynchronous implementation of a CAN driver for the Jaguar
  * @brief Reimplements the large majority of useful operations on the Jaguar
@@ -21,7 +23,7 @@
  * @author Karthik Viswanathan
  * @author David Giandomenico
  */
-class AsyncCANJaguar: public CANJaguar
+class AsyncCANJaguar: public CANJaguar, public Loggable
 {
 public:
 	// collection flags
@@ -95,6 +97,8 @@ private:
 	semaphore* m_comm_semaphore;
 	bool m_is_running; //implementation in progress - controlled termination of task -dg
 	bool m_is_quitting; // ditto
+
+	void println(const char * str);
 
 public:
 	/*!
@@ -434,6 +438,11 @@ public:
 	 * @param Clear the cache
 	 */
 	void ResetCache();
+
+	/*!
+	 * Logs data
+	 */
+	virtual void log();
 };
 
 #endif /* PROXIED_CAN_JAGUAR_H_ */

@@ -8,8 +8,14 @@ GameState AsyncCANJaguar::m_game_state = DISABLED;
 //ProxiedCANJaguar::JaguarList ProxiedCANJaguar::jaguars = {0};
 AsyncCANJaguar::AsyncCANJaguar * AsyncCANJaguar::jaguar_list_ = NULL;
 
+void AsyncCANJaguar::println(const char * str)
+{
+	AsyncPrinter::Printf("%s: %s", m_name, str);
+}
+
 AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, char* name) :
 			CANJaguar(channel),
+			Loggable(),
 			m_task_name("JAG#" + Util::ToString<int>(channel)),
 			m_print_ctor_dtor(m_task_name.c_str(), (m_task_name + "\n").c_str()),
 			m_channel(channel),
@@ -214,7 +220,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_output_voltage = v;
 			else
-				AsyncPrinter::Printf("Invalid output voltage; not storing\n");
+				println("Invalid output voltage; not storing\n");
 		}
 
 		if (m_collection_flags & OUTCURR)
@@ -223,7 +229,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_output_current = current;
 			else
-				AsyncPrinter::Printf("Invalid current; not storing\n");
+				println("Invalid current; not storing\n");
 		}
 
 		if (m_collection_flags & POS)
@@ -232,7 +238,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_position = pos;
 			else
-				AsyncPrinter::Printf("Invalid position value; not storing\n");
+				println("Invalid position value; not storing\n");
 		}
 
 		if (m_collection_flags & PID)
@@ -241,17 +247,17 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_p = p;
 			else
-				AsyncPrinter::Printf("Invalid proportional gain; not storing\n");
+				println("Invalid proportional gain; not storing\n");
 			float i = CANJaguar::GetI();
 			if (StatusOK())
 				m_i = i;
 			else
-				AsyncPrinter::Printf("Invalid integral gain; not storing\n");
+				println("Invalid integral gain; not storing\n");
 			float d = CANJaguar::GetD();
 			if (StatusOK())
 				m_d = d;
 			else
-				AsyncPrinter::Printf("Invalid derivative gain; not storing\n");
+				println("Invalid derivative gain; not storing\n");
 		}
 
 		if (m_collection_flags & SPEEDREF)
@@ -260,7 +266,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_speed_ref = s;
 			else
-				AsyncPrinter::Printf("Invalid speed reference; not storing\n");
+				println("Invalid speed reference; not storing\n");
 		}
 
 		if (m_collection_flags & POSREF)
@@ -269,7 +275,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_position_ref = p;
 			else
-				AsyncPrinter::Printf("Invalid position reference; not storing");
+				println("Invalid position reference; not storing");
 		}
 
 		if (m_collection_flags & CTRLMODE)
@@ -278,7 +284,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_ctrl_mode = c;
 			else
-				AsyncPrinter::Printf("Invalid control mode; not storing\n");
+				println("Invalid control mode; not storing\n");
 		}
 
 		if (m_collection_flags & BUSVOLT)
@@ -287,7 +293,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_bus_voltage = v;
 			else
-				AsyncPrinter::Printf("Invalid bus voltage; not storing\n");
+				println("Invalid bus voltage; not storing\n");
 		}
 
 		if (m_collection_flags & TEMP)
@@ -296,7 +302,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_temperature = t;
 			else
-				AsyncPrinter::Printf("Invalid temperature; not storing\n");
+				println("Invalid temperature; not storing\n");
 		}
 
 		if (m_collection_flags & SPEED)
@@ -305,7 +311,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_speed = s;
 			else
-				AsyncPrinter::Printf("Invalid speed; not storing\n");
+				println("Invalid speed; not storing\n");
 		}
 
 		if (m_collection_flags & FWDLIMOK)
@@ -314,8 +320,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_fwd_limit_ok = b;
 			else
-				AsyncPrinter::Printf(
-						"Invalid forward limit status, not storing\n");
+				println("Invalid forward limit status, not storing\n");
 		}
 
 		if (m_collection_flags & REVLIMOK)
@@ -324,8 +329,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_rev_limit_ok = b;
 			else
-				AsyncPrinter::Printf(
-						"Invalid reverse limit status, not storing\n");
+				println("Invalid reverse limit status, not storing\n");
 		}
 
 		if (m_collection_flags & PWRCYCLE)
@@ -334,8 +338,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_pwr_cyc = b;
 			else
-				AsyncPrinter::Printf(
-						"Invalid power cycle status, not storing\n");
+				println("Invalid power cycle status, not storing\n");
 		}
 
 		if (m_collection_flags & EXPIRE)
@@ -344,7 +347,7 @@ void AsyncCANJaguar::CommTask()
 			if (StatusOK())
 				m_expire = e;
 			else
-				AsyncPrinter::Printf("Invalid expiration time, not storing\n");
+				println("Invalid expiration time, not storing\n");
 		}
 
 		m_last_game_state = m_game_state;
@@ -504,4 +507,149 @@ void AsyncCANJaguar::addCollectionFlags(uint32_t flags)
 void AsyncCANJaguar::setCollectionFlags(uint32_t flags)
 {
 	m_collection_flags = flags;
+}
+
+void AsyncCANJaguar::log()
+{
+	SmartDashboard *sdb = SmartDashboard::GetInstance();
+	std::string prefix(m_name);
+	prefix += ": ";
+
+	std::string cv("None");
+	if (m_collection_flags & SPEEDREF)
+	{
+		cv += "Speed Reference, ";
+		std::string out;
+		switch (GetSpeedReference())
+		{
+		case kSpeedRef_Encoder:
+			out = "Encoder";
+			break;
+		case kSpeedRef_InvEncoder:
+			out = "Indexing Encoder";
+			break;
+		case kSpeedRef_QuadEncoder:
+			out = "Quadrature Encoder";
+			break;
+		case kSpeedRef_None:
+			out = "None";
+			break;
+		}
+		sdb->PutString(prefix + "Speed Reference", out);
+	}
+	if (m_collection_flags & POSREF)
+	{
+		cv += "Position Reference, ";
+		std::string out;
+		switch (GetPositionReference())
+		{
+		case kPosRef_Potentiometer:
+			out = "Potentiometer";
+			break;
+		case kPosRef_QuadEncoder:
+			out = "Quadrature Encoder";
+			break;
+		case kPosRef_None:
+			out = "None";
+			break;
+		}
+		sdb->PutString(prefix + "Position Reference", out);
+	}
+	if (m_collection_flags & PID)
+	{
+		cv += "PID, ";
+		sdb->PutDouble((prefix + "Proportional Gain").c_str(), GetP());
+		sdb->PutDouble((prefix + "Integral Gain").c_str(), GetI());
+		sdb->PutDouble((prefix + "Derivative Gain").c_str(), GetD());
+	}
+	if (m_collection_flags & CTRLMODE)
+	{
+		cv += "Control Mode, ";
+		std::string out;
+		switch (GetControlMode())
+		{
+		case kPercentVbus:
+			out = "Duty Cycle";
+			break;
+		case kVoltage:
+			out = "Voltage";
+			break;
+		case kSpeed:
+			out = "Speed";
+			break;
+		case kPosition:
+			out = "Position";
+			break;
+		case kCurrent:
+			out = "Current";
+			break;
+		}
+		sdb->PutString(prefix + "Control Mode (read)", out);
+	}
+	if (m_collection_flags & BUSVOLT)
+	{
+		cv += "Bus Voltage, ";
+		sdb->PutDouble((prefix + "Bus Voltage").c_str(), GetBusVoltage());
+	}
+	if (m_collection_flags & OUTVOLT)
+	{
+		cv += "Output Voltage, ";
+		sdb->PutDouble((prefix + "Output Voltage").c_str(), GetOutputVoltage());
+	}
+	if (m_collection_flags & OUTCURR)
+	{
+		cv += "Output Current, ";
+		sdb->PutDouble((prefix + "Output Current").c_str(), GetOutputCurrent());
+	}
+	if (m_collection_flags & TEMP)
+	{
+		cv += "Temperature, ";
+		sdb->PutDouble((prefix + "Temperature").c_str(), GetTemperature());
+	}
+	if (m_collection_flags & FWDLIMOK)
+	{
+		cv += "Forward Soft Limit OK, ";
+		sdb->PutBoolean((prefix + "Forward Limit OK").c_str(),
+				GetForwardLimitOK());
+	}
+	if (m_collection_flags & REVLIMOK)
+	{
+		cv += "Reverse Soft Limit OK, ";
+		sdb->PutBoolean((prefix + "Reverse Limit OK").c_str(),
+				GetReverseLimitOK());
+	}
+	if (m_collection_flags & PWRCYCLE)
+	{
+		cv += "Power Cycled, ";
+		sdb->PutBoolean((prefix + "Power Cycled").c_str(), GetPowerCycled());
+	}
+	if (m_collection_flags & EXPIRE)
+	{
+		cv += "Expiration";
+		sdb->PutDouble((prefix + "Expiration").c_str(), GetExpiration());
+	}
+
+	std::string out;
+	switch (m_control_mode.peek())
+	{
+	case kPercentVbus:
+		out = "Duty Cycle";
+		break;
+	case kVoltage:
+		out = "Voltage";
+		break;
+	case kSpeed:
+		out = "Speed";
+		break;
+	case kPosition:
+		out = "Position";
+		break;
+	case kCurrent:
+		out = "Current";
+		break;
+	}
+
+	sdb->PutString(prefix + "Control Mode", out);
+	sdb->PutDouble((prefix + "Setpoint").c_str(), m_setpoint.peek());
+	sdb->PutString(prefix + "Enabled Collection Values", cv);
 }

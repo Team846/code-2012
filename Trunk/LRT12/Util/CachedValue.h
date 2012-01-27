@@ -34,6 +34,12 @@ public:
 	float getValue();
 
 	/*!
+	 * Gets the most recent cached value without clearing hte new value flag
+	 * @return
+	 */
+	float peek();
+
+	/*!
 	 * @brief Forcibly sets the new value flag.
 	 */
 	void uncache();
@@ -107,6 +113,12 @@ public:
 	 * @return the cached value
 	 */
 	int getValue();
+
+	/*!
+	 * Gets the most recent cached value without clearing hte new value flag
+	 * @return
+	 */
+	int peek();
 
 	/*!
 	 * @brief Forcibly sets the new value flag.

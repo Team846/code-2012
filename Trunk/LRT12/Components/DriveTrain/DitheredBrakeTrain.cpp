@@ -3,8 +3,8 @@
 DitheredBrakeTrain::DitheredBrakeTrain()
 // TODO fix initialization
 :
-	leftEncoder(DriveEncoders::GetInstance().GetLeftEncoder()),
-			rightEncoder(DriveEncoders::GetInstance().GetRightEncoder())
+	leftEncoder(DriveEncoders::GetInstance().getLeftEncoder()),
+			rightEncoder(DriveEncoders::GetInstance().getRightEncoder())
 {
 	Configure();
 }
@@ -83,9 +83,9 @@ DriveCommand DitheredBrakeTrain::Drive(float forwardInput, float turnInput)
 		rightInput = Util::Sign<float>(rightInput) * 1.0;
 	}
 
-	float leftSpeed = DriveEncoders::GetInstance().GetNormalizedMotorSpeed(
+	float leftSpeed = DriveEncoders::GetInstance().getNormalizedMotorSpeed(
 			leftEncoder);
-	float rightSpeed = DriveEncoders::GetInstance().GetNormalizedMotorSpeed(
+	float rightSpeed = DriveEncoders::GetInstance().getNormalizedMotorSpeed(
 			rightEncoder);
 
 	drive.leftCommand = CalculateBrakeAndDutyCycle(leftInput, leftSpeed);

@@ -37,6 +37,11 @@ int CachedInt::getValue()
 	return m_value;
 }
 
+int CachedInt::peek()
+{
+	return m_value;
+}
+
 void CachedInt::uncache()
 {
 	m_has_new_value = true;
@@ -110,6 +115,11 @@ float CachedFloat::getValue()
 {
 	m_has_new_value = false;
 	m_previous_value = m_value;
+	return m_value;
+}
+
+float CachedFloat::peek()
+{
 	return m_value;
 }
 

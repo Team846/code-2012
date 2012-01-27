@@ -4,6 +4,7 @@
 #include "DriveTrain/CLDriveTrain.h"
 #include "../Config/RobotConfig.h"
 #include "../Config/Configurable.h"
+#include "../Log/Loggable.h"
 #include "../Jaguar/Esc.h"
 #include "../Sensors/DriveEncoders.h"
 #include "Component.h"
@@ -12,7 +13,7 @@
  * @brief Component that handles the drivetrain
  * @author Robert Ying
  */
-class Drivetrain: public Component, Configurable
+class Drivetrain: public Component, Configurable, public Loggable
 {
 public:
 	/*!
@@ -30,6 +31,8 @@ public:
 	virtual std::string GetName();
 
 	virtual void Configure();
+
+	virtual void log();
 
 private:
 	std::string m_name;

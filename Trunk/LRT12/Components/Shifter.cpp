@@ -72,13 +72,13 @@ void Shifter::Output()
 	case ACTION::GEARBOX::LOW_GEAR:
 		leftServo->SetMicroseconds(lowGearServoValLeft);
 		rightServo->SetMicroseconds(lowGearServoValRight);
-		encoders.SetHighGear(false);
+		encoders.setHighGear(false);
 		break;
 
 	case ACTION::GEARBOX::HIGH_GEAR:
 		leftServo->SetMicroseconds(highGearServoValLeft);
 		rightServo->SetMicroseconds(highGearServoValRight);
-		encoders.SetHighGear(true);
+		encoders.setHighGear(true);
 		break;
 
 	default:
@@ -92,3 +92,10 @@ string Shifter::GetName()
 	return "Shifter";
 }
 
+void Shifter::log()
+{
+	SmartDashboard::GetInstance()->PutString(
+			"Robot Gear",
+			(action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR) ? "High Gear"
+					: "Low Gear");
+}

@@ -1,7 +1,9 @@
 #include "LRTEncoder.h"
 
-LRTEncoder::LRTEncoder(UINT32 sourceA, UINT32 sourceB, float trim) :
-	Encoder(sourceA, sourceB, false, CounterBase::k1X), trim(trim)
+LRTEncoder::LRTEncoder(const char * name, UINT32 sourceA, UINT32 sourceB,
+		float trim) :
+	Encoder(sourceA, sourceB, false, CounterBase::k1X), trim(trim),
+			m_name(name)
 //    , useless(15 + count, , false, CounterBase::k1X)
 {
 }
@@ -24,4 +26,12 @@ double LRTEncoder::GetRate()
 INT32 LRTEncoder::Get()
 {
 	return (INT32) (Encoder::Get() * trim);
+}
+
+void LRTEncoder::log()
+{
+	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	std::string prefix = m_name + ": ";
+	sdb->PutDouble((prefix + "Rate").c_str(), GetRate());
+	sdb->PutInt((prefix + "Count").c_str(), Get());
 }

@@ -5,6 +5,7 @@
 #include "..\..\Config\Config.h"
 #include "..\..\Config\Configurable.h"
 #include "../../Util/PID.h"
+#include "../../Log/Loggable.h"
 #include "DitheredBrakeTrain.h"
 
 /*!
@@ -14,7 +15,7 @@
  * @brief DOES implement closed-loop relative position control
  * @author Robert Ying
  */
-class ClosedLoopDrivetrain: public DitheredBrakeTrain
+class ClosedLoopDrivetrain: public DitheredBrakeTrain, public Loggable
 {
 public:
 	/*!
@@ -32,7 +33,10 @@ public:
 
 	virtual void Configure();
 
+	virtual void log();
+
 private:
+	void logPID(const char * prefix, PID* pid);
 	/*!
 	 * @brief Drives at a set forward and turn rate
 	 * @param rawFwd rate of movement colinear with direction of motion
@@ -71,6 +75,12 @@ public:
 	void setRelativeDrivePosition(float pos);
 
 	/*!
+	 * Gets current drive setpoint
+	 * @return
+	 */
+	float getDriveSetpoint();
+
+	/*!
 	 * @brief Set drive rate
 	 * @param rate speed
 	 */
@@ -93,6 +103,12 @@ public:
 	 * @param rate
 	 */
 	void setTurnRate(float rate);
+
+	/*!
+	 * Gets current turn setpoint
+	 * @return
+	 */
+	float getTurnSetpoint();
 
 	/*!
 	 * @brief Set raw turn duty cycle

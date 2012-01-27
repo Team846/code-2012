@@ -11,7 +11,7 @@ void _GLOBAL__I__ZN10ActionData8instanceE();
 
 void _GLOBAL__I__ZN10DrivetrainC2Ev();
 
-void _GLOBAL__I__ZN10LRTEncoderC2Ejjf();
+void _GLOBAL__I__ZN10LRTEncoderC2EPKcjjf();
 
 void _GLOBAL__I__ZN10LRTRobot12C2Ev();
 
@@ -80,7 +80,7 @@ void (*_ctors[])() =
     {
     _GLOBAL__I__ZN10ActionData8instanceE,
     _GLOBAL__I__ZN10DrivetrainC2Ev,
-    _GLOBAL__I__ZN10LRTEncoderC2Ejjf,
+    _GLOBAL__I__ZN10LRTEncoderC2EPKcjjf,
     _GLOBAL__I__ZN10LRTRobot12C2Ev,
     _GLOBAL__I__ZN12AsyncPrinter8InstanceEv,
     _GLOBAL__I__ZN12ConfigLoaderC2Ev,
@@ -119,7 +119,7 @@ void _GLOBAL__D__ZN10ActionData8instanceE();
 
 void _GLOBAL__D__ZN10DrivetrainC2Ev();
 
-void _GLOBAL__D__ZN10LRTEncoderC2Ejjf();
+void _GLOBAL__D__ZN10LRTEncoderC2EPKcjjf();
 
 void _GLOBAL__D__ZN10LRTRobot12C2Ev();
 
@@ -184,7 +184,7 @@ void (*_dtors[])() =
     {
     _GLOBAL__D__ZN10ActionData8instanceE,
     _GLOBAL__D__ZN10DrivetrainC2Ev,
-    _GLOBAL__D__ZN10LRTEncoderC2Ejjf,
+    _GLOBAL__D__ZN10LRTEncoderC2EPKcjjf,
     _GLOBAL__D__ZN10LRTRobot12C2Ev,
     _GLOBAL__D__ZN12AsyncPrinter8InstanceEv,
     _GLOBAL__D__ZN12ConfigLoaderC2Ev,

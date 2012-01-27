@@ -3,13 +3,14 @@
 
 #include "Component.h"
 #include "..\Config\Configurable.h"
+#include "../Log/Loggable.h"
 
 class Config;
 class DriveEncoders;
 class LRTServo;
 class VirtualLRTServo;
 
-class Shifter: public Component, public Configurable
+class Shifter: public Component, public Configurable, public Loggable
 {
 private:
 	LRTServo* leftServo, *rightServo;
@@ -38,6 +39,7 @@ public:
 	void virtual Output();
 	virtual void Configure();
 	virtual string GetName();
+	virtual void log();
 };
 
 #endif //SHIFTER_H_

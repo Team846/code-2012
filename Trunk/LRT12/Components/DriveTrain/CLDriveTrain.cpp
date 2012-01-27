@@ -120,12 +120,12 @@ void ClosedLoopDrivetrain::update()
 {
 	if (m_drive_control_type == CL_POSITION)
 	{
-		m_drive_control->setInput(m_encoders.GetRobotDist());
+		m_drive_control->setInput(m_encoders.getRobotDist());
 	}
 	else
 	{
 		m_drive_control->setInput(
-				Util::Clamp<float>(m_encoders.GetNormalizedForwardMotorSpeed(),
+				Util::Clamp<float>(m_encoders.getNormalizedForwardMotorSpeed(),
 						-1.0, 1.0));
 		m_drive_op_complete = true; // this flag doesn't mean much here
 	}
@@ -140,12 +140,12 @@ void ClosedLoopDrivetrain::update()
 
 	if (m_turn_control_type == CL_POSITION)
 	{
-		m_turn_control->setInput(fmod(m_encoders.GetTurnAngle(), 360.0));
+		m_turn_control->setInput(fmod(m_encoders.getTurnAngle(), 360.0));
 	}
 	else
 	{
 		m_turn_control->setInput(
-				Util::Clamp<float>(m_encoders.GetNormalizedTurningMotorSpeed(),
+				Util::Clamp<float>(m_encoders.getNormalizedTurningMotorSpeed(),
 						-1.0, 1.0));
 		m_turn_op_complete = true; // this flag doesn't mean much here
 	}
@@ -242,7 +242,7 @@ bool ClosedLoopDrivetrain::getHighGear()
 void ClosedLoopDrivetrain::setRelativeDrivePosition(float pos)
 {
 	setDriveControl(CL_POSITION);
-	m_drive_control->setSetpoint(pos + m_encoders.GetRobotDist());
+	m_drive_control->setSetpoint(pos + m_encoders.getRobotDist());
 	m_drive_op_complete = false;
 }
 
@@ -251,6 +251,11 @@ void ClosedLoopDrivetrain::setDriveRate(float rate)
 	setDriveControl(CL_RATE);
 	m_drive_control->setSetpoint(rate);
 	m_drive_op_complete = false;
+}
+
+float ClosedLoopDrivetrain::getDriveSetpoint()
+{
+	return m_drive_control->getSetpoint();
 }
 
 void ClosedLoopDrivetrain::setRawDriveDutyCycle(float duty)
@@ -263,7 +268,7 @@ void ClosedLoopDrivetrain::setRawDriveDutyCycle(float duty)
 void ClosedLoopDrivetrain::setRelativeTurnPosition(float pos)
 {
 	setTurnControl(CL_POSITION);
-	m_turn_control->setSetpoint(pos + m_encoders.GetTurnAngle());
+	m_turn_control->setSetpoint(pos + m_encoders.getTurnAngle());
 	m_turn_op_complete = false;
 }
 
@@ -272,6 +277,11 @@ void ClosedLoopDrivetrain::setTurnRate(float rate)
 	setTurnControl(CL_RATE);
 	m_turn_control->setSetpoint(rate);
 	m_turn_op_complete = false;
+}
+
+float ClosedLoopDrivetrain::getTurnSetpoint()
+{
+	return m_turn_control->getSetpoint();
 }
 
 void ClosedLoopDrivetrain::setRawTurnDutyCycle(float duty)
@@ -311,4 +321,33 @@ void ClosedLoopDrivetrain::reset()
 	m_rate_turn_low_gear_pid.reset();
 	m_pos_turn_high_gear_pid.reset();
 	m_pos_turn_low_gear_pid.reset();
+}
+
+void ClosedLoopDrivetrain::logPID(const char * prefix, PID * pid)
+{
+	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	std::string pf(prefix);
+	pf += ": ";
+	sdb->PutDouble((pf + "Proportional").c_str(), pid->getProportionalGain());
+	sdb->PutDouble((pf + "Integral").c_str(), pid->getIntegralGain());
+	sdb->PutDouble((pf + "Derivative").c_str(), pid->getDerivativeGain());
+	sdb->PutDouble((pf + "Error").c_str(), pid->getError());
+	sdb->PutDouble((pf + "Accumulated Error").c_str(),
+			pid->getAccumulatedError());
+	sdb->PutDouble((pf + "Setpoint").c_str(), pid->getSetpoint());
+}
+
+void ClosedLoopDrivetrain::log()
+{
+	logPID("Drive Rate High Gear PID", &m_rate_drive_high_gear_pid);
+	logPID("Drive Rate Low Gear PID", &m_rate_drive_low_gear_pid);
+	logPID("Drive Position High Gear PID", &m_pos_drive_high_gear_pid);
+	logPID("Drive Position Low Gear PID", &m_pos_drive_low_gear_pid);
+	logPID("Turn Rate High Gear PID", &m_rate_turn_high_gear_pid);
+	logPID("Turn Rate Low Gear PID", &m_rate_turn_low_gear_pid);
+	logPID("Turn Position High Gear PID", &m_pos_turn_high_gear_pid);
+	logPID("Turn Position Low Gear PID", &m_pos_turn_low_gear_pid);
+	logPID("Active Drive PID", m_drive_control);
+	logPID("Active Turn PID", m_turn_control);
+
 }

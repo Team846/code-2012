@@ -1,5 +1,5 @@
 #include "Drivetrain.h"
-#include "../Util/AsynchronousPrinter.h"
+#include "../Util/AsyncPrinter.h"
 #include "../ActionData/DriveTrainAction.h"
 #include "../ActionData/ShifterAction.h"
 
@@ -9,9 +9,9 @@ Drivetrain::Drivetrain() :
 	m_esc_left
 			= new Esc(RobotConfig::CAN::DRIVE_LEFT_A,
 					RobotConfig::CAN::DRIVE_LEFT_B,
-					m_encoders.GetLeftEncoder(), "left");
+					m_encoders.getLeftEncoder(), "left");
 	m_esc_right = new Esc(RobotConfig::CAN::DRIVE_RIGHT_A,
-			RobotConfig::CAN::DRIVE_RIGHT_B, m_encoders.GetRightEncoder(),
+			RobotConfig::CAN::DRIVE_RIGHT_B, m_encoders.getRightEncoder(),
 			"right");
 }
 
@@ -39,6 +39,7 @@ void Drivetrain::Output()
 		action->drivetrain->synchronizedCyclesRemaining = NUM_CYCLES_TO_SYNC;
 	}
 
+	//	m_encoders.setHighGear(isHighGear); // set by shifter
 	m_drive_control.setHighGear(isHighGear);
 
 	// only try new operation if previous one is complete, else discard
@@ -106,8 +107,7 @@ void Drivetrain::Output()
 	else
 	{
 		action->drivetrain->setTurnOperation = false;
-		AsyncPrinter::Printf(
-				"Previous turn operation not complete, discarding");
+		AsyncPrinter::Printf("Previous turn operation not complete, discarding");
 	}
 	action->drivetrain->previousTurnOperationComplete
 			= m_drive_control.turnOperationComplete();
@@ -121,11 +121,11 @@ void Drivetrain::Output()
 	{
 		action->drivetrain->synchronizedCyclesRemaining--;
 		cmd.rightCommand.dutyCycle
-				= m_encoders.GetNormalizedOpposingGearMotorSpeed(
-						m_encoders.GetRightEncoder());
+				= m_encoders.getNormalizedOpposingGearMotorSpeed(
+						m_encoders.getRightEncoder());
 		cmd.leftCommand.dutyCycle
-				= m_encoders.GetNormalizedOpposingGearMotorSpeed(
-						m_encoders.GetLeftEncoder());
+				= m_encoders.getNormalizedOpposingGearMotorSpeed(
+						m_encoders.getLeftEncoder());
 		cmd.rightCommand.brakingDutyCycle = 0.0;
 		cmd.leftCommand.brakingDutyCycle = 0.0;
 	}
@@ -146,4 +146,49 @@ void Drivetrain::Output()
 	{
 		m_drive_control.reset();
 	}
+}
+
+void Drivetrain::log()
+{
+	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	std::string prefix = m_name + ": ";
+
+	std::string drivemode;
+	switch (m_drive_control.getDriveMode())
+	{
+	case ClosedLoopDrivetrain::CL_DISABLED:
+		drivemode = "Open Loop";
+		break;
+	case ClosedLoopDrivetrain::CL_RATE:
+		drivemode = "Rate";
+		break;
+	case ClosedLoopDrivetrain::CL_POSITION:
+		drivemode = "Position";
+		break;
+	}
+	sdb->PutString(prefix + "Drive mode", drivemode);
+
+	std::string turnmode;
+	switch (m_drive_control.getTurnMode())
+	{
+	case ClosedLoopDrivetrain::CL_DISABLED:
+		turnmode = "Open Loop";
+		break;
+	case ClosedLoopDrivetrain::CL_RATE:
+		turnmode = "Rate";
+		break;
+	case ClosedLoopDrivetrain::CL_POSITION:
+		turnmode = "Position";
+		break;
+	}
+	sdb->PutString(prefix + "Turn mode", turnmode);
+
+	sdb->PutDouble((prefix + "Left Duty Cycle").c_str(),
+			action->drivetrain->raw.leftDutyCycle);
+	sdb->PutDouble((prefix + "Right Duty Cycle").c_str(),
+			action->drivetrain->raw.rightDutyCycle);
+	sdb->PutDouble((prefix + "Left Braking Duty Cycle").c_str(),
+			action->drivetrain->raw.leftBrakingDutyCycle);
+	sdb->PutDouble((prefix + "Right Braking Duty Cycle").c_str(),
+			action->drivetrain->raw.rightBrakingDutyCycle);
 }

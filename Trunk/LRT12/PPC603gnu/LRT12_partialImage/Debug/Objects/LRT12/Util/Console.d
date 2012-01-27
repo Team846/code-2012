@@ -1,7 +1,7 @@
 LRT12_partialImage/Debug/Objects/LRT12/Util/Console.o:  \
  C:/WindRiver/workspace/LRT12/Util/Console.cpp \
   C:/WindRiver/workspace/LRT12/Util/Console.h \
-  C:/WindRiver/workspace/LRT12/Util/AsynchronousPrinter.h \
+  C:/WindRiver/workspace/LRT12/Util/AsyncPrinter.h \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/queue \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/algorithm \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/memory \
@@ -320,7 +320,7 @@ LRT12_partialImage/Debug/Objects/LRT12/Util/Console.o:  \
 
 C:/WindRiver/workspace/LRT12/Util/Console.h:
 
-C:/WindRiver/workspace/LRT12/Util/AsynchronousPrinter.h:
+C:/WindRiver/workspace/LRT12/Util/AsyncPrinter.h:
 
 c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/queue:
 
