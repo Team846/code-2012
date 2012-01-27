@@ -39,6 +39,8 @@ void _GLOBAL__I__ZN3Esc14CurrentLimiterC2Ev();
 
 void _GLOBAL__I__ZN3LCD8instanceE();
 
+void _GLOBAL__I__ZN3Log10m_instanceE();
+
 void _GLOBAL__I__ZN5BrainC2Ev();
 
 void _GLOBAL__I__ZN5Build6NUMBERE();
@@ -52,6 +54,8 @@ void _GLOBAL__I__ZN7ShifterC2Ev();
 void _GLOBAL__I__ZN8LRTServoC2EjPc();
 
 void _GLOBAL__I__ZN8LauncherC2Ev();
+
+void _GLOBAL__I__ZN8LoggableC2Ev();
 
 void _GLOBAL__I__ZN8Profiler8instanceE();
 
@@ -94,6 +98,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN20ClosedLoopDrivetrainC2Ev,
     _GLOBAL__I__ZN3Esc14CurrentLimiterC2Ev,
     _GLOBAL__I__ZN3LCD8instanceE,
+    _GLOBAL__I__ZN3Log10m_instanceE,
     _GLOBAL__I__ZN5BrainC2Ev,
     _GLOBAL__I__ZN5Build6NUMBERE,
     _GLOBAL__I__ZN6Config8instanceE,
@@ -101,6 +106,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN7ShifterC2Ev,
     _GLOBAL__I__ZN8LRTServoC2EjPc,
     _GLOBAL__I__ZN8LauncherC2Ev,
+    _GLOBAL__I__ZN8LoggableC2Ev,
     _GLOBAL__I__ZN8Profiler8instanceE,
     _GLOBAL__I__ZN9Component19createComponentDataEbi,
     _GLOBAL__I__ZN12PrintCommandC2EPKc,
@@ -147,6 +153,8 @@ void _GLOBAL__D__ZN3Esc14CurrentLimiterC2Ev();
 
 void _GLOBAL__D__ZN3LCD8instanceE();
 
+void _GLOBAL__D__ZN3Log10m_instanceE();
+
 void _GLOBAL__D__ZN5BrainC2Ev();
 
 void _GLOBAL__D__ZN5Build6NUMBERE();
@@ -160,6 +168,8 @@ void _GLOBAL__D__ZN7ShifterC2Ev();
 void _GLOBAL__D__ZN8LRTServoC2EjPc();
 
 void _GLOBAL__D__ZN8LauncherC2Ev();
+
+void _GLOBAL__D__ZN8LoggableC2Ev();
 
 void _GLOBAL__D__ZN8Profiler8instanceE();
 
@@ -198,6 +208,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN20ClosedLoopDrivetrainC2Ev,
     _GLOBAL__D__ZN3Esc14CurrentLimiterC2Ev,
     _GLOBAL__D__ZN3LCD8instanceE,
+    _GLOBAL__D__ZN3Log10m_instanceE,
     _GLOBAL__D__ZN5BrainC2Ev,
     _GLOBAL__D__ZN5Build6NUMBERE,
     _GLOBAL__D__ZN6Config8instanceE,
@@ -205,6 +216,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN7ShifterC2Ev,
     _GLOBAL__D__ZN8LRTServoC2EjPc,
     _GLOBAL__D__ZN8LauncherC2Ev,
+    _GLOBAL__D__ZN8LoggableC2Ev,
     _GLOBAL__D__ZN8Profiler8instanceE,
     _GLOBAL__D__ZN9Component19createComponentDataEbi,
     _GLOBAL__D__ZN9Scheduler9_instanceE,

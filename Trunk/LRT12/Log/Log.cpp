@@ -1,5 +1,8 @@
 #include "Log.h"
-#include "WPILib/SmartDashboard/SmartDashboard.h"
+#include "Loggable.h"
+
+Log* Log::m_instance = NULL;
+std::vector<Loggable*> Log::m_loggables;
 
 Log::Log()
 {
@@ -23,7 +26,7 @@ void Log::logAll()
 {
 	for (uint32_t i = 0; i < m_loggables.size(); i++)
 	{
-		Loggable* ptr = m_loggables[i];
+		Loggable* ptr = m_loggables.at(i);
 
 		if (ptr->shouldLog())
 		{

@@ -1,6 +1,6 @@
 #include "ConfigLoader.h"
 #include "..\Config\Config.h"
-#include "..\Util\AsynchronousPrinter.h"
+#include "..\Util\AsyncPrinter.h"
 #include "..\ActionData\ConfigAction.h"
 
 ConfigLoader::ConfigLoader() :

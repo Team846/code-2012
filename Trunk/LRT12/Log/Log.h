@@ -2,7 +2,9 @@
 #define LRT_LOG_H_
 
 #include <vector>
-#include "Loggable.h"
+#include <WPILib.h>
+
+class Loggable;
 
 /*!
  * Class to simplify logging
@@ -31,8 +33,10 @@ public:
 	static void logAll();
 
 private:
-	Log();
+	Log();DISALLOW_COPY_AND_ASSIGN( Log);
+
 	static Log* m_instance;
 	static std::vector<Loggable*> m_loggables;
 };
+
 #endif

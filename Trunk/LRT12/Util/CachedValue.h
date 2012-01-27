@@ -6,7 +6,8 @@
  * @author Robert Ying
  */
 
-class CachedFloat
+template<class T>
+class CachedValue
 {
 public:
 	/*!
@@ -14,30 +15,30 @@ public:
 	 * @param initialValue the initial cached value
 	 * @param cacheCycles the number of cycles before automatic refresh
 	 */
-	CachedFloat(float initialValue, int cacheCycles = 25);
+	CachedValue(T initialValue, int cacheCycles = 25);
 
 	/*!
 	 * @brief Constructs a new cached value object
 	 */
-	CachedFloat();
+	CachedValue();
 
 	/*!
 	 * @brief Set a new value to be cached, automatically sets the new value flag
 	 * @param newValue the new value to be cached
 	 */
-	void setValue(float newValue);
+	void setValue(T newValue);
 
 	/*!
 	 * @brief Gets the most recent cached value and clears the new value flag 
 	 * @return the cached value
 	 */
-	float getValue();
+	T getValue();
 
 	/*!
-	 * Gets the most recent cached value without clearing hte new value flag
+	 * @brief Gets the most recent cached value
 	 * @return
 	 */
-	float peek();
+	T peek();
 
 	/*!
 	 * @brief Forcibly sets the new value flag.
@@ -73,8 +74,8 @@ public:
 	bool isCaching();
 
 private:
-	volatile float m_value;
-	volatile float m_previous_value;
+	volatile T m_value;
+	volatile T m_previous_value;
 	bool m_has_new_value;
 	bool m_is_caching;
 	bool m_has_been_set;
@@ -82,85 +83,96 @@ private:
 	int m_cache_cycles;
 };
 
-/*!
- * @brief Basic class to keep track of cached values
- * @author Robert Ying
- */
-
-class CachedInt
+template<class T>
+CachedValue<T>::CachedValue(T initialValue, int cacheCycles)
 {
-public:
-	/*!
-	 * @brief Constructs a new cached value object with an initial value
-	 * @param initialValue the initial cached value
-	 * @param cacheCycles the number of cycles before automatic refresh
-	 */
-	CachedInt(int initialValue, int cacheCycles = 25);
+	m_value = initialValue;
+	m_cache_cycles = cacheCycles;
+	enableCaching(cacheCycles);
+	uncache();
+	m_has_been_set = true;
+}
 
-	/*!
-	 * @brief Constructs a new cached value object
-	 */
-	CachedInt();
+template<class T>
+CachedValue<T>::CachedValue()
+{
+	enableCaching(25);
+	m_has_new_value = false;
+	m_has_been_set = false;
+}
 
-	/*!
-	 * @brief Set a new value to be cached, automatically sets the new value flag
-	 * @param newValue the new value to be cached
-	 */
-	void setValue(int newValue);
+template<class T>
+void CachedValue<T>::setValue(T newValue)
+{
+	m_has_been_set = true;
+	// value is already cached, ignore input
+	if (m_previous_value == newValue)
+	{
+		return;
+	}
 
-	/*!
-	 * @brief Gets the most recent cached value and clears the new value flag 
-	 * @return the cached value
-	 */
-	int getValue();
+	// set new item flag
+	m_value = newValue;
+	uncache();
+}
 
-	/*!
-	 * Gets the most recent cached value without clearing hte new value flag
-	 * @return
-	 */
-	int peek();
+template<class T>
+T CachedValue<T>::getValue()
+{
+	m_has_new_value = false;
+	m_previous_value = m_value;
+	return m_value;
+}
 
-	/*!
-	 * @brief Forcibly sets the new value flag.
-	 */
-	void uncache();
+template<class T>
+T CachedValue<T>::peek()
+{
+	return m_value;
+}
 
-	/*!
-	 * @brief Increments the internal cycle counter
-	 */
-	void incrementCounter();
+template<class T>
+void CachedValue<T>::uncache()
+{
+	m_has_new_value = true;
+	m_counter = 0;
+}
 
-	/*!
-	 * @brief Enables caching, defaults to previous setting of cache cycles
-	 * @param cacheCycles number of cycles to cache
-	 */
-	void enableCaching(int cacheCycles = -1);
+template<class T>
+void CachedValue<T>::incrementCounter()
+{
+	if (!m_is_caching || ++m_counter >= m_cache_cycles)
+	{
+		uncache();
+	}
+}
 
-	/*!
-	 * @brief Disables caching
-	 */
-	void disableCaching();
+template<class T>
+void CachedValue<T>::enableCaching(int cacheCycles)
+{
+	m_is_caching = true;
 
-	/*!
-	 * Flag for new or updated cache value
-	 * @return whether or not the cached value has changed
-	 */
-	bool hasNewValue();
+	if (cacheCycles != -1)
+	{
+		m_cache_cycles = cacheCycles;
+	}
+}
 
-	/*!
-	 * Flag for whether or not caching is enabled
-	 * @return whether or not caching is enabled
-	 */
-	bool isCaching();
+template<class T>
+void CachedValue<T>::disableCaching()
+{
+	m_is_caching = false;
+}
 
-private:
-	volatile int m_value;
-	volatile int m_previous_value;
-	bool m_has_new_value;
-	bool m_is_caching;
-	bool m_has_been_set;
-	int m_counter;
-	int m_cache_cycles;
-};
+template<class T>
+bool CachedValue<T>::hasNewValue()
+{
+	return m_has_been_set && (m_has_new_value || !m_is_caching);
+}
 
+template<class T>
+bool CachedValue<T>::isCaching()
+{
+	return m_is_caching;
+}
+///
 #endif

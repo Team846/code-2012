@@ -11,7 +11,7 @@
 #include "Util/AsyncPrinter.h"
 #include "Util/PrintInConstructor.h"
 
-#include "Jaguar/AsynchronousCANJaguar.h"
+#include "Jaguar/AsyncCANJaguar.h"
 class LRTRobot12: public LRTRobotBase
 {
 public:

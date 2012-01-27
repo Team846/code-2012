@@ -1,6 +1,7 @@
 #ifndef LOGGABLE_H_
 #define LOGGABLE_H_
 
+#include "Log.h"
 #include "WPILib/SmartDashboard/SmartDashboard.h"
 
 /*!
