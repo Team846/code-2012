@@ -1,7 +1,6 @@
 #include "CachedValue.h"
 
-template<class T>
-CachedValue<T>::CachedValue(T initialValue, int cacheCycles)
+CachedInt::CachedInt(int initialValue, int cacheCycles)
 {
 	m_value = initialValue;
 	m_cache_cycles = cacheCycles;
@@ -10,16 +9,14 @@ CachedValue<T>::CachedValue(T initialValue, int cacheCycles)
 	m_has_been_set = true;
 }
 
-template<class T>
-CachedValue<T>::CachedValue()
+CachedInt::CachedInt()
 {
 	enableCaching(25);
 	m_has_new_value = false;
 	m_has_been_set = false;
 }
 
-template<class T>
-void CachedValue<T>::setValue(T newValue)
+void CachedInt::setValue(int newValue)
 {
 	m_has_been_set = true;
 	// value is already cached, ignore input
@@ -33,23 +30,20 @@ void CachedValue<T>::setValue(T newValue)
 	uncache();
 }
 
-template<class T>
-T CachedValue<T>::getValue()
+int CachedInt::getValue()
 {
 	m_has_new_value = false;
 	m_previous_value = m_value;
 	return m_value;
 }
 
-template<class T>
-void CachedValue<T>::uncache()
+void CachedInt::uncache()
 {
 	m_has_new_value = true;
 	m_counter = 0;
 }
 
-template<class T>
-void CachedValue<T>::incrementCounter()
+void CachedInt::incrementCounter()
 {
 	if (!m_is_caching || ++m_counter >= m_cache_cycles)
 	{
@@ -57,8 +51,7 @@ void CachedValue<T>::incrementCounter()
 	}
 }
 
-template<class T>
-void CachedValue<T>::enableCaching(int cacheCycles)
+void CachedInt::enableCaching(int cacheCycles)
 {
 	m_is_caching = true;
 
@@ -68,20 +61,94 @@ void CachedValue<T>::enableCaching(int cacheCycles)
 	}
 }
 
-template<class T>
-void CachedValue<T>::disableCaching()
+void CachedInt::disableCaching()
 {
 	m_is_caching = false;
 }
 
-template<class T>
-bool CachedValue<T>::hasNewValue()
+bool CachedInt::hasNewValue()
 {
 	return m_has_been_set && (m_has_new_value || !m_is_caching);
 }
 
-template<class T>
-bool CachedValue<T>::isCaching()
+bool CachedInt::isCaching()
 {
 	return m_is_caching;
 }
+
+CachedFloat::CachedFloat(float initialValue, int cacheCycles)
+{
+	m_value = initialValue;
+	m_cache_cycles = cacheCycles;
+	enableCaching(cacheCycles);
+	uncache();
+	m_has_been_set = true;
+}
+
+CachedFloat::CachedFloat()
+{
+	enableCaching(25);
+	m_has_new_value = false;
+	m_has_been_set = false;
+}
+
+void CachedFloat::setValue(float newValue)
+{
+	m_has_been_set = true;
+	// value is already cached, ignore input
+	if (m_previous_value == newValue)
+	{
+		return;
+	}
+
+	// set new item flag
+	m_value = newValue;
+	uncache();
+}
+
+float CachedFloat::getValue()
+{
+	m_has_new_value = false;
+	m_previous_value = m_value;
+	return m_value;
+}
+
+void CachedFloat::uncache()
+{
+	m_has_new_value = true;
+	m_counter = 0;
+}
+
+void CachedFloat::incrementCounter()
+{
+	if (!m_is_caching || ++m_counter >= m_cache_cycles)
+	{
+		uncache();
+	}
+}
+
+void CachedFloat::enableCaching(int cacheCycles)
+{
+	m_is_caching = true;
+
+	if (cacheCycles != -1)
+	{
+		m_cache_cycles = cacheCycles;
+	}
+}
+
+void CachedFloat::disableCaching()
+{
+	m_is_caching = false;
+}
+
+bool CachedFloat::hasNewValue()
+{
+	return m_has_been_set && (m_has_new_value || !m_is_caching);
+}
+
+bool CachedFloat::isCaching()
+{
+	return m_is_caching;
+}
+

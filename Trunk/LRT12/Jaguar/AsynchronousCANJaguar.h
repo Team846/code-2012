@@ -46,28 +46,28 @@ private:
 	int m_channel;
 	char* m_name;
 
-	CachedValue<float> m_setpoint;
-	CachedValue<NeutralMode> m_neutral_mode;
-	CachedValue<ControlMode> m_control_mode;
-	CachedValue<PositionReference> m_position_reference;
-	CachedValue<SpeedReference> m_speed_reference;
+	CachedFloat m_setpoint;
+	CachedInt m_neutral_mode;
+	CachedInt m_control_mode;
+	CachedInt m_position_reference;
+	CachedInt m_speed_reference;
 
-	CachedValue<double> m_pid_p;
-	CachedValue<double> m_pid_i;
-	CachedValue<double> m_pid_d;
+	CachedFloat m_pid_p;
+	CachedFloat m_pid_i;
+	CachedFloat m_pid_d;
 
-	CachedValue<double> m_enable_control;
+	CachedFloat m_enable_control;
 	bool m_should_disable_control;
 
-	CachedValue<double> m_voltage_ramp_rate;
-	CachedValue<double> m_max_output_voltage;
-	CachedValue<float> m_fault_time;
-	CachedValue<float> m_expiration;
-	CachedValue<UINT16> m_encoder_codes_per_rev;
-	CachedValue<UINT16> m_potentiometer_turns;
+	CachedFloat m_voltage_ramp_rate;
+	CachedFloat m_max_output_voltage;
+	CachedFloat m_fault_time;
+	CachedFloat m_expiration;
+	CachedInt m_encoder_codes_per_rev;
+	CachedInt m_potentiometer_turns;
 
-	CachedValue<double> m_forward_limit_position;
-	CachedValue<double> m_reverse_limit_position;
+	CachedFloat m_forward_limit_position;
+	CachedFloat m_reverse_limit_position;
 	volatile bool m_should_disable_position_limits;
 
 	volatile uint32_t m_collection_flags;
@@ -435,12 +435,5 @@ public:
 	 */
 	void ResetCache();
 };
-
-template class CachedValue<AsynchronousCANJaguar::NeutralMode> ;
-template class CachedValue<AsynchronousCANJaguar::ControlMode> ;
-template class CachedValue<UINT16> ;
-template class CachedValue<double> ;
-template class CachedValue<AsynchronousCANJaguar::PositionReference> ;
-template class CachedValue<AsynchronousCANJaguar::SpeedReference> ;
 
 #endif /* PROXIED_CAN_JAGUAR_H_ */

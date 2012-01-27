@@ -116,18 +116,21 @@ void AsynchronousCANJaguar::CommTask()
 		if (m_control_mode.hasNewValue())
 		{
 			ResetCache();
-			CANJaguar::ChangeControlMode(m_control_mode.getValue());
+			CANJaguar::ChangeControlMode(
+					(AsynchronousCANJaguar::ControlMode) m_control_mode.getValue());
 			// note that m_control_mode should be uncached as of this point
 		}
 
 		if (m_position_reference.hasNewValue())
 		{
-			CANJaguar::SetPositionReference(m_position_reference.getValue());
+			CANJaguar::SetPositionReference(
+					(AsynchronousCANJaguar::PositionReference) m_position_reference.getValue());
 		}
 
 		if (m_speed_reference.hasNewValue())
 		{
-			CANJaguar::SetSpeedReference(m_speed_reference.getValue());
+			CANJaguar::SetSpeedReference(
+					(AsynchronousCANJaguar::SpeedReference) m_speed_reference.getValue());
 		}
 
 		if (m_pid_p.hasNewValue() || m_pid_i.hasNewValue()
@@ -197,7 +200,8 @@ void AsynchronousCANJaguar::CommTask()
 		//change the mode, then do the set point.
 		if (m_neutral_mode.hasNewValue())
 		{
-			CANJaguar::ConfigNeutralMode(m_neutral_mode.getValue());
+			CANJaguar::ConfigNeutralMode(
+					(AsynchronousCANJaguar::NeutralMode) m_neutral_mode.getValue());
 		}
 
 		if (m_setpoint.hasNewValue())
@@ -363,26 +367,26 @@ void AsynchronousCANJaguar::CommTask()
 
 void AsynchronousCANJaguar::BeginComm()
 {
-	semGive( m_comm_semaphore);
+	semGive(m_comm_semaphore);
 }
 
 //Set() is ambiguous, since it doesn't include the mode.
 //We've replaced them with specific command.  They are still in progress.  TODO -dg
 void AsynchronousCANJaguar::SetDutyCycle(float duty_cycle)
 {
-	m_control_mode.setValue(kPercentVbus);
+	m_control_mode.setValue((int) kPercentVbus);
 	m_setpoint.setValue(duty_cycle);
 }
 
 void AsynchronousCANJaguar::SetPosition(float position)
 {
-	m_control_mode.setValue(kPosition);
+	m_control_mode.setValue((int) kPosition);
 	m_setpoint.setValue(position);
 }
 
 void AsynchronousCANJaguar::SetVelocity(float velocity)
 {
-	m_control_mode.setValue(kSpeed);
+	m_control_mode.setValue((int) kSpeed);
 	m_setpoint.setValue(velocity);
 }
 
@@ -395,13 +399,13 @@ void AsynchronousCANJaguar::Set(float setpoint, UINT8 syncGroup)
 void AsynchronousCANJaguar::SetPositionReference(
 		CANJaguar::PositionReference reference)
 {
-	m_position_reference.setValue(reference);
+	m_position_reference.setValue((int) reference);
 }
 
 void AsynchronousCANJaguar::SetSpeedReference(
 		CANJaguar::SpeedReference reference)
 {
-	m_speed_reference.setValue(reference);
+	m_speed_reference.setValue((int) reference);
 }
 
 void AsynchronousCANJaguar::SetPID(double p, double i, double d)
@@ -413,12 +417,12 @@ void AsynchronousCANJaguar::SetPID(double p, double i, double d)
 
 void AsynchronousCANJaguar::ConfigNeutralMode(NeutralMode mode)
 {
-	m_neutral_mode.setValue(mode);
+	m_neutral_mode.setValue((int) mode);
 }
 
 void AsynchronousCANJaguar::ChangeControlMode(ControlMode mode)
 {
-	m_control_mode.setValue(mode);
+	m_control_mode.setValue((int) mode);
 }
 
 void AsynchronousCANJaguar::EnableControl(double encoderInitialPosition)

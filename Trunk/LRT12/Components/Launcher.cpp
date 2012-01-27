@@ -75,3 +75,8 @@ void Launcher::Output()
 		break;
 	}
 }
+
+std::string Launcher::GetName()
+{
+	return m_name;
+}
