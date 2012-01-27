@@ -7,7 +7,7 @@
  * @author Brian Axelrod
  */
 
-class PID_controller
+class PID
 {
 public:
 	/*!
@@ -19,13 +19,13 @@ public:
 	 * @param i_decay integral decay (defaults to 0.5)
 	 * @param feedforward whether or not feedforward is used
 	 */
-	PID_controller(float p_gain, float i_gain, float d_gain,
+	PID(float p_gain, float i_gain, float d_gain,
 			float ff_gain = 1.0, float i_decay = 0.5, bool feedforward = true);
 
 	/*!
 	 * @brief Constructs a PID controller with no gains set
 	 */
-	PID_controller();
+	PID();
 
 	/*!
 	 * @brief Sets PID parameters. All gains are in constant (not timebase) form

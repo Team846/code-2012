@@ -1,6 +1,6 @@
 #include "LCD.h"
 #include "..\Util\Util.h"
-#include "..\Util\AsynchronousPrinter.h"
+#include "../Util/AsyncPrinter.h"
 #include "NetworkCommunication/FRCComm.h"
 #include <cstdio>
 #include <Synchronized.h>
@@ -43,7 +43,7 @@ void LCD::Print(UINT8 line, const char* format, ...)
 {
 	if (line > kNumBufferLines)
 	{
-		AsynchronousPrinter::Printf("LCD: out of bounds %d\n", line);
+		AsyncPrinter::Printf("LCD: out of bounds %d\n", line);
 		return;
 	}
 
@@ -100,8 +100,8 @@ void LCD::ScrollLCD(int x, int y)
 	curColumnIndex = Util::Clamp<int>(curColumnIndex + x, 0,
 			kNumBufferColumns - kNumLcdPhysicalColumns);
 
-	AsynchronousPrinter::Printf("DS LCD Scroll %d %d => %d,%d\n", x, y,
-			curLineIndex, curColumnIndex);
+	AsyncPrinter::Printf("DS LCD Scroll %d %d => %d,%d\n", x, y, curLineIndex,
+			curColumnIndex);
 }
 
 void LCD::UpdateHeartbeat(bool isServiceMode)

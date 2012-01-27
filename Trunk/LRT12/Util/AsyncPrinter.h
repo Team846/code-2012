@@ -10,11 +10,11 @@ using std::string;
 /*!
  * @brief Provides an asynchronous equivilent of printf. 
  */
-class AsynchronousPrinter
+class AsyncPrinter
 {
 public:
-	virtual ~AsynchronousPrinter(); //why is this virtual? -dg
-	static AsynchronousPrinter& Instance();
+	virtual ~AsyncPrinter(); //why is this virtual? -dg
+	static AsyncPrinter& Instance();
 
 	/*!
 	 * @brief Asynchronous alternative to Printf
@@ -27,7 +27,7 @@ public:
 	}
 
 protected:
-	AsynchronousPrinter();
+	AsyncPrinter();
 
 private:
 	static int PrinterTaskWrapper(); //match (FUNCPTR):  int *FUNCPTR(...)
@@ -42,7 +42,7 @@ private:
 	Task printerTask; //T vsWorks background task that prints the buffered output.
 	queue<string> queue_;
 
-	const static int kMaxBuffer_ = 4096;DISALLOW_COPY_AND_ASSIGN(AsynchronousPrinter);
+	const static int kMaxBuffer_ = 4096;DISALLOW_COPY_AND_ASSIGN(AsyncPrinter);
 };
 
 #endif

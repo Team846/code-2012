@@ -6,7 +6,7 @@
 #include "..\Config\Configurable.h"
 #include "..\Config\RobotConfig.h"
 #include "..\Util\Util.h"
-#include "..\Util\AsynchronousPrinter.h"
+#include "../Util/AsyncPrinter.h"
 
 #define CHANGEME 0
 

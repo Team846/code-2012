@@ -36,7 +36,7 @@ LRTRobot12::~LRTRobot12()
 
 	//End background printing; Request print task to stop and die.
 	//Premature?  We could move this to ~LRTRobotBase()
-	AsynchronousPrinter::Quit();
+	AsyncPrinter::Quit();
 }
 
 void LRTRobot12::RobotInit()
@@ -48,7 +48,7 @@ void LRTRobot12::RobotInit()
 					+ "-" + Util::ToString<int>(
 					config.Get<int> ("Build", "RunNumber", 0))).c_str();
 
-	AsynchronousPrinter::Printf(build);
+	AsyncPrinter::Printf(build);
 }
 
 static int ExecutionNotify(...)

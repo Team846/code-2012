@@ -3,7 +3,7 @@
 
 #include "Util\Util.h"
 #include "Util\Profiler.h"
-#include "Util\AsynchronousPrinter.h"
+#include "Util\AsyncPrinter.h"
 #include <semLib.h>
 #include <WPILib.h>
 #include <vxWorks.h>

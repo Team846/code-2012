@@ -1,20 +1,18 @@
 #ifndef ESC_H_
 #define ESC_H_
 
-#include "AsynchronousCANJaguar.h"
+#include "AsyncCANJaguar.h"
 #include "CANJaguarBrake.h"
 #include "WPILib.h"
 #include "..\Config\Config.h"
 #include "..\Config\Configurable.h"
-#include "..\Util\AsynchronousPrinter.h"
+#include "..\Util\AsyncPrinter.h"
 #include "..\Sensors\DriveEncoders.h"
 #include "..\Util\RunningSum.h"
 #include <string>
 using namespace std;
 
-class Esc: public AsynchronousCANJaguar,
-		public CANJaguarBrake,
-		public Configurable
+class Esc: public AsyncCANJaguar, public CANJaguarBrake, public Configurable
 {
 public:
 	Esc(int channel, LRTEncoder& encoder, string name);

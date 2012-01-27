@@ -36,7 +36,7 @@ void Console::PrintEverySecond(const char* format, ...)
 		va_start(args, format);
 
 		vsprintf(buffer, format, args); // format string into buffer
-		AsynchronousPrinter::Printf(buffer);
+		AsyncPrinter::Printf(buffer);
 		va_end(args);
 	}
 }
@@ -52,7 +52,7 @@ void Console::PrintEveryHalfSecond(const char* format, ...)
 		va_start(args, format);
 
 		vsprintf(buffer, format, args); // format string into buffer
-		AsynchronousPrinter::Printf(buffer);
+		AsyncPrinter::Printf(buffer);
 		va_end(args);
 	}
 }
@@ -69,7 +69,7 @@ void Console::PrintMultipleTimesPerSecond(float hertz, const char* format, ...)
 		va_start(args, format);
 
 		vsprintf(buffer, format, args); // format string into buffer
-		AsynchronousPrinter::Printf(buffer);
+		AsyncPrinter::Printf(buffer);
 		va_end(args);
 	}
 }

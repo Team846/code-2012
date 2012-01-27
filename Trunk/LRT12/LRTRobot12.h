@@ -8,7 +8,7 @@
 #include "wdLib.h"
 #include "sysLib.h"
 
-#include "Util/AsynchronousPrinter.h"
+#include "Util/AsyncPrinter.h"
 #include "Util/PrintInConstructor.h"
 
 #include "Jaguar/AsynchronousCANJaguar.h"

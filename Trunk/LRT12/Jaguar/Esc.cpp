@@ -25,8 +25,8 @@ float Esc::CurrentLimiter::Limit(float targetSpeed, float robotSpeed)
 
 // Esc Class
 Esc::Esc(int channel, LRTEncoder& encoder, string name) :
-	AsynchronousCANJaguar(channel, "ESC?"),
-			CANJaguarBrake((*(AsynchronousCANJaguar*) this)),
+	AsyncCANJaguar(channel, "ESC?"),
+			CANJaguarBrake((*(AsyncCANJaguar*) this)),
 			m_hasPartner(false), m_partner(NULL), m_encoder(encoder),
 			m_name(name), m_index(0), m_stopping_integrator(0),
 			m_error_running(0)
@@ -34,8 +34,8 @@ Esc::Esc(int channel, LRTEncoder& encoder, string name) :
 }
 
 Esc::Esc(int channelA, int channelB, LRTEncoder& encoder, string name) :
-	AsynchronousCANJaguar(channelA, "ESC A?"),
-			CANJaguarBrake((*(AsynchronousCANJaguar*) this)),
+	AsyncCANJaguar(channelA, "ESC A?"),
+			CANJaguarBrake((*(AsyncCANJaguar*) this)),
 			m_hasPartner(true),
 			m_partner(new Esc(channelB, encoder, name + "B")),
 			m_encoder(encoder), m_name(name + "A"), m_index(0),
@@ -102,13 +102,13 @@ void Esc::SetDutyCycle(float speed)
 #endif
 
 	// no current limiting
-	AsynchronousCANJaguar::SetDutyCycle(Util::Clamp<float>(speed, -1.0, 1.0));
+	AsyncCANJaguar::SetDutyCycle(Util::Clamp<float>(speed, -1.0, 1.0));
 	//    controller.Set(channel, Util::Clamp<float>(speed, -1.0, 1.0));
 }
 
 void Esc::ResetCache()
 {
-	AsynchronousCANJaguar::ResetCache();
+	AsyncCANJaguar::ResetCache();
 	if (m_hasPartner)
 		m_partner->ResetCache();
 }

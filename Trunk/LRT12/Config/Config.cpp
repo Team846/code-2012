@@ -1,6 +1,6 @@
 #include "Build.h"
 #include "Config.h"
-#include "../Util/AsynchronousPrinter.h"
+#include "../Util/AsyncPrinter.h"
 #include <ctype.h>
 #include <sstream>
 
@@ -92,7 +92,7 @@ void Config::Load()
 		analogAssignmentScaleMax[i] = Get<float> ("Assignable",
 				keyname + ".scaleMax", 1);
 	}
-	AsynchronousPrinter::Printf("Done loading file\n");
+	AsyncPrinter::Printf("Done loading file\n");
 }
 
 map<string, string> Config::tload(string path)
@@ -111,7 +111,7 @@ map<string, string> Config::tload(string path)
 			ret[key] = val;
 		}
 
-		AsynchronousPrinter::Printf("  Cfg:%s=%s\n", key.c_str(), val.c_str());
+		AsyncPrinter::Printf("  Cfg:%s=%s\n", key.c_str(), val.c_str());
 	}
 
 	fin.close();
@@ -185,12 +185,12 @@ void Config::CheckForFileUpdates()
 		Load();
 
 		// must configure the new values
-		AsynchronousPrinter::Printf("Applying Configuration\n");
+		AsyncPrinter::Printf("Applying Configuration\n");
 		ConfigureAll();
 
 		//Wait for printing if this is the first time the program is read.
 		if (0 == configLastReadTime_)
-			while (!AsynchronousPrinter::QueueEmpty())
+			while (!AsyncPrinter::QueueEmpty())
 				Wait(0.010);
 
 		// Load() sometimes saves the configuration,
@@ -268,12 +268,13 @@ template<typename T> void Config::Set(string sectionName, string key, T val)
 		string newString = valueLocation->substr(0, indexOfStartOfOldValue);
 		newString += key + "=";
 		newString += newVal;
-		newString += valueLocation->substr(min(indexOfEquals + oldVal.size(), valueLocation->size()));
+		newString += valueLocation->substr(
+				min(indexOfEquals + oldVal.size(), valueLocation->size()));
 		//dies on next line
 		printf("Almost dead\n");
 		*valueLocation = newString;
 		printf("Not dead\n");
-//		valueLocation->replace(indexOfStartOfOldValue, oldVal.size(), newVal);
+		//		valueLocation->replace(indexOfStartOfOldValue, oldVal.size(), newVal);
 	}
 	else //if the value doesn't yet exist add it
 	{
@@ -343,7 +344,7 @@ void Config::LoadFile(string path)
 	ifstream fin(path.c_str());
 	if (!fin.is_open())
 	{
-		AsynchronousPrinter::Printf("Config could not open %s for reading\n",
+		AsyncPrinter::Printf("Config could not open %s for reading\n",
 				path.c_str());
 		return;
 	}
@@ -397,7 +398,7 @@ void Config::LoadFile(string path)
 		{
 			currentSection = line.substr(1, line.find_last_of("]") - 1);
 			(*sectionsMap)[currentSection] = iter;
-			AsynchronousPrinter::Printf("%s\n", currentSection.c_str());
+			AsyncPrinter::Printf("%s\n", currentSection.c_str());
 			continue;
 		}
 
@@ -411,7 +412,7 @@ void Config::LoadFile(string path)
 		ConfigVal newVal;
 		newVal.val = val;
 		newVal.positionInFile = iter;
-		AsynchronousPrinter::Printf("\t%s=%s\n", key.c_str(), val.c_str());
+		AsyncPrinter::Printf("\t%s=%s\n", key.c_str(), val.c_str());
 		(*newConfigData)[currentSection][key] = newVal;
 	}
 }
@@ -421,7 +422,7 @@ void Config::SaveToFile(string path)
 	ofstream fout(path.c_str());
 	if (!fout.is_open())
 	{
-		AsynchronousPrinter::Printf("Config could not open %s for writing\n",
+		AsyncPrinter::Printf("Config could not open %s for writing\n",
 				path.c_str());
 		return;
 	}

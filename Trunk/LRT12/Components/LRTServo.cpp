@@ -1,5 +1,5 @@
 #include "LRTServo.h"
-#include "../Util/AsynchronousPrinter.h"
+#include "../Util/AsyncPrinter.h"
 #include "../Util/Util.h"
 
 LRTServo::LRTServo(UINT32 channel, char* name) :
@@ -36,7 +36,7 @@ void LRTServo::Set(float value)
 	if (enabled)
 	{
 		if (previous_value_ != value)
-			AsynchronousPrinter::Printf("%s set: %4f\n", name_,
+			AsyncPrinter::Printf("%s set: %4f\n", name_,
 					previous_value_ = value);
 
 		Servo::Set(value);

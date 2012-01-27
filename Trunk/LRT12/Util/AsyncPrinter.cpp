@@ -1,44 +1,47 @@
-#include "AsynchronousPrinter.h"
+#include "AsyncPrinter.h"
 
 #define PRINT 1
 
-AsynchronousPrinter& AsynchronousPrinter::Instance()
+AsyncPrinter& AsyncPrinter::Instance()
 {
-	static AsynchronousPrinter printer;
+	static AsyncPrinter printer;
 	return printer;
 }
 
-AsynchronousPrinter::AsynchronousPrinter() :
+AsyncPrinter::AsyncPrinter() :
 			quitting_(false),
 			running_(false),
-			semaphore_(semMCreate( SEM_Q_PRIORITY | SEM_DELETE_SAFE	| SEM_INVERSION_SAFE)),
+			semaphore_(
+					semMCreate(
+							SEM_Q_PRIORITY | SEM_DELETE_SAFE
+									| SEM_INVERSION_SAFE)),
 			queue_bytes_(0),
 			printerTask("LRT-AsynchronousPrinter",
-					(FUNCPTR) AsynchronousPrinter::PrinterTaskWrapper)
+					(FUNCPTR) AsyncPrinter::PrinterTaskWrapper)
 {
 	printerTask.Start();
 }
 
-AsynchronousPrinter::~AsynchronousPrinter()
+AsyncPrinter::~AsyncPrinter()
 {
 	if (running_)
 		printerTask.Stop();
 
-	semDelete(semaphore_);
+	semDelete( semaphore_);
 
 	//For some reason, this destructor isn't getting called when the robot task is killed -dg
 	// I never see this line printed.  Hence the call to Aysync...Quit() in the rebot dtor
 	printf("Async Printer deleted");
 }
 
-int AsynchronousPrinter::Printf(const char* format, ...)
+int AsyncPrinter::Printf(const char* format, ...)
 {
 #if !PRINT
 	return 0; // # of bytes printed
 #endif
 	char buffer[256];
 
-	AsynchronousPrinter& me = Instance();
+	AsyncPrinter& me = Instance();
 	if (me.quitting_) //the program is quitting. Abort.
 		return 0; // # of bytes printed
 
@@ -74,12 +77,12 @@ int AsynchronousPrinter::Printf(const char* format, ...)
 }
 
 //May be called externally to stop printing.
-void AsynchronousPrinter::Quit()
+void AsyncPrinter::Quit()
 {
 	Instance().quitting_ = true;
 }
 
-int AsynchronousPrinter::PrinterTaskWrapper()
+int AsyncPrinter::PrinterTaskWrapper()
 {
 #if !PRINT
 	Instance().running_ = false;
@@ -92,7 +95,7 @@ int AsynchronousPrinter::PrinterTaskWrapper()
 	return status;
 }
 
-int AsynchronousPrinter::PrinterTask()
+int AsyncPrinter::PrinterTask()
 {
 	while (!quitting_)
 	{

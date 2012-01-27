@@ -32,8 +32,8 @@ void Profiler::StartNewCycle()
 	{
 		double reportStart = Timer::GetFPGATimestamp();
 
-		AsynchronousPrinter::Printf("----------------------\n");
-		AsynchronousPrinter::Printf("PROFILER (%d cycles)\n", reportPeriod);
+		AsyncPrinter::Printf("----------------------\n");
+		AsyncPrinter::Printf("PROFILER (%d cycles)\n", reportPeriod);
 
 		typedef map<string, double>::value_type paired;
 		typedef set<paired, SortBySecondValue<paired> > SetSortedBySecond;
@@ -54,7 +54,7 @@ void Profiler::StartNewCycle()
 			int count = loggedCounts[it->first];
 			double mean = loggedSums[it->first] / count;
 
-			AsynchronousPrinter::Printf("| %-30s ~%.2f [%.2f-%.2f] x%d\n",
+			AsyncPrinter::Printf("| %-30s ~%.2f [%.2f-%.2f] x%d\n",
 					it->first.c_str(), mean, min, max, count);
 
 			++i;
@@ -67,7 +67,7 @@ void Profiler::StartNewCycle()
 		cycleIndex = 0;
 		ClearLogBuffer();
 
-		AsynchronousPrinter::Printf("End report (%.2f ms)\n", reportTime);
+		AsyncPrinter::Printf("End report (%.2f ms)\n", reportTime);
 	}
 }
 

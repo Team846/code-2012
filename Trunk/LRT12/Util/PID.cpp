@@ -1,17 +1,17 @@
-#include "PID_controller.h"
+#include "PID.h"
 
-PID_controller::PID_controller(float p_gain, float i_gain, float d_gain,
-		float ff_gain, float i_decay, bool feedforward)
+PID::PID(float p_gain, float i_gain, float d_gain, float ff_gain,
+		float i_decay, bool feedforward)
 {
 	setParameters(p_gain, i_gain, d_gain, ff_gain, i_decay, feedforward);
 }
 
-PID_controller::PID_controller()
+PID::PID()
 {
 	setParameters(0, 0, 0);
 }
 
-void PID_controller::setParameters(float p_gain, float i_gain, float d_gain,
+void PID::setParameters(float p_gain, float i_gain, float d_gain,
 		float ff_gain, float i_decay, bool feedforward)
 {
 	reset();
@@ -24,7 +24,7 @@ void PID_controller::setParameters(float p_gain, float i_gain, float d_gain,
 	enablePID();
 }
 
-float PID_controller::update(float dt)
+float PID::update(float dt)
 {
 	m_error = m_setpoint - m_input;
 
@@ -56,67 +56,67 @@ float PID_controller::update(float dt)
 	return m_output;
 }
 
-void PID_controller::setSetpoint(float setpoint)
+void PID::setSetpoint(float setpoint)
 {
 	m_setpoint = setpoint;
 }
 
-void PID_controller::setInput(float input)
+void PID::setInput(float input)
 {
 	m_input = input;
 }
 
-float PID_controller::getProportionalGain()
+float PID::getProportionalGain()
 {
 	return m_proportional_gain;
 }
 
-float PID_controller::getIntegralGain()
+float PID::getIntegralGain()
 {
 	return m_integral_gain;
 }
 
-float PID_controller::getDerivativeGain()
+float PID::getDerivativeGain()
 {
 	return m_derivative_gain;
 }
 
-float PID_controller::getFeedForwardGain()
+float PID::getFeedForwardGain()
 {
 	return m_feedforward_gain;
 }
 
-float PID_controller::getIntegralDecay()
+float PID::getIntegralDecay()
 {
 	return m_integral_decay;
 }
 
-float PID_controller::getInput()
+float PID::getInput()
 {
 	return m_input;
 }
 
-float PID_controller::getSetpoint()
+float PID::getSetpoint()
 {
 	return m_setpoint;
 }
 
-float PID_controller::getError()
+float PID::getError()
 {
 	return m_error;
 }
 
-float PID_controller::getAccumulatedError()
+float PID::getAccumulatedError()
 {
 	return m_acc_error;
 }
 
-float PID_controller::getPreviousError()
+float PID::getPreviousError()
 {
 	return m_prev_error;
 }
 
-float PID_controller::getOutput()
+float PID::getOutput()
 {
 	if (m_enabled)
 		return m_output;
@@ -124,17 +124,17 @@ float PID_controller::getOutput()
 		return m_setpoint;
 }
 
-void PID_controller::disablePID()
+void PID::disablePID()
 {
 	m_enabled = false;
 }
 
-void PID_controller::enablePID()
+void PID::enablePID()
 {
 	m_enabled = true;
 }
 
-void PID_controller::reset()
+void PID::reset()
 {
 	m_acc_error = 0.0;
 	m_error = 0.0;

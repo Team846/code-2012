@@ -21,7 +21,7 @@
  * @author Karthik Viswanathan
  * @author David Giandomenico
  */
-class AsynchronousCANJaguar: public CANJaguar
+class AsyncCANJaguar: public CANJaguar
 {
 public:
 	// collection flags
@@ -102,12 +102,12 @@ public:
 	 * @param channel Channel that the Jaguar is assigned to
 	 * @param name The name of the Jaguar
 	 */
-	AsynchronousCANJaguar(UINT8 channel, char* name);
+	AsyncCANJaguar(UINT8 channel, char* name);
 
 	/*!
 	 * @briefDestroys the Jaguar object and stops the thread
 	 */
-	~AsynchronousCANJaguar();
+	~AsyncCANJaguar();
 
 	/*!
 	 * @brief Stops the background thread
@@ -117,12 +117,12 @@ public:
 	/*!
 	 * @brief LinkedList of all of the constructed CAN Jaguars
 	 */
-	static AsynchronousCANJaguar* jaguar_list_;
+	static AsyncCANJaguar* jaguar_list_;
 
 	/*!
 	 * @brief Pointer to next Jaguar
 	 */
-	AsynchronousCANJaguar* next_jaguar_;
+	AsyncCANJaguar* next_jaguar_;
 
 	/*!
 	 * @brief Set the duty cycle of the Jaguar

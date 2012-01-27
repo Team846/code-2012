@@ -4,7 +4,7 @@
 #include "..\..\Sensors\DriveEncoders.h"
 #include "..\..\Config\Config.h"
 #include "..\..\Config\Configurable.h"
-#include "../../Util/PID_controller.h"
+#include "../../Util/PID.h"
 #include "DitheredBrakeTrain.h"
 
 /*!
@@ -146,19 +146,19 @@ private:
 
 	Config& m_config;
 
-	PID_controller m_rate_drive_high_gear_pid;
-	PID_controller m_rate_drive_low_gear_pid;
-	PID_controller m_rate_turn_high_gear_pid;
-	PID_controller m_rate_turn_low_gear_pid;
-	PID_controller m_drive_disabled;
-	PID_controller m_pos_drive_high_gear_pid;
-	PID_controller m_pos_drive_low_gear_pid;
-	PID_controller m_pos_turn_high_gear_pid;
-	PID_controller m_pos_turn_low_gear_pid;
-	PID_controller m_turn_disabled;
+	PID m_rate_drive_high_gear_pid;
+	PID m_rate_drive_low_gear_pid;
+	PID m_rate_turn_high_gear_pid;
+	PID m_rate_turn_low_gear_pid;
+	PID m_drive_disabled;
+	PID m_pos_drive_high_gear_pid;
+	PID m_pos_drive_low_gear_pid;
+	PID m_pos_turn_high_gear_pid;
+	PID m_pos_turn_low_gear_pid;
+	PID m_turn_disabled;
 
-	PID_controller * m_turn_control;
-	PID_controller * m_drive_control;
+	PID * m_turn_control;
+	PID * m_drive_control;
 
 	bool m_brake_left;
 	bool m_brake_right;

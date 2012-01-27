@@ -1,5 +1,5 @@
 #include "CLDriveTrain.h"
-#include "../../Util/AsynchronousPrinter.h"
+#include "../../Util/AsyncPrinter.h"
 #include <math.h>
 
 ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
@@ -106,7 +106,7 @@ void ClosedLoopDrivetrain::Configure()
 
 DriveCommand ClosedLoopDrivetrain::Drive(float rawFwd, float rawTurn)
 {
-	AsynchronousPrinter::Printf("Hidden drive function called; error\n");
+	AsyncPrinter::Printf("Hidden drive function called; error\n");
 	return DitheredBrakeTrain::Drive(rawFwd, rawTurn);
 }
 
@@ -176,18 +176,17 @@ void ClosedLoopDrivetrain::setDriveControl(CONTROL_TYPE type)
 	default:
 	case CL_DISABLED:
 		m_drive_control = &m_drive_disabled;
-		AsynchronousPrinter::Printf("Disabled closed-loop drive");
+		AsyncPrinter::Printf("Disabled closed-loop drive");
 		break;
 	case CL_RATE:
 		m_drive_control = m_in_high_gear ? &m_rate_drive_high_gear_pid
 				: &m_rate_drive_low_gear_pid;
-		AsynchronousPrinter::Printf("Enabled closed-loop rate control on drive");
+		AsyncPrinter::Printf("Enabled closed-loop rate control on drive");
 		break;
 	case CL_POSITION:
 		m_drive_control = m_in_high_gear ? &m_pos_drive_high_gear_pid
 				: &m_pos_drive_low_gear_pid;
-		AsynchronousPrinter::Printf(
-				"Enabled closed-loop position control on drive");
+		AsyncPrinter::Printf("Enabled closed-loop position control on drive");
 		break;
 	}
 }
@@ -209,18 +208,17 @@ void ClosedLoopDrivetrain::setTurnControl(CONTROL_TYPE type)
 	default:
 	case CL_DISABLED:
 		m_turn_control = &m_turn_disabled;
-		AsynchronousPrinter::Printf("Disabled closed-loop turn");
+		AsyncPrinter::Printf("Disabled closed-loop turn");
 		break;
 	case CL_RATE:
 		m_turn_control = m_in_high_gear ? &m_rate_turn_high_gear_pid
 				: &m_rate_turn_low_gear_pid;
-		AsynchronousPrinter::Printf("Enabled closed-loop rate control on turn");
+		AsyncPrinter::Printf("Enabled closed-loop rate control on turn");
 		break;
 	case CL_POSITION:
 		m_turn_control = m_in_high_gear ? &m_pos_turn_high_gear_pid
 				: &m_pos_turn_low_gear_pid;
-		AsynchronousPrinter::Printf(
-				"Enabled closed-loop position control on turn");
+		AsyncPrinter::Printf("Enabled closed-loop position control on turn");
 		break;
 	}
 }

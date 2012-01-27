@@ -2,7 +2,7 @@
 
 // Note: Should this also contain the SpeedController object?
 // And force it to 0 output when brakelevel > 0
-CANJaguarBrake::CANJaguarBrake(AsynchronousCANJaguar& jaggie) :
+CANJaguarBrake::CANJaguarBrake(AsyncCANJaguar& jaggie) :
 	m_jaguar(jaggie), m_cycle_count(0), m_brake_level(0)
 {
 }
@@ -24,12 +24,13 @@ void CANJaguarBrake::ApplyBrakes()
 		m_cycle_count = 0;
 
 	// select the cycleCount-th bit from the dither pattern; see below
-	bool shouldBrakeThisCycle = ditherPattern[m_brake_level] & (1 << m_cycle_count);
+	bool shouldBrakeThisCycle = ditherPattern[m_brake_level] & (1
+			<< m_cycle_count);
 
 	// ConfigNeutralMode sets whether the jaguar should brake or coast
 	m_jaguar.ConfigNeutralMode(
-			shouldBrakeThisCycle ? AsynchronousCANJaguar::kNeutralMode_Brake
-					: AsynchronousCANJaguar::kNeutralMode_Coast);
+			shouldBrakeThisCycle ? AsyncCANJaguar::kNeutralMode_Brake
+					: AsyncCANJaguar::kNeutralMode_Coast);
 }
 
 /*

@@ -71,7 +71,7 @@ void Drivetrain::Output()
 	else
 	{
 		action->drivetrain->setDriveOperation = false;
-		AsynchronousPrinter::Printf(
+		AsyncPrinter::Printf(
 				"Previous drive operation not complete, discarding");
 	}
 	action->drivetrain->previousDriveOperationComplete
@@ -106,7 +106,7 @@ void Drivetrain::Output()
 	else
 	{
 		action->drivetrain->setTurnOperation = false;
-		AsynchronousPrinter::Printf(
+		AsyncPrinter::Printf(
 				"Previous turn operation not complete, discarding");
 	}
 	action->drivetrain->previousTurnOperationComplete

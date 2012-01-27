@@ -14,7 +14,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
-#include "AsynchronousPrinter.h"
+#include "AsyncPrinter.h"
 
 class Profiler: public SensorBase
 {

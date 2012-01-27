@@ -6,7 +6,7 @@
 #include "../Config/RobotConfig.h"
 #include "../Config/Config.h"
 #include "../ActionData/LauncherAction.h"
-#include "../Jaguar/AsynchronousCANJaguar.h"
+#include "../Jaguar/AsyncCANJaguar.h"
 
 /*!
  * This class controls the ball launcher
@@ -32,7 +32,7 @@ public:
 	virtual std::string GetName();
 private:
 	ACTION::LAUNCHER::launcherState m_prevstate;
-	AsynchronousCANJaguar *m_top_roller, *m_bottom_roller;
+	AsyncCANJaguar *m_top_roller, *m_bottom_roller;
 	std::string m_name;
 	float m_pid_top[3], m_pid_bottom[3];
 	const static int PROPORTIONAL = 0;

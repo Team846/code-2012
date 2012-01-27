@@ -2,7 +2,7 @@
 #define CAN_JAGUAR_BRAKE_H_
 
 #include "CANJaguar.h"
-#include "AsynchronousCANJaguar.h"
+#include "AsyncCANJaguar.h"
 #include "..\Util\Util.h"
 
 /*!
@@ -11,7 +11,7 @@
 
 class CANJaguarBrake
 {
-	AsynchronousCANJaguar& m_jaguar;
+	AsyncCANJaguar& m_jaguar;
 	int m_cycle_count;
 	int m_brake_level;
 
@@ -20,7 +20,7 @@ public:
 	 * @brief constructs a brake
 	 * @param jaggie
 	 */
-	CANJaguarBrake(AsynchronousCANJaguar& jaggie);
+	CANJaguarBrake(AsyncCANJaguar& jaggie);
 
 	/*!
 	 * @brief Sets braking power

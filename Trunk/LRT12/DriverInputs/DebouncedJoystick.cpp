@@ -1,6 +1,6 @@
 #include "DebouncedJoystick.h"
 #include <cstdio>
-#include "..\Util\AsynchronousPrinter.h"
+#include "..\Util\AsyncPrinter.h"
 
 DebouncedJoystick::DebouncedJoystick(UINT32 port, int nBtns, int nAxes) :
 	Joystick(port), nBtns(nBtns), nAxes(nAxes)
@@ -26,7 +26,7 @@ bool DebouncedJoystick::ButtonInBounds(int button)
 {
 	if (button <= 0 || button > nBtns)
 	{
-		AsynchronousPrinter::Printf(
+		AsyncPrinter::Printf(
 				"[!]DebouncedJoystick: Button %d out of bounds!\n", button);
 		return false;
 	}
@@ -37,8 +37,8 @@ bool DebouncedJoystick::AxisInBounds(int axis)
 {
 	if (axis <= 0 || axis > nAxes)
 	{
-		AsynchronousPrinter::Printf(
-				"[!]DebouncedJoystick: Axis %d out of bounds!\n", axis);
+		AsyncPrinter::Printf("[!]DebouncedJoystick: Axis %d out of bounds!\n",
+				axis);
 		return false;
 	}
 	return true;

@@ -3,9 +3,9 @@
 Launcher::Launcher() :
 	Component(), m_name("Launcher")
 {
-	m_top_roller = new AsynchronousCANJaguar(RobotConfig::CAN::ROLLER_TOP,
+	m_top_roller = new AsyncCANJaguar(RobotConfig::CAN::ROLLER_TOP,
 			"Top Roller");
-	m_bottom_roller = new AsynchronousCANJaguar(
+	m_bottom_roller = new AsyncCANJaguar(
 			RobotConfig::CAN::ROLLER_BOTTOM, "Bottom Roller");
 	m_prevstate = ACTION::LAUNCHER::DISABLED;
 	Configure();
@@ -37,29 +37,29 @@ void Launcher::Output()
 		switch (action->launcher->state)
 		{
 		case ACTION::LAUNCHER::RUNNING:
-			m_top_roller->ChangeControlMode(AsynchronousCANJaguar::kSpeed);
+			m_top_roller->ChangeControlMode(AsyncCANJaguar::kSpeed);
 			m_top_roller->SetSpeedReference(
-					AsynchronousCANJaguar::kSpeedRef_Encoder);
+					AsyncCANJaguar::kSpeedRef_Encoder);
 			m_top_roller->ConfigNeutralMode(
-					AsynchronousCANJaguar::kNeutralMode_Coast);
+					AsyncCANJaguar::kNeutralMode_Coast);
 			m_top_roller->SetPID(m_pid_top[PROPORTIONAL], m_pid_top[INTEGRAL],
 					m_pid_top[DERIVATIVE]);
-			m_bottom_roller->ChangeControlMode(AsynchronousCANJaguar::kSpeed);
+			m_bottom_roller->ChangeControlMode(AsyncCANJaguar::kSpeed);
 			m_bottom_roller->SetSpeedReference(
-					AsynchronousCANJaguar::kSpeedRef_Encoder);
+					AsyncCANJaguar::kSpeedRef_Encoder);
 			m_bottom_roller->ConfigNeutralMode(
-					AsynchronousCANJaguar::kNeutralMode_Coast);
+					AsyncCANJaguar::kNeutralMode_Coast);
 			m_bottom_roller->SetPID(m_pid_bottom[PROPORTIONAL],
 					m_pid_bottom[INTEGRAL], m_pid_bottom[DERIVATIVE]);
 			break;
 		case ACTION::LAUNCHER::DISABLED:
-			m_top_roller->ChangeControlMode(AsynchronousCANJaguar::kPercentVbus);
+			m_top_roller->ChangeControlMode(AsyncCANJaguar::kPercentVbus);
 			m_top_roller->ConfigNeutralMode(
-					AsynchronousCANJaguar::kNeutralMode_Coast);
+					AsyncCANJaguar::kNeutralMode_Coast);
 			m_bottom_roller->ChangeControlMode(
-					AsynchronousCANJaguar::kPercentVbus);
+					AsyncCANJaguar::kPercentVbus);
 			m_bottom_roller->ConfigNeutralMode(
-					AsynchronousCANJaguar::kNeutralMode_Coast);
+					AsyncCANJaguar::kNeutralMode_Coast);
 
 		}
 	}

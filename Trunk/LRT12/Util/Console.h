@@ -1,7 +1,7 @@
 #ifndef LRTCONSOLE_H_
 #define LRTCONSOLE_H_
 
-#include "AsynchronousPrinter.h"
+#include "AsyncPrinter.h"
 
 class Console
 {

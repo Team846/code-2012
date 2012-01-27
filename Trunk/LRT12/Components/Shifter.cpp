@@ -1,5 +1,5 @@
 #include "Shifter.h"
-#include "../Util/AsynchronousPrinter.h"
+#include "../Util/AsyncPrinter.h"
 #include "LRTServo.h"
 #include "..\Sensors\DriveEncoders.h"
 #include "..\Config\RobotConfig.h"
@@ -82,7 +82,7 @@ void Shifter::Output()
 		break;
 
 	default:
-		AsynchronousPrinter::Printf("Fatal: %s:%d\n", __FILE__, __LINE__);
+		AsyncPrinter::Printf("Fatal: %s:%d\n", __FILE__, __LINE__);
 		break;
 	}
 }

@@ -18,17 +18,17 @@ void ConfigLoader::Output()
 {
 	if (action->config->load)
 	{
-		AsynchronousPrinter::Printf("Loading Configuration\n");
+		AsyncPrinter::Printf("Loading Configuration\n");
 		config.Load();
 	}
 	if (action->config->save)
 	{
-		AsynchronousPrinter::Printf("Saving Configuration\n");
+		AsyncPrinter::Printf("Saving Configuration\n");
 		config.Save();
 	}
 	if (action->config->apply)
 	{
-		AsynchronousPrinter::Printf("Applying Configuration\n");
+		AsyncPrinter::Printf("Applying Configuration\n");
 		config.ConfigureAll();
 	}
 }
