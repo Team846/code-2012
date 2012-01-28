@@ -39,6 +39,10 @@ ActionData::ActionData()
 	drivetrain->setDriveOperation = false;
 	drivetrain->setTurnOperation = false;
 	drivetrain->overrideOperationChecks = false;
+	drivetrain->raw.leftDutyCycle = 0.0;
+	drivetrain->raw.leftBrakingDutyCycle = 0.0;
+	drivetrain->raw.rightDutyCycle = 0.0;
+	drivetrain->raw.rightBrakingDutyCycle = 0.0;
 
 	shifter = (ShifterAction*) malloc(sizeof(ShifterAction));
 	shifter->force = false;

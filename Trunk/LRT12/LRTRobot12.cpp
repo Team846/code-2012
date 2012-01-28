@@ -1,5 +1,6 @@
 #include "LRTRobot12.h"
 #include "Util/PrintInConstructor.h"
+
 //#include <signal.h>
 //#include "Config/joystickdg.h"
 
@@ -27,11 +28,11 @@ LRTRobot12::~LRTRobot12()
 {
 	// Testing shows this to be the entry point for a Kill signal.
 	// Start shutting down processes here. -dg
-	printf("\n\nBegin Deleting LRTRobot11\n");
+	printf("\n\nBegin Deleting LRTRobot12\n");
 
 	// Kill the main loop, so we don't access deleted objects. -dg
 	LRTRobotBase::quitting_ = true;
-	printf("LRTRobot11 says to LRTRobotBase: \"Quit Main Loop please\"\n");
+	printf("LRTRobot12 says to LRTRobotBase: \"Quit Main Loop please\"\n");
 	Wait(0.100); //Wait for main loop to exec one last time and then exit.  Should take < 20ms.
 
 	//End background printing; Request print task to stop and die.
@@ -88,6 +89,8 @@ void LRTRobot12::MainLoop()
 	//        controller.ResetCache();
 
 	prevState = gameState;
+
+	Log::logAll();
 
 	// if we finish in time, cancel the watchdog's error message
 	wdCancel(mainLoopWatchDog);

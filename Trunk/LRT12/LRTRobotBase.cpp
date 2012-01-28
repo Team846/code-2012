@@ -1,4 +1,5 @@
 #include "LRTRobotBase.h"
+#include "Jaguar/AsyncCANJaguar.h"
 #include "Utility.h"
 #include "sysLib.h"
 
@@ -58,28 +59,27 @@ void LRTRobotBase::StartCompetition()
 		if (cycleCount % 100 == 0)
 		{
 			//          printf("Cycle count: %d\n", cycleCount);
-			AsyncPrinter::Printf("Sleep time: %.2fms\n\n",
-					sleepTime_us * 1.0e-3);
-			//          printf("Time: %.4fms\n", GetFPGATime() * 1.0e-3);
+			//			AsyncPrinter::Printf("Sleep time: %.2fms\n\n",
+			//sleepTime_us		* 1.0e-3);
+			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-3);
 			//          printf("Target Time: %.4fms\n", cycleExpire_us * 1.0e-3);
 			//          fflush(stdout);
 		}
 
 		//NB: This loop must be quit *before* the Jaguars are deleted!
-		//TODO: This should be moved to "MainLoop()" -dg
-#warning FIXTHIS
-		//        for(ProxiedCANJaguar* j = j->jaguar_list_; j != NULL; j = j->next_jaguar_)
-		//            j->BeginComm(); //release semaphores.
-
-		//        for(int i = 0; i < ProxiedCANJaguar::jaguars.num; i++)
-		//           ProxiedCANJaguar::jaguars.j[i]->BeginComm();
+		for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
+				= j->next_jaguar_)
+		{
+			j->BeginComm();
+		}
 	}
 }
 
 //called by interupt on timer. This structure with the semaphores is to avoid the restrictions of running an ISR.
 void LRTRobotBase::releaseLoop(void* param)
 {
-	AsyncPrinter::Printf("%d\n", GetFPGATime());
+	// RY: This was massively polluting the console
+	//	AsyncPrinter::Printf("%d\n", GetFPGATime());
 	semGive(((LRTRobotBase*) param)->loopSemaphore);
 	Wait(0.01); //give the thread up to 1 ms to start
 	//taskDelay(sysClkRateGet()/50/5);//check that this is at least 1 tick

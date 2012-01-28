@@ -5,6 +5,7 @@
 #include "Brain/Brain.h"
 #include "Components/Component.h"
 #include "Config/Config.h"
+#include "Log/Log.h"
 #include "wdLib.h"
 #include "sysLib.h"
 

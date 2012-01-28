@@ -13,6 +13,8 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	m_drive_disabled.disablePID();
 	m_turn_disabled.disablePID();
 
+	disableLog();
+
 	printf("Constructed CLRateTrain\n");
 }
 
@@ -328,26 +330,24 @@ void ClosedLoopDrivetrain::logPID(const char * prefix, PID * pid)
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	std::string pf(prefix);
 	pf += ": ";
-	sdb->PutDouble((pf + "Proportional").c_str(), pid->getProportionalGain());
-	sdb->PutDouble((pf + "Integral").c_str(), pid->getIntegralGain());
-	sdb->PutDouble((pf + "Derivative").c_str(), pid->getDerivativeGain());
-	sdb->PutDouble((pf + "Error").c_str(), pid->getError());
-	sdb->PutDouble((pf + "Accumulated Error").c_str(),
-			pid->getAccumulatedError());
-	sdb->PutDouble((pf + "Setpoint").c_str(), pid->getSetpoint());
+	sdb->PutDouble((pf + "P").c_str(), pid->getProportionalGain());
+	sdb->PutDouble((pf + "I").c_str(), pid->getIntegralGain());
+	sdb->PutDouble((pf + "D").c_str(), pid->getDerivativeGain());
+	sdb->PutDouble((pf + "E").c_str(), pid->getError());
+	sdb->PutDouble((pf + "AE").c_str(), pid->getAccumulatedError());
+	sdb->PutDouble((pf + "S").c_str(), pid->getSetpoint());
 }
 
 void ClosedLoopDrivetrain::log()
 {
-	logPID("Drive Rate High Gear PID", &m_rate_drive_high_gear_pid);
-	logPID("Drive Rate Low Gear PID", &m_rate_drive_low_gear_pid);
-	logPID("Drive Position High Gear PID", &m_pos_drive_high_gear_pid);
-	logPID("Drive Position Low Gear PID", &m_pos_drive_low_gear_pid);
-	logPID("Turn Rate High Gear PID", &m_rate_turn_high_gear_pid);
-	logPID("Turn Rate Low Gear PID", &m_rate_turn_low_gear_pid);
-	logPID("Turn Position High Gear PID", &m_pos_turn_high_gear_pid);
-	logPID("Turn Position Low Gear PID", &m_pos_turn_low_gear_pid);
+	logPID("DRHGPID", &m_rate_drive_high_gear_pid);
+	logPID("DRLGPID", &m_rate_drive_low_gear_pid);
+	logPID("DPHGPID", &m_pos_drive_high_gear_pid);
+	logPID("DPLGPID", &m_pos_drive_low_gear_pid);
+	logPID("TRHGPID", &m_rate_turn_high_gear_pid);
+	logPID("TRLGPID", &m_rate_turn_low_gear_pid);
+	logPID("TPHGPID", &m_pos_turn_high_gear_pid);
+	logPID("TPLGPID", &m_pos_turn_low_gear_pid);
 	logPID("Active Drive PID", m_drive_control);
 	logPID("Active Turn PID", m_turn_control);
-
 }
