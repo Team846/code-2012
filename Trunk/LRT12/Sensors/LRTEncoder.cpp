@@ -6,6 +6,7 @@ LRTEncoder::LRTEncoder(const char * name, UINT32 sourceA, UINT32 sourceB,
 			m_name(name)
 //    , useless(15 + count, , false, CounterBase::k1X)
 {
+	disableLog();
 }
 
 LRTEncoder::~LRTEncoder()

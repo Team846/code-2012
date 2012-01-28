@@ -325,29 +325,50 @@ void ClosedLoopDrivetrain::reset()
 	m_pos_turn_low_gear_pid.reset();
 }
 
-void ClosedLoopDrivetrain::logPID(const char * prefix, PID * pid)
-{
-	SmartDashboard * sdb = SmartDashboard::GetInstance();
-	std::string pf(prefix);
-	pf += ": ";
-	sdb->PutDouble((pf + "P").c_str(), pid->getProportionalGain());
-	sdb->PutDouble((pf + "I").c_str(), pid->getIntegralGain());
-	sdb->PutDouble((pf + "D").c_str(), pid->getDerivativeGain());
-	sdb->PutDouble((pf + "E").c_str(), pid->getError());
-	sdb->PutDouble((pf + "AE").c_str(), pid->getAccumulatedError());
-	sdb->PutDouble((pf + "S").c_str(), pid->getSetpoint());
-}
-
 void ClosedLoopDrivetrain::log()
 {
-	logPID("DRHGPID", &m_rate_drive_high_gear_pid);
-	logPID("DRLGPID", &m_rate_drive_low_gear_pid);
-	logPID("DPHGPID", &m_pos_drive_high_gear_pid);
-	logPID("DPLGPID", &m_pos_drive_low_gear_pid);
-	logPID("TRHGPID", &m_rate_turn_high_gear_pid);
-	logPID("TRLGPID", &m_rate_turn_low_gear_pid);
-	logPID("TPHGPID", &m_pos_turn_high_gear_pid);
-	logPID("TPLGPID", &m_pos_turn_low_gear_pid);
-	logPID("Active Drive PID", m_drive_control);
-	logPID("Active Turn PID", m_turn_control);
+	SmartDashboard * sdb = SmartDashboard::GetInstance();
+
+	std::string drivemode;
+	switch (getDriveMode())
+	{
+	case ClosedLoopDrivetrain::CL_DISABLED:
+		drivemode = "Open Loop";
+		break;
+	case ClosedLoopDrivetrain::CL_RATE:
+		drivemode = "Rate";
+		break;
+	case ClosedLoopDrivetrain::CL_POSITION:
+		drivemode = "Position";
+		break;
+	}
+	sdb->PutString("Drive mode", drivemode);
+	sdb->PutDouble("Active Drive P Gain",
+			m_drive_control->getProportionalGain());
+	sdb->PutDouble("Active Drive I Gain", m_drive_control->getIntegralGain());
+	sdb->PutDouble("Active Drive D Gain", m_drive_control->getDerivativeGain());
+	sdb->PutDouble("Active Drive Error", m_drive_control->getError());
+	sdb->PutDouble("Active Drive Accumulated Error",
+			m_drive_control->getAccumulatedError());
+
+	std::string turnmode;
+	switch (getTurnMode())
+	{
+	case ClosedLoopDrivetrain::CL_DISABLED:
+		turnmode = "Open Loop";
+		break;
+	case ClosedLoopDrivetrain::CL_RATE:
+		turnmode = "Rate";
+		break;
+	case ClosedLoopDrivetrain::CL_POSITION:
+		turnmode = "Position";
+		break;
+	}
+	sdb->PutString("Turn mode", turnmode);
+	sdb->PutDouble("Active Turn P Gain", m_turn_control->getProportionalGain());
+	sdb->PutDouble("Active Turn I Gain", m_turn_control->getIntegralGain());
+	sdb->PutDouble("Active Turn D Gain", m_turn_control->getDerivativeGain());
+	sdb->PutDouble("Active Turn Error", m_turn_control->getError());
+	sdb->PutDouble("Active Turn Accumulated Error",
+			m_turn_control->getAccumulatedError());
 }

@@ -255,7 +255,7 @@ template<typename T> void Config::Set(string sectionName, string key, T val)
 
 	if (ValueExists(sectionName, key)) // need to add in the value in such a way that preserves whitespace and comments
 	{
-		printf("value exists");
+		//		printf("value exists");
 		ConfigVal nameValuePair = (*newConfigData)[sectionName][key];
 		list<string>::iterator valueLocation = nameValuePair.positionInFile;
 		string oldVal = nameValuePair.val;
@@ -271,9 +271,9 @@ template<typename T> void Config::Set(string sectionName, string key, T val)
 		newString += valueLocation->substr(
 				min(indexOfEquals + oldVal.size(), valueLocation->size()));
 		//dies on next line
-		printf("Almost dead\n");
+		//		printf("Almost dead\n");
 		*valueLocation = newString;
-		printf("Not dead\n");
+		//		printf("Not dead\n");
 		//		valueLocation->replace(indexOfStartOfOldValue, oldVal.size(), newVal);
 	}
 	else //if the value doesn't yet exist add it

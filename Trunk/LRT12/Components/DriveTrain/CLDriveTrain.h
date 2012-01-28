@@ -36,7 +36,6 @@ public:
 	virtual void log();
 
 private:
-	void logPID(const char * prefix, PID* pid);
 	/*!
 	 * @brief Drives at a set forward and turn rate
 	 * @param rawFwd rate of movement colinear with direction of motion

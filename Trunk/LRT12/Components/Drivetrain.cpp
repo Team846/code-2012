@@ -153,36 +153,6 @@ void Drivetrain::log()
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	std::string prefix = m_name + ": ";
 
-	std::string drivemode;
-	switch (m_drive_control.getDriveMode())
-	{
-	case ClosedLoopDrivetrain::CL_DISABLED:
-		drivemode = "Open Loop";
-		break;
-	case ClosedLoopDrivetrain::CL_RATE:
-		drivemode = "Rate";
-		break;
-	case ClosedLoopDrivetrain::CL_POSITION:
-		drivemode = "Position";
-		break;
-	}
-	sdb->PutString(prefix + "Drive mode", drivemode);
-
-	std::string turnmode;
-	switch (m_drive_control.getTurnMode())
-	{
-	case ClosedLoopDrivetrain::CL_DISABLED:
-		turnmode = "Open Loop";
-		break;
-	case ClosedLoopDrivetrain::CL_RATE:
-		turnmode = "Rate";
-		break;
-	case ClosedLoopDrivetrain::CL_POSITION:
-		turnmode = "Position";
-		break;
-	}
-	sdb->PutString(prefix + "Turn mode", turnmode);
-
 	sdb->PutDouble((prefix + "Left Duty Cycle").c_str(),
 			action->drivetrain->raw.leftDutyCycle);
 	sdb->PutDouble((prefix + "Right Duty Cycle").c_str(),
