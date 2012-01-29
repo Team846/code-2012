@@ -4,10 +4,19 @@ using namespace std;
 
 #define CALC_POS(y, x, width) (y*width + x) 
 
+/* get reference to pixel at (col,row),
+for multi-channel images (col) should be multiplied by number of channels */
+#undef CV_IMAGE_ELEM
+#define CV_IMAGE_ELEM( image, color, row, col ) \
+	(*((image)->imageData + (image)->widthStep*(row)+(col)*((image)->widthStep/(image)->width)+(color)))
+	
+#define BLUE_CHANNEL 0
+#define GREEN_CHANNEL 1
+#define RED_CHANNEL 2
+
 
 int main()
 {
-
     // Open the file.
 	CvCapture * pCapture; //new OpenCV capture stream
 	IplImage * pVideoFrame; //new OpenCV image
@@ -25,7 +34,7 @@ int main()
 		pVideoFrame = cvQueryFrame(pCapture);
 		
 		grayScale = new char[pVideoFrame->width * pVideoFrame->height];
-		
+
 		//bgr - .6green+.29red+.11blue
 		for (int i = 0; i < pVideoFrame->width; i++)
 		{
@@ -35,9 +44,9 @@ int main()
 				//grayScale[CALC_POS(j, i, pVideoFrame->width)];
 				//cout << "get\n";
 				grayScale[CALC_POS(j, i, pVideoFrame->width)] = 
-					0.11*CV_IMAGE_ELEM(pVideoFrame, char, j, i*3+0); + 
-					0.6*CV_IMAGE_ELEM(pVideoFrame, char, j, i*3+1) + 
-					0.29*CV_IMAGE_ELEM(pVideoFrame, char, j, i*3+2);
+					0.11*CV_IMAGE_ELEM(pVideoFrame, BLUE_CHANNEL, j, i) + 
+					0.6*CV_IMAGE_ELEM(pVideoFrame, GREEN_CHANNEL, j, i) + 
+					0.29*CV_IMAGE_ELEM(pVideoFrame, RED_CHANNEL, j, i);
 				//cout << i << " " << j << "set\n";
 			}
 		}
