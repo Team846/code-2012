@@ -8,7 +8,7 @@ using namespace std;
 int main()
 {
 
-        // Open the file.
+    // Open the file.
 	CvCapture * pCapture; //new OpenCV capture stream
 	IplImage * pVideoFrame; //new OpenCV image
 
@@ -43,18 +43,30 @@ int main()
 		}
 
 		IplImage grayScaleImage; 
+		//grayScaleImage = * pVideoFrame;		
 		grayScaleImage.nSize = sizeof(IplImage);
 		grayScaleImage.ID = 0;		
 		grayScaleImage.nChannels = 1;
+		//grayScaleImage.alphaChannel = pVideoFrame->alphaChannel;
 		grayScaleImage.depth = 8;
+		//memcpy(grayScaleImage.colorModel, pVideoFrame->colorModel, 4);
+		//memcpy(grayScaleImage.channelSeq, pVideoFrame->channelSeq, 4);
 		grayScaleImage.dataOrder = 1;
 		grayScaleImage.origin = 0;
+		//grayScaleImage.align = pVideoFrame->align;
 		grayScaleImage.width = pVideoFrame->width;
 		grayScaleImage.height = pVideoFrame->height;
-		grayScaleImage.widthStep = pVideoFrame->width;
-		grayScaleImage.imageDataOrigin = grayScale;
+		grayScaleImage.roi = NULL;
+		grayScaleImage.maskROI = NULL;
+		//grayScaleImage.imageId = pVideoFrame->imageId;
+		//grayScaleImage.tileInfo = pVideoFrame->tileInfo;
+		grayScaleImage.imageSize = pVideoFrame->height*pVideoFrame->width;
 		grayScaleImage.imageData = grayScale;
-
+		grayScaleImage.widthStep = pVideoFrame->width;
+		//memcpy(grayScaleImage.BorderMode, pVideoFrame->BorderMode, 4*sizeof(int));
+		//memcpy(grayScaleImage.BorderConst, pVideoFrame->BorderConst, 4*sizeof(int));
+		grayScaleImage.imageDataOrigin = grayScale;
+		
 		cvShowImage( "video", pVideoFrame);
 		cvShowImage( "grey", &grayScaleImage);
 
