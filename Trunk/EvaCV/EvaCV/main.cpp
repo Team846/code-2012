@@ -14,70 +14,138 @@ for multi-channel images (col) should be multiplied by number of channels */
 #define GREEN_CHANNEL 1
 #define RED_CHANNEL 2
 
+void processImage(IplImage * colorImage, IplImage &processedImage, char * processedFrame)
+{
+	//processedImage = * colorImage;		
+	processedImage.nSize = sizeof(IplImage);
+	processedImage.ID = 0;		
+	processedImage.nChannels = 1;
+	//processedImage.alphaChannel = colorImage->alphaChannel;
+	processedImage.depth = 8;
+	//memcpy(processedImage.colorModel, colorImage->colorModel, 4);
+	//memcpy(processedImage.channelSeq, colorImage->channelSeq, 4);
+	processedImage.dataOrder = 1;
+	processedImage.origin = 0;
+	//processedImage.align = colorImage->align;
+	processedImage.width = colorImage->width;
+	processedImage.height = colorImage->height;
+	processedImage.roi = NULL;
+	processedImage.maskROI = NULL;
+	//processedImage.imageId = colorImage->imageId;
+	//processedImage.tileInfo = colorImage->tileInfo;
+	processedImage.imageSize = colorImage->height*colorImage->width;
+	processedImage.imageData = processedFrame;
+	processedImage.widthStep = colorImage->width;
+	//memcpy(processedImage.BorderMode, colorImage->BorderMode, 4*sizeof(int));
+	//memcpy(processedImage.BorderConst, colorImage->BorderConst, 4*sizeof(int));
+	processedImage.imageDataOrigin = processedFrame;
+}
+
+void getGrayPlane(IplImage * colorImage, IplImage &processedImage)
+{
+	char * processedFrame;
+	processedFrame = new char[colorImage->width * colorImage->height];
+	for (int i = 0; i < colorImage->width; i++)
+	{
+		for (int j = 0; j < colorImage->height; j++)
+		{
+			processedFrame[CALC_POS(j, i, colorImage->width)] = 
+				(11L*(int)CV_IMAGE_ELEM(colorImage, BLUE_CHANNEL, j, i) + 
+				60L*(int)CV_IMAGE_ELEM(colorImage, GREEN_CHANNEL, j, i) + 
+				29L*(int)CV_IMAGE_ELEM(colorImage, RED_CHANNEL, j, i))/100;
+			//cout << i << " " << j << "set\n";
+		}
+	}
+	processImage(colorImage, processedImage, processedFrame);
+}
+
+void getIntensity()
+{
+}
+
+void getRedPlane(IplImage * colorImage, IplImage &processedImage)
+{
+	char * processedFrame;
+	processedFrame = new char[colorImage->width * colorImage->height];
+	for (int i = 0; i < colorImage->width; i++)
+	{
+		for (int j = 0; j < colorImage->height; j++)
+		{
+			processedFrame[CALC_POS(j, i, colorImage->width)] = 
+				CV_IMAGE_ELEM(colorImage, RED_CHANNEL, j, i);
+			//cout << i << " " << j << "set\n";
+		}
+	}
+	processImage(colorImage, processedImage, processedFrame);
+}
+
+void getGreenPlane(IplImage * colorImage, IplImage &processedImage)
+{
+	char * processedFrame;
+	processedFrame = new char[colorImage->width * colorImage->height];
+	for (int i = 0; i < colorImage->width; i++)
+	{
+		for (int j = 0; j < colorImage->height; j++)
+		{
+			processedFrame[CALC_POS(j, i, colorImage->width)] = 
+				CV_IMAGE_ELEM(colorImage, GREEN_CHANNEL, j, i);
+			//cout << i << " " << j << "set\n";
+		}
+	}
+	processImage(colorImage, processedImage, processedFrame);
+}
+
+void getBluePlane(IplImage * colorImage, IplImage &processedImage)
+{
+	char * processedFrame;
+	processedFrame = new char[colorImage->width * colorImage->height];
+	for (int i = 0; i < colorImage->width; i++)
+	{
+		for (int j = 0; j < colorImage->height; j++)
+		{
+			processedFrame[CALC_POS(j, i, colorImage->width)] = 
+				CV_IMAGE_ELEM(colorImage, BLUE_CHANNEL, j, i);
+			//cout << i << " " << j << "set\n";
+		}
+	}
+	processImage(colorImage, processedImage, processedFrame);
+}
 
 int main()
 {
     // Open the file.
 	CvCapture * pCapture; //new OpenCV capture stream
 	IplImage * pVideoFrame; //new OpenCV image
-
-	char *grayScale;
 	
 	pCapture = cvCaptureFromCAM(0); 
 
 	cvNamedWindow( "video", CV_WINDOW_AUTOSIZE );
 	cvNamedWindow( "grey", CV_WINDOW_AUTOSIZE );
+	cvNamedWindow( "red" , CV_WINDOW_AUTOSIZE );
+	cvNamedWindow( "green" , CV_WINDOW_AUTOSIZE );
+	cvNamedWindow( "blue" , CV_WINDOW_AUTOSIZE );
 
 	int key = -1;
 	while(key==-1)
 	{
 		pVideoFrame = cvQueryFrame(pCapture);
-		
-		grayScale = new char[pVideoFrame->width * pVideoFrame->height];
 
 		//bgr - .6green+.29red+.11blue
-		for (int i = 0; i < pVideoFrame->width; i++)
-		{
-			for (int j = 0; j < pVideoFrame->height; j++)
-			{
-				
-				//grayScale[CALC_POS(j, i, pVideoFrame->width)];
-				//cout << "get\n";
-				grayScale[CALC_POS(j, i, pVideoFrame->width)] = 
-					0.11*CV_IMAGE_ELEM(pVideoFrame, BLUE_CHANNEL, j, i) + 
-					0.6*CV_IMAGE_ELEM(pVideoFrame, GREEN_CHANNEL, j, i) + 
-					0.29*CV_IMAGE_ELEM(pVideoFrame, RED_CHANNEL, j, i);
-				//cout << i << " " << j << "set\n";
-			}
-		}
+		IplImage grayScaleImage;
+		IplImage redPlaneImage;
+		IplImage greenPlaneImage;
+		IplImage bluePlaneImage;
 
-		IplImage grayScaleImage; 
-		//grayScaleImage = * pVideoFrame;		
-		grayScaleImage.nSize = sizeof(IplImage);
-		grayScaleImage.ID = 0;		
-		grayScaleImage.nChannels = 1;
-		//grayScaleImage.alphaChannel = pVideoFrame->alphaChannel;
-		grayScaleImage.depth = 8;
-		//memcpy(grayScaleImage.colorModel, pVideoFrame->colorModel, 4);
-		//memcpy(grayScaleImage.channelSeq, pVideoFrame->channelSeq, 4);
-		grayScaleImage.dataOrder = 1;
-		grayScaleImage.origin = 0;
-		//grayScaleImage.align = pVideoFrame->align;
-		grayScaleImage.width = pVideoFrame->width;
-		grayScaleImage.height = pVideoFrame->height;
-		grayScaleImage.roi = NULL;
-		grayScaleImage.maskROI = NULL;
-		//grayScaleImage.imageId = pVideoFrame->imageId;
-		//grayScaleImage.tileInfo = pVideoFrame->tileInfo;
-		grayScaleImage.imageSize = pVideoFrame->height*pVideoFrame->width;
-		grayScaleImage.imageData = grayScale;
-		grayScaleImage.widthStep = pVideoFrame->width;
-		//memcpy(grayScaleImage.BorderMode, pVideoFrame->BorderMode, 4*sizeof(int));
-		//memcpy(grayScaleImage.BorderConst, pVideoFrame->BorderConst, 4*sizeof(int));
-		grayScaleImage.imageDataOrigin = grayScale;
+		getGrayPlane(pVideoFrame, grayScaleImage);
+		getRedPlane(pVideoFrame, redPlaneImage);
+		getGreenPlane(pVideoFrame, greenPlaneImage);
+		getBluePlane(pVideoFrame, bluePlaneImage);
 		
 		cvShowImage( "video", pVideoFrame);
 		cvShowImage( "grey", &grayScaleImage);
+		cvShowImage( "red" , &redPlaneImage );
+		cvShowImage( "green" , &greenPlaneImage );
+		cvShowImage( "blue" , &bluePlaneImage );
 
 		key = cvWaitKey(20);
 	}
@@ -86,12 +154,12 @@ int main()
 	cvReleaseCapture ( &pCapture );
 	cvDestroyWindow( "video" );
 
-
 	/*
         IplImage *img = cvLoadImage("photo.jpg");
-        if (!img) {
-                printf("Error: Couldn't open the image file.\n");
-                return 1;
+        if (!img) 
+		{
+			printf("Error: Couldn't open the image file.\n");
+            return 1;
         }
 
         // Display the image.
