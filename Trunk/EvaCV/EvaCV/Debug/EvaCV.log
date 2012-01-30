@@ -1,4 +1,4 @@
-﻿Build started 1/29/2012 4:55:06 PM.
+﻿Build started 1/29/2012 8:46:03 PM.
      1>Project "C:\Users\Eva\documents\visual studio 2010\Projects\EvaCV\EvaCV\EvaCV.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\EvaCV.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -23,4 +23,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:07.46
+Time Elapsed 00:00:06.93

@@ -162,7 +162,7 @@ int main()
 	pCapture = cvCaptureFromCAM(0); 
 
 	cvNamedWindow( "video", CV_WINDOW_AUTOSIZE );
-	cvNamedWindow( "grey", CV_WINDOW_AUTOSIZE );
+	cvNamedWindow( "gray", CV_WINDOW_AUTOSIZE );
 	cvNamedWindow( "red" , CV_WINDOW_AUTOSIZE );
 	cvNamedWindow( "green" , CV_WINDOW_AUTOSIZE );
 	cvNamedWindow( "blue" , CV_WINDOW_AUTOSIZE );
@@ -173,21 +173,30 @@ int main()
 		pVideoFrame = cvQueryFrame(pCapture);
 
 		//bgr - .6green+.29red+.11blue
-		IplImage grayScaleImage;
+		IplImage intensityImage;
+		IplImage grayPlaneImage;
 		IplImage redPlaneImage;
 		IplImage greenPlaneImage;
 		IplImage bluePlaneImage;
 
-		getIntensity(pVideoFrame, grayScaleImage);
+		getIntensity(pVideoFrame, intensityImage);
+		getGrayPlane(pVideoFrame, grayPlaneImage);
 		getRedPlane(pVideoFrame, redPlaneImage);
 		getGreenPlane(pVideoFrame, greenPlaneImage);
 		getBluePlane(pVideoFrame, bluePlaneImage);
 		
 		cvShowImage( "video", pVideoFrame);
-		cvShowImage( "grey", &grayScaleImage);
+		cvShowImage( "intensity", &intensityImage);
+		cvShowImage( "gray", &grayPlaneImage);
 		cvShowImage( "red" , &redPlaneImage );
 		cvShowImage( "green" , &greenPlaneImage );
 		cvShowImage( "blue" , &bluePlaneImage );
+
+		delete[] intensityImage.imageDataOrigin;
+		delete[] grayPlaneImage.imageDataOrigin;
+		delete[] redPlaneImage.imageDataOrigin;
+		delete[] greenPlaneImage.imageDataOrigin;
+		delete[] bluePlaneImage.imageDataOrigin;
 
 		key = cvWaitKey(20);
 	}
