@@ -2,6 +2,31 @@
 #include <stdio.h>
 using namespace std;
 
+/* Macros to convert RGB to YCrCb. The transformations are as follows:
+ 
+D1/CCIR 601
+ 
+Y = 0.299R + 0.587G + 0.114B
+Cr = 0.500R - 0.419G - 0.081B + 128
+Cb = 0.500B - 0.169R - 0.331G + 128
+ 
+HD/SMPTE 240m
+ 
+Y = 0.212R + 0.701G + 0.087B
+Cr = 0.500R - 0.445G - 0.055B + 128
+Cb = 0.500B - 0.116R - 0.384G + 128
+ 
+The macros implement the transformations using fixed point arithmetic. The
+coefficients are scaled by a factor 1024. */
+ 
+#define D1_Y(r,g,b) (306*(r)+601*(g)+117*(b))>>10
+ 
+#define HD_Y(r,g,b) (217*(r)+717*(g)+89*(b))>>10
+ 
+/* Clip 4:2:2 samples to legal values for active display */
+ 
+#define CLIPY(x) (x > 255 ? 255 : (x < 0 ? 0 : x))
+
 #define CALC_POS(y, x, width) (y*width + x) 
 
 /* get reference to pixel at (col,row),
@@ -49,18 +74,35 @@ void getGrayPlane(IplImage * colorImage, IplImage &processedImage)
 	{
 		for (int j = 0; j < colorImage->height; j++)
 		{
-			processedFrame[CALC_POS(j, i, colorImage->width)] = 
-				(11L*(int)CV_IMAGE_ELEM(colorImage, BLUE_CHANNEL, j, i) + 
-				60L*(int)CV_IMAGE_ELEM(colorImage, GREEN_CHANNEL, j, i) + 
-				29L*(int)CV_IMAGE_ELEM(colorImage, RED_CHANNEL, j, i))/100;
+			int r = CV_IMAGE_ELEM(colorImage, RED_CHANNEL, j, i);
+			int g = CV_IMAGE_ELEM(colorImage, GREEN_CHANNEL, j, i);
+			int b = CV_IMAGE_ELEM(colorImage, BLUE_CHANNEL, j, i);
+			int y = D1_Y(r&0xff,g&0xff,b&0xff);
+			processedFrame[CALC_POS(j, i, colorImage->width)] = CLIPY(y);
 			//cout << i << " " << j << "set\n";
 		}
 	}
 	processImage(colorImage, processedImage, processedFrame);
 }
 
-void getIntensity()
+void getIntensity(IplImage * colorImage, IplImage &processedImage)
 {
+	char * processedFrame;
+	processedFrame = new char[colorImage->width * colorImage->height];
+	for (int i = 0; i < colorImage->width; i++)
+	{
+		for (int j = 0; j < colorImage->height; j++)
+		{
+			int r = CV_IMAGE_ELEM(colorImage, RED_CHANNEL, j, i);
+			int g = CV_IMAGE_ELEM(colorImage, GREEN_CHANNEL, j, i);
+			int b = CV_IMAGE_ELEM(colorImage, BLUE_CHANNEL, j, i);
+			int y = HD_Y(r&0xff,g&0xff,b&0xff);
+			processedFrame[CALC_POS(j, i, colorImage->width)] = CLIPY(y);
+			//cout << i << " " << j << "set\n";
+		}
+	}
+	processImage(colorImage, processedImage, processedFrame);
+
 }
 
 void getRedPlane(IplImage * colorImage, IplImage &processedImage)
@@ -136,7 +178,7 @@ int main()
 		IplImage greenPlaneImage;
 		IplImage bluePlaneImage;
 
-		getGrayPlane(pVideoFrame, grayScaleImage);
+		getIntensity(pVideoFrame, grayScaleImage);
 		getRedPlane(pVideoFrame, redPlaneImage);
 		getGreenPlane(pVideoFrame, greenPlaneImage);
 		getBluePlane(pVideoFrame, bluePlaneImage);
