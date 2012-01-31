@@ -153,6 +153,37 @@ void getBluePlane(IplImage * colorImage, IplImage &processedImage)
 	processImage(colorImage, processedImage, processedFrame);
 }
 
+void getBlackAndWhitePlane(IplImage * colorImage, IplImage &processedImage)
+{
+	char * processedFrame;
+	processedFrame = new char[colorImage->width * colorImage->height];
+	int aa = 127;
+	FILE *fp = fopen("black.txt","r");
+	if (fp == NULL) 
+	{
+		printf("lazha\n");
+	} 
+	else 
+	{
+		fscanf(fp,"%i",&aa);
+		fclose(fp);
+	}
+	for (int i = 0; i < colorImage->width; i++)
+	{
+		for (int j = 0; j < colorImage->height; j++)
+		{
+			int r = CV_IMAGE_ELEM(colorImage, RED_CHANNEL, j, i);
+			int g = CV_IMAGE_ELEM(colorImage, GREEN_CHANNEL, j, i);
+			int b = CV_IMAGE_ELEM(colorImage, BLUE_CHANNEL, j, i);
+			int y = D1_Y(r&0xff,g&0xff,b&0xff);
+			int vasya = CLIPY(y);
+			processedFrame[CALC_POS(j, i, colorImage->width)] = vasya>aa ? 255 : 0;
+			//cout << i << " " << j << "set\n";
+		}
+	}
+	processImage(colorImage, processedImage, processedFrame);
+}
+
 int main()
 {
     // Open the file.
@@ -166,6 +197,7 @@ int main()
 	cvNamedWindow( "red" , CV_WINDOW_AUTOSIZE );
 	cvNamedWindow( "green" , CV_WINDOW_AUTOSIZE );
 	cvNamedWindow( "blue" , CV_WINDOW_AUTOSIZE );
+	cvNamedWindow( "black/white" , CV_WINDOW_AUTOSIZE);
 
 	int key = -1;
 	while(key==-1)
@@ -178,12 +210,14 @@ int main()
 		IplImage redPlaneImage;
 		IplImage greenPlaneImage;
 		IplImage bluePlaneImage;
+		IplImage blackAndWhitePlaneImage;
 
 		getIntensity(pVideoFrame, intensityImage);
 		getGrayPlane(pVideoFrame, grayPlaneImage);
 		getRedPlane(pVideoFrame, redPlaneImage);
 		getGreenPlane(pVideoFrame, greenPlaneImage);
 		getBluePlane(pVideoFrame, bluePlaneImage);
+		getBlackAndWhitePlane(pVideoFrame, blackAndWhitePlaneImage);
 		
 		cvShowImage( "video", pVideoFrame);
 		cvShowImage( "intensity", &intensityImage);
@@ -191,12 +225,14 @@ int main()
 		cvShowImage( "red" , &redPlaneImage );
 		cvShowImage( "green" , &greenPlaneImage );
 		cvShowImage( "blue" , &bluePlaneImage );
-
+		cvShowImage( "black/white" , &blackAndWhitePlaneImage);
+			
 		delete[] intensityImage.imageDataOrigin;
 		delete[] grayPlaneImage.imageDataOrigin;
 		delete[] redPlaneImage.imageDataOrigin;
 		delete[] greenPlaneImage.imageDataOrigin;
 		delete[] bluePlaneImage.imageDataOrigin;
+		delete[] blackAndWhitePlaneImage.imageDataOrigin;
 
 		key = cvWaitKey(20);
 	}
