@@ -14,7 +14,7 @@ public:
 	virtual void Output();
 	virtual string GetName();
 private:
-	Config& config;
+	Config *m_config;
 };
 
 #endif

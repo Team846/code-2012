@@ -1,5 +1,5 @@
-#ifndef LRT_ROBOT_11_H_
-#define LRT_ROBOT_11_H_
+#ifndef LRT_ROBOT_12_H_
+#define LRT_ROBOT_12_H_
 
 #include "LRTRobotBase.h"
 #include "Brain/Brain.h"
@@ -28,7 +28,7 @@ private:
 
 	PrintInConstructor dc_CANBus_;
 
-	Config& config;
+	Config *config;
 
 	DriverStation* ds;
 

@@ -10,11 +10,11 @@ bool Config::hasRun = false;
 const string Config::CONFIG_FILE_PATH = "/LRT12.conf";
 const string Config::COMMENT_DELIMITERS = "#;";
 
-Config& Config::GetInstance()
+Config* Config::GetInstance()
 {
 	if (instance == NULL)
 		instance = new Config();
-	return *instance;
+	return instance;
 }
 
 Config::Config() :

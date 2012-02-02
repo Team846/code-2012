@@ -28,16 +28,16 @@ Shifter::~Shifter()
 void Shifter::Configure()
 {
 	// TODO: add servo values into config
-	Config& config = Config::GetInstance();
-	lowGearServoValLeft = config.Get<int> (config_section,
+	Config * config = Config::GetInstance();
+	lowGearServoValLeft = config->Get<int> (config_section,
 			"leftLowGearServoVal", 1700);
-	highGearServoValLeft = config.Get<int> (config_section,
+	highGearServoValLeft = config->Get<int> (config_section,
 			"leftHighGearServoVal", 1050);
-	lowGearServoValRight = config.Get<int> (config_section,
+	lowGearServoValRight = config->Get<int> (config_section,
 			"rightLowGearServoVal", 1100);
-	highGearServoValRight = config.Get<int> (config_section,
+	highGearServoValRight = config->Get<int> (config_section,
 			"rightHighGearServoVal", 1850);
-	servoDisableDelay = config.Get<int> (config_section, "servoDisableDelay",
+	servoDisableDelay = config->Get<int> (config_section, "servoDisableDelay",
 			5 * 50);
 }
 

@@ -19,7 +19,7 @@ Launcher::~Launcher()
 
 void Launcher::Configure()
 {
-	Config * c = &Config::GetInstance();
+	Config * c = Config::GetInstance();
 	m_pid_top[PROPORTIONAL] = c->Get<double> (m_name, "topRollerP", 1.0);
 	m_pid_top[INTEGRAL] = c->Get<double> (m_name, "topRollerI", 0.0);
 	m_pid_top[DERIVATIVE] = c->Get<double> (m_name, "topRollerD", 0.0);

@@ -42,12 +42,12 @@ LRTRobot12::~LRTRobot12()
 
 void LRTRobot12::RobotInit()
 {
-	config.ConfigureAll();
+	config->ConfigureAll();
 
 	const char* build =
-			(Util::ToString<int>(config.Get<int> ("Build", "BuildNumber", 1))
+			(Util::ToString<int>(config->Get<int> ("Build", "BuildNumber", 1))
 					+ "-" + Util::ToString<int>(
-					config.Get<int> ("Build", "RunNumber", 0))).c_str();
+					config->Get<int> ("Build", "RunNumber", 0))).c_str();
 
 	AsyncPrinter::Printf(build);
 }

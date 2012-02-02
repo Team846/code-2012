@@ -24,7 +24,7 @@ class DriveEncoders: public Configurable, public Loggable
 {
 private:
 	static DriveEncoders* m_instance;
-	Config& m_config;
+	Config *m_config;
 	std::string m_configsection;
 
 	LRTEncoder m_encoder_left;

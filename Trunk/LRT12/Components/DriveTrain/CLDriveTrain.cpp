@@ -25,81 +25,81 @@ void ClosedLoopDrivetrain::Configure()
 
 	const static string configSection = "CLDriveTrain";
 
-	float drive_rate_p_high = m_config.Get<float> (configSection,
+	float drive_rate_p_high = m_config->Get<float> (configSection,
 			"driveRateHighP", 1.5);
-	float drive_rate_i_high = m_config.Get<float> (configSection,
+	float drive_rate_i_high = m_config->Get<float> (configSection,
 			"driveRateHighI", 0.0);
-	float drive_rate_d_high = m_config.Get<float> (configSection,
+	float drive_rate_d_high = m_config->Get<float> (configSection,
 			"driveRateHighD", 0.0);
 
 	m_rate_drive_high_gear_pid.setParameters(drive_rate_p_high,
 			drive_rate_i_high, drive_rate_d_high, 1.0, FWD_DECAY, true);
 
-	float drive_rate_p_low = m_config.Get<float> (configSection,
+	float drive_rate_p_low = m_config->Get<float> (configSection,
 			"driveRateLowP", 1.5);
-	float drive_rate_i_low = m_config.Get<float> (configSection,
+	float drive_rate_i_low = m_config->Get<float> (configSection,
 			"driveRateLowI", 0.0);
-	float drive_rate_d_low = m_config.Get<float> (configSection,
+	float drive_rate_d_low = m_config->Get<float> (configSection,
 			"driveRateLowD", 0.0);
 
 	m_rate_drive_low_gear_pid.setParameters(drive_rate_p_low, drive_rate_i_low,
 			drive_rate_d_low, 1.0, FWD_DECAY, true);
 
-	float turn_rate_p_high = m_config.Get<float> (configSection,
+	float turn_rate_p_high = m_config->Get<float> (configSection,
 			"turnRateHighP", 1.5);
-	float turn_rate_i_high = m_config.Get<float> (configSection,
+	float turn_rate_i_high = m_config->Get<float> (configSection,
 			"turnRateHighI", 0.0);
-	float turn_rate_d_high = m_config.Get<float> (configSection,
+	float turn_rate_d_high = m_config->Get<float> (configSection,
 			"turnRateHighD", 0.0);
 
 	m_rate_turn_high_gear_pid.setParameters(turn_rate_p_high, turn_rate_i_high,
 			turn_rate_d_high, 1.0, FWD_DECAY, true);
 
-	float turn_rate_p_low = m_config.Get<float> (configSection, "turnRateLowP",
+	float turn_rate_p_low = m_config->Get<float> (configSection, "turnRateLowP",
 			1.5);
-	float turn_rate_i_low = m_config.Get<float> (configSection, "turnRateLowI",
+	float turn_rate_i_low = m_config->Get<float> (configSection, "turnRateLowI",
 			0.0);
-	float turn_rate_d_low = m_config.Get<float> (configSection, "turnRateLowD",
+	float turn_rate_d_low = m_config->Get<float> (configSection, "turnRateLowD",
 			0.0);
 
 	m_rate_turn_low_gear_pid.setParameters(turn_rate_p_low, turn_rate_i_low,
 			turn_rate_d_low, 1.0, FWD_DECAY, true);
 
-	float drive_pos_p_high = m_config.Get<float> (configSection,
+	float drive_pos_p_high = m_config->Get<float> (configSection,
 			"drivePosHighP", 1.5);
-	float drive_pos_i_high = m_config.Get<float> (configSection,
+	float drive_pos_i_high = m_config->Get<float> (configSection,
 			"drivePosHighI", 0.0);
-	float drive_pos_d_high = m_config.Get<float> (configSection,
+	float drive_pos_d_high = m_config->Get<float> (configSection,
 			"drivePosHighD", 0.0);
 
 	m_pos_drive_high_gear_pid.setParameters(drive_pos_p_high, drive_pos_i_high,
 			drive_pos_d_high, 1.0, FWD_DECAY, true);
 
-	float drive_pos_p_low = m_config.Get<float> (configSection, "drivePosLowP",
+	float drive_pos_p_low = m_config->Get<float> (configSection, "drivePosLowP",
 			1.5);
-	float drive_pos_i_low = m_config.Get<float> (configSection, "drivePosLowI",
+	float drive_pos_i_low = m_config->Get<float> (configSection, "drivePosLowI",
 			0.0);
-	float drive_pos_d_low = m_config.Get<float> (configSection, "drivePosLowD",
+	float drive_pos_d_low = m_config->Get<float> (configSection, "drivePosLowD",
 			0.0);
 
 	m_pos_drive_low_gear_pid.setParameters(drive_pos_p_low, drive_pos_i_low,
 			drive_pos_d_low, 1.0, FWD_DECAY, true);
 
-	float turn_pos_p_high = m_config.Get<float> (configSection, "turnPosHighP",
+	float turn_pos_p_high = m_config->Get<float> (configSection, "turnPosHighP",
 			1.5);
-	float turn_pos_i_high = m_config.Get<float> (configSection, "turnPosHighI",
+	float turn_pos_i_high = m_config->Get<float> (configSection, "turnPosHighI",
 			0.0);
-	float turn_pos_d_high = m_config.Get<float> (configSection, "turnPosHighD",
+	float turn_pos_d_high = m_config->Get<float> (configSection, "turnPosHighD",
 			0.0);
 
 	m_pos_turn_high_gear_pid.setParameters(turn_pos_p_high, turn_pos_i_high,
 			turn_pos_d_high, 1.0, FWD_DECAY, true);
 
-	float turn_pos_p_low = m_config.Get<float> (configSection, "turnPosLowP",
+	float turn_pos_p_low = m_config->Get<float> (configSection, "turnPosLowP",
 			1.5);
-	float turn_pos_i_low = m_config.Get<float> (configSection, "turnPosLowI",
+	float turn_pos_i_low = m_config->Get<float> (configSection, "turnPosLowI",
 			0.0);
-	float turn_pos_d_low = m_config.Get<float> (configSection, "turnPosLowD",
+	float turn_pos_d_low = m_config->Get<float> (configSection, "turnPosLowD",
 			0.0);
 
 	m_pos_turn_low_gear_pid.setParameters(turn_pos_p_low, turn_pos_i_low,

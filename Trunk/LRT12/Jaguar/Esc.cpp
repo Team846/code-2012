@@ -58,7 +58,7 @@ void Esc::Configure()
 		m_partner->Configure();
 
 	string configSection("Esc");
-	m_p_gain = Config::GetInstance().Get<float> (configSection, "pGain", 4.0);
+	m_p_gain = Config::GetInstance()->Get<float> (configSection, "pGain", 4.0);
 }
 
 void Esc::Stop()

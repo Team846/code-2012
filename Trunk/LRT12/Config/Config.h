@@ -34,7 +34,7 @@ public:
 	/*!
 	 * @brief The accessor method for the global instance of this class. 
 	 */
-	static Config& GetInstance();
+	static Config* GetInstance();
 
 	/*!
 	 * @brief Updates all the values from the configuration file. This may overwrites changes you made. 

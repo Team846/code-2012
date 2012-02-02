@@ -7,6 +7,8 @@
  * @author Brian Axelrod
  * @author Robert Ying
  */
+
+struct BPDAction;
 struct ConfigAction;
 struct DriveTrainAction;
 struct ShifterAction;
@@ -49,6 +51,8 @@ public:
 	 * @brief contains commands relevant to the launcher. Is defined in ActionData\LauncherAction.h
 	 */
 	LauncherAction* launcher;
+	
+	BPDAction* bridgePD;
 
 	/*!
 	 * @brief contains data that is relevant to all/many components.

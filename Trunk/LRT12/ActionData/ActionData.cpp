@@ -2,6 +2,7 @@
 #include "DriveTrainAction.h"
 #include "LauncherAction.h"
 #include "ShifterAction.h"
+#include "BPDAction.h"
 #include "ConfigAction.h"
 
 ActionData* ActionData::instance = NULL;
@@ -52,6 +53,10 @@ ActionData::ActionData()
 	launcher->state = ACTION::LAUNCHER::RUNNING;
 	launcher->bottomSpeed = 0.0;
 	launcher->topSpeed = 0.0;
+	
+	bridgePD = (BPDAction*) malloc(sizeof(BPDAction));
+	bridgePD->state = ACTION::BPD::IDLE;
+	bridgePD->completion_status = ACTION::UNSET;
 }
 
 ActionData::~ActionData()

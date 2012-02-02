@@ -23,7 +23,7 @@ Drivetrain::~Drivetrain()
 
 void Drivetrain::Configure()
 {
-	Config::GetInstance().Get(m_name, "numCyclesToSync", 25);
+	Config::GetInstance()->Get(m_name, "numCyclesToSync", 25);
 }
 
 std::string Drivetrain::GetName()

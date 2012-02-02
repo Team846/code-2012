@@ -159,7 +159,7 @@ public:
 private:
 	DriveEncoders& m_encoders;
 
-	Config& m_config;
+	Config *m_config;
 
 	PID m_rate_drive_high_gear_pid;
 	PID m_rate_drive_low_gear_pid;
