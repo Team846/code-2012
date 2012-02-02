@@ -6,6 +6,8 @@
 namespace RobotConfig
 {
 const uint32_t INVALID = ~0; //use to mark unused ports below. Will cause errors. -dg
+const uint32_t LOOP_RATE = 50; //hertz
+
 namespace CAN //ports 1-16 (2CAN limitation)
 {
 const uint32_t DRIVE_RIGHT_A = CHANGEME;

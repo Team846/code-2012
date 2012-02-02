@@ -13,7 +13,7 @@ void AsyncCANJaguar::println(const char * str)
 	AsyncPrinter::Printf("%s: %s", m_name, str);
 }
 
-AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, char* name) :
+AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 			CANJaguar(channel),
 			Loggable(),
 			m_task_name("JAG#" + Util::ToString<int>(channel)),

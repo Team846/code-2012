@@ -3,126 +3,141 @@
 
 #include "Esc.h"
 
-// CurrentLimiter class
-Esc::CurrentLimiter::CurrentLimiter() :
-	timeExtended(0), timeBurst(0), coolExtended(0), coolBurst(0)
+/************************** Esc Class ********************/
+ESC::ESC(int channel, LRTEncoder *encoder, string name) :
+			m_name(name)
 {
+	m_encoder = encoder;
+	jag1 = new AsyncCANJaguar(channel, name.c_str());
+	jag2 = NULL;
+	m_cycle_count = 0;
 }
 
-float Esc::CurrentLimiter::Limit(float targetSpeed, float robotSpeed)
+ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
+			m_name(name + "A")
 {
-	//    if(Util::Abs<float>(targetSpeed) < .001)
-	//        return 0.0; //dont defeat the dynamic braking
-	//
-	//    const static float kMaxConst = .55;
-	//    if(targetSpeed < 0)
-	//        return -Limit(-targetSpeed, - robotSpeed);
-	//
-	//    float voltage_normalized = DriverStation::GetInstance()->GetBatteryVoltage() / 12;
-	//    float voltageLim = kMaxConst / voltage_normalized;
-	return targetSpeed;
-}
-
-// Esc Class
-Esc::Esc(int channel, LRTEncoder& encoder, string name) :
-	AsyncCANJaguar(channel, "ESC?"), CANJaguarBrake((*(AsyncCANJaguar*) this)),
-			m_hasPartner(false), m_partner(NULL), m_encoder(encoder),
-			m_name(name), m_index(0), m_stopping_integrator(0),
-			m_error_running(0)
-{
-}
-
-Esc::Esc(int channelA, int channelB, LRTEncoder& encoder, string name) :
-	AsyncCANJaguar(channelA, "ESC A?"),
-			CANJaguarBrake((*(AsyncCANJaguar*) this)), m_hasPartner(true),
-			m_partner(new Esc(channelB, encoder, name + "B")),
-			m_encoder(encoder), m_name(name + "A"), m_index(0),
-			m_stopping_integrator(0), m_error_running(0)
-{
+	m_encoder = encoder;
+	jag1 = new AsyncCANJaguar(channelA, (name + "A").c_str());
+	jag2 = new AsyncCANJaguar(channelB, (name + "B").c_str());
+	m_cycle_count = 0;
 	printf("Constructed ESC: %s\n", name.c_str());
 }
 
-Esc::~Esc()
+ESC::~ESC()
 {
-	if (m_partner)
-	{
-		delete m_partner;
-		m_partner = NULL;
-		m_hasPartner = false;
-	}
+	delete jag1;
+	delete jag2;
 }
 
-void Esc::Configure()
+void ESC::Configure()
 {
-	if (m_hasPartner)
-		m_partner->Configure();
-
 	string configSection("Esc");
 	m_p_gain = Config::GetInstance()->Get<float> (configSection, "pGain", 4.0);
 }
 
-void Esc::Stop()
+//first is dutycycle, second is braking
+std::pair<float, float> ESC::CalculateBrakeAndDutyCycle(float desired_speed, float current_speed)
 {
-	if (m_hasPartner)
-		m_partner->Stop();
+	std::pair<float, float> command;
 
-	float RobotSpeed = DriveEncoders::GetInstance().getNormalizedMotorSpeed(
-			m_encoder);
-	if (Util::Abs<double>(RobotSpeed) > 0.3)
+	command.first = 0.0;
+	command.second = 0.0;
+
+	if (current_speed < 0)
 	{
-		SetBrake(8);
-		SetDutyCycle(0.0);
-		return;
+		command = CalculateBrakeAndDutyCycle(-desired_speed, -current_speed);
+		command.first = -command.first;
+		return command;
 	}
-	double error = 0.0 - RobotSpeed;
-	//    static float k = 1. / 2;
-	//    errorRunning *= k;
-	//    errorRunning += error;
 
-	double correction = m_p_gain * m_stopping_integrator.UpdateSum(error);
+	// speed >= 0 at this point
+	if (desired_speed >= current_speed) // trying to go faster
+	{
+		command.first = desired_speed;
+		command.second = 0.0;
+	}
+	// trying to slow down
+	else
+	{
+		float error = desired_speed - current_speed; // error always <= 0
 
-	//    if(error < 0.01)
-	//        Set(0.0);
+		if (desired_speed >= 0) // braking is based on speed alone; reverse power unnecessary
+		{
+			command.first = 0.0; // must set 0 to brake
 
-	//    Set(errorRunning * pGain * (1 - k));
-	SetDutyCycle(correction);
-	SetBrake(8);
+			if (current_speed > -error)
+				command.second = -error / current_speed; // speed always > 0
+			else
+				command.second = 1.0;
+		}
+		else // input < 0; braking with reverse power
+		{
+			command.second = 0.0; // not braking
+			command.first = error / (1.0 + current_speed); // dutyCycle <= 0 because error <= 0
+		}
+	}
+
+	return command;
 }
 
-void Esc::SetDutyCycle(float speed)
 
+void ESC::SetDutyCycle(float dutyCycle)
 {
-	if (m_hasPartner)
-		m_partner->SetDutyCycle(speed);
-
+	
 #ifdef USE_DASHBOARD
 	//    SmartDashboard::Log(speed, name.c_str());
 #endif
+	float speed = m_encoder->GetRate() / m_max_encoder_rate;
+	std::pair<float, float> command = CalculateBrakeAndDutyCycle(dutyCycle, speed);
+	
+	if (fabs(command.first) < 1E-4) //brake only when duty cycle = 0
+	{
+		dutyCycle = 0.0;
+		
+		// cycleCount ranges from 0 to 8
+		if (++m_cycle_count >= 8)
+				m_cycle_count = 0;
+		
+		/*
+		 * Each integer, corresponding to value, is a bitfield of 8 cycles
+		 * Pattern N has N bits out of 8 set to true.
+		 * 0: 0000 0000 = 0x00
+		 * 1: 0000 0001 = 0x01
+		 * 2: 0001 0001 = 0x11
+		 * 3: 0010 0101 = 0x25
+		 * 4: 0101 0101 = 0x55
+		 * 5: 1101 0101 = 0xD5
+		 * 6: 1110 1110 = 0xEE
+		 * 7: 1111 1110 = 0xFE
+		 * 8: 1111 1111 = 0xFF
+		 */
+		static const UINT8 ditherPattern[] = {0x00, 0x01, 0x11, 0x25, 0x55, 0xD5, 0xEE, 0xFE, 0xFF};
 
-	// no current limiting
-	AsyncCANJaguar::SetDutyCycle(Util::Clamp<float>(speed, -1.0, 1.0));
-	//    controller.Set(channel, Util::Clamp<float>(speed, -1.0, 1.0));
+		int brake_level = (int) (fabs(command.second) * 8);
+		bool shouldBrakeThisCycle = ditherPattern[brake_level] & (1
+					<< m_cycle_count);
+		
+		if (shouldBrakeThisCycle)
+		{
+			jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
+			jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
+		}
+		else
+		{
+			jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+			jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+		}
+	}
+	
+	dutyCycle = Util::Clamp<float>(dutyCycle, -1.0, 1.0);
+	jag1->SetDutyCycle(dutyCycle);
+	jag2->SetDutyCycle(dutyCycle);
 }
 
-void Esc::ResetCache()
+void ESC::ResetCache()
 {
-	AsyncCANJaguar::ResetCache();
-	if (m_hasPartner)
-		m_partner->ResetCache();
+	jag1->ResetCache();
+	if (jag2)
+		jag2->ResetCache();
 }
 
-void Esc::ApplyBrake()
-{
-	if (m_hasPartner)
-		m_partner->ApplyBrake();
-
-	CANJaguarBrake::ApplyBrakes();
-}
-
-void Esc::SetBrake(int brakeAmount)
-{
-	if (m_hasPartner)
-		m_partner->SetBrake(brakeAmount);
-
-	CANJaguarBrake::SetBrake(brakeAmount);
-}

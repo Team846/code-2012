@@ -20,9 +20,6 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 
 void ClosedLoopDrivetrain::Configure()
 {
-	// confiure parent class
-	DitheredBrakeTrain::Configure();
-
 	const static string configSection = "CLDriveTrain";
 
 	float drive_rate_p_high = m_config->Get<float> (configSection,
@@ -106,15 +103,30 @@ void ClosedLoopDrivetrain::Configure()
 			turn_pos_d_low, 1.0, FWD_DECAY, true);
 }
 
-DriveCommand ClosedLoopDrivetrain::Drive(float rawFwd, float rawTurn)
+ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::Drive(float rawTurn, float rawFwd)
 {
-	AsyncPrinter::Printf("Hidden drive function called; error\n");
-	return DitheredBrakeTrain::Drive(rawFwd, rawTurn);
+	DriveCommand drive;
+
+	float leftInput = rawTurn - rawFwd;
+	float rightInput = rawTurn + rawFwd;
+
+	// TODO must decide whether forward or turn takes precedence
+	if(Util::Abs<float>(leftInput) > 1.0)
+		leftInput = Util::Sign<float>(leftInput) * 1.0;
+
+	// TODO must decide whether forward or turn takes precedence
+	if(Util::Abs<float>(rightInput) > 1.0)
+		rightInput = Util::Sign<float>(rightInput) * 1.0;
+
+	drive.leftDutyCycle   = leftInput;
+	drive.rightDutyCycle  = rightInput;
+	drive.shouldLinearize = true;
+	return drive;
 }
 
-DriveCommand ClosedLoopDrivetrain::getOutput()
+ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::getOutput()
 {
-	return DitheredBrakeTrain::Drive(m_drive_control->getOutput(),
+	return Drive(m_drive_control->getOutput(),
 			m_turn_control->getOutput());
 }
 

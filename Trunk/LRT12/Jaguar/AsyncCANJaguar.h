@@ -46,7 +46,7 @@ private:
 	string m_task_name;
 	PrintInConstructor m_print_ctor_dtor;
 	int m_channel;
-	char* m_name;
+	const char* m_name;
 
 	CachedValue<float> m_setpoint;
 	CachedValue<AsyncCANJaguar::NeutralMode> m_neutral_mode;
@@ -106,7 +106,7 @@ public:
 	 * @param channel Channel that the Jaguar is assigned to
 	 * @param name The name of the Jaguar
 	 */
-	AsyncCANJaguar(UINT8 channel, char* name);
+	AsyncCANJaguar(UINT8 channel, const char* name);
 
 	/*!
 	 * @briefDestroys the Jaguar object and stops the thread

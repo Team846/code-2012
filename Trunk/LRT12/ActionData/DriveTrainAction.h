@@ -25,9 +25,9 @@ struct DriveTrainAction
 	struct
 	{
 		float leftDutyCycle;
-		float leftBrakingDutyCycle;
+//		float leftBrakingDutyCycle;
 		float rightDutyCycle;
-		float rightBrakingDutyCycle;
+//		float rightBrakingDutyCycle;
 	} raw;
 
 	bool previousDriveOperationComplete;

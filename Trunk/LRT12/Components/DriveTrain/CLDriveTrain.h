@@ -6,7 +6,6 @@
 #include "..\..\Config\Configurable.h"
 #include "../../Util/PID.h"
 #include "../../Log/Loggable.h"
-#include "DitheredBrakeTrain.h"
 
 /*!
  * @brief implements a closed-loop drivetrain
@@ -15,7 +14,7 @@
  * @brief DOES implement closed-loop relative position control
  * @author Robert Ying
  */
-class ClosedLoopDrivetrain: public DitheredBrakeTrain, public Loggable
+class ClosedLoopDrivetrain:  public Loggable
 {
 public:
 	/*!
@@ -25,6 +24,12 @@ public:
 	{
 		CL_DISABLED, CL_RATE, CL_POSITION
 	} CONTROL_TYPE;
+	
+	typedef struct
+	{
+	    float leftDutyCycle, rightDutyCycle;
+	    bool shouldLinearize;
+	} DriveCommand;
 
 	/*!
 	 * @brief constructs the drivetrain

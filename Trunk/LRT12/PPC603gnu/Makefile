@@ -182,15 +182,19 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/ConfigLoader.o : $(PRJ_R
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DavidLauncher.o : $(PRJ_ROOT_DIR)/Components/DavidLauncher.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DriveTrain/CLDriveTrain.o : $(PRJ_ROOT_DIR)/Components/DriveTrain/CLDriveTrain.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
-LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DriveTrain/DitheredBrakeTrain.o : $(PRJ_ROOT_DIR)/Components/DriveTrain/DitheredBrakeTrain.cpp $(FORCE_FILE_BUILD)
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Drivetrain.o : $(PRJ_ROOT_DIR)/Components/Drivetrain.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
-LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Drivetrain.o : $(PRJ_ROOT_DIR)/Components/Drivetrain.cpp $(FORCE_FILE_BUILD)
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/EvaLauncher.o : $(PRJ_ROOT_DIR)/Components/EvaLauncher.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
@@ -227,10 +231,6 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.o : 
 
 
 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/AsyncCANJaguar.o : $(PRJ_ROOT_DIR)/Jaguar/AsyncCANJaguar.cpp $(FORCE_FILE_BUILD)
-	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
-
-
-LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/CANJaguarBrake.o : $(PRJ_ROOT_DIR)/Jaguar/CANJaguarBrake.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
@@ -295,9 +295,10 @@ OBJECTS_LRT12_partialImage = LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Action
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/BLauncher.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Component.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/ConfigLoader.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DavidLauncher.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DriveTrain/CLDriveTrain.o \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DriveTrain/DitheredBrakeTrain.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Drivetrain.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/EvaLauncher.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/LRTServo.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Launcher.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Shifter.o \
@@ -307,7 +308,6 @@ OBJECTS_LRT12_partialImage = LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Action
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/AsyncCANJaguar.o \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/CANJaguarBrake.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/Esc.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.o \
@@ -336,11 +336,11 @@ LRT12_partialImage/$(MODE_DIR)/LRT12_partialImage_clean :
 force : 
 
 DEP_FILES := LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/BLauncher.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Component.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/ConfigLoader.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DriveTrain/CLDriveTrain.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DriveTrain/DitheredBrakeTrain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Drivetrain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/LRTServo.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Launcher.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Shifter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/AsyncCANJaguar.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/CANJaguarBrake.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Component.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/ConfigLoader.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DavidLauncher.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DriveTrain/CLDriveTrain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Drivetrain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/EvaLauncher.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/LRTServo.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Launcher.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Shifter.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/AsyncCANJaguar.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/Esc.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Log.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Loggable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/DriveEncoders.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/LRTEncoder.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsyncPrinter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d \

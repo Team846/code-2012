@@ -323,6 +323,15 @@ LRT12_partialImage/Debug/Objects/LRT12/LRTRobotBase.o:  \
   C:/WindRiver/vxworks-6.3/target/h/WPILib/Vision/ColorImage.h \
   C:/WindRiver/vxworks-6.3/target/h/WPILib/WPIErrors.h \
   C:/WindRiver/workspace/LRT12/Util\AsyncPrinter.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/AsyncCANJaguar.h \
+  C:/WindRiver/vxworks-6.3/target/h/WPILib/CANJaguar.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/../LRTRobotBase.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/../Util/Util.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/../Util/PrintInConstructor.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/../Util/CachedValue.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/../Log/Loggable.h \
+  C:/WindRiver/workspace/LRT12/Jaguar/../Log/Log.h \
+  C:/WindRiver/vxworks-6.3/target/h/WPILib/SmartDashboard/SmartDashboard.h \
   C:/WindRiver/vxworks-6.3/target/h/WPILib/Utility.h \
   C:/WindRiver/vxworks-6.3/target/h/sysLib.h \
   C:/WindRiver/vxworks-6.3/target/h/bootLib.h \
@@ -978,6 +987,24 @@ C:/WindRiver/vxworks-6.3/target/h/WPILib/Vision/ColorImage.h:
 C:/WindRiver/vxworks-6.3/target/h/WPILib/WPIErrors.h:
 
 C:/WindRiver/workspace/LRT12/Util\AsyncPrinter.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/AsyncCANJaguar.h:
+
+C:/WindRiver/vxworks-6.3/target/h/WPILib/CANJaguar.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/../LRTRobotBase.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/../Util/Util.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/../Util/PrintInConstructor.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/../Util/CachedValue.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/../Log/Loggable.h:
+
+C:/WindRiver/workspace/LRT12/Jaguar/../Log/Log.h:
+
+C:/WindRiver/vxworks-6.3/target/h/WPILib/SmartDashboard/SmartDashboard.h:
 
 C:/WindRiver/vxworks-6.3/target/h/WPILib/Utility.h:
 

@@ -1,5 +1,5 @@
 #include "DriveEncoders.h"
-#include "..\Config\Config.h"
+#include "..\Config\config.h"
 
 DriveEncoders* DriveEncoders::m_instance = NULL;
 

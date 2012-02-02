@@ -2,68 +2,67 @@
 #define ESC_H_
 
 #include "AsyncCANJaguar.h"
-#include "CANJaguarBrake.h"
 #include "WPILib.h"
 #include "..\Config\Config.h"
 #include "..\Config\Configurable.h"
 #include "..\Util\AsyncPrinter.h"
 #include "..\Sensors\DriveEncoders.h"
 #include "..\Util\RunningSum.h"
+#include <utility>
 #include <string>
 using namespace std;
 
-class Esc: public AsyncCANJaguar, public CANJaguarBrake, public Configurable
+class ESC : public Configurable
 {
 public:
-	Esc(int channel, LRTEncoder& encoder, string name);
-	Esc(int channelA, int channelB, LRTEncoder& encoder, string name);
-	~Esc();
+	/*!
+	 * @brief Constructs a new LRT specific ESC object. 
+	 * @param channel CANID of the Jaguar 
+	 * @param encoder 
+	 * @param name
+	 */
+	ESC(int channel, LRTEncoder* encoder, string name);
+	/*!
+	 * @brief Constructs a new LRT specific ESC object. 
+	 * @param channelA CANID of first Jaguar
+	 * @param channelB CANID of second Jaguar
+	 * @param encoder
+	 * @param name
+	 */
+	ESC(int channelA, int channelB, LRTEncoder* encoder, string name);
+	
+	/*!
+	 * @brief Cleans up the speed controller including cleanup of the jaguar resources.
+	 */
+	~ESC();
+	
+	/*!
+	 * @brief loads in mutable parameters of the ESC
+	 */
 	virtual void Configure();
-	void Stop();
+	
+	/*!
+	 * @brief Sets the duty cycle. Includes break dithering to ensure a linear response. 
+	 * @param dutycycle
+	 */
 	void SetDutyCycle(float dutycycle);
 
-	void ApplyBrake();
-	void SetBrake(int brakeAmount);
-
+	/*!
+	 * @brief Resets the caching.
+	 */
 	void ResetCache();
-
 private:
-	bool m_hasPartner;
-	Esc* m_partner;
+	AsyncCANJaguar *jag1, *jag2;
 
-	class CurrentLimiter
-	{
-	public:
-		CurrentLimiter();
-		float Limit(float speed, float robotSpeed);
-
-	private:
-		UINT32 timeExtended, timeBurst;
-		UINT32 coolExtended, coolBurst;
-
-		const static float kmaxContinous = 40.0 / 133;
-		const static float kmaxExtended = 60.0 / 133;
-		const static float kmaxBurst = 100.0 / 133;
-
-		const static float kmaxExtendedPeriodSeconds = 2.0;
-		const static float kmaxBurstPeriodSeconds = 0.2;
-
-		const static float kminExtendedCooldown = 1.0;
-		const static float kminBurstCooldown = 0.5;
-	};
-
-	CurrentLimiter m_currentLimiter;
-	LRTEncoder& m_encoder;
+	LRTEncoder* m_encoder;
 
 	string m_name;
+	int m_cycle_count;
 
 	float m_p_gain;
-	int m_index;
+	float m_max_encoder_rate;
 
-	const static int kArraySize = 4;
-	RunningSum m_stopping_integrator;
-	float m_error_running;
-	float m_errors[kArraySize];
+	std::pair<float, float> CalculateBrakeAndDutyCycle(float target_speed, float current_speed);
 };
 
 #endif /* ESC_H_ */

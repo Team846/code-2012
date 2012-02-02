@@ -38,7 +38,7 @@ private:
 	std::string m_name;
 	ClosedLoopDrivetrain m_drive_control;
 	DriveEncoders& m_encoders;
-	Esc * m_esc_left, *m_esc_right;
+	ESC * m_esc_left, *m_esc_right;
 	int NUM_CYCLES_TO_SYNC;
 };
 
