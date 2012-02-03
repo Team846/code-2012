@@ -143,29 +143,6 @@ void RBridgePD::Output()
 //            AsynchronousPrinter::Printf("setpoint %.3f\n",Util::Max<float>(powerDown, error*0.0015));
         }
         break;
-        
-    case ACTION::BPD::MANUAL_UP:
-        if(potValue < maxPosition)
-            armEsc->SetDutyCycle(maxPowerUp);
-        else
-            armEsc->SetDutyCycle(0.0);
-
-        action->bridgePD->completion_status = ACTION::IN_PROGRESS;
-        // operator must hold button to stay in manual mode
-        action->bridgePD->state = ACTION::BPD::IDLE;
-        break;
-
-    case ACTION::BPD::MANUAL_DOWN:
-        if(potValue > minPosition)
-            armEsc->SetDutyCycle(powerDown);
-        else
-            armEsc->SetDutyCycle(0.0);
-
-        action->bridgePD->completion_status = ACTION::IN_PROGRESS;
-        // operator must hold button to stay in manual mode
-        action->bridgePD->state = ACTION::BPD::IDLE;
-        break;
-
     case ACTION::BPD::IDLE:
         action->bridgePD->completion_status = ACTION::SUCCESS;
         armEsc->SetDutyCycle(0.0);

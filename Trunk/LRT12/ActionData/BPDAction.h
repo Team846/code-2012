@@ -14,11 +14,10 @@ namespace ACTION
 	{
 		enum eStates
 		{
-			IDLE = 1, PRESET_BOTTOM = 2, PRESET_TOP = 3,
-			PRESET_MIDDLE = 4,  MANUAL_DOWN = 5, MANUAL_UP = 6
+			IDLE = 1, PRESET_BOTTOM = 2, PRESET_TOP = 3
 		};
 		char* const state_string[6 + 1] =
-		{"ERROR", "IDLE", "Preset_Bottom", "Preset_Top", "Preset_Middle", "Manual_Down", "Manual_Up"};
+		{"ERROR", "IDLE", "Preset_Bottom", "Preset_Top"};
 	}
 }
 
