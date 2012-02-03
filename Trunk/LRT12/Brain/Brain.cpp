@@ -1,5 +1,7 @@
 #include "Brain.h"
+#include "../ActionData/DriveTrainAction.h"
 #include "../Config/DriverStationConfig.h"
+#include "Joystick.h"
 
 Brain::Brain() :
 			m_teleop_task("Teleop", (FUNCPTR) Brain::teleopTaskEntryPoint),
@@ -80,13 +82,14 @@ int Brain::teleopTaskEntryPoint(uint32_t brain)
 
 void Brain::process()
 {
-	//TODO to something
-	//This heuristic may eventually have to change
+	//This heuristic may eventually have to change if brain is to do processing during disabled
 	if (m_ds->IsAutonomous())
 	{
 
 	}
 	else if (m_ds->IsOperatorControl())
 	{
+		actionData->drivetrain->rate.desiredDriveRate = m_driver_stick.GetAxis(Joystick::kYAxis);
+		actionData->drivetrain->rate.desiredTurnRate  = m_driver_stick.GetAxis(Joystick::kZAxis);
 	}
 }
