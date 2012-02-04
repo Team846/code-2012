@@ -58,7 +58,7 @@ void Console::PrintEveryHalfSecond(const char* format, ...)
 }
 
 // hertz may be < 1
-void Console::PrintMultipleTimesPerSecond(float hertz, const char* format, ...)
+void Console::PrintMultipleTimesPerSecond(double hertz, const char* format, ...)
 {
 	if (cycleNum % int(kCyclesPerSecond / hertz) == 0)
 	{

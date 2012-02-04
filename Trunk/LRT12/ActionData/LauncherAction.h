@@ -20,8 +20,8 @@ enum launcherState
 struct LauncherAction
 {
 	ACTION::LAUNCHER::launcherState state;
-	float topSpeed;
-	float bottomSpeed;
+	double topSpeed;
+	double bottomSpeed;
 };
 
 #endif

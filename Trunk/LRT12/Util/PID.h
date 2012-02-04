@@ -19,8 +19,8 @@ public:
 	 * @param i_decay integral decay (defaults to 0.5)
 	 * @param feedforward whether or not feedforward is used
 	 */
-	PID(float p_gain, float i_gain, float d_gain,
-			float ff_gain = 1.0, float i_decay = 0.5, bool feedforward = true);
+	PID(double p_gain, double i_gain, double d_gain, double ff_gain = 1.0,
+			double i_decay = 0.5, bool feedforward = true);
 
 	/*!
 	 * @brief Constructs a PID controller with no gains set
@@ -37,93 +37,95 @@ public:
 	 * @param i_decay integral decay (defaults to 0.5)
 	 * @param feedforward whether or not feedforward is used
 	 */
-	void setParameters(float p_gain, float i_gain, float d_gain,
-			float ff_gain = 1.0, float i_decay = 0.5, bool feedforward = true);
+	void
+			setParameters(double p_gain, double i_gain, double d_gain,
+					double ff_gain = 1.0, double i_decay = 0.5,
+					bool feedforward = true);
 
 	/*!
 	 * @brief updates the PID controller, call on each loop
 	 * @param dt time differential
 	 * @return pid output
 	 */
-	float update(float dt);
+	double update(double dt);
 
 	/*!
 	 * @brief sets the feedback input
 	 * @param PID input
 	 */
-	void setInput(float input);
+	void setInput(double input);
 
 	/*!
 	 * @brief sets the setpoint
 	 * @param setpoint
 	 */
-	void setSetpoint(float setpoint);
+	void setSetpoint(double setpoint);
 
 	/*!
 	 * @brief gets the PID output
 	 * @return PID output
 	 */
-	float getOutput();
+	double getOutput();
 
 	/*!
 	 * @brief Gets the p gain
 	 * @return proportional PID gain
 	 */
-	float getProportionalGain();
+	double getProportionalGain();
 
 	/*!
 	 * @brief Gets the i gain
 	 * @return integral PID gain
 	 */
-	float getIntegralGain();
+	double getIntegralGain();
 
 	/*!
 	 * @brief Gets the d gain
 	 * @return derivative PID gain
 	 */
-	float getDerivativeGain();
+	double getDerivativeGain();
 
 	/*!
 	 * @brief Gets the feed forward gain
 	 * @return feed forward gain
 	 */
-	float getFeedForwardGain();
+	double getFeedForwardGain();
 
 	/*!
 	 * @brief Gets the integral decay rate
 	 * @return integral decay rate
 	 */
-	float getIntegralDecay();
+	double getIntegralDecay();
 
 	/*!
 	 * @brief Gets the input value
 	 * @return input
 	 */
-	float getInput();
+	double getInput();
 
 	/*!
 	 * @brief Gets the setpoint value
 	 * @return setpoint
 	 */
-	float getSetpoint();
+	double getSetpoint();
 
 	/*!
 	 * @brief Gets the error value
 	 * @return error
 	 */
-	float getError();
+	double getError();
 
 	/*!
 	 * @brief Gets the accumulated running sum
 	 * @return running sum
 	 */
-	float getAccumulatedError();
+	double getAccumulatedError();
 
 	/*!
 	 * @brief Gets the previous error (one iteration ago)
 	 * @return previous error
 	 */
-	float getPreviousError();
+	double getPreviousError();
 
 	/*!
 	 * @brief status flag for feed-forward PID
@@ -147,17 +149,17 @@ public:
 	void enablePID();
 
 private:
-	float m_proportional_gain;
-	float m_integral_gain;
-	float m_derivative_gain;
-	float m_feedforward_gain;
-	float m_integral_decay;
-	float m_input;
-	float m_output;
-	float m_setpoint;
-	float m_error;
-	float m_prev_error;
-	float m_acc_error;
+	double m_proportional_gain;
+	double m_integral_gain;
+	double m_derivative_gain;
+	double m_feedforward_gain;
+	double m_integral_decay;
+	double m_input;
+	double m_output;
+	double m_setpoint;
+	double m_error;
+	double m_prev_error;
+	double m_acc_error;
 	bool m_is_feed_forward;
 	bool m_enabled;
 };

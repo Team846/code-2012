@@ -8,8 +8,8 @@ DebouncedJoystick::DebouncedJoystick(UINT32 port, int nBtns, int nAxes) :
 	// N.B. indexes are 1-based
 	wasPressed = new bool[nBtns + 1];
 	isPressed = new bool[nBtns + 1];
-	axisPrevValue = new float[nAxes + 1];
-	axisValue = new float[nAxes + 1];
+	axisPrevValue = new double[nAxes + 1];
+	axisValue = new double[nAxes + 1];
 
 	Init();
 }
@@ -71,7 +71,7 @@ void DebouncedJoystick::Update()
 	}
 }
 
-float DebouncedJoystick::GetRawAxisDelta(int axis)
+double DebouncedJoystick::GetRawAxisDelta(int axis)
 {
 	// return positive when stick is pushed forward
 	return axisPrevValue[axis] - axisValue[axis];

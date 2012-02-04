@@ -42,21 +42,21 @@ RBridgePD::~RBridgePD()
 
 void RBridgePD::Configure()
 {
-    minPosition = config->Get<float>(configSection, "minPosition", 280);
-    maxPosition = config->Get<float>(configSection, "maxPosition", 530);
+    minPosition = config->Get<double>(configSection, "minPosition", 280);
+    maxPosition = config->Get<double>(configSection, "maxPosition", 530);
 
-    midPositionDeadband = config->Get<float>(configSection, "midPositionDeadband", 10);
+    midPositionDeadband = config->Get<double>(configSection, "midPositionDeadband", 10);
 
-    maxPowerUp    = config->Get<float>(configSection, "maxPowerUp", 0.30);
-    powerRetainUp = config->Get<float>(configSection, "powerRetainUp", 0.10);
-    powerDown     = config->Get<float>(configSection, "powerDown", -0.15);
+    maxPowerUp    = config->Get<double>(configSection, "maxPowerUp", 0.30);
+    powerRetainUp = config->Get<double>(configSection, "powerRetainUp", 0.10);
+    powerDown     = config->Get<double>(configSection, "powerDown", -0.15);
 
-    midPowerUp    = config->Get<float>(configSection, "midPowerUp", 0.2);
-    midPowerDown  = config->Get<float>(configSection, "midPowerDown", -0.15);
+    midPowerUp    = config->Get<double>(configSection, "midPowerUp", 0.2);
+    midPowerDown  = config->Get<double>(configSection, "midPowerDown", -0.15);
     
-    pGainDown 	  = config->Get<float>(configSection, "pGainDown", 0.0015); 
-    pGainUp	      = config->Get<float>(configSection, "pGainUp", 0.003); 
-    pGainMid	  = config->Get<float>(configSection, "pGainMid", 0.01);
+    pGainDown 	  = config->Get<double>(configSection, "pGainDown", 0.0015); 
+    pGainUp	      = config->Get<double>(configSection, "pGainUp", 0.003); 
+    pGainMid	  = config->Get<double>(configSection, "pGainMid", 0.01);
 
     timeoutCycles = (int)(config->Get<int>(configSection, "timeoutMs", 1500) * 1.0 / 1000.0 * 50.0 / 1.0);
 }
@@ -64,7 +64,7 @@ void RBridgePD::Configure()
 void RBridgePD::Output()
 {
 
-    float potValue = armPot->GetAverageValue();
+    double potValue = armPot->GetAverageValue();
 
 #ifdef USE_DASHBOARD
     SmartDashboard::Log(potValue, "Arm Pot Value");
@@ -110,9 +110,9 @@ void RBridgePD::Output()
         else //we have not yet hit the setpoint
         {
             action->bridgePD->completion_status = ACTION::IN_PROGRESS;
-		    float error = maxPosition - potValue;
+		    double error = maxPosition - potValue;
             
-            armEsc->SetDutyCycle(Util::Max<float>(Util::Min<float>(maxPowerUp*1.5, error*pGainUp), 0.15));
+            armEsc->SetDutyCycle(Util::Max<double>(Util::Min<double>(maxPowerUp*1.5, error*pGainUp), 0.15));
 
         }
         break;
@@ -138,9 +138,9 @@ void RBridgePD::Output()
         else
         {
             action->bridgePD->completion_status = ACTION::IN_PROGRESS;
-            float error = minPosition - potValue;
-            armEsc->SetDutyCycle(Util::Max<float>(powerDown, error*pGainDown));
-//            AsynchronousPrinter::Printf("setpoint %.3f\n",Util::Max<float>(powerDown, error*0.0015));
+            double error = minPosition - potValue;
+            armEsc->SetDutyCycle(Util::Max<double>(powerDown, error*pGainDown));
+//            AsynchronousPrinter::Printf("setpoint %.3f\n",Util::Max<double>(powerDown, error*0.0015));
         }
         break;
     case ACTION::BPD::IDLE:

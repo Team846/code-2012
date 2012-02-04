@@ -9,8 +9,8 @@ struct DriveTrainAction
 		bool drive_control;
 		bool turn_control;
 
-		float desiredDriveRate;
-		float desiredTurnRate;
+		double desiredDriveRate;
+		double desiredTurnRate;
 	} rate;
 
 	struct
@@ -18,16 +18,16 @@ struct DriveTrainAction
 		bool drive_control;
 		bool turn_control;
 
-		float desiredRelativeDrivePosition;
-		float desiredRelativeTurnPosition;
+		double desiredRelativeDrivePosition;
+		double desiredRelativeTurnPosition;
 	} position;
 
 	struct
 	{
-		float leftDutyCycle;
-//		float leftBrakingDutyCycle;
-		float rightDutyCycle;
-//		float rightBrakingDutyCycle;
+		double leftDutyCycle;
+//		double leftBrakingDutyCycle;
+		double rightDutyCycle;
+//		double rightBrakingDutyCycle;
 	} raw;
 
 	bool previousDriveOperationComplete;

@@ -12,7 +12,7 @@ public:
 	 * @brief Constructs a running sum
 	 * @param decayConstant rate of decay
 	 */
-	RunningSum(float decayConstant) :
+	RunningSum(double decayConstant) :
 		decayConstant(decayConstant), runningSum(0)
 	{
 
@@ -23,7 +23,7 @@ public:
 	 * @param x
 	 * @return new value
 	 */
-	float UpdateSum(float x)
+	double UpdateSum(double x)
 	{
 		runningSum *= decayConstant;
 		runningSum += x;
@@ -39,8 +39,8 @@ public:
 	}
 
 private:
-	float decayConstant;
-	float runningSum;
+	double decayConstant;
+	double runningSum;
 };
 
 #endif

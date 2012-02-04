@@ -27,7 +27,7 @@ public:
 	
 	typedef struct
 	{
-	    float leftDutyCycle, rightDutyCycle;
+	    double leftDutyCycle, rightDutyCycle;
 	    bool shouldLinearize;
 	} DriveCommand;
 
@@ -47,7 +47,7 @@ private:
 	 * @param rawTurn rate of rotation about center of mass
 	 * @return drive command for escs
 	 */
-	DriveCommand Drive(float rawFwd, float rawTurn);
+	DriveCommand Drive(double rawFwd, double rawTurn);
 public:
 	/*!
 	 * @brief updates loops; run on each cycle
@@ -76,49 +76,49 @@ public:
 	 * @brief Set drive position relative to current
 	 * @param pos relative position
 	 */
-	void setRelativeDrivePosition(float pos);
+	void setRelativeDrivePosition(double pos);
 
 	/*!
 	 * Gets current drive setpoint
 	 * @return
 	 */
-	float getDriveSetpoint();
+	double getDriveSetpoint();
 
 	/*!
 	 * @brief Set drive rate
 	 * @param rate speed
 	 */
-	void setDriveRate(float rate);
+	void setDriveRate(double rate);
 
 	/*!
 	 * @brief Sets raw drive duty cycle
 	 * @param duty
 	 */
-	void setRawDriveDutyCycle(float duty);
+	void setRawDriveDutyCycle(double duty);
 
 	/*!
 	 * @brief Set turn position relative to current
 	 * @param pos
 	 */
-	void setRelativeTurnPosition(float pos);
+	void setRelativeTurnPosition(double pos);
 
 	/*!
 	 * @brief Set turn rate
 	 * @param rate
 	 */
-	void setTurnRate(float rate);
+	void setTurnRate(double rate);
 
 	/*!
 	 * Gets current turn setpoint
 	 * @return
 	 */
-	float getTurnSetpoint();
+	double getTurnSetpoint();
 
 	/*!
 	 * @brief Set raw turn duty cycle
 	 * @param duty
 	 */
-	void setRawTurnDutyCycle(float duty);
+	void setRawTurnDutyCycle(double duty);
 
 	/*!
 	 * @brief Returns true when drive operation is complete
@@ -190,8 +190,8 @@ private:
 
 	bool m_in_high_gear;
 
-	const static float FWD_DECAY = 0.87;
-	const static float TURN_DECAY = 0.87; // (1/2)^(1/5) =~ 0.87
+	const static double FWD_DECAY = 0.87;
+	const static double TURN_DECAY = 0.87; // (1/2)^(1/5) =~ 0.87
 };
 
 #endif

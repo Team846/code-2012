@@ -25,14 +25,14 @@ public:
 	bool IsHatSwitchDown(int axis, int direction);
 	bool WasHatSwitchDown(int axis, int direction);
 
-	float GetRawAxisDelta(int axis);
+	double GetRawAxisDelta(int axis);
 
 private:
 	int nBtns, nAxes;
 	bool* wasPressed;
 	bool* isPressed;
-	float* axisPrevValue;
-	float* axisValue;
+	double* axisPrevValue;
+	double* axisValue;
 };
 
 #endif

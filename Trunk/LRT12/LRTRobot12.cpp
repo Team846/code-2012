@@ -19,13 +19,15 @@ LRTRobot12::LRTRobot12() :
 	mainLoopWatchDog = wdCreate();
 
 	//set priority above default so that we get hgiher priority than default
-	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority 
+	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority
 
 	printf("---- Robot Initialized ----\n\n");
 }
 
 LRTRobot12::~LRTRobot12()
 {
+	// try to free SmartDashboard resources
+	SmartDashboard::GetInstance()->DeleteSingletons();
 	// Testing shows this to be the entry point for a Kill signal.
 	// Start shutting down processes here. -dg
 	printf("\n\nBegin Deleting LRTRobot12\n");
@@ -90,7 +92,13 @@ void LRTRobot12::MainLoop()
 
 	prevState = gameState;
 
-	Log::logAll();
+	// limit rate of logging 
+	static uint8_t cycle_count = 0;
+	if (++cycle_count >= 5)
+	{
+		cycle_count = 0;
+		Log::logAll();
+	}
 
 	// if we finish in time, cancel the watchdog's error message
 	wdCancel(mainLoopWatchDog);

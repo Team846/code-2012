@@ -35,7 +35,7 @@ private:
 	ACTION::LAUNCHER::launcherState m_prevstate;
 	AsyncCANJaguar *m_top_roller, *m_bottom_roller;
 	std::string m_name;
-	float m_pid_top[3], m_pid_bottom[3];
+	double m_pid_top[3], m_pid_bottom[3];
 	const static int PROPORTIONAL = 0, DERIVATIVE = 1, INTEGRAL = 2;
 };
 #endif

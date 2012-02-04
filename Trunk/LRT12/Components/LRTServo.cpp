@@ -31,7 +31,7 @@ bool LRTServo::IsEnabled()
 	return enabled;
 }
 
-void LRTServo::Set(float value)
+void LRTServo::Set(double value)
 {
 	if (enabled)
 	{
@@ -51,12 +51,12 @@ void LRTServo::SetMicroseconds(int ms)
 		const int MIN_VAL = 727;
 		const int MAX_VAL = 2252;
 		ms = Util::Clamp(ms, MIN_VAL, MAX_VAL);
-		float val = Util::Rescale<float>(ms, MIN_VAL, MAX_VAL, 0.0, 1.0);
+		double val = Util::Rescale<double>(ms, MIN_VAL, MAX_VAL, 0.0, 1.0);
 		Servo::Set(val);
 	}
 }
 
-void LRTServo::SetAngle(float angle)
+void LRTServo::SetAngle(double angle)
 {
 	if (enabled)
 		Servo::SetAngle(angle);

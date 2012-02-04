@@ -26,10 +26,10 @@ private:
 
     int oldState;
 
-    float maxPosition, minPosition, midPosition, midPositionDeadband;
-    float maxPowerUp, powerRetainUp, powerDown, midPGain;
-    float midPowerUp, midPowerDown;
-    float pGainDown, pGainUp, pGainMid;
+    double maxPosition, minPosition, midPosition, midPositionDeadband;
+    double maxPowerUp, powerRetainUp, powerDown, midPGain;
+    double midPowerUp, midPowerDown;
+    double pGainDown, pGainUp, pGainMid;
 
     int timeoutCycles;
     int cycleCount;
@@ -40,7 +40,7 @@ private:
     int pulseCount;
     int hysteresis;
 
-    const static float ARM_UP_THRESHOLD = 10;
+    const static double ARM_UP_THRESHOLD = 10;
 
 public:
     RBridgePD();

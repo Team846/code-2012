@@ -7,7 +7,7 @@ class LRTServo: public Servo
 {
 private:
 	bool enabled;
-	float previous_value_; //use for detecting changes.
+	double previous_value_; //use for detecting changes.
 
 public:
 	char* name_; //user supplied name of servo for diagnostics
@@ -17,8 +17,8 @@ public:
 	void SetEnabled(bool enabled);
 	bool IsEnabled();
 
-	virtual void Set(float value);
-	virtual void SetAngle(float angle);
+	virtual void Set(double value);
+	virtual void SetAngle(double angle);
 	void SetMicroseconds(int ms);
 };
 

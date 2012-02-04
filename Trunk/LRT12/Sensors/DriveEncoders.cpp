@@ -21,21 +21,21 @@ DriveEncoders::DriveEncoders() :
 					RobotConfig::DIGITAL_IO::ENCODER_RIGHT_A,
 					RobotConfig::DIGITAL_IO::ENCODER_RIGHT_B),
 			PULSES_PER_REVOLUTION(
-					m_config->Get<float> (m_configsection,
+					m_config->Get<double> (m_configsection,
 							"pulses_per_revolution", 100.0)),
 			ENCODER_RATE_HIGH_GEAR(
-					m_config->Get<float> (m_configsection,
+					m_config->Get<double> (m_configsection,
 							"high_gear_encoder_rate", 1475.0)),
 			MAX_TURNING_RATE(
-					m_config->Get<float> (m_configsection, "max_turning_rate",
+					m_config->Get<double> (m_configsection, "max_turning_rate",
 							2950.0)),
 			TICKS_PER_FULL_TURN(
-					m_config->Get<float> (m_configsection,
+					m_config->Get<double> (m_configsection,
 							"ticks_per_full_turn", 1350.0 * 180.0 / 165.0)),
 			WHEEL_DIAMETER(
-					m_config->Get<float> (m_configsection, "wheel_diameter", 4.0)), // inches
+					m_config->Get<double> (m_configsection, "wheel_diameter", 4.0)), // inches
 			LOW_GEAR_MULTIPLIER(
-					m_config->Get<float> (m_configsection,
+					m_config->Get<double> (m_configsection,
 							"low_gear_multiplier", 16.3 / 6.4))
 
 {
@@ -189,6 +189,7 @@ void DriveEncoders::log()
 {
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	sdb->PutDouble("Robot Drive Speed", getNormalizedForwardMotorSpeed());
+	AsyncPrinter::Printf("Fwd: %d\n", getNormalizedForwardMotorSpeed());
 	sdb->PutDouble("Robot Turning Speed", getNormalizedTurningMotorSpeed());
 	sdb->PutDouble("Robot Drive Distance", getRobotDist());
 	sdb->PutDouble("Robot Turn Angle", getTurnAngle());

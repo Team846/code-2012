@@ -89,7 +89,13 @@ void Brain::process()
 	}
 	else if (m_ds->IsOperatorControl())
 	{
-		actionData->drivetrain->rate.desiredDriveRate = m_driver_stick.GetAxis(Joystick::kYAxis);
-		actionData->drivetrain->rate.desiredTurnRate  = m_driver_stick.GetAxis(Joystick::kZAxis);
+		actionData->drivetrain->rate.drive_control = false;
+		actionData->drivetrain->rate.turn_control = false;
+		actionData->drivetrain->position.drive_control = false;
+		actionData->drivetrain->position.turn_control = false;
+		actionData->drivetrain->rate.desiredDriveRate = m_driver_stick.GetAxis(
+				Joystick::kYAxis);
+		actionData->drivetrain->rate.desiredTurnRate = m_driver_stick.GetAxis(
+				Joystick::kZAxis);
 	}
 }

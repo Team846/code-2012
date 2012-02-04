@@ -1,7 +1,7 @@
 #include "PID.h"
 
-PID::PID(float p_gain, float i_gain, float d_gain, float ff_gain,
-		float i_decay, bool feedforward)
+PID::PID(double p_gain, double i_gain, double d_gain, double ff_gain,
+		double i_decay, bool feedforward)
 {
 	setParameters(p_gain, i_gain, d_gain, ff_gain, i_decay, feedforward);
 }
@@ -11,8 +11,8 @@ PID::PID()
 	setParameters(0, 0, 0);
 }
 
-void PID::setParameters(float p_gain, float i_gain, float d_gain,
-		float ff_gain, float i_decay, bool feedforward)
+void PID::setParameters(double p_gain, double i_gain, double d_gain,
+		double ff_gain, double i_decay, bool feedforward)
 {
 	reset();
 	m_proportional_gain = p_gain;
@@ -24,20 +24,20 @@ void PID::setParameters(float p_gain, float i_gain, float d_gain,
 	enablePID();
 }
 
-float PID::update(float dt)
+double PID::update(double dt)
 {
 	m_error = m_setpoint - m_input;
 
 	// calculate discrete derivative
-	float delta = (m_error - m_prev_error) / dt;
+	double delta = (m_error - m_prev_error) / dt;
 
 	// approximate with riemann sum and decay
 	m_acc_error *= m_integral_decay;
 	m_acc_error += m_error * dt;
-	float integral = m_acc_error / (1 - m_integral_decay);
+	double integral = m_acc_error / (1 - m_integral_decay);
 
 	// magic PID line
-	float PID_output = m_proportional_gain * (m_error + m_integral_gain
+	double PID_output = m_proportional_gain * (m_error + m_integral_gain
 			* integral + m_derivative_gain * delta);
 
 	if (m_is_feed_forward)
@@ -56,67 +56,67 @@ float PID::update(float dt)
 	return m_output;
 }
 
-void PID::setSetpoint(float setpoint)
+void PID::setSetpoint(double setpoint)
 {
 	m_setpoint = setpoint;
 }
 
-void PID::setInput(float input)
+void PID::setInput(double input)
 {
 	m_input = input;
 }
 
-float PID::getProportionalGain()
+double PID::getProportionalGain()
 {
 	return m_proportional_gain;
 }
 
-float PID::getIntegralGain()
+double PID::getIntegralGain()
 {
 	return m_integral_gain;
 }
 
-float PID::getDerivativeGain()
+double PID::getDerivativeGain()
 {
 	return m_derivative_gain;
 }
 
-float PID::getFeedForwardGain()
+double PID::getFeedForwardGain()
 {
 	return m_feedforward_gain;
 }
 
-float PID::getIntegralDecay()
+double PID::getIntegralDecay()
 {
 	return m_integral_decay;
 }
 
-float PID::getInput()
+double PID::getInput()
 {
 	return m_input;
 }
 
-float PID::getSetpoint()
+double PID::getSetpoint()
 {
 	return m_setpoint;
 }
 
-float PID::getError()
+double PID::getError()
 {
 	return m_error;
 }
 
-float PID::getAccumulatedError()
+double PID::getAccumulatedError()
 {
 	return m_acc_error;
 }
 
-float PID::getPreviousError()
+double PID::getPreviousError()
 {
 	return m_prev_error;
 }
 
-float PID::getOutput()
+double PID::getOutput()
 {
 	if (m_enabled)
 		return m_output;

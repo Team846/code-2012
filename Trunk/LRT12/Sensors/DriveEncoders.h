@@ -45,18 +45,18 @@ public:
 	 */
 	virtual ~DriveEncoders();
 
-	const float PULSES_PER_REVOLUTION; // pulses per wheel revolution [BA]
+	const double PULSES_PER_REVOLUTION; // pulses per wheel revolution [BA]
 
-	const float ENCODER_RATE_HIGH_GEAR;
-	const float MAX_TURNING_RATE;
+	const double ENCODER_RATE_HIGH_GEAR;
+	const double MAX_TURNING_RATE;
 
-	const float TICKS_PER_FULL_TURN;
-	const float WHEEL_DIAMETER; // in
+	const double TICKS_PER_FULL_TURN;
+	const double WHEEL_DIAMETER; // in
 
 	// extrapolate max low gear speed
-	const float LOW_GEAR_MULTIPLIER;
+	const double LOW_GEAR_MULTIPLIER;
 
-	const static float PI = 3.14159;
+	const static double PI = 3.14159;
 
 	/*!
 	 * @brief sets the current gear ratio

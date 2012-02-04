@@ -13,8 +13,6 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	m_drive_disabled.disablePID();
 	m_turn_disabled.disablePID();
 
-	disableLog();
-
 	printf("Constructed CLRateTrain\n");
 }
 
@@ -22,112 +20,112 @@ void ClosedLoopDrivetrain::Configure()
 {
 	const static string configSection = "CLDriveTrain";
 
-	float drive_rate_p_high = m_config->Get<float> (configSection,
+	double drive_rate_p_high = m_config->Get<double> (configSection,
 			"driveRateHighP", 1.5);
-	float drive_rate_i_high = m_config->Get<float> (configSection,
+	double drive_rate_i_high = m_config->Get<double> (configSection,
 			"driveRateHighI", 0.0);
-	float drive_rate_d_high = m_config->Get<float> (configSection,
+	double drive_rate_d_high = m_config->Get<double> (configSection,
 			"driveRateHighD", 0.0);
 
 	m_rate_drive_high_gear_pid.setParameters(drive_rate_p_high,
 			drive_rate_i_high, drive_rate_d_high, 1.0, FWD_DECAY, true);
 
-	float drive_rate_p_low = m_config->Get<float> (configSection,
+	double drive_rate_p_low = m_config->Get<double> (configSection,
 			"driveRateLowP", 1.5);
-	float drive_rate_i_low = m_config->Get<float> (configSection,
+	double drive_rate_i_low = m_config->Get<double> (configSection,
 			"driveRateLowI", 0.0);
-	float drive_rate_d_low = m_config->Get<float> (configSection,
+	double drive_rate_d_low = m_config->Get<double> (configSection,
 			"driveRateLowD", 0.0);
 
 	m_rate_drive_low_gear_pid.setParameters(drive_rate_p_low, drive_rate_i_low,
 			drive_rate_d_low, 1.0, FWD_DECAY, true);
 
-	float turn_rate_p_high = m_config->Get<float> (configSection,
+	double turn_rate_p_high = m_config->Get<double> (configSection,
 			"turnRateHighP", 1.5);
-	float turn_rate_i_high = m_config->Get<float> (configSection,
+	double turn_rate_i_high = m_config->Get<double> (configSection,
 			"turnRateHighI", 0.0);
-	float turn_rate_d_high = m_config->Get<float> (configSection,
+	double turn_rate_d_high = m_config->Get<double> (configSection,
 			"turnRateHighD", 0.0);
 
 	m_rate_turn_high_gear_pid.setParameters(turn_rate_p_high, turn_rate_i_high,
 			turn_rate_d_high, 1.0, FWD_DECAY, true);
 
-	float turn_rate_p_low = m_config->Get<float> (configSection, "turnRateLowP",
-			1.5);
-	float turn_rate_i_low = m_config->Get<float> (configSection, "turnRateLowI",
-			0.0);
-	float turn_rate_d_low = m_config->Get<float> (configSection, "turnRateLowD",
-			0.0);
+	double turn_rate_p_low = m_config->Get<double> (configSection,
+			"turnRateLowP", 1.5);
+	double turn_rate_i_low = m_config->Get<double> (configSection,
+			"turnRateLowI", 0.0);
+	double turn_rate_d_low = m_config->Get<double> (configSection,
+			"turnRateLowD", 0.0);
 
 	m_rate_turn_low_gear_pid.setParameters(turn_rate_p_low, turn_rate_i_low,
 			turn_rate_d_low, 1.0, FWD_DECAY, true);
 
-	float drive_pos_p_high = m_config->Get<float> (configSection,
+	double drive_pos_p_high = m_config->Get<double> (configSection,
 			"drivePosHighP", 1.5);
-	float drive_pos_i_high = m_config->Get<float> (configSection,
+	double drive_pos_i_high = m_config->Get<double> (configSection,
 			"drivePosHighI", 0.0);
-	float drive_pos_d_high = m_config->Get<float> (configSection,
+	double drive_pos_d_high = m_config->Get<double> (configSection,
 			"drivePosHighD", 0.0);
 
 	m_pos_drive_high_gear_pid.setParameters(drive_pos_p_high, drive_pos_i_high,
 			drive_pos_d_high, 1.0, FWD_DECAY, true);
 
-	float drive_pos_p_low = m_config->Get<float> (configSection, "drivePosLowP",
-			1.5);
-	float drive_pos_i_low = m_config->Get<float> (configSection, "drivePosLowI",
-			0.0);
-	float drive_pos_d_low = m_config->Get<float> (configSection, "drivePosLowD",
-			0.0);
+	double drive_pos_p_low = m_config->Get<double> (configSection,
+			"drivePosLowP", 1.5);
+	double drive_pos_i_low = m_config->Get<double> (configSection,
+			"drivePosLowI", 0.0);
+	double drive_pos_d_low = m_config->Get<double> (configSection,
+			"drivePosLowD", 0.0);
 
 	m_pos_drive_low_gear_pid.setParameters(drive_pos_p_low, drive_pos_i_low,
 			drive_pos_d_low, 1.0, FWD_DECAY, true);
 
-	float turn_pos_p_high = m_config->Get<float> (configSection, "turnPosHighP",
-			1.5);
-	float turn_pos_i_high = m_config->Get<float> (configSection, "turnPosHighI",
-			0.0);
-	float turn_pos_d_high = m_config->Get<float> (configSection, "turnPosHighD",
-			0.0);
+	double turn_pos_p_high = m_config->Get<double> (configSection,
+			"turnPosHighP", 1.5);
+	double turn_pos_i_high = m_config->Get<double> (configSection,
+			"turnPosHighI", 0.0);
+	double turn_pos_d_high = m_config->Get<double> (configSection,
+			"turnPosHighD", 0.0);
 
 	m_pos_turn_high_gear_pid.setParameters(turn_pos_p_high, turn_pos_i_high,
 			turn_pos_d_high, 1.0, FWD_DECAY, true);
 
-	float turn_pos_p_low = m_config->Get<float> (configSection, "turnPosLowP",
+	double turn_pos_p_low = m_config->Get<double> (configSection, "turnPosLowP",
 			1.5);
-	float turn_pos_i_low = m_config->Get<float> (configSection, "turnPosLowI",
+	double turn_pos_i_low = m_config->Get<double> (configSection, "turnPosLowI",
 			0.0);
-	float turn_pos_d_low = m_config->Get<float> (configSection, "turnPosLowD",
+	double turn_pos_d_low = m_config->Get<double> (configSection, "turnPosLowD",
 			0.0);
 
 	m_pos_turn_low_gear_pid.setParameters(turn_pos_p_low, turn_pos_i_low,
 			turn_pos_d_low, 1.0, FWD_DECAY, true);
 }
 
-ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::Drive(float rawTurn, float rawFwd)
+ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::Drive(double rawTurn,
+		double rawFwd)
 {
 	DriveCommand drive;
 
-	float leftInput = rawTurn - rawFwd;
-	float rightInput = rawTurn + rawFwd;
+	double leftInput = rawTurn - rawFwd;
+	double rightInput = rawTurn + rawFwd;
 
 	// TODO must decide whether forward or turn takes precedence
-	if(Util::Abs<float>(leftInput) > 1.0)
-		leftInput = Util::Sign<float>(leftInput) * 1.0;
+	if (Util::Abs<double>(leftInput) > 1.0)
+		leftInput = Util::Sign<double>(leftInput) * 1.0;
 
 	// TODO must decide whether forward or turn takes precedence
-	if(Util::Abs<float>(rightInput) > 1.0)
-		rightInput = Util::Sign<float>(rightInput) * 1.0;
+	if (Util::Abs<double>(rightInput) > 1.0)
+		rightInput = Util::Sign<double>(rightInput) * 1.0;
 
-	drive.leftDutyCycle   = leftInput;
-	drive.rightDutyCycle  = rightInput;
+	drive.leftDutyCycle = leftInput;
+	drive.rightDutyCycle = rightInput;
 	drive.shouldLinearize = true;
 	return drive;
 }
 
 ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::getOutput()
 {
-	return Drive(m_drive_control->getOutput(),
-			m_turn_control->getOutput());
+	return Drive(m_drive_control->getOutput(), m_turn_control->getOutput());
 }
 
 void ClosedLoopDrivetrain::update()
@@ -139,7 +137,7 @@ void ClosedLoopDrivetrain::update()
 	else
 	{
 		m_drive_control->setInput(
-				Util::Clamp<float>(m_encoders.getNormalizedForwardMotorSpeed(),
+				Util::Clamp<double>(m_encoders.getNormalizedForwardMotorSpeed(),
 						-1.0, 1.0));
 		m_drive_op_complete = true; // this flag doesn't mean much here
 	}
@@ -159,7 +157,7 @@ void ClosedLoopDrivetrain::update()
 	else
 	{
 		m_turn_control->setInput(
-				Util::Clamp<float>(m_encoders.getNormalizedTurningMotorSpeed(),
+				Util::Clamp<double>(m_encoders.getNormalizedTurningMotorSpeed(),
 						-1.0, 1.0));
 		m_turn_op_complete = true; // this flag doesn't mean much here
 	}
@@ -190,17 +188,14 @@ void ClosedLoopDrivetrain::setDriveControl(CONTROL_TYPE type)
 	default:
 	case CL_DISABLED:
 		m_drive_control = &m_drive_disabled;
-		AsyncPrinter::Printf("Disabled closed-loop drive");
 		break;
 	case CL_RATE:
 		m_drive_control = m_in_high_gear ? &m_rate_drive_high_gear_pid
 				: &m_rate_drive_low_gear_pid;
-		AsyncPrinter::Printf("Enabled closed-loop rate control on drive");
 		break;
 	case CL_POSITION:
 		m_drive_control = m_in_high_gear ? &m_pos_drive_high_gear_pid
 				: &m_pos_drive_low_gear_pid;
-		AsyncPrinter::Printf("Enabled closed-loop position control on drive");
 		break;
 	}
 }
@@ -222,17 +217,17 @@ void ClosedLoopDrivetrain::setTurnControl(CONTROL_TYPE type)
 	default:
 	case CL_DISABLED:
 		m_turn_control = &m_turn_disabled;
-		AsyncPrinter::Printf("Disabled closed-loop turn");
+		AsyncPrinter::Printf("Disabled closed-loop turn\n");
 		break;
 	case CL_RATE:
 		m_turn_control = m_in_high_gear ? &m_rate_turn_high_gear_pid
 				: &m_rate_turn_low_gear_pid;
-		AsyncPrinter::Printf("Enabled closed-loop rate control on turn");
+		AsyncPrinter::Printf("Enabled closed-loop rate control on turn\n");
 		break;
 	case CL_POSITION:
 		m_turn_control = m_in_high_gear ? &m_pos_turn_high_gear_pid
 				: &m_pos_turn_low_gear_pid;
-		AsyncPrinter::Printf("Enabled closed-loop position control on turn");
+		AsyncPrinter::Printf("Enabled closed-loop position control on turn\n");
 		break;
 	}
 }
@@ -253,52 +248,52 @@ bool ClosedLoopDrivetrain::getHighGear()
 	return m_in_high_gear;
 }
 
-void ClosedLoopDrivetrain::setRelativeDrivePosition(float pos)
+void ClosedLoopDrivetrain::setRelativeDrivePosition(double pos)
 {
 	setDriveControl(CL_POSITION);
 	m_drive_control->setSetpoint(pos + m_encoders.getRobotDist());
 	m_drive_op_complete = false;
 }
 
-void ClosedLoopDrivetrain::setDriveRate(float rate)
+void ClosedLoopDrivetrain::setDriveRate(double rate)
 {
 	setDriveControl(CL_RATE);
 	m_drive_control->setSetpoint(rate);
 	m_drive_op_complete = false;
 }
 
-float ClosedLoopDrivetrain::getDriveSetpoint()
+double ClosedLoopDrivetrain::getDriveSetpoint()
 {
 	return m_drive_control->getSetpoint();
 }
 
-void ClosedLoopDrivetrain::setRawDriveDutyCycle(float duty)
+void ClosedLoopDrivetrain::setRawDriveDutyCycle(double duty)
 {
 	setDriveControl(CL_DISABLED);
 	m_drive_control->setSetpoint(duty);
 	m_drive_op_complete = false;
 }
 
-void ClosedLoopDrivetrain::setRelativeTurnPosition(float pos)
+void ClosedLoopDrivetrain::setRelativeTurnPosition(double pos)
 {
 	setTurnControl(CL_POSITION);
 	m_turn_control->setSetpoint(pos + m_encoders.getTurnAngle());
 	m_turn_op_complete = false;
 }
 
-void ClosedLoopDrivetrain::setTurnRate(float rate)
+void ClosedLoopDrivetrain::setTurnRate(double rate)
 {
 	setTurnControl(CL_RATE);
 	m_turn_control->setSetpoint(rate);
 	m_turn_op_complete = false;
 }
 
-float ClosedLoopDrivetrain::getTurnSetpoint()
+double ClosedLoopDrivetrain::getTurnSetpoint()
 {
 	return m_turn_control->getSetpoint();
 }
 
-void ClosedLoopDrivetrain::setRawTurnDutyCycle(float duty)
+void ClosedLoopDrivetrain::setRawTurnDutyCycle(double duty)
 {
 	setTurnControl(CL_DISABLED);
 	m_turn_control->setSetpoint(duty);

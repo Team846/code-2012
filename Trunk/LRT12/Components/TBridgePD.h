@@ -25,16 +25,16 @@ private:
 	AsyncCANJaguar* m_bpdEsc;
 	AnalogChannel* m_bpdPot;
 	
-	float m_minPosition;
-	float m_maxPosition;
+	double m_minPosition;
+	double m_maxPosition;
 	
-	float m_maxPowerUp;
-	float m_powerDown;
+	double m_maxPowerUp;
+	double m_powerDown;
 	
-	float m_pGainUp;
-	float m_pGainDown;
+	double m_pGainUp;
+	double m_pGainDown;
 	
-	float m_powerRetainUp;
+	double m_powerRetainUp;
 	
 	ACTION::BPD::eStates m_lastState;
 	

@@ -1,12 +1,11 @@
 #include "LRTEncoder.h"
 
 LRTEncoder::LRTEncoder(const char * name, UINT32 sourceA, UINT32 sourceB,
-		float trim) :
+		double trim) :
 	Encoder(sourceA, sourceB, false, CounterBase::k1X), trim(trim),
 			m_name(name)
 //    , useless(15 + count, , false, CounterBase::k1X)
 {
-	disableLog();
 }
 
 LRTEncoder::~LRTEncoder()

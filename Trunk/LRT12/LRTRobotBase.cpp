@@ -37,7 +37,7 @@ void LRTRobotBase::StartCompetition()
 	Profiler& profiler = Profiler::GetInstance();
 
 	// must allow a negative value in case loop runs over 20ms
-	INT32 sleepTime_us = 0;
+	//	INT32 sleepTime_us = 0;
 
 	AsyncPrinter::Printf("starting synchronizer");
 	loopSynchronizer.StartPeriodic(1.0 / 50.0); //arg is period in seconds

@@ -38,10 +38,11 @@ namespace DIGITAL_IO //ports 1-14
 {
 const uint32_t LINE_SENSOR_SI = CHANGEME;
 const uint32_t LINE_SENSOR_CLOCK = CHANGEME;
-const uint32_t ENCODER_LEFT_A = CHANGEME;
-const uint32_t ENCODER_LEFT_B = CHANGEME;
-const uint32_t ENCODER_RIGHT_A = CHANGEME;
-const uint32_t ENCODER_RIGHT_B = CHANGEME;
+const uint32_t ENCODER_LEFT_A       = 9;
+const uint32_t ENCODER_LEFT_B       = 10;
+const uint32_t ENCODER_RIGHT_A      = 13;
+const uint32_t ENCODER_RIGHT_B      = 14;
+
 }
 
 }

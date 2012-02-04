@@ -12,7 +12,7 @@ public:
 	int GetCycleCount();
 	void PrintEverySecond(const char* format, ...);
 	void PrintEveryHalfSecond(const char* format, ...);
-	void PrintMultipleTimesPerSecond(float hertz, const char* format, ...);
+	void PrintMultipleTimesPerSecond(double hertz, const char* format, ...);
 
 private:
 	Console();DISALLOW_COPY_AND_ASSIGN(Console);

@@ -6,10 +6,9 @@
 Drivetrain::Drivetrain() :
 	Component(), m_name("Drivetrain"), m_encoders(DriveEncoders::GetInstance())
 {
-	m_esc_left
-			= new ESC(RobotConfig::CAN::DRIVE_LEFT_A,
-					RobotConfig::CAN::DRIVE_LEFT_B,
-					&m_encoders.getLeftEncoder(), "left");
+	m_esc_left = new ESC(RobotConfig::CAN::DRIVE_LEFT_A,
+			RobotConfig::CAN::DRIVE_LEFT_B, &m_encoders.getLeftEncoder(),
+			"left");
 	m_esc_right = new ESC(RobotConfig::CAN::DRIVE_RIGHT_A,
 			RobotConfig::CAN::DRIVE_RIGHT_B, &m_encoders.getRightEncoder(),
 			"right");
@@ -73,7 +72,7 @@ void Drivetrain::Output()
 	{
 		action->drivetrain->setDriveOperation = false;
 		AsyncPrinter::Printf(
-				"Previous drive operation not complete, discarding");
+				"Previous drive operation not complete, discarding\n");
 	}
 	action->drivetrain->previousDriveOperationComplete
 			= m_drive_control.driveOperationComplete();
@@ -107,7 +106,7 @@ void Drivetrain::Output()
 	else
 	{
 		action->drivetrain->setTurnOperation = false;
-		AsyncPrinter::Printf("Previous turn operation not complete, discarding");
+		AsyncPrinter::Printf("Previous turn operation not complete, discarding\n");
 	}
 	action->drivetrain->previousTurnOperationComplete
 			= m_drive_control.turnOperationComplete();
@@ -120,13 +119,11 @@ void Drivetrain::Output()
 	if (action->drivetrain->synchronizedCyclesRemaining > 0)
 	{
 		action->drivetrain->synchronizedCyclesRemaining--;
-		cmd.rightDutyCycle
-				= m_encoders.getNormalizedOpposingGearMotorSpeed(
-						m_encoders.getRightEncoder());
-		cmd.leftDutyCycle
-				= m_encoders.getNormalizedOpposingGearMotorSpeed(
-						m_encoders.getLeftEncoder());
-		
+		cmd.rightDutyCycle = m_encoders.getNormalizedOpposingGearMotorSpeed(
+				m_encoders.getRightEncoder());
+		cmd.leftDutyCycle = m_encoders.getNormalizedOpposingGearMotorSpeed(
+				m_encoders.getLeftEncoder());
+
 		cmd.shouldLinearize = false;
 	}
 
@@ -134,11 +131,11 @@ void Drivetrain::Output()
 	m_esc_right->SetDutyCycle(cmd.rightDutyCycle);
 
 	action->drivetrain->raw.leftDutyCycle = cmd.leftDutyCycle;
-//	action->drivetrain->raw.leftBrakingDutyCycle
-//			= cmd.leftCommand.brakingDutyCycle;
+	//	action->drivetrain->raw.leftBrakingDutyCycle
+	//			= cmd.leftCommand.brakingDutyCycle;
 	action->drivetrain->raw.rightDutyCycle = cmd.rightDutyCycle;
-//	action->drivetrain->raw.rightBrakingDutyCycle
-//			= cmd.rightCommand.brakingDutyCycle;
+	//	action->drivetrain->raw.rightBrakingDutyCycle
+	//			= cmd.rightCommand.brakingDutyCycle;
 
 	if (action->wasDisabled)
 	{
@@ -155,8 +152,8 @@ void Drivetrain::log()
 			action->drivetrain->raw.leftDutyCycle);
 	sdb->PutDouble((prefix + "Right Duty Cycle").c_str(),
 			action->drivetrain->raw.rightDutyCycle);
-//	sdb->PutDouble((prefix + "Left Braking Duty Cycle").c_str(),
-//			action->drivetrain->raw.leftBrakingDutyCycle);
-//	sdb->PutDouble((prefix + "Right Braking Duty Cycle").c_str(),
-//			action->drivetrain->raw.rightBrakingDutyCycle);
+	//	sdb->PutDouble((prefix + "Left Braking Duty Cycle").c_str(),
+	//			action->drivetrain->raw.leftBrakingDutyCycle);
+	//	sdb->PutDouble((prefix + "Right Braking Duty Cycle").c_str(),
+	//			action->drivetrain->raw.rightBrakingDutyCycle);
 }

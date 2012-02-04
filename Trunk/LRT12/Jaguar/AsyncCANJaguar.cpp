@@ -554,9 +554,12 @@ void AsyncCANJaguar::log()
 	if (m_collection_flags & PID)
 	{
 		cv += "PID, ";
-		sdb->PutDouble((prefix + "Proportional Gain").c_str(), GetP());
-		sdb->PutDouble((prefix + "Integral Gain").c_str(), GetI());
-		sdb->PutDouble((prefix + "Derivative Gain").c_str(), GetD());
+		double temp = GetP();
+		sdb->PutDouble((prefix + "Proportional Gain").c_str(), temp);
+		temp = GetI();
+		sdb->PutDouble((prefix + "Integral Gain").c_str(), temp);
+		temp = GetD();
+		sdb->PutDouble((prefix + "Derivative Gain").c_str(), temp);
 	}
 	if (m_collection_flags & CTRLMODE)
 	{
@@ -585,22 +588,26 @@ void AsyncCANJaguar::log()
 	if (m_collection_flags & BUSVOLT)
 	{
 		cv += "Bus Voltage, ";
-		sdb->PutDouble((prefix + "Bus Voltage").c_str(), GetBusVoltage());
+		double temp = GetBusVoltage();
+		sdb->PutDouble((prefix + "Bus Voltage").c_str(), temp);
 	}
 	if (m_collection_flags & OUTVOLT)
 	{
 		cv += "Output Voltage, ";
-		sdb->PutDouble((prefix + "Output Voltage").c_str(), GetOutputVoltage());
+		double temp = GetOutputVoltage();
+		sdb->PutDouble((prefix + "Output Voltage").c_str(), temp);
 	}
 	if (m_collection_flags & OUTCURR)
 	{
 		cv += "Output Current, ";
-		sdb->PutDouble((prefix + "Output Current").c_str(), GetOutputCurrent());
+		double temp = GetOutputCurrent();
+		sdb->PutDouble((prefix + "Output Current").c_str(), temp);
 	}
 	if (m_collection_flags & TEMP)
 	{
 		cv += "Temperature, ";
-		sdb->PutDouble((prefix + "Temperature").c_str(), GetTemperature());
+		double temp = GetTemperature();
+		sdb->PutDouble((prefix + "Temperature").c_str(), temp);
 	}
 	if (m_collection_flags & FWDLIMOK)
 	{
@@ -622,7 +629,8 @@ void AsyncCANJaguar::log()
 	if (m_collection_flags & EXPIRE)
 	{
 		cv += "Expiration";
-		sdb->PutDouble((prefix + "Expiration").c_str(), GetExpiration());
+		double temp = GetExpiration();
+		sdb->PutDouble((prefix + "Expiration").c_str(), temp);
 	}
 
 	std::string out;
@@ -646,6 +654,7 @@ void AsyncCANJaguar::log()
 	}
 
 	sdb->PutString(prefix + "Control Mode", out);
-	sdb->PutDouble((prefix + "Setpoint").c_str(), m_setpoint.peek());
+	double temp = (double) m_setpoint.peek();
+	sdb->PutDouble((prefix + "Setpoint").c_str(), temp);
 	sdb->PutString(prefix + "Enabled Collection Values", cv);
 }

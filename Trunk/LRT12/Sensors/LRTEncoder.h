@@ -12,7 +12,7 @@ class LRTEncoder: public Encoder, public Loggable
 private:
 	//  static int count = 0;
 	//    Encoder useless;
-	float trim;
+	double trim;
 	std::string m_name;
 
 public:
@@ -24,7 +24,7 @@ public:
 	 * @param trim scaling factor for the encoder
 	 */
 	LRTEncoder(const char * name, UINT32 sourceA, UINT32 sourceB,
-			float trim = 1.0);
+			double trim = 1.0);
 
 	/*!
 	 * @brief destroys this LRT Encoder
