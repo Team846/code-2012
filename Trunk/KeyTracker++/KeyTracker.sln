@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KeyTracker", "KeyTracker\KeyTracker.vcxproj", "{29405D9C-22F5-4217-8039-7075A19C179F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{29405D9C-22F5-4217-8039-7075A19C179F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{29405D9C-22F5-4217-8039-7075A19C179F}.Debug|Win32.Build.0 = Debug|Win32
+		{29405D9C-22F5-4217-8039-7075A19C179F}.Release|Win32.ActiveCfg = Release|Win32
+		{29405D9C-22F5-4217-8039-7075A19C179F}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
