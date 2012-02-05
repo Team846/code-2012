@@ -7,6 +7,9 @@
  * TO-DO:
  * - Get distance from edge
  * 
+ * CURRENT STATUS:
+ * - Sobel is working!
+ * - Brian is not happy with binary thresholding. :(
  */
 
 using System;
@@ -26,6 +29,9 @@ namespace KeyDetection
         static PixelData blueHigh; //If we have a blue key
         static PixelData blueLow;*/
 
+        const float PPI_RATIO = 35; // assuming the image is the entire static test image, bitmap.height / 12 inches
+        static Point IMG_CENTER;
+
         static void Main(string[] args)
         {
             Stopwatch sw = new Stopwatch();
@@ -34,25 +40,26 @@ namespace KeyDetection
 
             Bitmap frameImage = new Bitmap("framein.jpg");
 
+            IMG_CENTER = new Point((frameImage.Width-1) / 2, (frameImage.Height-1) / 2);
+
             UnsafeBitmap unsafeFrame = new UnsafeBitmap(frameImage);
+
             unsafeFrame.LockBitmap();
-
             unsafeFrame = BlackWhite(unsafeFrame);
-            //int rowY = GetNumberPixels(unsafeFrame);
-            Bitmap sobel = Sobel.DoSobel(unsafeFrame);
-
+            UnsafeBitmap sobel = Sobel.DoSobel(unsafeFrame);
             unsafeFrame.UnlockBitmap();
+            unsafeFrame.Dispose();
 
-            //Graphics gBmp = Graphics.FromImage(unsafeFrame.Bitmap);
-            //Brush redBrush = new SolidBrush(Color.Red);
+            sobel.LockBitmap();
+            float distance = GetDistance(sobel);
+            sobel.UnlockBitmap();
 
-            //gBmp.FillRectangle(redBrush, 0, rowY, unsafeFrame.Bitmap.Width, 2);
+            Console.WriteLine(distance + " inches");
 
             sw.Stop();
 
-            sobel.Save("frameout.jpg", ImageFormat.Jpeg);
+            sobel.Bitmap.Save("frameout.jpg", ImageFormat.Jpeg);
 
-            // program end
             sobel.Dispose();
 
             Console.WriteLine("Execution finished in {0}ms.", sw.ElapsedMilliseconds);
@@ -60,7 +67,27 @@ namespace KeyDetection
             Console.ReadKey();
         }
 
-        /* http://stackoverflow.com/questions/4669317/how-to-convert-a-bitmap-image-to-black-and-white-in-c */
+        /// <summary>
+        /// Gets the distance between the center of the image and the key line.
+        /// </summary>
+        /// <param name="uBmp">The input image, with Sobel's edge detection.</param>
+        /// <returns>The distance, in inches, between the center of the camera and the key line.</returns>
+        public static float GetDistance(UnsafeBitmap uBmp)
+        {
+            int rowY = GetNumberPixels(uBmp);
+
+            if (rowY <= 0)
+                return Int32.MinValue; // unable to locate
+
+            /* TO-DO: Account for angles */
+            return (float)(IMG_CENTER.Y - rowY) / PPI_RATIO;
+        }
+
+        /// <summary>
+        /// Creates a binary (black and white) bitmap.
+        /// </summary>
+        /// <param name="uBmp">The original bitmap.</param>
+        /// <returns>A binary bitmap.</returns>
         public static UnsafeBitmap BlackWhite(UnsafeBitmap uBmp)
         {
             int rgb;
@@ -72,12 +99,7 @@ namespace KeyDetection
                 {
                     pData = uBmp.GetPixel(x, y);
 
-                    //rgb = (pData.red >= redLow.red && pData.red <= redHigh.red) && (pData.green >= redLow.green && pData.green <= redHigh.green) && (pData.blue >= redLow.blue && pData.blue <= redHigh.blue) ? 255 : 0;
-                    //rgb = (pData.Color >= redLow.Color && pData.Color <= redHigh.Color) ? 255 : 0;
-                    //rgb = ((int)pData.red + (int)pData.green + (int)pData.blue) / 3;
-                    if (Color.FromArgb((int)(pData.Color & 0x000000FF),
-                    (int)(pData.Color & 0x0000FF00) >> 8,
-                    (int)(pData.Color & 0x00FF0000) >> 16).GetSaturation() > 0.175)
+                    if (Color.FromArgb(pData.red, pData.blue, pData.green).GetSaturation() > 0.175)
                     {
                         rgb = 255;
                     }
@@ -87,24 +109,30 @@ namespace KeyDetection
                     }
 
                     uBmp.SetPixel(x, y, new PixelData((byte)rgb, (byte)rgb, (byte)rgb));
-                    //uBmp.SetPixel(x, y, new PixelData((byte)rgb, (byte)rgb, (byte)rgb));
                 }
             }
 
             return uBmp;
         }
-        public static int GetNumberPixels(UnsafeBitmap uBmp)
+
+        /// <summary>
+        /// Gets the row with the highest amount of black pixels
+        /// </summary>
+        /// <param name="uBmp">The unsafe bitmap to work with.</param>
+        /// <param name="minAmount">(OPTIONAL) The minimum amount of required pixels for a row to pass.</param>
+        /// <returns>The Y coordinate of the row with the highest amount of black pixels</returns>
+        public static int GetNumberPixels(UnsafeBitmap uBmp, int minAmount=Int32.MinValue)
         {
             int row = -1;
             int maxNumPixels = 0;
-            for (int y = 0; y < uBmp.Bitmap.Height; y++)
+            for (int y = 1; y < uBmp.Bitmap.Height - 1; y++)
             {
                 int numPixels = 0;
                 PixelData pData;
-                for (int x = 0; x < uBmp.Bitmap.Width; x++)
+                for (int x = 1; x < uBmp.Bitmap.Width - 1; x++)
                 {
                     pData = uBmp.GetPixel(x, y);
-                    if (pData.red == 255 && pData.green == 255 && pData.blue == 255)
+                    if (pData.red == 0 && pData.green == 0 && pData.blue == 0)
                     {
                         numPixels++;
                     }
@@ -117,10 +145,16 @@ namespace KeyDetection
                 }
             }
 
-            return row;
+            if(maxNumPixels >= minAmount)
+                return row;
+
+            return -1;
         }
     }
 
+    /// <summary>
+    /// Struct that holds the individual red, blue, and green channels for a pixel.
+    /// </summary>
     public struct PixelData
     {
         public PixelData(byte red, byte blue, byte green)
@@ -150,7 +184,7 @@ namespace KeyDetection
 
     public class Sobel
     {
-        public static Bitmap DoSobel(UnsafeBitmap uBmp)
+        public static UnsafeBitmap DoSobel(UnsafeBitmap uBmp)
         {
             int[,] gx = new int[,] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };   //  The matrix Gx
             int[,] gy = new int[,] { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };  //  The matrix Gy
@@ -183,52 +217,15 @@ namespace KeyDetection
 
             eBmp.UnlockBitmap();
 
-            return eBmp.Bitmap;
+            return eBmp;
         }
-        /*
-            public static Bitmap DoSobel(UnsafeBitmap uBmp)
-            {
-                UnsafeBitmap eBmp = new UnsafeBitmap(new Bitmap(uBmp.Bitmap.Width, uBmp.Bitmap.Height));
-
-                eBmp.LockBitmap();
-
-                for (int i = 1; i < eBmp.Bitmap.Width - 1; i++)
-                {
-                    for (int j = 1; j < eBmp.Bitmap.Height - 1; j++)
-                    {
-                        int mag = 0;
-
-                        mag += Math.Abs(0
-                            - uBmp.GetPixel(i - 1, j - 1).red
-                            - uBmp.GetPixel(i - 1, j).red * 2
-                            - uBmp.GetPixel(i - 1, j + 1).red
-                            + uBmp.GetPixel(i + 1, j - 1).red
-                            + uBmp.GetPixel(i + 1, j).red * 2
-                            + uBmp.GetPixel(i + 1, j).red);
-                        mag += Math.Abs(0
-                            - uBmp.GetPixel(i - 1, j - 1).red
-                            - uBmp.GetPixel(i, j - 1).red * 2
-                            - uBmp.GetPixel(i + 1, j - 1).red
-                            + uBmp.GetPixel(i - 1, j + 1).red
-                            + uBmp.GetPixel(i, j + 1).red * 2
-                            + uBmp.GetPixel(i + 1, j + 1).red);
-
-                        mag /= 8;
-
-                        eBmp.SetPixel(i, j, new PixelData((byte)0, (byte)0, (byte)0));
-                    }
-                }
-
-                eBmp.UnlockBitmap();
-
-                return eBmp.Bitmap;
-            }*/
     }
 
     /*
- * TAKEN FROM:
- * http://www.dreamincode.net/forums/topic/14788-c%23-fast-acces-to-bitmap-pixels/ 
- */
+    * Source:
+    * http://www.dreamincode.net/forums/topic/14788-c%23-fast-acces-to-bitmap-pixels/ 
+    */
+
     public unsafe class UnsafeBitmap
     {
         Bitmap bitmap;
