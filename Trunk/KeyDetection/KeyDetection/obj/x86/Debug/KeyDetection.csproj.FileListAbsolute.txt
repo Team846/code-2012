@@ -1,0 +1,10 @@
+C:\Users\Tony\AppData\Local\Temporary Projects\KeyDetection\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Tony\AppData\Local\Temporary Projects\KeyDetection\bin\Debug\KeyDetection.exe
+C:\Users\Tony\AppData\Local\Temporary Projects\KeyDetection\bin\Debug\KeyDetection.pdb
+C:\Users\Tony\AppData\Local\Temporary Projects\KeyDetection\obj\x86\Debug\KeyDetection.exe
+C:\Users\Tony\AppData\Local\Temporary Projects\KeyDetection\obj\x86\Debug\KeyDetection.pdb
+C:\Users\Tony\documents\visual studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.exe
+C:\Users\Tony\documents\visual studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.pdb
+C:\Users\Tony\documents\visual studio 2010\Projects\KeyDetection\KeyDetection\bin\Debug\KeyDetection.exe
+C:\Users\Tony\documents\visual studio 2010\Projects\KeyDetection\KeyDetection\bin\Debug\KeyDetection.pdb
+C:\Users\Tony\documents\visual studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Debug\ResolveAssemblyReference.cache
