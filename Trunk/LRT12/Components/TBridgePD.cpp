@@ -24,16 +24,16 @@ void TBridgePD::Configure()
 	Config * config = Config::GetInstance();
 
 	/* TODO: default values... */
-	m_minPosition 	= config->Get<double>(m_configSection, "minPosition", 0.0f);
-	m_maxPosition	= config->Get<double>(m_configSection, "maxPosition", 0.0f);
+	m_minPosition 	= config->Get<double>(m_configSection, "minPosition", 0.0);
+	m_maxPosition	= config->Get<double>(m_configSection, "maxPosition", 0.0);
 	
-	m_maxPowerUp 	= config->Get<double>(m_configSection, "maxPowerUp", 0.0f);
-	m_powerDown		= config->Get<double>(m_configSection, "powerDown", 0.0f);
+	m_maxPowerUp 	= config->Get<double>(m_configSection, "maxPowerUp", 0.0);
+	m_powerDown		= config->Get<double>(m_configSection, "powerDown", 0.0);
 	
-	m_pGainUp		= config->Get<double>(m_configSection, "pGainUp", 0.0f);
-	m_pGainDown		= config->Get<double>(m_configSection, "pGainDown", 0.0f);
+	m_pGainUp		= config->Get<double>(m_configSection, "pGainUp", 0.0);
+	m_pGainDown		= config->Get<double>(m_configSection, "pGainDown", 0.0);
 	
-	m_powerRetainUp	= config->Get<double>(m_configSection, "powerRetainUp", 0.0f);
+	m_powerRetainUp	= config->Get<double>(m_configSection, "powerRetainUp", 0.0);
 }
 
 void TBridgePD::Output()
