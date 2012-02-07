@@ -46,8 +46,8 @@ findSquares4 (IplImage * img, CvMemStorage * storage)
   cvSetImageROI (timg, cvRect (0, 0, sz.width, sz.height));
 
   // down-scale and upscale the image to filter out the noise
-//  cvPyrDown (timg, pyr, 7);
-//  cvPyrUp (pyr, timg, 7);
+  cvPyrDown (timg, pyr, 7);
+  cvPyrUp (pyr, timg, 7);
   tgray = cvCreateImage (sz, 8, 1);
 
   // find squares in every color plane of the image
@@ -75,7 +75,6 @@ findSquares4 (IplImage * img, CvMemStorage * storage)
       cvThreshold (tgray, gray, thresh, 255, CV_THRESH_BINARY);
     }
 #endif // USE_CANNY
-    cvShowImage ("bw", gray);
 
     // find contours and store them all as a list
     cvFindContours (gray, storage, &contours, sizeof (CvContour),
@@ -135,90 +134,114 @@ findSquares4 (IplImage * img, CvMemStorage * storage)
 
   return squares;
 }
-
-void
-drawSquares (IplImage * img, CvSeq * squares)
-{ // the function draws all the squares in the image
-  CvSeqReader reader;
-  CvPoint pt[4];
-  IplImage *cpy = cvCloneImage (img);
-  int i;
-
-  // initialize reader of the sequence
-  cvStartReadSeq (squares, &reader, 0);
-
-  // read 4 sequence elements at a time (all vertices of a square)
-  for (i = 0; i < squares->total; i += 4)
-    {
-      CvPoint *rect = pt;
-      int count = 4;
-
-      // read 4 vertices
-      memcpy (pt, reader.ptr, squares->elem_size);
-      CV_NEXT_SEQ_ELEM (squares->elem_size, reader);
-      memcpy (pt + 1, reader.ptr, squares->elem_size);
-      CV_NEXT_SEQ_ELEM (squares->elem_size, reader);
-      memcpy (pt + 2, reader.ptr, squares->elem_size);
-      CV_NEXT_SEQ_ELEM (squares->elem_size, reader);
-      memcpy (pt + 3, reader.ptr, squares->elem_size);
-      CV_NEXT_SEQ_ELEM (squares->elem_size, reader);
-
-      // draw the square as a closed polyline 
-      cvPolyLine (cpy, &rect, &count, 1, 1, CV_RGB (0, 255, 0), 3, 8);
-    }
-
-  // show the resultant image
-  cvShowImage ("squares", cpy);
-  cvReleaseImage (&cpy);
-}
-
-void
-on_trackbar (int a)
+CvSeq *
+findSquares4new (IplImage * img, CvMemStorage * storage)
 {
-}
+// returns sequence of squares detected on the image.
+// the sequence is stored in the specified memory storage
+  CvSeq *contours;
+  CvSize sz = cvSize (img->width, img->height);
+  IplImage *tgray = cvCreateImage (sz, 8, 1);
+  IplImage *bw = cvCreateImage (sz, 8, 1);
+  CvSeq *result;
+  double s, t;
+  // create empty sequence that will contain points -
+  // 4 points per square (the square's vertices)
+  CvSeq *squares = cvCreateSeq (0, sizeof (CvSeq), sizeof (CvPoint), storage);
 
-int save = 0;
-void
-saver (int a)
-{//signal 10 handler. produces number used in save picture filename
-  save++;
+  // find squares in every color plane of the image
+  //for (c = 0; c < 3; c++)
+  {
+    // extract the c-th color plane
+  //int c = 1;
+   // cvSetImageCOI (img, c + 1);
+    //cvCopy (img, tgray, 0);
+	cvSplit(img,tgray,0,0,0);
+      //     tgray(x,y) = bw(x,y) < (l+1)*255/N ? 255 : 0
+      //cvThreshold (tgray, bw, (l + 1) * 255 / N, 255,
+      cvThreshold (tgray, bw, thresh, 255, CV_THRESH_BINARY);
+
+    // find contours and store them all as a list
+    cvFindContours (bw, storage, &contours, sizeof (CvContour),
+		    CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE);
+
+    // test each contour
+    while (contours)
+      {
+	// approximate contour with accuracy proportional
+	// to the contour perimeter
+	result = cvApproxPoly (contours, sizeof (CvContour), storage,
+			       CV_POLY_APPROX_DP,
+			       cvContourPerimeter (contours) * 0.02, 0);
+	// square contours should have 4 vertices after approximation
+	// relatively large area (to filter out noisy contours)
+	// and be convex.
+	// Note: absolute value of an area is used because
+	// area may be positive or negative - in accordance with the
+	// contour orientation
+	if (result->total == 4 &&
+	    fabs (cvContourArea (result, CV_WHOLE_SEQ)) > 1000 &&
+	    cvCheckContourConvexity (result))
+	  {
+	    s = 0;
+
+	    for (int i = 2; i < 5; i++)
+	      {
+		// find minimum angle between joint
+		// edges (maximum of cosine)
+		    t = fabs (angle ((CvPoint *)
+				     cvGetSeqElem (result, i),
+				     (CvPoint *) cvGetSeqElem (result,
+							       i - 2),
+				     (CvPoint *) cvGetSeqElem (result,
+							       i - 1)));
+		    s = s > t ? s : t;
+	      }
+
+	    // if cosines of all angles are small
+	    // (all angles are ~90 degree) then write quandrange
+	    // vertices to resultant sequence 
+	    if (s < 0.3)
+	      for (int i = 0; i < 4; i++)
+		cvSeqPush (squares, (CvPoint *) cvGetSeqElem (result, i));
+	  }
+
+	// take the next contour
+	contours = contours->h_next;
+      }
+  }
+
+  // release all the temporary images
+  cvReleaseImage (&bw);
+  cvReleaseImage (&tgray);
+
+  return squares;
 }
 
 int
 main (int argc, char **argv)
 {
-  signal (SIGUSR1, saver);
-
   CvCapture *pCapture = cvCaptureFromCAM (0);	//new OpenCV capture stream
 
-  cvNamedWindow ("bw", CV_WINDOW_AUTOSIZE);
   // create memory storage that will contain all the dynamic data
   CvMemStorage *storage = cvCreateMemStorage (0);
   // create window with name "squares"
   // create trackbar (slider) with parent "squares" and set callback
   // (the slider regulates threshold) 
-  cvNamedWindow ("squares", 1);
-  cvCreateTrackbar ("thresh1", "squares", &thresh, 255, on_trackbar);
   int key = -1;
   int countt = 0;
-  int savesave = 0;
   while (key == -1)
     {
       IplImage *pVideoFrame = cvQueryFrame (pCapture);
-      printf ("==== %i ====\n", countt++);
+      if (countt++ == 1000)
+	      exit(0);
+      //printf ("==== %i ====\n", countt++);
       //cvShowImage ("video", pVideoFrame);
 
       IplImage *img = cvCloneImage (pVideoFrame);
       // force the image processing
-      drawSquares (img, findSquares4 (img, storage));
+      findSquares4 (img, storage);
 
-      if (savesave != save)
-	{
-	  savesave = save;
-	  char name[32];
-	  sprintf (name, "data%i.bmp", save);
-	  cvSaveImage (name, img);
-	}
       // release both images
       cvReleaseImage (&img);
       // clear memory storage - reset free space position
@@ -229,9 +252,6 @@ main (int argc, char **argv)
     }
 
   cvReleaseCapture (&pCapture);
-
-  cvDestroyWindow ("bw");
-  cvDestroyWindow ("squares");
 
   return 0;
 }
