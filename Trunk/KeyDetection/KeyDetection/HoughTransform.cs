@@ -3,7 +3,6 @@
  * As of February 6th, 8:11 AM, this code properly detects the edge of the key
  *
  * TO-DO:
- * - Get distance from edge
  * - Improve Hough Transform
  * 
  * CURRENT STATUS:
@@ -27,7 +26,7 @@ namespace KeyDetection
             return uBmp.GetPixel(i, j).red / 255;
         }
 
-        public static UnsafeBitmap DoTransform(UnsafeBitmap uBmp)
+        public static BitmapUtil.Line DoTransform(UnsafeBitmap uBmp)
         {
             int rMax = (int)(Math.Sqrt((uBmp.Bitmap.Width * uBmp.Bitmap.Width) + (uBmp.Bitmap.Height * uBmp.Bitmap.Height)));
             int[,] bmpArray = new int[360, rMax];
@@ -80,8 +79,6 @@ namespace KeyDetection
             uBmp.UnlockBitmap();
             UnsafeBitmap oBmp = new UnsafeBitmap(uBmp.Bitmap);
             uBmp.LockBitmap();
-            Graphics g = Graphics.FromImage(oBmp.Bitmap);
-            Pen redPen = new Pen(Color.Red, 3);
             if (ubBmp.GetPixel(x, y).red != 0)
             {
                 for (int k = x - 10; k <= x + 10; k++)
@@ -97,6 +94,7 @@ namespace KeyDetection
 
                     }
                 }
+
                 rho2 = y;
                 theta2 = x * Math.PI / 180;
                 Console.WriteLine(rho2);
@@ -107,29 +105,15 @@ namespace KeyDetection
                           (int)Math.Round(y0 + uBmp.Bitmap.Height * (a)));
                 Point pt2 = new Point((int)Math.Round(x0 - uBmp.Bitmap.Width * (-b)),
                           (int)Math.Round(y0 - uBmp.Bitmap.Height * (a)));
-                g.DrawLine(redPen, pt1, pt2);
                 Console.WriteLine(pt1);
                 Console.WriteLine(pt2);
-                for (int z = 0; z < 256; z++)
-                {
-                    /*
-                    int yPixel = (int)((rho2 / Math.Sin(theta2)) - ((z - 128.0) * (Math.Cos(theta2) / Math.Sin(theta2))) + 128.0);
-                    int xPixel = (int)((rho2 / Math.Cos(theta2)) - ((z - 128.0) * Math.Tan(theta2)) + 128.0);
 
-                    if (z > 0 && z < 256 && yPixel > 0 && yPixel < 256)
-                    {
-                        g.DrawLine(redPen, new Point(z + 20, yPixel + 20), new Point(z + 20, yPixel + 20));
-                    }
-
-                    if (xPixel > 0 && xPixel < 256)
-                    {
-                        g.DrawLine(redPen, new Point(xPixel + 20, z + 20), new Point(xPixel + 20, z + 20));
-                    }*/
-                }
-                g.Dispose();
+                ubBmp.UnlockBitmap();
+                return new BitmapUtil.Line(pt1, pt2);
             }
+
             ubBmp.UnlockBitmap();
-            return oBmp;
+            return new BitmapUtil.Line(-1, -1, -1, -1);
         }
     }
 }

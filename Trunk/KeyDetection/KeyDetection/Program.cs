@@ -3,7 +3,6 @@
  * As of February 6th, 8:11 AM, this code properly detects the edge of the key
  *
  * TO-DO:
- * - Get distance from edge
  * - Improve Hough Transform
  * 
  * CURRENT STATUS:
@@ -49,18 +48,26 @@ namespace KeyDetection
             unsafeFrame2.Dispose();
             sobel.LockBitmap();
             sobel2.LockBitmap();
-            sobel = HoughTransform.DoTransform(sobel);
-            sobel2 = HoughTransform.DoTransform(sobel2);
-            sobel.LockBitmap();
-            sobel2.LockBitmap();
-            float distance = BitmapUtil.GetDistance(sobel);
+            BitmapUtil.Line edge = HoughTransform.DoTransform(sobel);
+            BitmapUtil.Line edge2 = HoughTransform.DoTransform(sobel2);
+            float distance = BitmapUtil.GetDistance(sobel, edge);
+            float distance2 = BitmapUtil.GetDistance(sobel2, edge2);
             sobel.UnlockBitmap();
             sobel2.UnlockBitmap();
 
 
             Console.WriteLine(distance + " inches");
+            Console.WriteLine(distance2 + "inches");
 
             sw.Stop();
+
+            Graphics g = Graphics.FromImage(sobel.Bitmap);
+            Pen red = new Pen(Color.Red, 3);
+
+            g.DrawLine(red, edge.Start, edge.End);
+
+            g = Graphics.FromImage(sobel2.Bitmap);
+            g.DrawLine(red, edge2.Start, edge2.End);
 
             sobel.Bitmap.Save("frameout.jpg", ImageFormat.Jpeg);
             sobel2.Bitmap.Save("frameout2.jpg", ImageFormat.Jpeg);

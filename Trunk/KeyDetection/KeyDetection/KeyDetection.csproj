@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitmapUtil.cs" />
+    <Compile Include="RawBitmap.cs" />
     <Compile Include="GaussianBlur.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="HoughTransform.cs" />

@@ -3,3 +3,8 @@ C:\Users\derek\documents\visual studio 2010\Projects\KeyDetection\KeyDetection\b
 C:\Users\derek\documents\visual studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\Users\derek\documents\visual studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.exe
 C:\Users\derek\documents\visual studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.pdb
+C:\Users\derek\Documents\frc12\Trunk\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.exe
+C:\Users\derek\Documents\frc12\Trunk\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.pdb
+C:\Users\derek\Documents\frc12\Trunk\KeyDetection\KeyDetection\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\derek\Documents\frc12\Trunk\KeyDetection\KeyDetection\bin\Debug\KeyDetection.exe
+C:\Users\derek\Documents\frc12\Trunk\KeyDetection\KeyDetection\bin\Debug\KeyDetection.pdb

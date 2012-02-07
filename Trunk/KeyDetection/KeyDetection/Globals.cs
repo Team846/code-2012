@@ -3,7 +3,6 @@
  * As of February 6th, 8:11 AM, this code properly detects the edge of the key
  *
  * TO-DO:
- * - Get distance from edge
  * - Improve Hough Transform
  * 
  * CURRENT STATUS:

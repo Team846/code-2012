@@ -3,7 +3,6 @@
  * As of February 6th, 8:11 AM, this code properly detects the edge of the key
  *
  * TO-DO:
- * - Get distance from edge
  * - Improve Hough Transform
  * 
  * CURRENT STATUS:
@@ -22,20 +21,40 @@ namespace KeyDetection
 {
     public class BitmapUtil
     {
+        public struct Line
+        {
+            Point start;
+            Point end;
+
+            public Line(int x1, int y1, int x2, int y2)
+                : this(new Point(x1, y2), new Point(x2, y2))
+            { }
+
+            public Line(Point p1, Point p2)
+            {
+                this.start = p1;
+                this.end = p2;
+            }
+
+            public Point Start { get { return start; } }
+            public Point End { get { return end; } }
+        }
+
         /// <summary>
         /// Gets the distance between the center of the image and the key line.
         /// </summary>
         /// <param name="uBmp">The input image, with Sobel's edge detection.</param>
         /// <returns>The distance, in inches, between the center of the camera and the key line.</returns>
-        public static float GetDistance(UnsafeBitmap uBmp, float PPI_RATIO=Globals.PPI_RATIO)
+        public static float GetDistance(UnsafeBitmap uBmp, Line edge, float PPI_RATIO = Globals.PPI_RATIO)
         {
-            int rowY = GetNumberPixels(uBmp);
+            if (edge.Start.X < 0 && edge.Start.Y < 0 && edge.End.X < 0 && edge.End.Y < 0)
+                return Single.MinValue; // INVALID_LINE
 
-            if (rowY <= 0)
-                return Int32.MinValue; // unable to locate
-
-            /* TO-DO: Account for angles */
-            return (float)(Globals.IMG_CENTER.Y - rowY) / PPI_RATIO; // TO-DO: Find center coordinates to make IMG_CENTER constant so we can use an optional parameter
+            float slope = (edge.End.Y - edge.Start.Y) / (edge.End.X - edge.Start.X);
+            float intercept = edge.Start.Y - slope * edge.Start.X;
+            float y = uBmp.Bitmap.Width / 2 + intercept;
+            float distance = y - uBmp.Bitmap.Height / 2;
+            return distance / PPI_RATIO;
         }
 
         /// <summary>
@@ -65,7 +84,7 @@ namespace KeyDetection
             return uBmp;
         }
 
-        public static UnsafeBitmap BlackWhite(UnsafeBitmap uBmp, double satThreshold=Globals.satThreshold)
+        public static UnsafeBitmap BlackWhite(UnsafeBitmap uBmp, double satThreshold = Globals.satThreshold)
         {
             int rgb;
             PixelData pData;
