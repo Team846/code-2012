@@ -32,6 +32,11 @@ public:
 	~LRTEncoder();
 
 	/*!
+	 * @brief Starts the LRT Encoder
+	 */
+	void Start();
+
+	/*!
 	 * @brief Gets the current count of the encoder
 	 * @return encoder tick count
 	 */

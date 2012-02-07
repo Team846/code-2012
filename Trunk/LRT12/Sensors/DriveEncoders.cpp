@@ -33,7 +33,8 @@ DriveEncoders::DriveEncoders() :
 					m_config->Get<double> (m_configsection,
 							"ticks_per_full_turn", 1350.0 * 180.0 / 165.0)),
 			WHEEL_DIAMETER(
-					m_config->Get<double> (m_configsection, "wheel_diameter", 4.0)), // inches
+					m_config->Get<double> (m_configsection, "wheel_diameter",
+							4.0)), // inches
 			LOW_GEAR_MULTIPLIER(
 					m_config->Get<double> (m_configsection,
 							"low_gear_multiplier", 16.3 / 6.4))
@@ -56,8 +57,8 @@ DriveEncoders::~DriveEncoders()
 
 void DriveEncoders::Configure()
 {
-	//ne faire rien/don't do anything
-
+	m_encoder_left.Start();
+	m_encoder_right.Start();
 }
 
 double DriveEncoders::rawForwardSpeed()
@@ -124,7 +125,9 @@ double DriveEncoders::getWheelDist(int side)
 {
 	// pulses / ( pulses / revolution ) * distance / revolution = inch distance
 	LRTEncoder& e = (side == LEFT ? m_encoder_left : m_encoder_right);
-	return e.Get() / PULSES_PER_REVOLUTION * WHEEL_DIAMETER * PI;
+	double rate = (double) ((e.Get() * 1.0) / PULSES_PER_REVOLUTION
+			* WHEEL_DIAMETER * PI);
+	return rate;
 }
 
 double DriveEncoders::getLeftSpeed()

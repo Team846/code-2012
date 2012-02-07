@@ -27,7 +27,7 @@ LRTRobot12::LRTRobot12() :
 LRTRobot12::~LRTRobot12()
 {
 	// try to free SmartDashboard resources
-	SmartDashboard::GetInstance()->DeleteSingletons();
+	SmartDashboard::DeleteSingletons();
 	// Testing shows this to be the entry point for a Kill signal.
 	// Start shutting down processes here. -dg
 	printf("\n\nBegin Deleting LRTRobot12\n");
@@ -94,7 +94,7 @@ void LRTRobot12::MainLoop()
 
 	// limit rate of logging 
 	static uint8_t cycle_count = 0;
-	if (++cycle_count >= 5)
+	if (++cycle_count >= 10)
 	{
 		cycle_count = 0;
 		Log::logAll();

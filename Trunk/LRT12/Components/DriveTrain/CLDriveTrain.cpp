@@ -90,12 +90,12 @@ void ClosedLoopDrivetrain::Configure()
 	m_pos_turn_high_gear_pid.setParameters(turn_pos_p_high, turn_pos_i_high,
 			turn_pos_d_high, 1.0, FWD_DECAY, true);
 
-	double turn_pos_p_low = m_config->Get<double> (configSection, "turnPosLowP",
-			1.5);
-	double turn_pos_i_low = m_config->Get<double> (configSection, "turnPosLowI",
-			0.0);
-	double turn_pos_d_low = m_config->Get<double> (configSection, "turnPosLowD",
-			0.0);
+	double turn_pos_p_low = m_config->Get<double> (configSection,
+			"turnPosLowP", 1.5);
+	double turn_pos_i_low = m_config->Get<double> (configSection,
+			"turnPosLowI", 0.0);
+	double turn_pos_d_low = m_config->Get<double> (configSection,
+			"turnPosLowD", 0.0);
 
 	m_pos_turn_low_gear_pid.setParameters(turn_pos_p_low, turn_pos_i_low,
 			turn_pos_d_low, 1.0, FWD_DECAY, true);
@@ -137,8 +137,8 @@ void ClosedLoopDrivetrain::update()
 	else
 	{
 		m_drive_control->setInput(
-				Util::Clamp<double>(m_encoders.getNormalizedForwardMotorSpeed(),
-						-1.0, 1.0));
+				Util::Clamp<double>(
+						m_encoders.getNormalizedForwardMotorSpeed(), -1.0, 1.0));
 		m_drive_op_complete = true; // this flag doesn't mean much here
 	}
 	m_drive_control->update(1.0 / 50); // 50 Hz assumed update rate
@@ -157,8 +157,8 @@ void ClosedLoopDrivetrain::update()
 	else
 	{
 		m_turn_control->setInput(
-				Util::Clamp<double>(m_encoders.getNormalizedTurningMotorSpeed(),
-						-1.0, 1.0));
+				Util::Clamp<double>(
+						m_encoders.getNormalizedTurningMotorSpeed(), -1.0, 1.0));
 		m_turn_op_complete = true; // this flag doesn't mean much here
 	}
 	m_turn_control->update(1.0 / 50); // 50 Hz assumed update rate
