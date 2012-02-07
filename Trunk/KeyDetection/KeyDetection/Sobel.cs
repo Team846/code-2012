@@ -1,16 +1,14 @@
-﻿/* HORRIBLE FORMATTING/FILE STRUCTURE IS DUE TO RESTRICTIONS IN PLACE BY COLLABEDIT -- will separate/properly format at final release */
-
-/*
+﻿/*
  * Authors: Tony Peng & Raphael Chang
- * As of February 5th, 2:45 AM, this code properly detects the edge of the key
+ * As of February 6th, 8:11 AM, this code properly detects the edge of the key
  *
  * TO-DO:
  * - Get distance from edge
- * - Finish Hough Transform
+ * - Improve Hough Transform
  * 
  * CURRENT STATUS:
  * - Sobel is working!
- * - Hough Transform is NOT working! :(
+ * - Hough Transform is working, but accuracy could be improved a bit. :|
  */
 
 using System;
@@ -54,7 +52,16 @@ namespace KeyDetection
                         eBmp.SetPixel(j, i, new PixelData(255, 255, 255));
                 }
             }
-
+            for (int j = 0; j < uBmp.Bitmap.Width; j++)
+            {
+                eBmp.SetPixel(j, 0, new PixelData(255, 255, 255));
+                eBmp.SetPixel(j, uBmp.Bitmap.Height - 1, new PixelData(255, 255, 255));
+            }
+            for (int i = 0; i < uBmp.Bitmap.Height; i++)
+            {
+                eBmp.SetPixel(0, i, new PixelData(255, 255, 255));
+                eBmp.SetPixel(uBmp.Bitmap.Width - 1, i, new PixelData(255, 255, 255));
+            }
             eBmp.UnlockBitmap();
 
             return eBmp;

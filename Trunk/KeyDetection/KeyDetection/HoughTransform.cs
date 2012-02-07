@@ -1,16 +1,14 @@
-﻿/* HORRIBLE FORMATTING/FILE STRUCTURE IS DUE TO RESTRICTIONS IN PLACE BY COLLABEDIT -- will separate/properly format at final release */
-
-/*
+﻿/*
  * Authors: Tony Peng & Raphael Chang
- * As of February 5th, 2:45 AM, this code properly detects the edge of the key
+ * As of February 6th, 8:11 AM, this code properly detects the edge of the key
  *
  * TO-DO:
  * - Get distance from edge
- * - Finish Hough Transform
+ * - Improve Hough Transform
  * 
  * CURRENT STATUS:
  * - Sobel is working!
- * - Hough Transform is NOT working! :(
+ * - Hough Transform is working, but accuracy could be improved a bit. :|
  */
 
 using System;
@@ -24,7 +22,6 @@ namespace KeyDetection
 {
     public class HoughTransform
     {
-        static int[,] maxPosArray = new int[10, 2];
         static int gPD_R(UnsafeBitmap uBmp, int i, int j)
         {
             return uBmp.GetPixel(i, j).red / 255;
@@ -32,10 +29,10 @@ namespace KeyDetection
 
         public static UnsafeBitmap DoTransform(UnsafeBitmap uBmp)
         {
-            int[,] bmpArray = new int[uBmp.Bitmap.Width, uBmp.Bitmap.Height];
+            int rMax = (int)(Math.Sqrt((uBmp.Bitmap.Width * uBmp.Bitmap.Width) + (uBmp.Bitmap.Height * uBmp.Bitmap.Height)));
+            int[,] bmpArray = new int[360, rMax];
 
-            int rMax = (int)(Math.Sqrt((uBmp.Bitmap.Width / 2 * uBmp.Bitmap.Width / 2) + (uBmp.Bitmap.Height / 2 * uBmp.Bitmap.Height / 2)));
-            Bitmap bBmp = new Bitmap(uBmp.Bitmap.Width, uBmp.Bitmap.Height);
+            Bitmap bBmp = new Bitmap(360, rMax);
             UnsafeBitmap ubBmp = new UnsafeBitmap(bBmp);
 
             ubBmp.LockBitmap();
@@ -49,9 +46,10 @@ namespace KeyDetection
                         for (int t = 0; t < 360; t++)
                         {
                             double theta = t * Math.PI / 180;
-                            int rho = (int)((((double)j - ((double)uBmp.Bitmap.Width / 2.0)) * Math.Cos(theta)) + (((double)i - ((double)uBmp.Bitmap.Height / 2.0)) * Math.Sin(theta)));
-                            rho = -(rho - rMax);
-                            if (!(rho < 0) && !(rho > rMax))
+                            //int rho = (int)((((double)j - ((double)uBmp.Bitmap.Width / 2.0)) * Math.Cos(theta)) + (((double)i - ((double)uBmp.Bitmap.Height / 2.0)) * Math.Sin(theta)));
+                            //rho = -(rho - rMax);
+                            int rho = (int)((((double)j) * Math.Cos(theta)) + (((double)i) * Math.Sin(theta)));
+                            if (rho >= 0 && rho <= rMax)
                             {
                                 ubBmp.SetPixel(t, rho, new PixelData(255, 255, 255));
                                 bmpArray[t, rho] += 1;
@@ -62,12 +60,12 @@ namespace KeyDetection
             }
             int x = 0;
             int y = 0;
-            int max = bmpArray[0, 0];
+            int max = 0;
             int xPos, yPos;
 
-            for (int m = 1; m < uBmp.Bitmap.Height; m++)
+            for (int m = 0; m < rMax; m++)
             {
-                for (int n = 1; n < uBmp.Bitmap.Width; n++)
+                for (int n = 0; n < 360; n++)
                 {
                     if (bmpArray[n, m] > max)
                     {
@@ -77,8 +75,13 @@ namespace KeyDetection
                     }
                 }
             }
-            int rho2;
+            double rho2;
             double theta2;
+            uBmp.UnlockBitmap();
+            UnsafeBitmap oBmp = new UnsafeBitmap(uBmp.Bitmap);
+            uBmp.LockBitmap();
+            Graphics g = Graphics.FromImage(oBmp.Bitmap);
+            Pen redPen = new Pen(Color.Red, 3);
             if (ubBmp.GetPixel(x, y).red != 0)
             {
                 for (int k = x - 10; k <= x + 10; k++)
@@ -94,19 +97,24 @@ namespace KeyDetection
 
                     }
                 }
-                rho2 = (y - rMax) * -1;
+                rho2 = y;
                 theta2 = x * Math.PI / 180;
                 Console.WriteLine(rho2);
                 Console.WriteLine(theta2);
-                Graphics g = Graphics.FromImage(uBmp.Bitmap);
-                Pen redPen = new Pen(Color.Red);
+                double a = Math.Cos(theta2), b = Math.Sin(theta2);
+                double x0 = a * rho2, y0 = b * rho2;
+                Point pt1 = new Point((int)Math.Round(x0 + uBmp.Bitmap.Width * (-b)),
+                          (int)Math.Round(y0 + uBmp.Bitmap.Height * (a)));
+                Point pt2 = new Point((int)Math.Round(x0 - uBmp.Bitmap.Width * (-b)),
+                          (int)Math.Round(y0 - uBmp.Bitmap.Height * (a)));
+                g.DrawLine(redPen, pt1, pt2);
+                Console.WriteLine(pt1);
+                Console.WriteLine(pt2);
                 for (int z = 0; z < 256; z++)
                 {
-
-                    int yPixel = (int)(((double)rho2 / Math.Sin(theta2)) - (((double)z - 128.0) * (Math.Cos(theta2) / Math.Sin(theta2))) + 128.0);
-
-                    // To get a Clear line....we draw in x- as well as in y direction
-                    int xPixel = (int)(((double)rho2 / Math.Cos(theta2)) - (((double)z - 128.0) * Math.Tan(theta2)) + 128.0);
+                    /*
+                    int yPixel = (int)((rho2 / Math.Sin(theta2)) - ((z - 128.0) * (Math.Cos(theta2) / Math.Sin(theta2))) + 128.0);
+                    int xPixel = (int)((rho2 / Math.Cos(theta2)) - ((z - 128.0) * Math.Tan(theta2)) + 128.0);
 
                     if (z > 0 && z < 256 && yPixel > 0 && yPixel < 256)
                     {
@@ -116,13 +124,12 @@ namespace KeyDetection
                     if (xPixel > 0 && xPixel < 256)
                     {
                         g.DrawLine(redPen, new Point(xPixel + 20, z + 20), new Point(xPixel + 20, z + 20));
-                    }
+                    }*/
                 }
+                g.Dispose();
             }
-            uBmp.Bitmap.Save("image.jpg");
-
             ubBmp.UnlockBitmap();
-            return uBmp;
+            return oBmp;
         }
     }
 }
