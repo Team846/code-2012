@@ -192,7 +192,6 @@ void DriveEncoders::log()
 {
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	sdb->PutDouble("Robot Drive Speed", getNormalizedForwardMotorSpeed());
-	AsyncPrinter::Printf("Fwd: %d\n", getNormalizedForwardMotorSpeed());
 	sdb->PutDouble("Robot Turning Speed", getNormalizedTurningMotorSpeed());
 	sdb->PutDouble("Robot Drive Distance", getRobotDist());
 	sdb->PutDouble("Robot Turn Angle", getTurnAngle());

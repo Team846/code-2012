@@ -5,38 +5,38 @@
 
 /************************** Esc Class ********************/
 ESC::ESC(int channel, LRTEncoder *encoder, string name) :
-			m_name(name)
+	m_name(name)
 {
 	m_encoder = encoder;
-	jag1 = new AsyncCANJaguar(channel, name.c_str());
-	jag2 = NULL;
+	m_jag1 = new AsyncCANJaguar(channel, name.c_str());
+	m_jag2 = NULL;
 	m_cycle_count = 0;
 }
 
 ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
-			m_name(name + "A")
+	m_name(name + "A")
 {
 	m_encoder = encoder;
-	jag1 = new AsyncCANJaguar(channelA, (name + "A").c_str());
-	jag2 = new AsyncCANJaguar(channelB, (name + "B").c_str());
+	m_jag1 = new AsyncCANJaguar(channelA, (name + "A").c_str());
+	m_jag2 = new AsyncCANJaguar(channelB, (name + "B").c_str());
 	m_cycle_count = 0;
 	printf("Constructed ESC: %s\n", name.c_str());
 }
 
 ESC::~ESC()
 {
-	delete jag1;
-	delete jag2;
+	delete m_jag1;
+	delete m_jag2;
 }
 
 void ESC::Configure()
 {
 	string configSection("Esc");
-	m_p_gain = Config::GetInstance()->Get<float> (configSection, "pGain", 4.0);
 }
 
 //first is dutycycle, second is braking
-std::pair<float, float> ESC::CalculateBrakeAndDutyCycle(float desired_speed, float current_speed)
+std::pair<float, float> ESC::CalculateBrakeAndDutyCycle(float desired_speed,
+		float current_speed)
 {
 	std::pair<float, float> command;
 
@@ -80,24 +80,24 @@ std::pair<float, float> ESC::CalculateBrakeAndDutyCycle(float desired_speed, flo
 	return command;
 }
 
-
 void ESC::SetDutyCycle(float dutyCycle)
 {
-	
+
 #ifdef USE_DASHBOARD
 	//    SmartDashboard::Log(speed, name.c_str());
 #endif
-	float speed = m_encoder->GetRate() / m_max_encoder_rate;
-	std::pair<float, float> command = CalculateBrakeAndDutyCycle(dutyCycle, speed);
-	
+	double speed = m_encoder->GetRate() / m_max_encoder_rate;
+	std::pair<float, float> command = CalculateBrakeAndDutyCycle(dutyCycle,
+			speed);
+
 	if (fabs(command.first) < 1E-4) //brake only when duty cycle = 0
 	{
 		dutyCycle = 0.0;
-		
+
 		// cycleCount ranges from 0 to 8
 		if (++m_cycle_count >= 8)
-				m_cycle_count = 0;
-		
+			m_cycle_count = 0;
+
 		/*
 		 * Each integer, corresponding to value, is a bitfield of 8 cycles
 		 * Pattern N has N bits out of 8 set to true.
@@ -111,33 +111,34 @@ void ESC::SetDutyCycle(float dutyCycle)
 		 * 7: 1111 1110 = 0xFE
 		 * 8: 1111 1111 = 0xFF
 		 */
-		static const UINT8 ditherPattern[] = {0x00, 0x01, 0x11, 0x25, 0x55, 0xD5, 0xEE, 0xFE, 0xFF};
+		static const UINT8 ditherPattern[] =
+		{ 0x00, 0x01, 0x11, 0x25, 0x55, 0xD5, 0xEE, 0xFE, 0xFF };
 
 		int brake_level = (int) (fabs(command.second) * 8);
 		bool shouldBrakeThisCycle = ditherPattern[brake_level] & (1
-					<< m_cycle_count);
-		
+				<< m_cycle_count);
+
 		if (shouldBrakeThisCycle)
 		{
-			jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
-			jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
+			m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
+			m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
 		}
 		else
 		{
-			jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
-			jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+			m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+			m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 		}
 	}
-	
+
 	dutyCycle = Util::Clamp<float>(dutyCycle, -1.0, 1.0);
-	jag1->SetDutyCycle(dutyCycle);
-	jag2->SetDutyCycle(dutyCycle);
+	m_jag1->SetDutyCycle(dutyCycle);
+	m_jag2->SetDutyCycle(dutyCycle);
 }
 
 void ESC::ResetCache()
 {
-	jag1->ResetCache();
-	if (jag2)
-		jag2->ResetCache();
+	m_jag1->ResetCache();
+	if (m_jag2)
+		m_jag2->ResetCache();
 }
 

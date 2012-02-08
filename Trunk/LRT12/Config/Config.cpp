@@ -87,9 +87,9 @@ void Config::Load()
 				"default");
 		analogAssignmentSections[i] = Get<string> ("Assignable",
 				keyname + ".section", "default");
-		analogAssignmentScaleMin[i] = Get<float> ("Assignable",
+		analogAssignmentScaleMin[i] = Get<double> ("Assignable",
 				keyname + ".scaleMin", 1);
-		analogAssignmentScaleMax[i] = Get<float> ("Assignable",
+		analogAssignmentScaleMax[i] = Get<double> ("Assignable",
 				keyname + ".scaleMax", 1);
 	}
 	AsyncPrinter::Printf("Done loading file\n");
@@ -123,9 +123,9 @@ void Config::Save()
 	SaveToFile(CONFIG_FILE_PATH);
 }
 
-float Config::ScaleAssignableAnalogValue(float value, int analogIndex)
+double Config::ScaleAssignableAnalogValue(double value, int analogIndex)
 {
-	return Util::Rescale<float>(value, 0, 5,
+	return Util::Rescale<double>(value, 0, 5,
 			analogAssignmentScaleMin[analogIndex],
 			analogAssignmentScaleMax[analogIndex]);
 }
@@ -139,7 +139,7 @@ void Config::UpdateAssignableDials()
 			ProfilerHelper pf;
 
 			pf.Start("UpdateAssignable.Scale");
-			float newValue = ScaleAssignableAnalogValue(ds.GetAnalogIn(i + 1),
+			double newValue = ScaleAssignableAnalogValue(ds.GetAnalogIn(i + 1),
 					i);
 			pf.Finish();
 
@@ -150,8 +150,8 @@ void Config::UpdateAssignableDials()
 			pf.Finish();
 
 			pf.Start("UpdateAssignable.Set");
-			//            Set(analogAssignments[i], Util::ToString<float>(newValue));
-			Set<float> (analogAssignmentSections[i], analogAssignmentKeys[i],
+			//            Set(analogAssignments[i], Util::ToString<double>(newValue));
+			Set<double> (analogAssignmentSections[i], analogAssignmentKeys[i],
 					newValue);
 			pf.Finish();
 		}
@@ -207,8 +207,6 @@ bool Config::ValueExists(string section, string key)
 					!= (*newConfigData)[section].end();
 }
 
-template float Config::Get<float>(string section, string key,
-		float defaultValue);
 template bool Config::Get<bool>(string section, string key, bool defaultValue);
 template double Config::Get<double>(string section, string key,
 		double defaultValue);
@@ -240,7 +238,6 @@ template<typename T> T Config::Get(string section, string key, T defaultValue)
 
 template void Config::Set<bool>(string section, string key, bool val);
 template void Config::Set<int>(string section, string key, int val);
-template void Config::Set<float>(string section, string key, float val);
 template void Config::Set<double>(string section, string key, double val);
 template void Config::Set<string>(string section, string key, string val);
 

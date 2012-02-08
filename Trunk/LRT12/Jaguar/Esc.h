@@ -12,7 +12,7 @@
 #include <string>
 using namespace std;
 
-class ESC : public Configurable
+class ESC: public Configurable
 {
 public:
 	/*!
@@ -30,17 +30,17 @@ public:
 	 * @param name
 	 */
 	ESC(int channelA, int channelB, LRTEncoder* encoder, string name);
-	
+
 	/*!
 	 * @brief Cleans up the speed controller including cleanup of the jaguar resources.
 	 */
 	~ESC();
-	
+
 	/*!
 	 * @brief loads in mutable parameters of the ESC
 	 */
 	virtual void Configure();
-	
+
 	/*!
 	 * @brief Sets the duty cycle. Includes break dithering to ensure a linear response. 
 	 * @param dutycycle
@@ -52,17 +52,17 @@ public:
 	 */
 	void ResetCache();
 private:
-	AsyncCANJaguar *jag1, *jag2;
+	AsyncCANJaguar *m_jag1, *m_jag2;
 
 	LRTEncoder* m_encoder;
 
 	string m_name;
 	int m_cycle_count;
 
-	float m_p_gain;
 	float m_max_encoder_rate;
 
-	std::pair<float, float> CalculateBrakeAndDutyCycle(float target_speed, float current_speed);
+	std::pair<float, float> CalculateBrakeAndDutyCycle(float target_speed,
+			float current_speed);
 };
 
 #endif /* ESC_H_ */

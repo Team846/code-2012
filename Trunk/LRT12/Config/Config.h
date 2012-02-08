@@ -100,11 +100,11 @@ private:
 	void SaveToFile(string path);
 
 	DriverStation& ds;
-	float ScaleAssignableAnalogValue(float value, int analogIndex);
+	double ScaleAssignableAnalogValue(double value, int analogIndex);
 	string analogAssignmentKeys[kNumAnalogAssignable];
 	string analogAssignmentSections[kNumAnalogAssignable];
-	float analogAssignmentScaleMin[kNumAnalogAssignable];
-	float analogAssignmentScaleMax[kNumAnalogAssignable];
+	double analogAssignmentScaleMin[kNumAnalogAssignable];
+	double analogAssignmentScaleMax[kNumAnalogAssignable];
 
 	static bool hasRun;
 	string buildNumKey, runNumKey, buildTimeKey;

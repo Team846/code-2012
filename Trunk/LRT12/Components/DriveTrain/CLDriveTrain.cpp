@@ -13,6 +13,9 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	m_drive_disabled.disablePID();
 	m_turn_disabled.disablePID();
 
+	setDriveControl(m_drive_control_type);
+	setTurnControl(m_turn_control_type);
+
 	printf("Constructed CLRateTrain\n");
 }
 
