@@ -16,12 +16,22 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Text;
+using System.Windows.Forms;
 
 namespace KeyDetection
 {
     class Program
     {
-        static void Main(string[] args)
+        [STAThread]
+        static void Main(String[] args)
+        {
+            Viewer viewer = new Viewer();
+
+            Application.EnableVisualStyles();
+            Application.Run(viewer);
+        }
+
+        /*static void Main(string[] args)
         {
             Stopwatch sw = new Stopwatch();
 
@@ -78,6 +88,6 @@ namespace KeyDetection
             Console.WriteLine("Execution finished in {0}ms.", sw.ElapsedMilliseconds);
 
             Console.ReadKey();
-        }
+        }*/
     }
 }
