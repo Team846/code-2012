@@ -29,6 +29,8 @@ void _GLOBAL__I__ZN13DriveEncoders10m_instanceE();
 
 void _GLOBAL__I__ZN14AsyncCANJaguar12m_game_stateE();
 
+void _GLOBAL__I__ZN16PneumaticShifterC2Ev();
+
 void _GLOBAL__I__ZN17DebouncedJoystickC2Ejii();
 
 void _GLOBAL__I__ZN20ClosedLoopDrivetrainC2Ev();
@@ -95,6 +97,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN13DavidLauncherC2Ev,
     _GLOBAL__I__ZN13DriveEncoders10m_instanceE,
     _GLOBAL__I__ZN14AsyncCANJaguar12m_game_stateE,
+    _GLOBAL__I__ZN16PneumaticShifterC2Ev,
     _GLOBAL__I__ZN17DebouncedJoystickC2Ejii,
     _GLOBAL__I__ZN20ClosedLoopDrivetrainC2Ev,
     _GLOBAL__I__ZN3ESCC2EiP10LRTEncoderSs,
@@ -145,6 +148,8 @@ void _GLOBAL__D__ZN13DavidLauncherC2Ev();
 void _GLOBAL__D__ZN13DriveEncoders10m_instanceE();
 
 void _GLOBAL__D__ZN14AsyncCANJaguar12m_game_stateE();
+
+void _GLOBAL__D__ZN16PneumaticShifterC2Ev();
 
 void _GLOBAL__D__ZN17DebouncedJoystickC2Ejii();
 
@@ -208,6 +213,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN13DavidLauncherC2Ev,
     _GLOBAL__D__ZN13DriveEncoders10m_instanceE,
     _GLOBAL__D__ZN14AsyncCANJaguar12m_game_stateE,
+    _GLOBAL__D__ZN16PneumaticShifterC2Ev,
     _GLOBAL__D__ZN17DebouncedJoystickC2Ejii,
     _GLOBAL__D__ZN20ClosedLoopDrivetrainC2Ev,
     _GLOBAL__D__ZN3ESCC2EiP10LRTEncoderSs,
