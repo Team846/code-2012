@@ -16,6 +16,10 @@ LRTRobot12::LRTRobot12() :
 	ds = DriverStation::GetInstance();
 	components = Component::CreateComponents();
 
+	compressor = new Compressor(RobotConfig::DIGITAL_IO::COMPRESSOR_RELAY_PIN,
+			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN);
+	compressor->Start();
+
 	mainLoopWatchDog = wdCreate();
 
 	//set priority above default so that we get hgiher priority than default
@@ -28,6 +32,8 @@ LRTRobot12::~LRTRobot12()
 {
 	// try to free SmartDashboard resources
 	SmartDashboard::DeleteSingletons();
+	compressor->Stop();
+	delete compressor;
 	// Testing shows this to be the entry point for a Kill signal.
 	// Start shutting down processes here. -dg
 	printf("\n\nBegin Deleting LRTRobot12\n");
@@ -94,7 +100,7 @@ void LRTRobot12::MainLoop()
 
 	// limit rate of logging 
 	static uint8_t cycle_count = 0;
-	if (++cycle_count >= 10)
+	if (++cycle_count >= 5)
 	{
 		cycle_count = 0;
 		Log::logAll();

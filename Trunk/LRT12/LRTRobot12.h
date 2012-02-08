@@ -5,14 +5,17 @@
 #include "Brain/Brain.h"
 #include "Components/Component.h"
 #include "Config/Config.h"
+#include "Config/RobotConfig.h"
 #include "Log/Log.h"
 #include "wdLib.h"
 #include "sysLib.h"
+#include "Compressor.h"
 
 #include "Util/AsyncPrinter.h"
 #include "Util/PrintInConstructor.h"
 
 #include "Jaguar/AsyncCANJaguar.h"
+
 class LRTRobot12: public LRTRobotBase
 {
 public:
@@ -29,6 +32,8 @@ private:
 	PrintInConstructor dc_CANBus_;
 
 	Config *config;
+
+	Compressor *compressor;
 
 	DriverStation* ds;
 
