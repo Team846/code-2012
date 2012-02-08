@@ -95,6 +95,7 @@
             this.menu_Options.Name = "menu_Options";
             this.menu_Options.Size = new System.Drawing.Size(61, 20);
             this.menu_Options.Text = "Options";
+            this.menu_Options.Click += new System.EventHandler(this.menu_Options_Click);
             // 
             // status_Progress
             // 

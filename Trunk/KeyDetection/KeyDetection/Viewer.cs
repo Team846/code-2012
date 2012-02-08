@@ -82,7 +82,7 @@ namespace KeyDetection
                 status_Progress.BeginInvoke(
                     new Action(() =>
                         status_Progress.Value = 75));
-                float distance = BitmapUtil.GetDistance(sobel, edge);
+                float[] distanceangle = BitmapUtil.GetDistanceAndAngle(sobel, edge);
                 status_Progress.BeginInvoke(
                     new Action(() =>
                         status_Progress.Value = 100));
@@ -94,8 +94,27 @@ namespace KeyDetection
 
                 Graphics g = Graphics.FromImage(processed);
                 Pen red = new Pen(Color.Red, 3);
+                Pen blue = new Pen(Color.Blue, 5);
+                Pen green = new Pen(Color.Green, 5);
+                Pen gold = new Pen(Color.Gold, 3);
+                Pen black = new Pen(Color.Black, 1);
+                
+                SolidBrush b_green = new SolidBrush(Color.Green);
+
+                g.DrawLine(black, 0, Globals.IMG_CENTER.Y, processed.Width - 1, Globals.IMG_CENTER.Y);
 
                 g.DrawLine(red, edge.Start, edge.End);
+
+                g.DrawLine(green, Globals.IMG_CENTER.X - 10, Globals.IMG_CENTER.Y, Globals.IMG_CENTER.X + 10, Globals.IMG_CENTER.Y);
+                g.DrawLine(blue, Globals.IMG_CENTER.X - 10, distanceangle[0] + Globals.IMG_CENTER.Y, Globals.IMG_CENTER.X + 10, distanceangle[0] + Globals.IMG_CENTER.Y);
+                g.DrawLine(gold, Globals.IMG_CENTER.X, distanceangle[0] + Globals.IMG_CENTER.Y, Globals.IMG_CENTER.X, Globals.IMG_CENTER.Y);
+
+                string dist_str = Globals.PPI_RATIO <= 0 ? distanceangle[0] + "px (no PPI), " + distanceangle[1].ToString() + "" : distanceangle[0] / Globals.PPI_RATIO + "inches, " + distanceangle[1].ToString() + "";
+
+                Font arial = new Font("Arial", 12);
+                g.DrawString(dist_str, new Font("Arial", 12), b_green, Globals.IMG_CENTER.X + 10, Globals.IMG_CENTER.Y + (distanceangle[0] / 2));
+
+                Console.WriteLine(dist_str);
 
                 panel2.BeginInvoke(
                     new Action(() =>
@@ -136,6 +155,11 @@ namespace KeyDetection
         private void Viewer_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void menu_Options_Click(object sender, EventArgs e)
+        {
+            new Options().Show();
         }
     }
 }

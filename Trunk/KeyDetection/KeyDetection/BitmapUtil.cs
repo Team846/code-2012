@@ -45,16 +45,42 @@ namespace KeyDetection
         /// </summary>
         /// <param name="uBmp">The input image, with Sobel's edge detection.</param>
         /// <returns>The distance, in inches, between the center of the camera and the key line.</returns>
-        public static float GetDistance(UnsafeBitmap uBmp, Line edge, float PPI_RATIO = Globals.PPI_RATIO)
+        public static float[] GetDistanceAndAngle(UnsafeBitmap uBmp, Line edge, float PPI_RATIO=-1)
         {
-            if (edge.Start.X < 0 && edge.Start.Y < 0 && edge.End.X < 0 && edge.End.Y < 0)
-                return Single.MinValue; // INVALID_LINE
+            float[] toreturn = new float[2];
 
-            float slope = (edge.End.Y - edge.Start.Y) / (edge.End.X - edge.Start.X);
-            float intercept = edge.Start.Y - slope * edge.Start.X;
-            float y = uBmp.Bitmap.Width / 2 + intercept;
-            float distance = y - uBmp.Bitmap.Height / 2;
-            return distance / PPI_RATIO;
+            toreturn[0] = Single.MinValue;
+            toreturn[1] = Single.MinValue;
+
+            if (edge.Start.X == -1 && edge.Start.Y == -1 && edge.End.X == -1 && edge.End.Y == -1)
+                return toreturn; // INVALID_LINE
+
+
+            if (PPI_RATIO == -1)
+                PPI_RATIO = Globals.PPI_RATIO;
+
+            // y = mx + b
+            // b = y - mx
+
+            float slope = (float)(edge.End.Y - edge.Start.Y) / (float)(edge.End.X - edge.Start.X);
+            float intercept = (float)edge.End.Y - slope * (float)edge.End.X;
+            float y = slope * (float)Globals.IMG_CENTER.X + intercept;
+            float distance = y - (float)Globals.IMG_CENTER.Y;
+            
+            toreturn[0] = distance;
+            toreturn[1] = GetAngle(slope);
+
+            return toreturn;
+        }
+
+        public static float GetAngle(float rise, float run)
+        {
+            return GetAngle(rise / run);
+        }
+
+        public static float GetAngle(float slope)
+        {
+            return (float)Math.Atan(slope) * (180f / (float)Math.PI);
         }
 
         /// <summary>

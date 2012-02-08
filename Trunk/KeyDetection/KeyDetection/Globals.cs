@@ -27,7 +27,7 @@ namespace KeyDetection
 
         public const double satThreshold = 0.15; //0<=x<=1
 
-        public const float PPI_RATIO = 35; // assuming the image is the entire static test image, bitmap.height / 12 inches
+        public static float PPI_RATIO = 0; // assuming the image is the entire static test image, bitmap.height / 12 inches
         public static Point IMG_CENTER = new Point();
     }
 }
