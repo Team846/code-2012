@@ -1,0 +1,5 @@
+C:\Users\Tony\Documents\Visual Studio 2010\Projects\KeyDetection\KeyDetection\bin\Release\KeyDetection.exe
+C:\Users\Tony\Documents\Visual Studio 2010\Projects\KeyDetection\KeyDetection\bin\Release\KeyDetection.pdb
+C:\Users\Tony\Documents\Visual Studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\Tony\Documents\Visual Studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Release\KeyDetection.exe
+C:\Users\Tony\Documents\Visual Studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Release\KeyDetection.pdb
