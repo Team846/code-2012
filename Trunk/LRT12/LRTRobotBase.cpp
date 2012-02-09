@@ -6,9 +6,12 @@
 /**
  * Constructor for RobotIterativeBase. Initializes member variables.
  */
-LRTRobotBase::LRTRobotBase() :
-	quitting_(false), cycleCount(0), loopSynchronizer(&releaseLoop, this)
+LRTRobotBase::LRTRobotBase()
 {
+	loopSynchronizer = new Notifier(&releaseLoop, this);
+	quitting_ = false;
+	cycleCount = 0;
+
 	printf("Creating LRTRobotbase\n");
 	loopSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 }
@@ -18,7 +21,14 @@ LRTRobotBase::LRTRobotBase() :
  */
 LRTRobotBase::~LRTRobotBase()
 {
+	loopSynchronizer->Stop();
+	delete loopSynchronizer;
+	for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j = j->next_jaguar_)
+	{
+		j->StopBackgroundTask();
+	}
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
+	AsyncPrinter::Quit();
 }
 
 /**
@@ -40,7 +50,7 @@ void LRTRobotBase::StartCompetition()
 	//	INT32 sleepTime_us = 0;
 
 	AsyncPrinter::Printf("starting synchronizer");
-	loopSynchronizer.StartPeriodic(1.0 / 50.0); //arg is period in seconds
+	loopSynchronizer->StartPeriodic(1.0 / 50.0); //arg is period in seconds
 
 	// loop until we are quitting -- must be set by the destructor of the derived class.
 

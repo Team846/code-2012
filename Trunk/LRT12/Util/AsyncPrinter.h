@@ -39,7 +39,7 @@ private:
 	semaphore* semaphore_;
 	int queue_bytes_;
 
-	Task printerTask; //T vsWorks background task that prints the buffered output.
+	Task * printerTask; //T vsWorks background task that prints the buffered output.
 	queue<string> queue_;
 
 	const static int kMaxBuffer_ = 4096;DISALLOW_COPY_AND_ASSIGN(AsyncPrinter);

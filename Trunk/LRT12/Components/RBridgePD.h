@@ -17,14 +17,14 @@ class RBridgePD : public Component, public Configurable
 private:
     Config *config;
     string configSection;
-    AsyncCANJaguar* armEsc;
+    AsyncCANJaguar* m_arm_esc;
 #ifdef VIRTUAL
-    VirtualPot* armPot;
+    VirtualPot* m_arm_pot;
 #else
-    AnalogChannel* armPot;
+    AnalogChannel* m_arm_pot;
 #endif
 
-    int oldState;
+    int m_prev_state;
 
     double maxPosition, minPosition, midPosition, midPositionDeadband;
     double maxPowerUp, powerRetainUp, powerDown, midPGain;
@@ -32,12 +32,12 @@ private:
     double pGainDown, pGainUp, pGainMid;
 
     int timeoutCycles;
-    int cycleCount;
+    int m_cycle_count;
 
     enum {BOTTOM = 1, TOP = 2};
-    bool presetMode;
+    bool m_preset_mode;
 
-    int pulseCount;
+    int m_pulse_count;
     int hysteresis;
 
     const static double ARM_UP_THRESHOLD = 10;

@@ -106,7 +106,8 @@ void Drivetrain::Output()
 	else
 	{
 		action->drivetrain->setTurnOperation = false;
-		AsyncPrinter::Printf("Previous turn operation not complete, discarding\n");
+		AsyncPrinter::Printf(
+				"Previous turn operation not complete, discarding\n");
 	}
 	action->drivetrain->previousTurnOperationComplete
 			= m_drive_control.turnOperationComplete();
@@ -152,8 +153,4 @@ void Drivetrain::log()
 			action->drivetrain->raw.leftDutyCycle);
 	sdb->PutDouble((prefix + "Right Duty Cycle").c_str(),
 			action->drivetrain->raw.rightDutyCycle);
-	//	sdb->PutDouble((prefix + "Left Braking Duty Cycle").c_str(),
-	//			action->drivetrain->raw.leftBrakingDutyCycle);
-	//	sdb->PutDouble((prefix + "Right Braking Duty Cycle").c_str(),
-	//			action->drivetrain->raw.rightBrakingDutyCycle);
 }

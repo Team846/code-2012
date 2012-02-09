@@ -8,26 +8,25 @@ AsyncPrinter& AsyncPrinter::Instance()
 	return printer;
 }
 
-AsyncPrinter::AsyncPrinter() :
-			quitting_(false),
-			running_(false),
-			semaphore_(
-					semMCreate(
-							SEM_Q_PRIORITY | SEM_DELETE_SAFE
-									| SEM_INVERSION_SAFE)),
-			queue_bytes_(0),
-			printerTask("LRT-AsynchronousPrinter",
-					(FUNCPTR) AsyncPrinter::PrinterTaskWrapper)
+AsyncPrinter::AsyncPrinter()
 {
-	printerTask.Start();
+	printerTask = new Task("LRT-AsynchronousPrinter",
+			(FUNCPTR) AsyncPrinter::PrinterTaskWrapper);
+	quitting_ = false;
+	running_ = false;
+	semaphore_ = semMCreate(
+			SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE);
+	queue_bytes_ = 0;
+
+	printerTask->Start();
 }
 
 AsyncPrinter::~AsyncPrinter()
 {
 	if (running_)
-		printerTask.Stop();
+		printerTask->Stop();
 
-	semDelete( semaphore_);
+	semDelete(semaphore_);
 
 	//For some reason, this destructor isn't getting called when the robot task is killed -dg
 	// I never see this line printed.  Hence the call to Aysync...Quit() in the rebot dtor

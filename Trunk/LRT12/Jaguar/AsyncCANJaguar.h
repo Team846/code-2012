@@ -46,7 +46,7 @@ private:
 	string m_task_name;
 	PrintInConstructor m_print_ctor_dtor;
 	int m_channel;
-	const char* m_name;
+	char* m_name;
 
 	CachedValue<float> m_setpoint;
 	CachedValue<AsyncCANJaguar::NeutralMode> m_neutral_mode;
@@ -92,7 +92,7 @@ private:
 	GameState m_last_game_state;
 
 	int m_index;
-	Task m_comm_task;
+	Task * m_comm_task;
 
 	semaphore* m_comm_semaphore;
 	bool m_is_running; //implementation in progress - controlled termination of task -dg

@@ -16,9 +16,9 @@ LRTRobot12::LRTRobot12() :
 	ds = DriverStation::GetInstance();
 	components = Component::CreateComponents();
 
-	compressor = new Compressor(RobotConfig::DIGITAL_IO::COMPRESSOR_RELAY_PIN,
-			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN);
-	compressor->Start();
+	//	compressor = new Compressor(RobotConfig::DIGITAL_IO::COMPRESSOR_RELAY_PIN,
+	//			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN);
+	//	compressor->Start();
 
 	mainLoopWatchDog = wdCreate();
 
@@ -32,8 +32,6 @@ LRTRobot12::~LRTRobot12()
 {
 	// try to free SmartDashboard resources
 	SmartDashboard::DeleteSingletons();
-	compressor->Stop();
-	delete compressor;
 	// Testing shows this to be the entry point for a Kill signal.
 	// Start shutting down processes here. -dg
 	printf("\n\nBegin Deleting LRTRobot12\n");
@@ -45,7 +43,7 @@ LRTRobot12::~LRTRobot12()
 
 	//End background printing; Request print task to stop and die.
 	//Premature?  We could move this to ~LRTRobotBase()
-	AsyncPrinter::Quit();
+	//	AsyncPrinter::Quit();
 }
 
 void LRTRobot12::RobotInit()
@@ -99,10 +97,10 @@ void LRTRobot12::MainLoop()
 	prevState = gameState;
 
 	// limit rate of logging 
-	static uint8_t cycle_count = 0;
-	if (++cycle_count >= 5)
+	static uint8_t counter = 0;
+	if (++counter >= 5)
 	{
-		cycle_count = 0;
+		counter = 0;
 		Log::logAll();
 	}
 

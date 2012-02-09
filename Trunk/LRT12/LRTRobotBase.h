@@ -57,7 +57,7 @@ protected:
 
 private:
 	SEM_ID loopSemaphore;
-	Notifier loopSynchronizer;
+	Notifier * loopSynchronizer;
 	static void releaseLoop(void* param);
 };
 

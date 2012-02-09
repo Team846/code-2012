@@ -33,8 +33,6 @@ private:
 
 	Config *config;
 
-	Compressor *compressor;
-
 	DriverStation* ds;
 
 	GameState prevState;

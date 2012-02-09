@@ -5,7 +5,6 @@
 #define DISABLE_SETPOINT_CACHING 0
 
 GameState AsyncCANJaguar::m_game_state = DISABLED;
-//ProxiedCANJaguar::JaguarList ProxiedCANJaguar::jaguars = {0};
 AsyncCANJaguar::AsyncCANJaguar * AsyncCANJaguar::jaguar_list_ = NULL;
 
 void AsyncCANJaguar::println(const char * str)
@@ -16,34 +15,37 @@ void AsyncCANJaguar::println(const char * str)
 AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 			CANJaguar(channel),
 			Loggable(),
-			m_task_name("JAG#" + Util::ToString<int>(channel)),
-			m_print_ctor_dtor(m_task_name.c_str(), (m_task_name + "\n").c_str()),
-			m_channel(channel),
-			m_name(name),
-			m_setpoint(0.0),
-			m_should_disable_control(false),
-			m_should_disable_position_limits(false),
-			m_collection_flags(0),
-			m_last_game_state(DISABLED),
-			//    : controller(CANBusController::GetInstance())
-			//    , index(jaguars.num)
-			m_comm_task(m_task_name.c_str(),
-					(FUNCPTR) AsyncCANJaguar::CommTaskWrapper),
-			m_comm_semaphore(semBCreate(SEM_Q_PRIORITY, SEM_EMPTY)),
-			m_is_running(false), m_is_quitting(false)
+			m_print_ctor_dtor(m_task_name.c_str(), (m_task_name + "\n").c_str())
 {
-
+	m_task_name = "JAG#" + Util::ToString<int>(channel);
+	m_comm_task = new Task(m_task_name.c_str(),
+			(FUNCPTR) AsyncCANJaguar::CommTaskWrapper);
+	m_comm_semaphore = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
+	m_channel = channel;
+	m_setpoint.setValue(0.0);
+	m_should_disable_control = false;
+	m_should_disable_position_limits = false;
+	m_collection_flags = 0;
+	m_last_game_state = DISABLED;
+	m_is_running = false;
+	m_is_quitting = false;
 	next_jaguar_ = jaguar_list_;
 	jaguar_list_ = this;
 
-	if (m_name == NULL)
+	disableLog();
+
+	if (name == NULL)
 		m_name = "?";
-	m_comm_task.Start((UINT32) this);
+	else
+	{
+		m_name = (char*) malloc(strlen(name) * sizeof(char));
+		strcpy(m_name, name);
+	}
+	m_comm_task->Start((UINT32) this);
 
 	m_enable_control.disableCaching();
 
 	printf("Created Jaguar %2d: %s\n", channel, m_name);
-
 }
 
 AsyncCANJaguar::~AsyncCANJaguar()
@@ -54,6 +56,8 @@ AsyncCANJaguar::~AsyncCANJaguar()
 	// currently the main loop is killed in the dtor of LRTRobot11.
 	//   JaguarReader::GetInstance().StopTask(); //kill the jag reader that accesses this object.
 	StopBackgroundTask();
+	delete m_comm_task;
+	free((void*) m_name);
 	int error = semDelete(m_comm_semaphore);
 	if (error)
 		printf("SemDelete Error=%d\n", error);
@@ -62,8 +66,8 @@ void AsyncCANJaguar::StopBackgroundTask()
 {
 	if (m_is_running)
 	{
-		INT32 task_id = m_comm_task.GetID(); //for info only. no safety check.
-		m_comm_task.Stop();
+		INT32 task_id = m_comm_task->GetID(); //for info only. no safety check.
+		m_comm_task->Stop();
 		printf("Task 0x%x killed for CANid=%d:%s\n", task_id, m_channel, m_name);
 	}
 }
@@ -509,6 +513,7 @@ void AsyncCANJaguar::log()
 {
 	SmartDashboard *sdb = SmartDashboard::GetInstance();
 	std::string prefix(m_name);
+	std::string buf;
 	prefix += ": ";
 
 	std::string cv("None");
@@ -531,7 +536,8 @@ void AsyncCANJaguar::log()
 			out = "None";
 			break;
 		}
-		sdb->PutString(prefix + "Speed Reference", out);
+		buf = prefix + "Speed Reference";
+		sdb->PutString(buf, out);
 	}
 	if (m_collection_flags & POSREF)
 	{
@@ -549,17 +555,21 @@ void AsyncCANJaguar::log()
 			out = "None";
 			break;
 		}
-		sdb->PutString(prefix + "Position Reference", out);
+		buf = prefix + "Position Reference";
+		sdb->PutString(buf, out);
 	}
 	if (m_collection_flags & PID)
 	{
 		cv += "PID, ";
 		double temp = GetP();
-		sdb->PutDouble((prefix + "Proportional Gain").c_str(), temp);
+		buf = prefix + "Proportional Gain";
+		sdb->PutDouble(buf.c_str(), temp);
 		temp = GetI();
-		sdb->PutDouble((prefix + "Integral Gain").c_str(), temp);
+		buf = prefix + "Integral Gain";
+		sdb->PutDouble(buf.c_str(), temp);
 		temp = GetD();
-		sdb->PutDouble((prefix + "Derivative Gain").c_str(), temp);
+		buf = prefix + "Derivative Gain";
+		sdb->PutDouble(buf.c_str(), temp);
 	}
 	if (m_collection_flags & CTRLMODE)
 	{
@@ -583,54 +593,61 @@ void AsyncCANJaguar::log()
 			out = "Current";
 			break;
 		}
-		sdb->PutString(prefix + "Control Mode (read)", out);
+		buf = prefix + "Control Mode (read)";
+		sdb->PutString(buf, out);
 	}
 	if (m_collection_flags & BUSVOLT)
 	{
 		cv += "Bus Voltage, ";
 		double temp = GetBusVoltage();
-		sdb->PutDouble((prefix + "Bus Voltage").c_str(), temp);
+		buf = prefix + "Bus Voltage";
+		sdb->PutDouble(buf.c_str(), temp);
 	}
 	if (m_collection_flags & OUTVOLT)
 	{
 		cv += "Output Voltage, ";
 		double temp = GetOutputVoltage();
-		sdb->PutDouble((prefix + "Output Voltage").c_str(), temp);
+		buf = prefix + "Output Voltage";
+		sdb->PutDouble(buf.c_str(), temp);
 	}
 	if (m_collection_flags & OUTCURR)
 	{
 		cv += "Output Current, ";
 		double temp = GetOutputCurrent();
-		sdb->PutDouble((prefix + "Output Current").c_str(), temp);
+		buf = prefix + "Output Current";
+		sdb->PutDouble(buf.c_str(), temp);
 	}
 	if (m_collection_flags & TEMP)
 	{
 		cv += "Temperature, ";
 		double temp = GetTemperature();
-		sdb->PutDouble((prefix + "Temperature").c_str(), temp);
+		buf = prefix + "Temperature";
+		sdb->PutDouble(buf.c_str(), temp);
 	}
 	if (m_collection_flags & FWDLIMOK)
 	{
 		cv += "Forward Soft Limit OK, ";
-		sdb->PutBoolean((prefix + "Forward Limit OK").c_str(),
-				GetForwardLimitOK());
+		buf = prefix + "Forward Limit OK";
+		sdb->PutBoolean(buf.c_str(), GetForwardLimitOK());
 	}
 	if (m_collection_flags & REVLIMOK)
 	{
 		cv += "Reverse Soft Limit OK, ";
-		sdb->PutBoolean((prefix + "Reverse Limit OK").c_str(),
-				GetReverseLimitOK());
+		buf = prefix + "Reverse Limit OK";
+		sdb->PutBoolean(buf.c_str(), GetReverseLimitOK());
 	}
 	if (m_collection_flags & PWRCYCLE)
 	{
 		cv += "Power Cycled, ";
-		sdb->PutBoolean((prefix + "Power Cycled").c_str(), GetPowerCycled());
+		buf = prefix + "Power Cycled";
+		sdb->PutBoolean(buf.c_str(), GetPowerCycled());
 	}
 	if (m_collection_flags & EXPIRE)
 	{
 		cv += "Expiration";
 		double temp = GetExpiration();
-		sdb->PutDouble((prefix + "Expiration").c_str(), temp);
+		buf = prefix + "Expiration";
+		sdb->PutDouble(buf.c_str(), temp);
 	}
 
 	std::string out;
@@ -653,8 +670,11 @@ void AsyncCANJaguar::log()
 		break;
 	}
 
-	sdb->PutString(prefix + "Control Mode", out);
+	buf = prefix + "Control Mode";
+	sdb->PutString(buf, out);
 	double temp = (double) m_setpoint.peek();
-	sdb->PutDouble((prefix + "Setpoint").c_str(), temp);
-	sdb->PutString(prefix + "Enabled Collection Values", cv);
+	buf = prefix + "Setpoint";
+	sdb->PutDouble(buf.c_str(), temp);
+	buf = prefix + "Enabled Collection Values";
+	sdb->PutString(buf, cv);
 }

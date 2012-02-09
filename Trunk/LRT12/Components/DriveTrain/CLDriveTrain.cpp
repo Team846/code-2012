@@ -220,17 +220,17 @@ void ClosedLoopDrivetrain::setTurnControl(CONTROL_TYPE type)
 	default:
 	case CL_DISABLED:
 		m_turn_control = &m_turn_disabled;
-		AsyncPrinter::Printf("Disabled closed-loop turn\n");
+		//		AsyncPrinter::Printf("Disabled closed-loop turn\n");
 		break;
 	case CL_RATE:
 		m_turn_control = m_in_high_gear ? &m_rate_turn_high_gear_pid
 				: &m_rate_turn_low_gear_pid;
-		AsyncPrinter::Printf("Enabled closed-loop rate control on turn\n");
+		//		AsyncPrinter::Printf("Enabled closed-loop rate control on turn\n");
 		break;
 	case CL_POSITION:
 		m_turn_control = m_in_high_gear ? &m_pos_turn_high_gear_pid
 				: &m_pos_turn_low_gear_pid;
-		AsyncPrinter::Printf("Enabled closed-loop position control on turn\n");
+		//		AsyncPrinter::Printf("Enabled closed-loop position control on turn\n");
 		break;
 	}
 }

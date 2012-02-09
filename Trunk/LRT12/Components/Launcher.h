@@ -8,6 +8,8 @@
 #include "../Log/Loggable.h"
 #include "../ActionData/LauncherAction.h"
 #include "../Jaguar/AsyncCANJaguar.h"
+#include "../Util/PID.h"
+#include "Counter.h"
 
 /*!
  * This class controls the ball launcher
@@ -33,12 +35,9 @@ public:
 	virtual std::string GetName();
 	virtual void log();
 private:
-	ACTION::LAUNCHER::launcherState m_prevstate;
-	AsyncCANJaguar *m_top_roller, *m_bottom_roller;
+	PID m_pid;
+	AsyncCANJaguar *m_roller;
+	Counter *m_enc;
 	std::string m_name;
-	double m_pid_top[3], m_pid_bottom[3];
-	const static int PROPORTIONAL = 0;
-	const static int INTEGRAL = 1;
-	const static int DERIVATIVE = 2;
 };
 #endif

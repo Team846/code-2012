@@ -23,6 +23,11 @@ public:
 	Brain();
 
 	/*!
+	 * @brief Destructs the brain.
+	 */
+	~Brain();
+
+	/*!
 	 * @brief starts teleop task
 	 */
 	void startTeleop();
@@ -61,15 +66,15 @@ private:
 	 */
 	static int teleopTaskEntryPoint(uint32_t autonTaskPtr);
 
-	Task m_teleop_task;
-	Task m_auton_task;
+	Task* m_teleop_task;
+	Task* m_auton_task;
 	semaphore* actionSemaphore;
 
 	ActionData *actionData;
 
 	DriverStation *m_ds;
-	DebouncedJoystick m_driver_stick;
-	DebouncedJoystick m_operator_stick;
+	DebouncedJoystick * m_driver_stick;
+	DebouncedJoystick * m_operator_stick;
 
 	uint32_t missedPackets;
 	bool isTeleop;

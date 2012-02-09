@@ -28,7 +28,7 @@ public:
 	double GetRawAxisDelta(int axis);
 
 private:
-	int nBtns, nAxes;
+	int m_num_buttons, m_num_axes;
 	bool* wasPressed;
 	bool* isPressed;
 	double* axisPrevValue;

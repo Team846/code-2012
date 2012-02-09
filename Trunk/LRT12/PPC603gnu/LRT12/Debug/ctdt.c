@@ -23,8 +23,6 @@ void _GLOBAL__I__ZN12ConfigurableC2Ev();
 
 void _GLOBAL__I__ZN12LRTRobotBaseC2Ev();
 
-void _GLOBAL__I__ZN13DavidLauncherC2Ev();
-
 void _GLOBAL__I__ZN13DriveEncoders10m_instanceE();
 
 void _GLOBAL__I__ZN14AsyncCANJaguar12m_game_stateE();
@@ -94,7 +92,6 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN12ConfigLoaderC2Ev,
     _GLOBAL__I__ZN12ConfigurableC2Ev,
     _GLOBAL__I__ZN12LRTRobotBaseC2Ev,
-    _GLOBAL__I__ZN13DavidLauncherC2Ev,
     _GLOBAL__I__ZN13DriveEncoders10m_instanceE,
     _GLOBAL__I__ZN14AsyncCANJaguar12m_game_stateE,
     _GLOBAL__I__ZN16PneumaticShifterC2Ev,
@@ -142,8 +139,6 @@ void _GLOBAL__D__ZN12ConfigLoaderC2Ev();
 void _GLOBAL__D__ZN12ConfigurableC2Ev();
 
 void _GLOBAL__D__ZN12LRTRobotBaseC2Ev();
-
-void _GLOBAL__D__ZN13DavidLauncherC2Ev();
 
 void _GLOBAL__D__ZN13DriveEncoders10m_instanceE();
 
@@ -210,7 +205,6 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN12ConfigLoaderC2Ev,
     _GLOBAL__D__ZN12ConfigurableC2Ev,
     _GLOBAL__D__ZN12LRTRobotBaseC2Ev,
-    _GLOBAL__D__ZN13DavidLauncherC2Ev,
     _GLOBAL__D__ZN13DriveEncoders10m_instanceE,
     _GLOBAL__D__ZN14AsyncCANJaguar12m_game_stateE,
     _GLOBAL__D__ZN16PneumaticShifterC2Ev,

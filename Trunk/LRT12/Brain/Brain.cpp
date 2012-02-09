@@ -1,24 +1,39 @@
 #include "Brain.h"
 #include "../ActionData/DriveTrainAction.h"
 #include "../Config/DriverStationConfig.h"
+#include "../ActionData/ShifterAction.h"
+#include "../ActionData/ConfigAction.h"
 #include "Joystick.h"
 
-Brain::Brain() :
-			m_teleop_task("Teleop", (FUNCPTR) Brain::teleopTaskEntryPoint),
-			m_auton_task("Auton", (FUNCPTR) Brain::autonTaskEntryPoint),
-			m_driver_stick(1, DriverStationConfig::NUM_JOYSTICK_BUTTONS,
-					DriverStationConfig::NUM_JOYSTICK_AXES),
-			m_operator_stick(2, DriverStationConfig::NUM_JOYSTICK_BUTTONS,
-					DriverStationConfig::NUM_JOYSTICK_AXES)
+Brain::Brain()
 {
+	m_teleop_task = new Task("Teleop", (FUNCPTR) Brain::teleopTaskEntryPoint);
+	m_auton_task = new Task("Auton", (FUNCPTR) Brain::autonTaskEntryPoint);
+	m_driver_stick = new DebouncedJoystick(1,
+			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
+			DriverStationConfig::NUM_JOYSTICK_AXES);
+	m_operator_stick = new DebouncedJoystick(2,
+			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
+			DriverStationConfig::NUM_JOYSTICK_AXES);
+
 	m_ds = DriverStation::GetInstance();
 	missedPackets = 0;
 	isTeleop = false;
 
 	actionData = ActionData::GetInstance();
 
-	m_auton_task.Start((uint32_t) this);
-	m_teleop_task.Start((int32_t) this);
+	m_auton_task->Start((uint32_t) this);
+	m_teleop_task->Start((int32_t) this);
+}
+
+Brain::~Brain()
+{
+	m_auton_task->Stop();
+	m_teleop_task->Stop();
+	delete m_auton_task;
+	delete m_teleop_task;
+	delete m_driver_stick;
+	delete m_operator_stick;
 }
 
 void Brain::startAuton()
@@ -55,8 +70,8 @@ void Brain::teleopTask()
 			}
 		}
 
-		m_driver_stick.Update();
-		m_operator_stick.Update();
+		m_driver_stick->Update();
+		m_operator_stick->Update();
 
 		process();
 
@@ -93,9 +108,21 @@ void Brain::process()
 		actionData->drivetrain->rate.turn_control = false;
 		actionData->drivetrain->position.drive_control = false;
 		actionData->drivetrain->position.turn_control = false;
-		actionData->drivetrain->rate.desiredDriveRate = m_driver_stick.GetAxis(
-				Joystick::kYAxis);
-		actionData->drivetrain->rate.desiredTurnRate = m_driver_stick.GetAxis(
+		actionData->drivetrain->rate.desiredDriveRate
+				= -m_driver_stick->GetAxis(Joystick::kYAxis);
+		actionData->drivetrain->rate.desiredTurnRate = m_driver_stick->GetAxis(
 				Joystick::kZAxis);
+		if (m_driver_stick->IsButtonJustPressed(2))
+		{
+			actionData->config->save = true;
+		}
+		if (m_driver_stick->IsButtonJustPressed(3))
+		{
+			actionData->config->load = true;
+		}
+		if (m_driver_stick->IsButtonJustPressed(4))
+		{
+			actionData->config->apply = true;
+		}
 	}
 }

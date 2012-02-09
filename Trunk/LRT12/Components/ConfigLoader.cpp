@@ -4,8 +4,9 @@
 #include "..\ActionData\ConfigAction.h"
 
 ConfigLoader::ConfigLoader() :
-	Component(), m_config(Config::GetInstance())
+	Component()
 {
+	m_config = Config::GetInstance();
 }
 
 ConfigLoader::~ConfigLoader()
@@ -19,16 +20,19 @@ void ConfigLoader::Output()
 	{
 		AsyncPrinter::Printf("Loading Configuration\n");
 		m_config->Load();
+		action->config->load = false;
 	}
 	if (action->config->save)
 	{
 		AsyncPrinter::Printf("Saving Configuration\n");
 		m_config->Save();
+		action->config->save = false;
 	}
 	if (action->config->apply)
 	{
 		AsyncPrinter::Printf("Applying Configuration\n");
 		m_config->ConfigureAll();
+		action->config->apply = false;
 	}
 }
 

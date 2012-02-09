@@ -14,11 +14,17 @@ ESC::ESC(int channel, LRTEncoder *encoder, string name) :
 }
 
 ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
-	m_name(name + "A")
+	m_name(name)
 {
 	m_encoder = encoder;
-	m_jag1 = new AsyncCANJaguar(channelA, (name + "A").c_str());
-	m_jag2 = new AsyncCANJaguar(channelB, (name + "B").c_str());
+	std::string tempa, tempb;
+	tempa = name + "A";
+	tempb = name + "B";
+	m_jag1 = new AsyncCANJaguar(channelA, tempa.c_str());
+	m_jag2 = new AsyncCANJaguar(channelB, tempb.c_str());
+
+	m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+	m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 	m_cycle_count = 0;
 	printf("Constructed ESC: %s\n", name.c_str());
 }
@@ -131,6 +137,7 @@ void ESC::SetDutyCycle(float dutyCycle)
 	}
 
 	dutyCycle = Util::Clamp<float>(dutyCycle, -1.0, 1.0);
+
 	m_jag1->SetDutyCycle(dutyCycle);
 	m_jag2->SetDutyCycle(dutyCycle);
 }

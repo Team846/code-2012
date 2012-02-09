@@ -3,8 +3,10 @@
 #include "..\Util\AsyncPrinter.h"
 
 DebouncedJoystick::DebouncedJoystick(UINT32 port, int nBtns, int nAxes) :
-	Joystick(port), nBtns(nBtns), nAxes(nAxes)
+	Joystick(port)
 {
+	m_num_buttons = nBtns;
+	m_num_axes = nAxes;
 	// N.B. indexes are 1-based
 	wasPressed = new bool[nBtns + 1];
 	isPressed = new bool[nBtns + 1];
@@ -24,7 +26,7 @@ DebouncedJoystick::~DebouncedJoystick()
 
 bool DebouncedJoystick::ButtonInBounds(int button)
 {
-	if (button <= 0 || button > nBtns)
+	if (button <= 0 || button > m_num_buttons)
 	{
 		AsyncPrinter::Printf(
 				"[!]DebouncedJoystick: Button %d out of bounds!\n", button);
@@ -35,7 +37,7 @@ bool DebouncedJoystick::ButtonInBounds(int button)
 
 bool DebouncedJoystick::AxisInBounds(int axis)
 {
-	if (axis <= 0 || axis > nAxes)
+	if (axis <= 0 || axis > m_num_axes)
 	{
 		AsyncPrinter::Printf("[!]DebouncedJoystick: Axis %d out of bounds!\n",
 				axis);
@@ -46,25 +48,25 @@ bool DebouncedJoystick::AxisInBounds(int axis)
 
 void DebouncedJoystick::Init()
 {
-	for (int i = 1; i <= nBtns; ++i)
+	for (int i = 1; i <= m_num_buttons; ++i)
 	{
 		wasPressed[i] = isPressed[i] = false;
 	}
 
-	for (int i = 1; i <= nAxes; ++i)
+	for (int i = 1; i <= m_num_axes; ++i)
 	{
 		axisPrevValue[i] = axisValue[i] = 0;
 	}
 }
 void DebouncedJoystick::Update()
 {
-	for (int i = 1; i <= nBtns; ++i)
+	for (int i = 1; i <= m_num_buttons; ++i)
 	{
 		wasPressed[i] = isPressed[i];
 		isPressed[i] = GetRawButton(i);
 	}
 
-	for (int i = 1; i <= nAxes; ++i)
+	for (int i = 1; i <= m_num_axes; ++i)
 	{
 		axisPrevValue[i] = axisValue[i];
 		axisValue[i] = GetRawAxis(i);

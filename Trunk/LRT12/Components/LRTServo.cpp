@@ -3,12 +3,13 @@
 #include "../Util/Util.h"
 
 LRTServo::LRTServo(UINT32 channel, char* name) :
-	Servo(channel), enabled(true), previous_value_(999.0), //an out of range value
-			name_(name)
+	Servo(channel), name_(name)
 {
-	if (!name_)
+	enabled = true;
+	previous_value_ = 999.0; //an out of range value
+	if (!name)
 		name_ = "servo";
-	printf("Created %s on channel %d\n", name_, channel);
+	printf("Created %s on channel %d\n", name_.c_str(), channel);
 }
 
 LRTServo::~LRTServo()
@@ -36,7 +37,7 @@ void LRTServo::Set(double value)
 	if (enabled)
 	{
 		if (previous_value_ != value)
-			AsyncPrinter::Printf("%s set: %4f\n", name_,
+			AsyncPrinter::Printf("%s set: %4f\n", name_.c_str(),
 					previous_value_ = value);
 
 		Servo::Set(value);

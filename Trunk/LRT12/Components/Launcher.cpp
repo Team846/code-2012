@@ -3,71 +3,43 @@
 Launcher::Launcher() :
 	Component(), m_name("Launcher")
 {
-	m_top_roller = new AsyncCANJaguar(RobotConfig::CAN::ROLLER_TOP,
-			"Top Roller");
-	m_bottom_roller = new AsyncCANJaguar(RobotConfig::CAN::ROLLER_BOTTOM,
-			"Bottom Roller");
-	m_prevstate = ACTION::LAUNCHER::DISABLED;
+	m_roller = new AsyncCANJaguar(RobotConfig::CAN::ROLLER_TOP, "Roller");
+	m_enc = new Counter((UINT32) RobotConfig::DIGITAL_IO::HALL_EFFECT);
+
+	m_enc->Start();
+	m_enc->SetMaxPeriod(0.1); // consider stopped if slower than 10rpm
 	Configure();
 }
 
 Launcher::~Launcher()
 {
-	delete m_top_roller;
-	delete m_bottom_roller;
+	delete m_enc;
+	delete m_roller;
 }
 
 void Launcher::Configure()
 {
 	Config * c = Config::GetInstance();
-	m_pid_top[PROPORTIONAL] = c->Get<double> (m_name, "topRollerP", 1.0);
-	m_pid_top[INTEGRAL] = c->Get<double> (m_name, "topRollerI", 0.0);
-	m_pid_top[DERIVATIVE] = c->Get<double> (m_name, "topRollerD", 0.0);
+	double p = c->Get<double> (m_name, "rollerP", 1.0);
+	double i = c->Get<double> (m_name, "rollerI", 0.0);
+	double d = c->Get<double> (m_name, "rollerD", 0.0);
+	double ff = c->Get<double> (m_name, "rollerFF", 1.0);
 
-	m_pid_bottom[PROPORTIONAL] = c->Get<double> (m_name, "bottomRollerP", 1.0);
-	m_pid_bottom[INTEGRAL] = c->Get<double> (m_name, "bottomRollerI", 0.0);
-	m_pid_bottom[DERIVATIVE] = c->Get<double> (m_name, "bottomRollerD", 0.0);
+	m_pid.setParameters(p, i, d, ff);
 }
 
 void Launcher::Output()
 {
-	if (m_prevstate != action->launcher->state)
-	{
-		m_prevstate = action->launcher->state;
-		switch (action->launcher->state)
-		{
-		case ACTION::LAUNCHER::RUNNING:
-			m_top_roller->ChangeControlMode(AsyncCANJaguar::kSpeed);
-			m_top_roller->SetSpeedReference(AsyncCANJaguar::kSpeedRef_Encoder);
-			m_top_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
-			m_top_roller->SetPID(m_pid_top[PROPORTIONAL], m_pid_top[INTEGRAL],
-					m_pid_top[DERIVATIVE]);
-			m_bottom_roller->ChangeControlMode(AsyncCANJaguar::kSpeed);
-			m_bottom_roller->SetSpeedReference(
-					AsyncCANJaguar::kSpeedRef_Encoder);
-			m_bottom_roller->ConfigNeutralMode(
-					AsyncCANJaguar::kNeutralMode_Coast);
-			m_bottom_roller->SetPID(m_pid_bottom[PROPORTIONAL],
-					m_pid_bottom[INTEGRAL], m_pid_bottom[DERIVATIVE]);
-			break;
-		case ACTION::LAUNCHER::DISABLED:
-			m_top_roller->ChangeControlMode(AsyncCANJaguar::kPercentVbus);
-			m_top_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
-			m_bottom_roller->ChangeControlMode(AsyncCANJaguar::kPercentVbus);
-			m_bottom_roller->ConfigNeutralMode(
-					AsyncCANJaguar::kNeutralMode_Coast);
-
-		}
-	}
 	switch (action->launcher->state)
 	{
 	case ACTION::LAUNCHER::RUNNING:
-		m_top_roller->SetVelocity(action->launcher->topSpeed);
-		m_bottom_roller->SetVelocity(action->launcher->bottomSpeed);
+		double speed = (m_enc->GetStopped()) ? 0.0 : (1.0 / m_enc->GetPeriod());
+		m_pid.setInput(speed);
+		m_pid.update(1.0 / 50); // 50 Hz
+		m_roller->SetDutyCycle(m_pid.getOutput());
 		break;
 	case ACTION::LAUNCHER::DISABLED:
-		m_top_roller->SetDutyCycle(0.0);
-		m_bottom_roller->SetDutyCycle(0.0);
+		m_pid.reset();
 		break;
 	}
 }
