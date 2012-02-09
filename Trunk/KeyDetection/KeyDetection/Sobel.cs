@@ -45,12 +45,13 @@ namespace KeyDetection
                             new_y += gy[hw + 1, wi + 1] * c;
                         }
                     }
-                    if (new_x * new_x + new_y * new_y > 512 * 512)
+                    if (new_x * new_x + new_y * new_y > (Math.Pow(2, Globals.edgeThreshold)) * (Math.Pow(2, Globals.edgeThreshold)))
                         eBmp.SetPixel(j, i, new PixelData(0, 0, 0));
                     else
                         eBmp.SetPixel(j, i, new PixelData(255, 255, 255));
                 }
             }
+            //Remove edge pixels
             for (int j = 0; j < uBmp.Bitmap.Width; j++)
             {
                 eBmp.SetPixel(j, 0, new PixelData(255, 255, 255));

@@ -45,7 +45,7 @@ namespace KeyDetection
         /// </summary>
         /// <param name="uBmp">The input image, with Sobel's edge detection.</param>
         /// <returns>The distance, in inches, between the center of the camera and the key line.</returns>
-        public static float[] GetDistanceAndAngle(UnsafeBitmap uBmp, Line edge, float PPI_RATIO=-1)
+        public static float[] GetDistanceAndAngle(UnsafeBitmap uBmp, Line edge, float PPI_RATIO=0)
         {
             float[] toreturn = new float[2];
 
@@ -56,7 +56,7 @@ namespace KeyDetection
                 return toreturn; // INVALID_LINE
 
 
-            if (PPI_RATIO == -1)
+            if (PPI_RATIO == 0)
                 PPI_RATIO = Globals.PPI_RATIO;
 
             // y = mx + b
@@ -110,7 +110,7 @@ namespace KeyDetection
             return uBmp;
         }
 
-        public static UnsafeBitmap BlackWhite(UnsafeBitmap uBmp, double satThreshold = Globals.satThreshold)
+        public static UnsafeBitmap BlackWhite(UnsafeBitmap uBmp)
         {
             int rgb;
             PixelData pData;
@@ -121,7 +121,7 @@ namespace KeyDetection
                 {
                     pData = uBmp.GetPixel(x, y);
 
-                    if (Color.FromArgb(pData.red, pData.blue, pData.green).GetSaturation() > satThreshold)
+                    if (Color.FromArgb(pData.red, pData.blue, pData.green).GetSaturation() > Globals.satThreshold)
                     {
                         rgb = 255;
                     }

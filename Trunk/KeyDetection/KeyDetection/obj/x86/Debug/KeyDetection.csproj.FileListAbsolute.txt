@@ -17,3 +17,7 @@ C:\Users\Tony\Documents\Visual Studio 2010\Projects\KeyDetection\KeyDetection\ob
 C:\Users\Tony\Documents\Visual Studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.exe
 C:\Users\Tony\Documents\Visual Studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.pdb
 C:\Users\Tony\Documents\Visual Studio 2010\Projects\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.Options.resources
+C:\Users\derek\Documents\frc12\Trunk\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.Options.resources
+C:\Users\derek\Documents\frc12\Trunk\KeyDetection\KeyDetection\obj\x86\Debug\KeyDetection.Viewer.resources
+C:\Users\derek\Documents\frc12\Trunk\KeyDetection\KeyDetection\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\derek\Documents\frc12\Trunk\KeyDetection\KeyDetection\obj\x86\Debug\GenerateResource.write.1.tlog

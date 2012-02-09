@@ -12,6 +12,14 @@ namespace KeyDetection
 {
     public partial class Viewer : Form
     {
+        public static System.Diagnostics.Stopwatch sw;
+        public static object lastLocation;
+        public static Thread thread;
+        public static Bitmap original;
+        public static Bitmap thresholded;
+        public static Bitmap edged;
+        public static Bitmap processed;
+
         public Viewer()
         {
             InitializeComponent();
@@ -28,8 +36,15 @@ namespace KeyDetection
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                Thread thread = new Thread(processImage);
+                thread = new Thread(processImage);
                 thread.Start(ofd.FileName);
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((Action)(() => setButton(false)));
+                    return;
+                }
+
+                setButton(false);
             }
         }
 
@@ -39,12 +54,27 @@ namespace KeyDetection
 
             try
             {
-                System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                panel1.BeginInvoke(
+                    new Action(() =>
+                        pic_Original.Image = null));
+                panel2.BeginInvoke(
+                    new Action(() =>
+                        pic_Thresholded.Image = null));
+                panel3.BeginInvoke(
+                    new Action(() =>
+                        pic_Edged.Image = null));
+                panel4.BeginInvoke(
+                    new Action(() =>
+                        pic_Processed.Image = null));
+                lastLocation = bLocation;
+
+                sw = new System.Diagnostics.Stopwatch();
 
                 sw.Start();
 
                 string bitmapLocation = (string)bLocation;
                 Bitmap frameImage = new Bitmap(bitmapLocation);
+                original = frameImage;
 
                 panel1.BeginInvoke(
                     new Action(() =>
@@ -66,17 +96,40 @@ namespace KeyDetection
                 UnsafeBitmap unsafeFrame = new UnsafeBitmap(frameImage);
 
                 unsafeFrame.LockBitmap();
-                unsafeFrame = BitmapUtil.BlackWhite(unsafeFrame);
+                if (Globals.threshold)
+                {
+                    unsafeFrame = BitmapUtil.BlackWhite(unsafeFrame);
+                }
                 status_Progress.BeginInvoke(
                     new Action(() =>
                         status_Progress.Value = 25));
-                //unsafeFrame = Grayscale(unsafeFrame);
+                //unsafeFrame = BitmapUtil.Grayscale(unsafeFrame);
+                unsafeFrame.UnlockBitmap();
+                thresholded = new Bitmap(unsafeFrame.Bitmap);
+                if (!Globals.threshold)
+                {
+                    UnsafeBitmap grayscale = unsafeFrame;
+                    grayscale.LockBitmap();
+                    grayscale = BitmapUtil.Grayscale(unsafeFrame);
+                    grayscale.UnlockBitmap();
+                    thresholded = new Bitmap(grayscale.Bitmap);
+                }
+                unsafeFrame.LockBitmap();
+                panel2.BeginInvoke(
+                    new Action(() =>
+                        pic_Thresholded.Image = (Image)thresholded.Clone()));
                 UnsafeBitmap sobel = Sobel.DoSobel(unsafeFrame);
                 status_Progress.BeginInvoke(
                     new Action(() =>
                         status_Progress.Value = 50));
                 unsafeFrame.UnlockBitmap();
                 unsafeFrame.Dispose();
+
+                edged = new Bitmap(sobel.Bitmap);
+                panel3.BeginInvoke(
+                    new Action(() =>
+                        pic_Edged.Image = (Image)edged.Clone()));
+
                 sobel.LockBitmap();
                 BitmapUtil.Line edge = HoughTransform.DoTransform(sobel);
                 status_Progress.BeginInvoke(
@@ -88,7 +141,7 @@ namespace KeyDetection
                         status_Progress.Value = 100));
                 sobel.UnlockBitmap();
 
-                Bitmap processed = new Bitmap(sobel.Bitmap);
+                processed = new Bitmap(sobel.Bitmap);
 
                 sobel.Dispose();
 
@@ -116,7 +169,7 @@ namespace KeyDetection
 
                 Console.WriteLine(dist_str);
 
-                panel2.BeginInvoke(
+                panel4.BeginInvoke(
                     new Action(() =>
                         pic_Processed.Image = (Image)processed.Clone()));
 
@@ -139,12 +192,70 @@ namespace KeyDetection
             }
             catch
             {
-                Console.WriteLine("[processImage()] Exception encountered...aborting...");
+                Console.WriteLine("No edges detected or no straight lines found.");
+                Bitmap blank = new Bitmap((String)bLocation);
+                panel3.BeginInvoke(
+                    new Action(() =>
+                        pic_Edged.Image = new Bitmap(blank.Width, blank.Height)));
+                label1.BeginInvoke(
+                    new Action(() =>
+                        label1.Text = "Last Operation completed in " + sw.ElapsedMilliseconds + "ms.")
+
+                    );
+                label1.BeginInvoke(
+                    new Action(() =>
+                        label1.Left = this.Width - label1.Width - 16)
+                    );
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((Action)(() => setButton(true)));
+                    return;
+                }
+
+                setButton(true);
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((Action)(() => setSave(false)));
+                    return;
+                }
+
+                setButton(false);
                 Thread.CurrentThread.Abort();
             }
+            if (this.InvokeRequired)
+            {
+                this.Invoke((Action)(() => setButton(true)));
+                return;
+            }
+
+            setButton(true);
+
+            if (this.InvokeRequired)
+            {
+                this.Invoke((Action)(() => setSave(true)));
+                return;
+            }
+
+            setButton(true);
 
             Console.WriteLine("[processImage()] Finished.  Aborting...");
             Thread.CurrentThread.Abort();
+        }
+
+        public void restart()
+        {
+            if (lastLocation != null)
+            {
+                thread = new Thread(processImage);
+                thread.Start(lastLocation);
+                if (this.InvokeRequired)
+                {
+                    this.Invoke((Action)(() => setButton(false)));
+                    return;
+                }
+
+                setButton(false);
+            }
         }
 
         private void pic_Processed_Click(object sender, EventArgs e)
@@ -160,6 +271,77 @@ namespace KeyDetection
         private void menu_Options_Click(object sender, EventArgs e)
         {
             new Options().Show();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            restart();
+        }
+
+        private void setButton(Boolean enabled)
+        {
+            this.button1.Enabled = enabled;
+        }
+
+        private void setSave(Boolean enabled)
+        {
+            this.saveImageToolStripMenuItem.Enabled = enabled;
+        }
+
+        private void saveOriginalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = "Save to...";
+
+            ofd.Multiselect = false;
+
+            ofd.Filter = "Image Files (*.png, *.jpg, *.jpeg, *.bmp)|*.png;*.jpg;*.jpeg;*.bmp";
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+            }
+        }
+
+        private void saveThresholdedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = "Save to...";
+
+            ofd.Multiselect = false;
+
+            ofd.Filter = "Image Files (*.png, *.jpg, *.jpeg, *.bmp)|*.png;*.jpg;*.jpeg;*.bmp";
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+            }
+        }
+
+        private void saveEdgedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = "Save to...";
+
+            ofd.Multiselect = false;
+
+            ofd.Filter = "Image Files (*.png, *.jpg, *.jpeg, *.bmp)|*.png;*.jpg;*.jpeg;*.bmp";
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+            }
+        }
+
+        private void saveProcessedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = "Save to...";
+
+            ofd.Multiselect = false;
+
+            ofd.Filter = "Image Files (*.png, *.jpg, *.jpeg, *.bmp)|*.png;*.jpg;*.jpeg;*.bmp";
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+            }
         }
     }
 }
