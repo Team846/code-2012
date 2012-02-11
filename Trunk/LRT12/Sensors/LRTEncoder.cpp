@@ -25,8 +25,7 @@ double LRTEncoder::GetRate()
 	// WPILib's GetRate() returns NaN if the rate is 0
 	// Karthik Viswanathan and Brian Axelrod, January 29th, 2011
 	double rate = Encoder::GetRate();
-	//	if (rate != rate) // test if rate is NaN because NaN != NaN
-	if (Encoder::GetStopped())
+	if (Encoder::GetStopped() || rate != rate) // test if rate is NaN because NaN != NaN cuz WPILib is evil D:
 		return 0.0;
 	return rate;
 }

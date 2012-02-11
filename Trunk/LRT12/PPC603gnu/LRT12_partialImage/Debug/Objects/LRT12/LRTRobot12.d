@@ -338,6 +338,7 @@ LRT12_partialImage/Debug/Objects/LRT12/LRTRobot12.o:  \
   C:/WindRiver/workspace/LRT12/Config/../Util/Profiler.h \
   c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/c++/3.4.4/fstream \
   C:/WindRiver/vxworks-6.3/target/h/sys/stat.h \
+  C:/WindRiver/workspace/LRT12/Config/RobotConfig.h \
   C:/WindRiver/workspace/LRT12/Log/Log.h \
   C:/WindRiver/vxworks-6.3/target/h/wdLib.h \
   C:/WindRiver/vxworks-6.3/target/h/sysLib.h \
@@ -348,6 +349,7 @@ LRT12_partialImage/Debug/Objects/LRT12/LRTRobot12.o:  \
   C:/WindRiver/vxworks-6.3/target/h/types/vxTypesOld.h \
   C:/WindRiver/vxworks-6.3/target/h/sioLibCommon.h \
   C:/WindRiver/vxworks-6.3/target/h/drv/timer/timerDev.h \
+  C:/WindRiver/vxworks-6.3/target/h/WPILib/Compressor.h \
   C:/WindRiver/workspace/LRT12/Util/AsyncPrinter.h \
   C:/WindRiver/workspace/LRT12/Util/PrintInConstructor.h \
   C:/WindRiver/workspace/LRT12/Jaguar/AsyncCANJaguar.h \
@@ -1036,6 +1038,8 @@ c:/windriver/gnu/3.4.4-vxworks-6.3/x86-win32/lib/gcc/../../../x86-win32/include/
 
 C:/WindRiver/vxworks-6.3/target/h/sys/stat.h:
 
+C:/WindRiver/workspace/LRT12/Config/RobotConfig.h:
+
 C:/WindRiver/workspace/LRT12/Log/Log.h:
 
 C:/WindRiver/vxworks-6.3/target/h/wdLib.h:
@@ -1055,6 +1059,8 @@ C:/WindRiver/vxworks-6.3/target/h/types/vxTypesOld.h:
 C:/WindRiver/vxworks-6.3/target/h/sioLibCommon.h:
 
 C:/WindRiver/vxworks-6.3/target/h/drv/timer/timerDev.h:
+
+C:/WindRiver/vxworks-6.3/target/h/WPILib/Compressor.h:
 
 C:/WindRiver/workspace/LRT12/Util/AsyncPrinter.h:
 

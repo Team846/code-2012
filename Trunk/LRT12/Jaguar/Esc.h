@@ -59,8 +59,6 @@ private:
 	string m_name;
 	int m_cycle_count;
 
-	float m_max_encoder_rate;
-
 	std::pair<float, float> CalculateBrakeAndDutyCycle(float target_speed,
 			float current_speed);
 };

@@ -22,7 +22,7 @@ ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
 	tempb = name + "B";
 	m_jag1 = new AsyncCANJaguar(channelA, tempa.c_str());
 	m_jag2 = new AsyncCANJaguar(channelB, tempb.c_str());
-
+	
 	m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 	m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 	m_cycle_count = 0;
@@ -92,7 +92,7 @@ void ESC::SetDutyCycle(float dutyCycle)
 #ifdef USE_DASHBOARD
 	//    SmartDashboard::Log(speed, name.c_str());
 #endif
-	double speed = m_encoder->GetRate() / m_max_encoder_rate;
+	double speed = m_encoder->GetRate() / DriveEncoders::GetInstance().getMaxEncoderRate();
 	std::pair<float, float> command = CalculateBrakeAndDutyCycle(dutyCycle,
 			speed);
 

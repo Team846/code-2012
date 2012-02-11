@@ -28,7 +28,7 @@ private:
 	std::string m_configsection;
 
 	LRTEncoder m_encoder_left;
-	LRTEncoder m_useless_encoder;
+//	LRTEncoder m_useless_encoder;
 	LRTEncoder m_encoder_right;
 
 	bool m_is_in_high_gear;
@@ -54,10 +54,11 @@ public:
 	const double WHEEL_DIAMETER; // in
 
 	// extrapolate max low gear speed
-	const double LOW_GEAR_MULTIPLIER;
+	const double HIGH_GEAR_MULTIPLIER;
 
 	const static double PI = 3.14159;
 
+	double getMaxEncoderRate();
 	/*!
 	 * @brief sets the current gear ratio
 	 * @param isHighGear
