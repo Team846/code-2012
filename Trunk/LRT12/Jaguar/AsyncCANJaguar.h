@@ -94,7 +94,7 @@ private:
 	int m_index;
 	Task * m_comm_task;
 
-	semaphore* m_comm_semaphore;
+	SEM_ID m_comm_semaphore;
 	bool m_is_running; //implementation in progress - controlled termination of task -dg
 	bool m_is_quitting; // ditto
 
@@ -416,7 +416,7 @@ public:
 	 * @brief Synchronizes the Jaguar with the cRIO status
 	 */
 	void CommTask();
-	
+
 	/*!
 	 * @brief Does the actual CommTask communication, not including timing
 	 */
