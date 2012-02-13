@@ -5,7 +5,7 @@
 ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	m_encoders(DriveEncoders::GetInstance()), m_config(Config::GetInstance()),
 			m_brake_left(false), m_brake_right(false),
-			m_drive_control_type(CL_RATE), m_turn_control_type(CL_RATE),
+			m_fwd_control_type(CL_RATE), m_turn_control_type(CL_RATE),
 			m_in_high_gear(true)
 {
 	Configure();
@@ -13,9 +13,9 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	m_drive_disabled.disablePID();
 	m_turn_disabled.disablePID();
 
-	setDriveControl(m_drive_control_type);
+	setDriveControl(m_fwd_control_type);
 	setTurnControl(m_turn_control_type);
-
+	
 	printf("Constructed CLRateTrain\n");
 }
 
@@ -78,7 +78,7 @@ void ClosedLoopDrivetrain::Configure()
 	double drive_pos_i_low = m_config->Get<double> (configSection,
 			"drivePosLowI", 0.0);
 	double drive_pos_d_low = m_config->Get<double> (configSection,
-			"drivePosLowD", 0.0);
+			"dri	vePosLowD", 0.0);
 
 	m_pos_drive_low_gear_pid.setParameters(drive_pos_p_low, drive_pos_i_low,
 			drive_pos_d_low, 1.0, FWD_DECAY, true);
@@ -128,55 +128,65 @@ ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::Drive(double rawTurn,
 
 ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::getOutput()
 {
-	return Drive(m_drive_control->getOutput(), m_turn_control->getOutput());
+	return Drive(output[FWD], output[TURN]);
 }
 
 void ClosedLoopDrivetrain::update()
 {
-	if (m_drive_control_type == CL_POSITION)
+	switch (m_fwd_control_type)
 	{
-		m_drive_control->setInput(m_encoders.getRobotDist());
+	case CL_POSITION:
+		m_pos_control[FWD]->setInput(m_encoders.getRobotDist());
+		m_pos_control[FWD]->update(1.0/50.0);
+		m_rate_control[FWD]->setSetpoint(m_pos_control[FWD]->getOutput());
+		if (m_pos_control[FWD]->getError() < 0.5 
+				&& m_pos_control[FWD]->getAccumulatedError() < 5.02-2)
+		{
+			m_fwd_op_complete = true;
+		}
+	case CL_RATE:
+		m_rate_control[FWD]->setInput(Util::Clamp<double>(
+				m_encoders.getNormalizedForwardMotorSpeed(), -1.0, 1.0));
+		m_rate_control[FWD]->update(1.0/50);
+		output[FWD] = m_rate_control[FWD]->getOutput();
+		break;
+	case CL_DISABLED:
+		m_fwd_op_complete = true;
+		break;
 	}
-	else
-	{
-		m_drive_control->setInput(
-				Util::Clamp<double>(
-						m_encoders.getNormalizedForwardMotorSpeed(), -1.0, 1.0));
-		m_drive_op_complete = true; // this flag doesn't mean much here
-	}
-	m_drive_control->update(1.0 / 50); // 50 Hz assumed update rate
 
-	// this only means something for position control.
-	if (m_drive_control->getError() < 0.5
-			&& m_drive_control->getAccumulatedError() < 5.0e-2)
-	{
-		m_drive_op_complete = true;
-	}
+	if (m_fwd_control_type != CL_POSITION)
+		m_fwd_op_complete = true; // this flag doesn't mean much here
 
-	if (m_turn_control_type == CL_POSITION)
+	switch (m_turn_control_type)
 	{
-		m_turn_control->setInput(fmod(m_encoders.getTurnAngle(), 360.0));
-	}
-	else
-	{
-		m_turn_control->setInput(
+	case CL_POSITION:
+		m_pos_control[TURN]->setInput(fmod(m_encoders.getTurnAngle(), 360.0));
+		m_pos_control[TURN]->update(1.0/50.0);
+		m_rate_control[TURN]->setSetpoint(m_pos_control[TURN]->getOutput());
+		if (m_pos_control[TURN]->getError() < 0.5 
+				&& m_pos_control[TURN]->getAccumulatedError() < 5.02-2)
+		{
+			m_turn_op_complete = true;
+		}
+	case CL_RATE:
+		m_rate_control[TURN]->setInput(
 				Util::Clamp<double>(
 						m_encoders.getNormalizedTurningMotorSpeed(), -1.0, 1.0));
+		m_rate_control[TURN]->update(1.0/50);
+		output[TURN] = m_rate_control[TURN]->getOutput();
+		break;
+	case CL_DISABLED:
+		m_fwd_op_complete = true;
+		break;
+	}
+	if (m_turn_control_type != CL_POSITION)
 		m_turn_op_complete = true; // this flag doesn't mean much here
-	}
-	m_turn_control->update(1.0 / 50); // 50 Hz assumed update rate
-
-	// this only means something for position control.
-	if (m_turn_control->getError() < 0.5
-			&& m_turn_control->getAccumulatedError() < 5.0e-2)
-	{
-		m_turn_op_complete = true;
-	}
 }
 
 void ClosedLoopDrivetrain::setDriveControl(CONTROL_TYPE type)
 {
-	if (m_drive_control_type != type)
+	if (m_fwd_control_type != type)
 	{
 		m_rate_drive_high_gear_pid.reset();
 		m_rate_drive_low_gear_pid.reset();
@@ -184,23 +194,13 @@ void ClosedLoopDrivetrain::setDriveControl(CONTROL_TYPE type)
 		m_pos_drive_low_gear_pid.reset();
 	}
 
-	m_drive_control_type = type;
+	m_fwd_control_type = type;
 
-	switch (m_drive_control_type)
-	{
-	default:
-	case CL_DISABLED:
-		m_drive_control = &m_drive_disabled;
-		break;
-	case CL_RATE:
-		m_drive_control = m_in_high_gear ? &m_rate_drive_high_gear_pid
-				: &m_rate_drive_low_gear_pid;
-		break;
-	case CL_POSITION:
-		m_drive_control = m_in_high_gear ? &m_pos_drive_high_gear_pid
-				: &m_pos_drive_low_gear_pid;
-		break;
-	}
+	m_rate_control[FWD] = m_in_high_gear ? &m_rate_drive_high_gear_pid
+			: &m_rate_drive_low_gear_pid;
+	
+	m_pos_control[FWD] = m_in_high_gear ? &m_pos_drive_high_gear_pid
+			: &m_pos_drive_low_gear_pid;
 }
 
 void ClosedLoopDrivetrain::setTurnControl(CONTROL_TYPE type)
@@ -215,24 +215,10 @@ void ClosedLoopDrivetrain::setTurnControl(CONTROL_TYPE type)
 
 	m_turn_control_type = type;
 
-	switch (m_turn_control_type)
-	{
-	default:
-	case CL_DISABLED:
-		m_turn_control = &m_turn_disabled;
-		//		AsyncPrinter::Printf("Disabled closed-loop turn\n");
-		break;
-	case CL_RATE:
-		m_turn_control = m_in_high_gear ? &m_rate_turn_high_gear_pid
-				: &m_rate_turn_low_gear_pid;
-		//		AsyncPrinter::Printf("Enabled closed-loop rate control on turn\n");
-		break;
-	case CL_POSITION:
-		m_turn_control = m_in_high_gear ? &m_pos_turn_high_gear_pid
-				: &m_pos_turn_low_gear_pid;
-		//		AsyncPrinter::Printf("Enabled closed-loop position control on turn\n");
-		break;
-	}
+	m_rate_control[TURN] = m_in_high_gear ? &m_rate_turn_high_gear_pid
+			: &m_rate_turn_low_gear_pid;
+	m_pos_control[TURN] = m_in_high_gear ? &m_pos_turn_high_gear_pid
+			: &m_pos_turn_low_gear_pid;
 }
 
 void ClosedLoopDrivetrain::setHighGear(bool isHighGear)
@@ -240,7 +226,7 @@ void ClosedLoopDrivetrain::setHighGear(bool isHighGear)
 	if (m_in_high_gear != isHighGear)
 	{
 		m_in_high_gear = isHighGear;
-		setDriveControl(m_drive_control_type);
+		setDriveControl(m_fwd_control_type);
 		setTurnControl(m_turn_control_type);
 		reset();
 	}
@@ -254,58 +240,55 @@ bool ClosedLoopDrivetrain::getHighGear()
 void ClosedLoopDrivetrain::setRelativeDrivePosition(double pos)
 {
 	setDriveControl(CL_POSITION);
-	m_drive_control->setSetpoint(pos + m_encoders.getRobotDist());
-	m_drive_op_complete = false;
+	m_pos_control[FWD]->setSetpoint(pos + m_encoders.getRobotDist());
+	m_fwd_op_complete = false;
 }
 
 void ClosedLoopDrivetrain::setDriveRate(double rate)
 {
 	setDriveControl(CL_RATE);
-	m_drive_control->setSetpoint(rate);
-	m_drive_op_complete = false;
+	m_rate_control[FWD]->setSetpoint(rate);
+	m_fwd_op_complete = false;
 }
 
 double ClosedLoopDrivetrain::getDriveSetpoint()
 {
-	return m_drive_control->getSetpoint();
+	return m_rate_control[FWD]->getSetpoint();
 }
 
 void ClosedLoopDrivetrain::setRawDriveDutyCycle(double duty)
 {
 	setDriveControl(CL_DISABLED);
-	m_drive_control->setSetpoint(duty);
-	m_drive_op_complete = false;
+	output[FWD] = duty;
 }
 
 void ClosedLoopDrivetrain::setRelativeTurnPosition(double pos)
 {
 	setTurnControl(CL_POSITION);
-	m_turn_control->setSetpoint(pos + m_encoders.getTurnAngle());
+	m_pos_control[TURN]->setSetpoint(pos + m_encoders.getTurnAngle());
 	m_turn_op_complete = false;
 }
 
 void ClosedLoopDrivetrain::setTurnRate(double rate)
 {
 	setTurnControl(CL_RATE);
-	m_turn_control->setSetpoint(rate);
-	m_turn_op_complete = false;
+	m_rate_control[TURN]->setSetpoint(rate);
 }
 
 double ClosedLoopDrivetrain::getTurnSetpoint()
 {
-	return m_turn_control->getSetpoint();
+	return m_pos_control[TURN]->getSetpoint();
 }
 
 void ClosedLoopDrivetrain::setRawTurnDutyCycle(double duty)
 {
 	setTurnControl(CL_DISABLED);
-	m_turn_control->setSetpoint(duty);
-	m_turn_op_complete = false;
+	output[TURN] = duty;
 }
 
 bool ClosedLoopDrivetrain::driveOperationComplete()
 {
-	return m_drive_op_complete;
+	return m_fwd_op_complete;
 }
 
 bool ClosedLoopDrivetrain::turnOperationComplete()
@@ -315,7 +298,7 @@ bool ClosedLoopDrivetrain::turnOperationComplete()
 
 ClosedLoopDrivetrain::CONTROL_TYPE ClosedLoopDrivetrain::getDriveMode()
 {
-	return m_drive_control_type;
+	return m_fwd_control_type;
 }
 
 ClosedLoopDrivetrain::CONTROL_TYPE ClosedLoopDrivetrain::getTurnMode()
@@ -352,14 +335,14 @@ void ClosedLoopDrivetrain::log()
 		drivemode = "Position";
 		break;
 	}
-	sdb->PutString("Drive mode", drivemode);
-	sdb->PutDouble("Active Drive P Gain",
-			m_drive_control->getProportionalGain());
-	sdb->PutDouble("Active Drive I Gain", m_drive_control->getIntegralGain());
-	sdb->PutDouble("Active Drive D Gain", m_drive_control->getDerivativeGain());
-	sdb->PutDouble("Active Drive Error", m_drive_control->getError());
-	sdb->PutDouble("Active Drive Accumulated Error",
-			m_drive_control->getAccumulatedError());
+//	sdb->PutString("Drive mode", drivemode);
+//	sdb->PutDouble("Active Drive P Gain",
+//			m_drive_control->getProportionalGain());
+//	sdb->PutDouble("Active Drive I Gain", m_drive_control->getIntegralGain());
+//	sdb->PutDouble("Active Drive D Gain", m_drive_control->getDerivativeGain());
+//	sdb->PutDouble("Active Drive Error", m_drive_control->getError());
+//	sdb->PutDouble("Active Drive Accumulated Error",
+//			m_drive_control->getAccumulatedError());
 
 	std::string turnmode;
 	switch (getTurnMode())
@@ -374,11 +357,11 @@ void ClosedLoopDrivetrain::log()
 		turnmode = "Position";
 		break;
 	}
-	sdb->PutString("Turn mode", turnmode);
-	sdb->PutDouble("Active Turn P Gain", m_turn_control->getProportionalGain());
-	sdb->PutDouble("Active Turn I Gain", m_turn_control->getIntegralGain());
-	sdb->PutDouble("Active Turn D Gain", m_turn_control->getDerivativeGain());
-	sdb->PutDouble("Active Turn Error", m_turn_control->getError());
-	sdb->PutDouble("Active Turn Accumulated Error",
-			m_turn_control->getAccumulatedError());
+//	sdb->PutString("Turn mode", turnmode);
+//	sdb->PutDouble("Active Turn P Gain", m_turn_control->getProportionalGain());
+//	sdb->PutDouble("Active Turn I Gain", m_turn_control->getIntegralGain());
+//	sdb->PutDouble("Active Turn D Gain", m_turn_control->getDerivativeGain());
+//	sdb->PutDouble("Active Turn Error", m_turn_control->getError());
+//	sdb->PutDouble("Active Turn Accumulated Error",
+//			m_turn_control->getAccumulatedError());
 }

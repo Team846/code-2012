@@ -40,7 +40,7 @@ void Drivetrain::Output()
 
 	//	m_encoders.setHighGear(isHighGear); // set by shifter
 	m_drive_control.setHighGear(isHighGear);
-	
+
 	// only try new operation if previous one is complete, else discard
 	if (m_drive_control.driveOperationComplete()
 			|| action->drivetrain->overrideOperationChecks)

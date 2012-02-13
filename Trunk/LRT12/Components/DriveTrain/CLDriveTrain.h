@@ -177,15 +177,17 @@ private:
 	PID m_pos_turn_low_gear_pid;
 	PID m_turn_disabled;
 
-	PID * m_turn_control;
-	PID * m_drive_control;
+	const static int TURN = 0, FWD = 1;
+	PID* m_pos_control[2];
+	PID* m_rate_control[2];
+	double output[2];
 
 	bool m_brake_left;
 	bool m_brake_right;
 
-	CONTROL_TYPE m_drive_control_type;
+	CONTROL_TYPE m_fwd_control_type;
 	CONTROL_TYPE m_turn_control_type;
-	bool m_drive_op_complete;
+	bool m_fwd_op_complete;
 	bool m_turn_op_complete;
 
 	bool m_in_high_gear;
