@@ -15,7 +15,7 @@ public:
 	 * @param initialValue the initial cached value
 	 * @param cacheCycles the number of cycles before automatic refresh
 	 */
-	CachedValue(T initialValue, int cacheCycles = 25);
+	CachedValue(T initialValue, int cacheCycles = 12);
 
 	/*!
 	 * @brief Constructs a new cached value object
@@ -68,6 +68,12 @@ public:
 	bool hasNewValue();
 
 	/*!
+	 * Flag for existance of value
+	 * @return whether or not the cached value has set
+	 */
+	bool hasValue();
+
+	/*!
 	 * Flag for whether or not caching is enabled
 	 * @return whether or not caching is enabled
 	 */
@@ -96,7 +102,7 @@ CachedValue<T>::CachedValue(T initialValue, int cacheCycles)
 template<class T>
 CachedValue<T>::CachedValue()
 {
-	enableCaching(25);
+	enableCaching(12);
 	m_has_new_value = false;
 	m_has_been_set = false;
 }
@@ -167,6 +173,12 @@ template<class T>
 bool CachedValue<T>::hasNewValue()
 {
 	return m_has_been_set && (m_has_new_value || !m_is_caching);
+}
+
+template<class T>
+bool CachedValue<T>::hasValue()
+{
+	return m_has_been_set;
 }
 
 template<class T>

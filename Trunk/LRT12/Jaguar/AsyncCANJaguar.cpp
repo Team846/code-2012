@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "sysLib.h"
 #include "../LRTRobotBase.h"
 #include "../Jaguar/AsyncCANJaguar.h"
 
@@ -44,6 +45,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	m_comm_task->Start((UINT32) this);
 
 	m_enable_control.disableCaching();
+//	m_setpoint.disableCaching();
 
 	printf("Created Jaguar %2d: %s\n", channel, m_name);
 }
@@ -89,6 +91,11 @@ void AsyncCANJaguar::CommTask()
 {
 	while (!m_is_quitting)
 	{
+		static int e = 0;
+		if (e++%100== 0)
+		{
+//			AsyncPrinter::Printf("LOOP\n");
+		}
 		semTake(m_comm_semaphore, WAIT_FOREVER);
 		if (m_is_quitting)
 			break;
@@ -208,8 +215,10 @@ void AsyncCANJaguar::CommTask()
 			CANJaguar::ConfigNeutralMode(m_neutral_mode.getValue());
 		}
 
+//		AsyncPrinter::Printf("O");
 		if (m_setpoint.hasNewValue())
 		{
+//			AsyncPrinter::Printf("Set %.4f\n", m_setpoint.getValue());
 			CANJaguar::Set(m_setpoint.getValue());
 		}
 
@@ -352,6 +361,7 @@ void AsyncCANJaguar::CommTask()
 
 		m_last_game_state = m_game_state;
 		//        AsynchronousPrinter::Printf("%d\n", channel);
+		taskDelay(sysClkRateGet()/200); //fixes erratic CAN problems, we can't run the loop as fast as we can. 
 	}
 }
 

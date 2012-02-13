@@ -53,6 +53,7 @@ public:
 	void ResetCache();
 private:
 	AsyncCANJaguar *m_jag1, *m_jag2;
+//	CANJaguar *m_jag1, *m_jag2;
 
 	LRTEncoder* m_encoder;
 

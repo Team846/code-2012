@@ -16,7 +16,6 @@ DriveEncoders::DriveEncoders() :
 			m_encoder_left("Left Drive Encoder",
 					RobotConfig::DIGITAL_IO::ENCODER_LEFT_A,
 					RobotConfig::DIGITAL_IO::ENCODER_LEFT_B),
-//			m_useless_encoder("Useless Encoder", 3, 6),
 			m_encoder_right("Right Drive Encoder",
 					RobotConfig::DIGITAL_IO::ENCODER_RIGHT_A,
 					RobotConfig::DIGITAL_IO::ENCODER_RIGHT_B),

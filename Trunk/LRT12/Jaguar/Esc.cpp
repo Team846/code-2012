@@ -88,7 +88,6 @@ std::pair<float, float> ESC::CalculateBrakeAndDutyCycle(float desired_speed,
 
 void ESC::SetDutyCycle(float dutyCycle)
 {
-
 #ifdef USE_DASHBOARD
 	//    SmartDashboard::Log(speed, name.c_str());
 #endif
@@ -138,8 +137,13 @@ void ESC::SetDutyCycle(float dutyCycle)
 
 	dutyCycle = Util::Clamp<float>(dutyCycle, -1.0, 1.0);
 
-	m_jag1->SetDutyCycle(dutyCycle);
-	m_jag2->SetDutyCycle(dutyCycle);
+	static int e = 0;
+	if ((e++)%21 == 0)
+		AsyncPrinter::Printf("In: %.4f out %.4f speed %.4f\n", dutyCycle, command.first, speed);
+	m_jag1->SetDutyCycle(command.first);
+	m_jag2->SetDutyCycle(command.first);
+//	m_jag1->Set(command.first);
+//	m_jag2->Set(command.first);
 }
 
 void ESC::ResetCache()

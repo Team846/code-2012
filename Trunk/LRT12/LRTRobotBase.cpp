@@ -24,7 +24,7 @@ LRTRobotBase::~LRTRobotBase()
 	loopSynchronizer->Stop();
 	delete loopSynchronizer;
 	for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j = j->next_jaguar_)
-	{
+	{	
 		j->StopBackgroundTask();
 	}
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
