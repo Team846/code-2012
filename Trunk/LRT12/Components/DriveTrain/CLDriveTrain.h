@@ -64,7 +64,7 @@ public:
 	 * @brief Gets the current drive mode
 	 * @return current drive mode
 	 */
-	CONTROL_TYPE getDriveMode();
+	CONTROL_TYPE getFwdMode();
 
 	/*!
 	 * @brief Gets the current turn mode
