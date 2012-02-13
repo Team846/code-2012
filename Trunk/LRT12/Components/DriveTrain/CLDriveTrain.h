@@ -64,7 +64,7 @@ public:
 	 * @brief Gets the current drive mode
 	 * @return current drive mode
 	 */
-	CONTROL_TYPE getFwdMode();
+	CONTROL_TYPE getTranslateMode();
 
 	/*!
 	 * @brief Gets the current turn mode
@@ -76,25 +76,25 @@ public:
 	 * @brief Set drive position relative to current
 	 * @param pos relative position
 	 */
-	void setRelativeDrivePosition(double pos);
+	void setRelativeTranslatePosition(double pos);
 
 	/*!
 	 * Gets current drive setpoint
 	 * @return
 	 */
-	double getDriveSetpoint();
+	double getTranslateSetpoint();
 
 	/*!
 	 * @brief Set drive rate
 	 * @param rate speed
 	 */
-	void setDriveRate(double rate);
+	void setTranslateRate(double rate);
 
 	/*!
 	 * @brief Sets raw drive duty cycle
 	 * @param duty
 	 */
-	void setRawDriveDutyCycle(double duty);
+	void setTranslateDriveDutyCycle(double duty);
 
 	/*!
 	 * @brief Set turn position relative to current
@@ -136,7 +136,7 @@ public:
 	 * @brief Sets type of control for translational motion
 	 * @param type control type
 	 */
-	void setDriveControl(CONTROL_TYPE type);
+	void setTranslateControl(CONTROL_TYPE type);
 
 	/*!
 	 * @brief Sets type of control for rotational motion
@@ -177,7 +177,7 @@ private:
 	PID m_pos_turn_low_gear_pid;
 	PID m_turn_disabled;
 
-	const static int TURN = 0, FWD = 1;
+	const static int TURN = 0, TRANSLATE = 1;
 	PID* m_pos_control[2];
 	PID* m_rate_control[2];
 	double output[2];

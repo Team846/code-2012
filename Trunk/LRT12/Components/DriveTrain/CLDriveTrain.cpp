@@ -13,7 +13,7 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	m_drive_disabled.disablePID();
 	m_turn_disabled.disablePID();
 
-	setDriveControl(m_fwd_control_type);
+	setTranslateControl(m_fwd_control_type);
 	setTurnControl(m_turn_control_type);
 	
 	printf("Constructed CLRateTrain\n");
@@ -128,7 +128,7 @@ ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::Drive(double rawTurn,
 
 ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::getOutput()
 {
-	return Drive(output[FWD], output[TURN]);
+	return Drive(output[TRANSLATE], output[TURN]);
 }
 
 void ClosedLoopDrivetrain::update()
@@ -136,19 +136,19 @@ void ClosedLoopDrivetrain::update()
 	switch (m_fwd_control_type)
 	{
 	case CL_POSITION:
-		m_pos_control[FWD]->setInput(m_encoders.getRobotDist());
-		m_pos_control[FWD]->update(1.0/50.0);
-		m_rate_control[FWD]->setSetpoint(m_pos_control[FWD]->getOutput());
-		if (m_pos_control[FWD]->getError() < 0.5 
-				&& m_pos_control[FWD]->getAccumulatedError() < 5.02-2)
+		m_pos_control[TRANSLATE]->setInput(m_encoders.getRobotDist());
+		m_pos_control[TRANSLATE]->update(1.0/50.0);
+		m_rate_control[TRANSLATE]->setSetpoint(m_pos_control[TRANSLATE]->getOutput());
+		if (m_pos_control[TRANSLATE]->getError() < 0.5 
+				&& m_pos_control[TRANSLATE]->getAccumulatedError() < 5.02-2)
 		{
 			m_fwd_op_complete = true;
 		}
 	case CL_RATE:
-		m_rate_control[FWD]->setInput(Util::Clamp<double>(
+		m_rate_control[TRANSLATE]->setInput(Util::Clamp<double>(
 				m_encoders.getNormalizedForwardMotorSpeed(), -1.0, 1.0));
-		m_rate_control[FWD]->update(1.0/50);
-		output[FWD] = m_rate_control[FWD]->getOutput();
+		m_rate_control[TRANSLATE]->update(1.0/50);
+		output[TRANSLATE] = m_rate_control[TRANSLATE]->getOutput();
 		break;
 	case CL_DISABLED:
 		m_fwd_op_complete = true;
@@ -184,7 +184,7 @@ void ClosedLoopDrivetrain::update()
 		m_turn_op_complete = true; // this flag doesn't mean much here
 }
 
-void ClosedLoopDrivetrain::setDriveControl(CONTROL_TYPE type)
+void ClosedLoopDrivetrain::setTranslateControl(CONTROL_TYPE type)
 {
 	if (m_fwd_control_type != type)
 	{
@@ -196,10 +196,10 @@ void ClosedLoopDrivetrain::setDriveControl(CONTROL_TYPE type)
 
 	m_fwd_control_type = type;
 
-	m_rate_control[FWD] = m_in_high_gear ? &m_rate_drive_high_gear_pid
+	m_rate_control[TRANSLATE] = m_in_high_gear ? &m_rate_drive_high_gear_pid
 			: &m_rate_drive_low_gear_pid;
 	
-	m_pos_control[FWD] = m_in_high_gear ? &m_pos_drive_high_gear_pid
+	m_pos_control[TRANSLATE] = m_in_high_gear ? &m_pos_drive_high_gear_pid
 			: &m_pos_drive_low_gear_pid;
 }
 
@@ -226,7 +226,7 @@ void ClosedLoopDrivetrain::setHighGear(bool isHighGear)
 	if (m_in_high_gear != isHighGear)
 	{
 		m_in_high_gear = isHighGear;
-		setDriveControl(m_fwd_control_type);
+		setTranslateControl(m_fwd_control_type);
 		setTurnControl(m_turn_control_type);
 		reset();
 	}
@@ -237,29 +237,29 @@ bool ClosedLoopDrivetrain::getHighGear()
 	return m_in_high_gear;
 }
 
-void ClosedLoopDrivetrain::setRelativeDrivePosition(double pos)
+void ClosedLoopDrivetrain::setRelativeTranslatePosition(double pos)
 {
-	setDriveControl(CL_POSITION);
-	m_pos_control[FWD]->setSetpoint(pos + m_encoders.getRobotDist());
+	setTranslateControl(CL_POSITION);
+	m_pos_control[TRANSLATE]->setSetpoint(pos + m_encoders.getRobotDist());
 	m_fwd_op_complete = false;
 }
 
-void ClosedLoopDrivetrain::setDriveRate(double rate)
+void ClosedLoopDrivetrain::setTranslateRate(double rate)
 {
-	setDriveControl(CL_RATE);
-	m_rate_control[FWD]->setSetpoint(rate);
+	setTranslateControl(CL_RATE);
+	m_rate_control[TRANSLATE]->setSetpoint(rate);
 	m_fwd_op_complete = false;
 }
 
-double ClosedLoopDrivetrain::getDriveSetpoint()
+double ClosedLoopDrivetrain::getTranslateSetpoint()
 {
-	return m_rate_control[FWD]->getSetpoint();
+	return m_rate_control[TRANSLATE]->getSetpoint();
 }
 
-void ClosedLoopDrivetrain::setRawDriveDutyCycle(double duty)
+void ClosedLoopDrivetrain::setTranslateDriveDutyCycle(double duty)
 {
-	setDriveControl(CL_DISABLED);
-	output[FWD] = duty;
+	setTranslateControl(CL_DISABLED);
+	output[TRANSLATE] = duty;
 }
 
 void ClosedLoopDrivetrain::setRelativeTurnPosition(double pos)
@@ -296,7 +296,7 @@ bool ClosedLoopDrivetrain::turnOperationComplete()
 	return m_turn_op_complete;
 }
 
-ClosedLoopDrivetrain::CONTROL_TYPE ClosedLoopDrivetrain::getFwdMode()
+ClosedLoopDrivetrain::CONTROL_TYPE ClosedLoopDrivetrain::getTranslateMode()
 {
 	return m_fwd_control_type;
 }
@@ -323,7 +323,7 @@ void ClosedLoopDrivetrain::log()
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 
 	std::string drivemode;
-	switch (getFwdMode())
+	switch (getTranslateMode())
 	{
 	case ClosedLoopDrivetrain::CL_DISABLED:
 		drivemode = "Open Loop";
@@ -338,12 +338,12 @@ void ClosedLoopDrivetrain::log()
 	sdb->PutString("Drive mode", drivemode);
 
 	sdb->PutDouble("FWD Pos Drive P Gain",
-			m_pos_control[FWD]->getProportionalGain());
-	sdb->PutDouble("FWD Pos Drive I Gain", m_pos_control[FWD]->getIntegralGain());
-	sdb->PutDouble("FWD Pos Drive D Gain", m_pos_control[FWD]->getDerivativeGain());
-	sdb->PutDouble("FWD Pos Drive Error", m_pos_control[FWD]->getError());
+			m_pos_control[TRANSLATE]->getProportionalGain());
+	sdb->PutDouble("FWD Pos Drive I Gain", m_pos_control[TRANSLATE]->getIntegralGain());
+	sdb->PutDouble("FWD Pos Drive D Gain", m_pos_control[TRANSLATE]->getDerivativeGain());
+	sdb->PutDouble("FWD Pos Drive Error", m_pos_control[TRANSLATE]->getError());
 	sdb->PutDouble("FWD Pos Drive Accumulated Error",
-			m_pos_control[FWD]->getAccumulatedError());
+			m_pos_control[TRANSLATE]->getAccumulatedError());
 
 	sdb->PutDouble("TURN Pos Drive P Gain",
 			m_pos_control[TURN]->getProportionalGain());
@@ -369,12 +369,12 @@ void ClosedLoopDrivetrain::log()
 	}
 	sdb->PutString("Turn mode", turnmode);
 	sdb->PutDouble("FWD rate Drive P Gain",
-			m_rate_control[FWD]->getProportionalGain());
-	sdb->PutDouble("FWD rate Drive I Gain", m_rate_control[FWD]->getIntegralGain());
-	sdb->PutDouble("FWD rate Drive D Gain", m_rate_control[FWD]->getDerivativeGain());
-	sdb->PutDouble("FWD rate Drive Error", m_rate_control[FWD]->getError());
+			m_rate_control[TRANSLATE]->getProportionalGain());
+	sdb->PutDouble("FWD rate Drive I Gain", m_rate_control[TRANSLATE]->getIntegralGain());
+	sdb->PutDouble("FWD rate Drive D Gain", m_rate_control[TRANSLATE]->getDerivativeGain());
+	sdb->PutDouble("FWD rate Drive Error", m_rate_control[TRANSLATE]->getError());
 	sdb->PutDouble("FWD rate Drive Accumulated Error",
-			m_rate_control[FWD]->getAccumulatedError());
+			m_rate_control[TRANSLATE]->getAccumulatedError());
 
 	sdb->PutDouble("TURN rate Drive P Gain",
 			m_rate_control[TURN]->getProportionalGain());

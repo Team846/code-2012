@@ -47,14 +47,14 @@ void Drivetrain::Output()
 	{
 		if (action->drivetrain->rate.drive_control)
 		{
-			m_drive_control.setDriveControl(ClosedLoopDrivetrain::CL_RATE);
-			m_drive_control.setDriveRate(
+			m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_RATE);
+			m_drive_control.setTranslateRate(
 					action->drivetrain->rate.desiredDriveRate);
 		}
 		else if (action->drivetrain->position.drive_control)
 		{
-			m_drive_control.setDriveControl(ClosedLoopDrivetrain::CL_POSITION);
-			m_drive_control.setRelativeDrivePosition(
+			m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_POSITION);
+			m_drive_control.setRelativeTranslatePosition(
 					action->drivetrain->position.desiredRelativeDrivePosition);
 			// command has been set, so now zero the relative pos
 			// this serves as a crude one-command queue
@@ -62,8 +62,8 @@ void Drivetrain::Output()
 		}
 		else
 		{
-			m_drive_control.setDriveControl(ClosedLoopDrivetrain::CL_DISABLED);
-			m_drive_control.setRawDriveDutyCycle(
+			m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_DISABLED);
+			m_drive_control.setTranslateDriveDutyCycle(
 					action->drivetrain->rate.desiredDriveRate);
 		}
 		action->drivetrain->setDriveOperation = true;
