@@ -58,7 +58,9 @@ protected:
 private:
 	SEM_ID loopSemaphore;
 	Notifier * loopSynchronizer;
+	Notifier * jagUpdater;
 	static void releaseLoop(void* param);
+	static void updateJaguars(void* param);
 };
 
 #endif

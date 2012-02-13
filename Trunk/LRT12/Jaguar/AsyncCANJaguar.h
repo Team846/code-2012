@@ -416,6 +416,11 @@ public:
 	 * @brief Synchronizes the Jaguar with the cRIO status
 	 */
 	void CommTask();
+	
+	/*!
+	 * @brief Does the actual CommTask communication, not including timing
+	 */
+	void update();
 
 	/*!
 	 * @brief Initializes communications

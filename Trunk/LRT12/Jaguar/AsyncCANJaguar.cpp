@@ -42,10 +42,13 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 		m_name = (char*) malloc(strlen(name) * sizeof(char));
 		strcpy(m_name, name);
 	}
+
+	m_comm_task->SetPriority(Task::kDefaultPriority - 2);
+
 	m_comm_task->Start((UINT32) this);
 
 	m_enable_control.disableCaching();
-//	m_setpoint.disableCaching();
+	//	m_setpoint.disableCaching();
 
 	printf("Created Jaguar %2d: %s\n", channel, m_name);
 }
@@ -92,277 +95,279 @@ void AsyncCANJaguar::CommTask()
 	while (!m_is_quitting)
 	{
 		static int e = 0;
-		if (e++%100== 0)
+		if (e++ % 100 == 0)
 		{
-//			AsyncPrinter::Printf("LOOP\n");
+			//			AsyncPrinter::Printf("LOOP\n");
 		}
 		semTake(m_comm_semaphore, WAIT_FOREVER);
 		if (m_is_quitting)
 			break;
+		update();
+		//        AsynchronousPrinter::Printf("%d\n", channel);
+		//		taskDelay(sysClkRateGet() / 200); //fixes erratic CAN problems, we can't run the loop as fast as we can. 
+	}
+}
 
-		// set data
-		// if game state has changed, uncache all cached values
-		if (m_last_game_state != m_game_state)
-		{
-			ResetCache();
-			// TODO: FINISH UP HERE, reset appropriate flags
-		}
+void AsyncCANJaguar::update()
+{
+	// set data
+	// if game state has changed, uncache all cached values
+	if (m_last_game_state != m_game_state)
+	{
+		ResetCache();
+		// TODO: FINISH UP HERE, reset appropriate flags
+	}
 
-		// check what we can still cache
-		// modes and setpoints should be automatically refreshed
-		m_neutral_mode.incrementCounter();
-		// m_control_mode.incrementCounter(); do not resend control mode periodically
-		m_setpoint.incrementCounter();
+	// check what we can still cache
+	// modes and setpoints should be automatically refreshed
+	m_neutral_mode.incrementCounter();
+	// m_control_mode.incrementCounter(); do not resend control mode periodically
+	m_setpoint.incrementCounter();
 
-		// if any of the modes or setpoints have changed
-		// resend all of them
-		if (m_neutral_mode.hasNewValue() || m_control_mode.hasNewValue()
-				|| m_setpoint.hasNewValue())
-		{
-			m_neutral_mode.uncache();
-			m_control_mode.uncache();
-			m_setpoint.uncache();
-		}
+	// if any of the modes or setpoints have changed
+	// resend all of them
+	if (m_neutral_mode.hasNewValue() || m_control_mode.hasNewValue()
+			|| m_setpoint.hasNewValue())
+	{
+		m_neutral_mode.uncache();
+		m_control_mode.uncache();
+		m_setpoint.uncache();
+	}
 
 #if DISABLE_SETPOINT_CACHING
-		ResetCache();
+	ResetCache();
 #endif
 
-		if (m_control_mode.hasNewValue())
-		{
-			ResetCache();
-			CANJaguar::ChangeControlMode(m_control_mode.getValue());
-			// note that m_control_mode should be uncached as of this point
-		}
-
-		if (m_position_reference.hasNewValue())
-		{
-			CANJaguar::SetPositionReference(m_position_reference.getValue());
-		}
-
-		if (m_speed_reference.hasNewValue())
-		{
-			CANJaguar::SetSpeedReference(m_speed_reference.getValue());
-		}
-
-		if (m_pid_p.hasNewValue() || m_pid_i.hasNewValue()
-				|| m_pid_d.hasNewValue())
-		{
-			CANJaguar::SetPID(m_pid_p.getValue(), m_pid_i.getValue(),
-					m_pid_d.getValue());
-		}
-
-		if (m_voltage_ramp_rate.hasNewValue())
-		{
-			CANJaguar::SetVoltageRampRate(m_voltage_ramp_rate.getValue());
-		}
-
-		if (m_max_output_voltage.hasNewValue())
-		{
-			CANJaguar::ConfigMaxOutputVoltage(m_max_output_voltage.getValue());
-		}
-
-		if (m_fault_time.hasNewValue())
-		{
-			CANJaguar::ConfigFaultTime(m_fault_time.getValue());
-		}
-
-		if (m_expiration.hasNewValue())
-		{
-			CANJaguar::SetExpiration(m_expiration.getValue());
-		}
-
-		if (m_encoder_codes_per_rev.hasNewValue())
-		{
-			CANJaguar::ConfigEncoderCodesPerRev(
-					m_encoder_codes_per_rev.getValue());
-		}
-
-		if (m_potentiometer_turns.hasNewValue())
-		{
-			CANJaguar::ConfigPotentiometerTurns(
-					m_potentiometer_turns.getValue());
-		}
-
-		if (m_should_disable_position_limits)
-		{
-			CANJaguar::DisableSoftPositionLimits();
-			m_should_disable_position_limits = false;
-		}
-
-		if (m_forward_limit_position.hasNewValue()
-				|| m_reverse_limit_position.hasNewValue())
-		{
-			CANJaguar::ConfigSoftPositionLimits(
-					m_forward_limit_position.getValue(),
-					m_reverse_limit_position.getValue());
-		}
-
-		if (m_enable_control.hasNewValue())
-		{
-			CANJaguar::EnableControl(m_enable_control.getValue());
-		}
-
-		if (m_should_disable_control)
-		{
-			CANJaguar::DisableControl();
-			m_should_disable_control = false;
-		}
-
-		//change the mode, then do the set point.
-		if (m_neutral_mode.hasNewValue())
-		{
-			CANJaguar::ConfigNeutralMode(m_neutral_mode.getValue());
-		}
-
-//		AsyncPrinter::Printf("O");
-		if (m_setpoint.hasNewValue())
-		{
-//			AsyncPrinter::Printf("Set %.4f\n", m_setpoint.getValue());
-			CANJaguar::Set(m_setpoint.getValue());
-		}
-
-		// collect data	
-		if (m_collection_flags & OUTVOLT)
-		{
-			float v = CANJaguar::GetOutputVoltage();
-			if (StatusOK())
-				m_output_voltage = v;
-			else
-				println("Invalid output voltage; not storing\n");
-		}
-
-		if (m_collection_flags & OUTCURR)
-		{
-			float current = CANJaguar::GetOutputCurrent();
-			if (StatusOK())
-				m_output_current = current;
-			else
-				println("Invalid current; not storing\n");
-		}
-
-		if (m_collection_flags & POS)
-		{
-			float pos = CANJaguar::GetPosition();
-			if (StatusOK())
-				m_position = pos;
-			else
-				println("Invalid position value; not storing\n");
-		}
-
-		if (m_collection_flags & PID)
-		{
-			float p = CANJaguar::GetP();
-			if (StatusOK())
-				m_p = p;
-			else
-				println("Invalid proportional gain; not storing\n");
-			float i = CANJaguar::GetI();
-			if (StatusOK())
-				m_i = i;
-			else
-				println("Invalid integral gain; not storing\n");
-			float d = CANJaguar::GetD();
-			if (StatusOK())
-				m_d = d;
-			else
-				println("Invalid derivative gain; not storing\n");
-		}
-
-		if (m_collection_flags & SPEEDREF)
-		{
-			SpeedReference s = CANJaguar::GetSpeedReference();
-			if (StatusOK())
-				m_speed_ref = s;
-			else
-				println("Invalid speed reference; not storing\n");
-		}
-
-		if (m_collection_flags & POSREF)
-		{
-			PositionReference p = CANJaguar::GetPositionReference();
-			if (StatusOK())
-				m_position_ref = p;
-			else
-				println("Invalid position reference; not storing");
-		}
-
-		if (m_collection_flags & CTRLMODE)
-		{
-			ControlMode c = CANJaguar::GetControlMode();
-			if (StatusOK())
-				m_ctrl_mode = c;
-			else
-				println("Invalid control mode; not storing\n");
-		}
-
-		if (m_collection_flags & BUSVOLT)
-		{
-			float v = CANJaguar::GetBusVoltage();
-			if (StatusOK())
-				m_bus_voltage = v;
-			else
-				println("Invalid bus voltage; not storing\n");
-		}
-
-		if (m_collection_flags & TEMP)
-		{
-			float t = CANJaguar::GetTemperature();
-			if (StatusOK())
-				m_temperature = t;
-			else
-				println("Invalid temperature; not storing\n");
-		}
-
-		if (m_collection_flags & SPEED)
-		{
-			float s = CANJaguar::GetSpeed();
-			if (StatusOK())
-				m_speed = s;
-			else
-				println("Invalid speed; not storing\n");
-		}
-
-		if (m_collection_flags & FWDLIMOK)
-		{
-			bool b = CANJaguar::GetForwardLimitOK();
-			if (StatusOK())
-				m_fwd_limit_ok = b;
-			else
-				println("Invalid forward limit status, not storing\n");
-		}
-
-		if (m_collection_flags & REVLIMOK)
-		{
-			bool b = CANJaguar::GetReverseLimitOK();
-			if (StatusOK())
-				m_rev_limit_ok = b;
-			else
-				println("Invalid reverse limit status, not storing\n");
-		}
-
-		if (m_collection_flags & PWRCYCLE)
-		{
-			bool b = CANJaguar::GetPowerCycled();
-			if (StatusOK())
-				m_pwr_cyc = b;
-			else
-				println("Invalid power cycle status, not storing\n");
-		}
-
-		if (m_collection_flags & EXPIRE)
-		{
-			float e = CANJaguar::GetExpiration();
-			if (StatusOK())
-				m_expire = e;
-			else
-				println("Invalid expiration time, not storing\n");
-		}
-
-		m_last_game_state = m_game_state;
-		//        AsynchronousPrinter::Printf("%d\n", channel);
-		taskDelay(sysClkRateGet()/200); //fixes erratic CAN problems, we can't run the loop as fast as we can. 
+	if (m_control_mode.hasNewValue())
+	{
+		ResetCache();
+		CANJaguar::ChangeControlMode(m_control_mode.getValue());
+		// note that m_control_mode should be uncached as of this point
 	}
+
+	if (m_position_reference.hasNewValue())
+	{
+		CANJaguar::SetPositionReference(m_position_reference.getValue());
+	}
+
+	if (m_speed_reference.hasNewValue())
+	{
+		CANJaguar::SetSpeedReference(m_speed_reference.getValue());
+	}
+
+	if (m_pid_p.hasNewValue() || m_pid_i.hasNewValue() || m_pid_d.hasNewValue())
+	{
+		CANJaguar::SetPID(m_pid_p.getValue(), m_pid_i.getValue(),
+				m_pid_d.getValue());
+	}
+
+	if (m_voltage_ramp_rate.hasNewValue())
+	{
+		CANJaguar::SetVoltageRampRate(m_voltage_ramp_rate.getValue());
+	}
+
+	if (m_max_output_voltage.hasNewValue())
+	{
+		CANJaguar::ConfigMaxOutputVoltage(m_max_output_voltage.getValue());
+	}
+
+	if (m_fault_time.hasNewValue())
+	{
+		CANJaguar::ConfigFaultTime(m_fault_time.getValue());
+	}
+
+	if (m_expiration.hasNewValue())
+	{
+		CANJaguar::SetExpiration(m_expiration.getValue());
+	}
+
+	if (m_encoder_codes_per_rev.hasNewValue())
+	{
+		CANJaguar::ConfigEncoderCodesPerRev(m_encoder_codes_per_rev.getValue());
+	}
+
+	if (m_potentiometer_turns.hasNewValue())
+	{
+		CANJaguar::ConfigPotentiometerTurns(m_potentiometer_turns.getValue());
+	}
+
+	if (m_should_disable_position_limits)
+	{
+		CANJaguar::DisableSoftPositionLimits();
+		m_should_disable_position_limits = false;
+	}
+
+	if (m_forward_limit_position.hasNewValue()
+			|| m_reverse_limit_position.hasNewValue())
+	{
+		CANJaguar::ConfigSoftPositionLimits(
+				m_forward_limit_position.getValue(),
+				m_reverse_limit_position.getValue());
+	}
+
+	if (m_enable_control.hasNewValue())
+	{
+		CANJaguar::EnableControl(m_enable_control.getValue());
+	}
+
+	if (m_should_disable_control)
+	{
+		CANJaguar::DisableControl();
+		m_should_disable_control = false;
+	}
+
+	//change the mode, then do the set point.
+	if (m_neutral_mode.hasNewValue())
+	{
+		CANJaguar::ConfigNeutralMode(m_neutral_mode.getValue());
+	}
+
+	//		AsyncPrinter::Printf("O");
+	if (m_setpoint.hasNewValue())
+	{
+		//			AsyncPrinter::Printf("Set %.4f\n", m_setpoint.getValue());
+		CANJaguar::Set(m_setpoint.getValue());
+	}
+
+	// collect data	
+	if (m_collection_flags & OUTVOLT)
+	{
+		float v = CANJaguar::GetOutputVoltage();
+		if (StatusOK())
+			m_output_voltage = v;
+		else
+			println("Invalid output voltage; not storing\n");
+	}
+
+	if (m_collection_flags & OUTCURR)
+	{
+		float current = CANJaguar::GetOutputCurrent();
+		if (StatusOK())
+			m_output_current = current;
+		else
+			println("Invalid current; not storing\n");
+	}
+
+	if (m_collection_flags & POS)
+	{
+		float pos = CANJaguar::GetPosition();
+		if (StatusOK())
+			m_position = pos;
+		else
+			println("Invalid position value; not storing\n");
+	}
+
+	if (m_collection_flags & PID)
+	{
+		float p = CANJaguar::GetP();
+		if (StatusOK())
+			m_p = p;
+		else
+			println("Invalid proportional gain; not storing\n");
+		float i = CANJaguar::GetI();
+		if (StatusOK())
+			m_i = i;
+		else
+			println("Invalid integral gain; not storing\n");
+		float d = CANJaguar::GetD();
+		if (StatusOK())
+			m_d = d;
+		else
+			println("Invalid derivative gain; not storing\n");
+	}
+
+	if (m_collection_flags & SPEEDREF)
+	{
+		SpeedReference s = CANJaguar::GetSpeedReference();
+		if (StatusOK())
+			m_speed_ref = s;
+		else
+			println("Invalid speed reference; not storing\n");
+	}
+
+	if (m_collection_flags & POSREF)
+	{
+		PositionReference p = CANJaguar::GetPositionReference();
+		if (StatusOK())
+			m_position_ref = p;
+		else
+			println("Invalid position reference; not storing");
+	}
+
+	if (m_collection_flags & CTRLMODE)
+	{
+		ControlMode c = CANJaguar::GetControlMode();
+		if (StatusOK())
+			m_ctrl_mode = c;
+		else
+			println("Invalid control mode; not storing\n");
+	}
+
+	if (m_collection_flags & BUSVOLT)
+	{
+		float v = CANJaguar::GetBusVoltage();
+		if (StatusOK())
+			m_bus_voltage = v;
+		else
+			println("Invalid bus voltage; not storing\n");
+	}
+
+	if (m_collection_flags & TEMP)
+	{
+		float t = CANJaguar::GetTemperature();
+		if (StatusOK())
+			m_temperature = t;
+		else
+			println("Invalid temperature; not storing\n");
+	}
+
+	if (m_collection_flags & SPEED)
+	{
+		float s = CANJaguar::GetSpeed();
+		if (StatusOK())
+			m_speed = s;
+		else
+			println("Invalid speed; not storing\n");
+	}
+
+	if (m_collection_flags & FWDLIMOK)
+	{
+		bool b = CANJaguar::GetForwardLimitOK();
+		if (StatusOK())
+			m_fwd_limit_ok = b;
+		else
+			println("Invalid forward limit status, not storing\n");
+	}
+
+	if (m_collection_flags & REVLIMOK)
+	{
+		bool b = CANJaguar::GetReverseLimitOK();
+		if (StatusOK())
+			m_rev_limit_ok = b;
+		else
+			println("Invalid reverse limit status, not storing\n");
+	}
+
+	if (m_collection_flags & PWRCYCLE)
+	{
+		bool b = CANJaguar::GetPowerCycled();
+		if (StatusOK())
+			m_pwr_cyc = b;
+		else
+			println("Invalid power cycle status, not storing\n");
+	}
+
+	if (m_collection_flags & EXPIRE)
+	{
+		float e = CANJaguar::GetExpiration();
+		if (StatusOK())
+			m_expire = e;
+		else
+			println("Invalid expiration time, not storing\n");
+	}
+
+	m_last_game_state = m_game_state;
+
 }
 
 void AsyncCANJaguar::BeginComm()

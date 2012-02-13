@@ -9,6 +9,7 @@
 LRTRobotBase::LRTRobotBase()
 {
 	loopSynchronizer = new Notifier(&releaseLoop, this);
+	jagUpdater = new Notifier(&updateJaguars, this);
 	quitting_ = false;
 	cycleCount = 0;
 
@@ -23,10 +24,15 @@ LRTRobotBase::~LRTRobotBase()
 {
 	loopSynchronizer->Stop();
 	delete loopSynchronizer;
+
+	jagUpdater->Stop();
+	delete jagUpdater;
+
 	for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j = j->next_jaguar_)
-	{	
+	{
 		j->StopBackgroundTask();
 	}
+
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
 	AsyncPrinter::Quit();
 }
@@ -51,6 +57,7 @@ void LRTRobotBase::StartCompetition()
 
 	AsyncPrinter::Printf("starting synchronizer");
 	loopSynchronizer->StartPeriodic(1.0 / 50.0); //arg is period in seconds
+	jagUpdater->StartPeriodic(1.0 / 200.0);
 
 	// loop until we are quitting -- must be set by the destructor of the derived class.
 
@@ -75,13 +82,6 @@ void LRTRobotBase::StartCompetition()
 			//          printf("Target Time: %.4fms\n", cycleExpire_us * 1.0e-3);
 			//          fflush(stdout);
 		}
-
-		//NB: This loop must be quit *before* the Jaguars are deleted!
-		for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
-				= j->next_jaguar_)
-		{
-			j->BeginComm();
-		}
 	}
 }
 
@@ -94,4 +94,14 @@ void LRTRobotBase::releaseLoop(void* param)
 	Wait(0.01); //give the thread up to 1 ms to start
 	//taskDelay(sysClkRateGet()/50/5);//check that this is at least 1 tick
 	semTake(((LRTRobotBase*) param)->loopSemaphore, NO_WAIT);
+}
+
+void LRTRobotBase::updateJaguars(void* param)
+{
+	// release jaggie semaphores
+	// NB: This loop must be quit *before* the Jaguars are deleted!
+	for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j = j->next_jaguar_)
+	{
+		j->BeginComm();
+	}
 }
