@@ -40,28 +40,6 @@ void Drivetrain::Output()
 
 	//	m_encoders.setHighGear(isHighGear); // set by shifter
 	m_drive_control.setHighGear(isHighGear);
-
-	/***************** Brian ***********************/
-	float turnSetpoint, fwdSetpoint;
-	
-	//position control
-	if (action->drivetrain->position.drive_control)
-	{
-		turnSetpoint;
-		fwdSetpoint;
-	}
-	else
-	{
-		turnSetpoint;
-		fwdSetpoint;
-	}
-	
-	if (action->drivetrain->rate.drive_control)
-	{
-		
-	}
-	/***************** Brian ***********************/
-	
 	
 	// only try new operation if previous one is complete, else discard
 	if (m_drive_control.driveOperationComplete()

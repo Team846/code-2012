@@ -74,6 +74,7 @@ void LRTRobot12::MainLoop()
 	GameState gameState = DetermineState();
 
 	//iterate though and output components
+	brain.getActionSem();
 	for (list<Component::ComponentWithData>::iterator iter =
 			components->begin(); iter != components->end(); iter++)
 	{
@@ -90,6 +91,7 @@ void LRTRobot12::MainLoop()
 
 		}
 	}
+	brain.releaseActionSem();
 
 	//    if(prevState != gameState)
 	//        controller.ResetCache();

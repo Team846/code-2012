@@ -137,9 +137,9 @@ void ESC::SetDutyCycle(float dutyCycle)
 
 	dutyCycle = Util::Clamp<float>(dutyCycle, -1.0, 1.0);
 
-	static int e = 0;
-	if ((e++)%21 == 0)
-		AsyncPrinter::Printf("In: %.4f out %.4f speed %.4f\n", dutyCycle, command.first, speed);
+//	static int e = 0;
+//	if ((e++)%21 == 0)
+//		AsyncPrinter::Printf("In: %.4f out %.4f speed %.4f\n", dutyCycle, command.first, speed);
 	m_jag1->SetDutyCycle(command.first);
 	m_jag2->SetDutyCycle(command.first);
 //	m_jag1->Set(command.first);

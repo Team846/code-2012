@@ -36,6 +36,16 @@ public:
 	 * @brief starts the auton task
 	 */
 	void startAuton();
+	
+	/*!
+	 * @brief gets the action semaphore
+	 */
+	void getActionSem();
+
+	/*!
+	 * @brief releases the action semaphore
+	 */
+	void releaseActionSem();
 private:
 	/*!
 	 * @brief processes the input
@@ -68,7 +78,7 @@ private:
 
 	Task* m_teleop_task;
 	Task* m_auton_task;
-	semaphore* actionSemaphore;
+	SEM_ID actionSemaphore;
 
 	ActionData *actionData;
 
