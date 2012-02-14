@@ -23,6 +23,8 @@ void _GLOBAL__I__ZN12ConfigurableC2Ev();
 
 void _GLOBAL__I__ZN12LRTRobotBaseC2Ev();
 
+void _GLOBAL__I__ZN13BallCollectorC2Ev();
+
 void _GLOBAL__I__ZN13DriveEncoders10m_instanceE();
 
 void _GLOBAL__I__ZN14AsyncCANJaguar12m_game_stateE();
@@ -45,6 +47,8 @@ void _GLOBAL__I__ZN5BrainC2Ev();
 
 void _GLOBAL__I__ZN5Build6NUMBERE();
 
+void _GLOBAL__I__ZN5WedgeC2Ev();
+
 void _GLOBAL__I__ZN6Config8instanceE();
 
 void _GLOBAL__I__ZN7Console8instanceE();
@@ -62,8 +66,6 @@ void _GLOBAL__I__ZN8Profiler8instanceE();
 void _GLOBAL__I__ZN9Component19createComponentDataEbi();
 
 void _GLOBAL__I__ZN9RBridgePDC2Ev();
-
-void _GLOBAL__I__ZN9TBridgePDC2Ev();
 
 void _GLOBAL__I__ZN12PrintCommandC2EPKc();
 
@@ -94,6 +96,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN12ConfigLoaderC2Ev,
     _GLOBAL__I__ZN12ConfigurableC2Ev,
     _GLOBAL__I__ZN12LRTRobotBaseC2Ev,
+    _GLOBAL__I__ZN13BallCollectorC2Ev,
     _GLOBAL__I__ZN13DriveEncoders10m_instanceE,
     _GLOBAL__I__ZN14AsyncCANJaguar12m_game_stateE,
     _GLOBAL__I__ZN16PneumaticShifterC2Ev,
@@ -105,6 +108,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN3PIDC2Edddddb,
     _GLOBAL__I__ZN5BrainC2Ev,
     _GLOBAL__I__ZN5Build6NUMBERE,
+    _GLOBAL__I__ZN5WedgeC2Ev,
     _GLOBAL__I__ZN6Config8instanceE,
     _GLOBAL__I__ZN7Console8instanceE,
     _GLOBAL__I__ZN7ShifterC2Ev,
@@ -114,7 +118,6 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN8Profiler8instanceE,
     _GLOBAL__I__ZN9Component19createComponentDataEbi,
     _GLOBAL__I__ZN9RBridgePDC2Ev,
-    _GLOBAL__I__ZN9TBridgePDC2Ev,
     _GLOBAL__I__ZN12PrintCommandC2EPKc,
     _GLOBAL__I__ZN9Scheduler9_instanceE,
     _GLOBAL__I__ZN11WaitCommandC2Ed,
@@ -143,6 +146,8 @@ void _GLOBAL__D__ZN12ConfigurableC2Ev();
 
 void _GLOBAL__D__ZN12LRTRobotBaseC2Ev();
 
+void _GLOBAL__D__ZN13BallCollectorC2Ev();
+
 void _GLOBAL__D__ZN13DriveEncoders10m_instanceE();
 
 void _GLOBAL__D__ZN14AsyncCANJaguar12m_game_stateE();
@@ -165,6 +170,8 @@ void _GLOBAL__D__ZN5BrainC2Ev();
 
 void _GLOBAL__D__ZN5Build6NUMBERE();
 
+void _GLOBAL__D__ZN5WedgeC2Ev();
+
 void _GLOBAL__D__ZN6Config8instanceE();
 
 void _GLOBAL__D__ZN7Console8instanceE();
@@ -182,8 +189,6 @@ void _GLOBAL__D__ZN8Profiler8instanceE();
 void _GLOBAL__D__ZN9Component19createComponentDataEbi();
 
 void _GLOBAL__D__ZN9RBridgePDC2Ev();
-
-void _GLOBAL__D__ZN9TBridgePDC2Ev();
 
 void _GLOBAL__D__ZN9Scheduler9_instanceE();
 
@@ -210,6 +215,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN12ConfigLoaderC2Ev,
     _GLOBAL__D__ZN12ConfigurableC2Ev,
     _GLOBAL__D__ZN12LRTRobotBaseC2Ev,
+    _GLOBAL__D__ZN13BallCollectorC2Ev,
     _GLOBAL__D__ZN13DriveEncoders10m_instanceE,
     _GLOBAL__D__ZN14AsyncCANJaguar12m_game_stateE,
     _GLOBAL__D__ZN16PneumaticShifterC2Ev,
@@ -221,6 +227,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN3PIDC2Edddddb,
     _GLOBAL__D__ZN5BrainC2Ev,
     _GLOBAL__D__ZN5Build6NUMBERE,
+    _GLOBAL__D__ZN5WedgeC2Ev,
     _GLOBAL__D__ZN6Config8instanceE,
     _GLOBAL__D__ZN7Console8instanceE,
     _GLOBAL__D__ZN7ShifterC2Ev,
@@ -230,7 +237,6 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN8Profiler8instanceE,
     _GLOBAL__D__ZN9Component19createComponentDataEbi,
     _GLOBAL__D__ZN9RBridgePDC2Ev,
-    _GLOBAL__D__ZN9TBridgePDC2Ev,
     _GLOBAL__D__ZN9Scheduler9_instanceE,
     _GLOBAL__D_wpi_error_s_ModuleIndexOutOfRange,
     _GLOBAL__D__ZN13NetworkTables3Key11_staticLockE,

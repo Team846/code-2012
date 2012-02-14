@@ -12,7 +12,7 @@ namespace LAUNCHER
  */
 enum launcherState
 {
-	RUNNING, DISABLED
+	DISABLED, RUNNING
 };
 }
 }
@@ -20,8 +20,8 @@ enum launcherState
 struct LauncherAction
 {
 	ACTION::LAUNCHER::launcherState state;
-	double topSpeed;
-	double bottomSpeed;
+	bool atSpeed;
+	double speed;
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include "LauncherAction.h"
 #include "ShifterAction.h"
 #include "BPDAction.h"
+#include "BallFeedAction.h"
 #include "ConfigAction.h"
 
 ActionData* ActionData::instance = NULL;
@@ -51,16 +52,25 @@ ActionData::ActionData()
 
 	launcher = (LauncherAction*) malloc(sizeof(LauncherAction));
 	launcher->state = ACTION::LAUNCHER::RUNNING;
-	launcher->bottomSpeed = 0.0;
-	launcher->topSpeed = 0.0;
+	launcher->speed = 0.0;
+	launcher->atSpeed = false;
 
 	bridgePD = (BPDAction*) malloc(sizeof(BPDAction));
 	bridgePD->state = ACTION::BPD::IDLE;
 	bridgePD->completion_status = ACTION::UNSET;
+
+	ballfeed = (BallFeedAction*) malloc(sizeof(BallFeedAction));
+	ballfeed->collector_state = ACTION::BALLFEED::COLLECTING;
+	ballfeed->sweepArmOut = false;
+
 }
 
 ActionData::~ActionData()
 {
 	free(config);
 	free(drivetrain);
+	free(launcher);
+	free(shifter);
+	free(bridgePD);
+	free(ballfeed);
 }

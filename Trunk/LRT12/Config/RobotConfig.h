@@ -14,9 +14,8 @@ const uint32_t DRIVE_RIGHT_A = 10;
 const uint32_t DRIVE_RIGHT_B = 1;
 const uint32_t DRIVE_LEFT_A = 2;
 const uint32_t DRIVE_LEFT_B = 3;
-const uint32_t BPD = CHANGEME;
-const uint32_t ROLLER_BOTTOM = CHANGEME;
-const uint32_t ROLLER_TOP = CHANGEME;
+const uint32_t COLLECTOR = CHANGEME;
+const uint32_t LAUNCHER = CHANGEME;
 }
 
 namespace PWM //ports 1-10
@@ -36,6 +35,10 @@ const uint32_t ENCODER_LEFT_A = 9;
 const uint32_t ENCODER_LEFT_B = 10;
 const uint32_t ENCODER_RIGHT_A = 13;
 const uint32_t ENCODER_RIGHT_B = 14;
+const uint32_t ARM_CYLINDER = CHANGEME;
+const uint32_t WEDGE_SPIKE_PIN = CHANGEME;
+const uint32_t WEDGE_LIMIT_TOP = CHANGEME;
+const uint32_t WEDGE_LIMIT_BOTTOM = CHANGEME;
 const uint32_t HALL_EFFECT = CHANGEME;
 const uint32_t COMPRESSOR_RELAY_PIN = CHANGEME;
 const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = CHANGEME;

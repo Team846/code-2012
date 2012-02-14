@@ -13,6 +13,7 @@ struct ConfigAction;
 struct DriveTrainAction;
 struct ShifterAction;
 struct LauncherAction;
+struct BallFeedAction;
 
 class ActionData
 {
@@ -51,8 +52,16 @@ public:
 	 * @brief contains commands relevant to the launcher. Is defined in ActionData\LauncherAction.h
 	 */
 	LauncherAction* launcher;
-	
+
+	/*!
+	 * @brief contains commands relevant to the wedge
+	 */
 	BPDAction* bridgePD;
+
+	/*!
+	 * @brief contains commands relevant to the ball feeding system
+	 */
+	BallFeedAction* ballfeed;
 
 	/*!
 	 * @brief contains data that is relevant to all/many components.
