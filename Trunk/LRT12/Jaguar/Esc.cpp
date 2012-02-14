@@ -17,11 +17,10 @@ ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
 	m_name(name)
 {
 	m_encoder = encoder;
-	std::string tempa, tempb;
-	tempa = name + "A";
-	tempb = name + "B";
-	m_jag1 = new AsyncCANJaguar(channelA, tempa.c_str());
-	m_jag2 = new AsyncCANJaguar(channelB, tempb.c_str());
+	namea = name + "A";
+	nameb = name + "B";
+	m_jag1 = new AsyncCANJaguar(channelA, namea.c_str());
+	m_jag2 = new AsyncCANJaguar(channelB, nameb.c_str());
 	
 	m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 	m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
