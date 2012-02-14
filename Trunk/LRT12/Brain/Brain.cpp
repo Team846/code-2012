@@ -116,6 +116,10 @@ void Brain::process()
 	else if (m_ds->IsOperatorControl())
 	{
 		takeActionSem();
+		if (m_driver_stick->GetThrottle() > 128)
+			actionData->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
+		else
+			actionData->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
 		actionData->drivetrain->rate.drive_control = true;
 		actionData->drivetrain->rate.turn_control = true;
 		actionData->drivetrain->position.drive_control = false;
