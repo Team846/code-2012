@@ -9,7 +9,7 @@ Component::ComponentData Component::createComponentData(
 		bool RequiresEnabledState, int DIO)
 {
 	ComponentData ret;
-	ret.RequiresEnabledState = false;
+	ret.RequiresEnabledState = RequiresEnabledState;
 	ret.DS_DIOToDisableComponent = DIO;
 	return ret;
 }

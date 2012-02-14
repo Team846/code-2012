@@ -1,5 +1,6 @@
 #include "LRTRobotBase.h"
 #include "Jaguar/AsyncCANJaguar.h"
+#include "Config/RobotConfig.h"
 #include "Utility.h"
 #include "sysLib.h"
 
@@ -46,14 +47,15 @@ void LRTRobotBase::StartCompetition()
 
 	// first and one-time initialization
 	RobotInit();
-	Profiler& profiler = Profiler::GetInstance();
 
 	// must allow a negative value in case loop runs over 20ms
 	//	INT32 sleepTime_us = 0;
 
-	AsyncPrinter::Printf("starting synchronizer");
-	loopSynchronizer->StartPeriodic(1.0 / 50.0); //arg is period in seconds
+	AsyncPrinter::Printf("starting synchronizer\r\n");
+	loopSynchronizer->StartPeriodic(1.0 / RobotConfig::LOOP_RATE); //arg is period in seconds
 
+	AsyncPrinter::Printf("Starting Profiler\r\n");
+	Profiler& profiler = Profiler::GetInstance();
 	// loop until we are quitting -- must be set by the destructor of the derived class.
 
 	while (!quitting_)

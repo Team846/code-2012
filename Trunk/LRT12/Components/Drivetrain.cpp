@@ -130,6 +130,7 @@ void Drivetrain::Output()
 
 		cmd.shouldLinearize = false;
 	}
+	printf("%.02f %.02f\r\n", cmd.leftDutyCycle, cmd.rightDutyCycle);
 
 	m_esc_left->SetDutyCycle(cmd.leftDutyCycle);
 	m_esc_right->SetDutyCycle(cmd.rightDutyCycle);

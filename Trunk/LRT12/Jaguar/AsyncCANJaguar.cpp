@@ -20,7 +20,8 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 {
 	m_task_name = "JAG#" + Util::ToString<int>(channel);
 	m_comm_task = new Task(m_task_name.c_str(),
-			(FUNCPTR) AsyncCANJaguar::CommTaskWrapper);
+			(FUNCPTR) AsyncCANJaguar::CommTaskWrapper,
+			Task::kDefaultPriority - 2);
 	m_comm_semaphore = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 	m_channel = channel;
 	m_setpoint.setValue(0.0);
@@ -33,7 +34,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	next_jaguar_ = jaguar_list_;
 	jaguar_list_ = this;
 
-	disableLog();
+	//	disableLog();
 
 	if (name == NULL)
 		m_name = "?";
@@ -42,8 +43,6 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 		m_name = (char*) malloc(strlen(name) * sizeof(char));
 		strcpy(m_name, name);
 	}
-
-	m_comm_task->SetPriority(Task::kDefaultPriority - 2);
 
 	m_comm_task->Start((UINT32) this);
 
@@ -103,7 +102,11 @@ void AsyncCANJaguar::CommTask()
 		if (m_is_quitting)
 			break;
 		update();
-		//        AsynchronousPrinter::Printf("%d\n", channel);
+
+		//		static int e = 0;
+		//		if (e++%101 == 0)
+		//		        AsyncPrinter::Printf("%d\n", m_channel);
+
 		//		taskDelay(sysClkRateGet() / 200); //fixes erratic CAN problems, we can't run the loop as fast as we can. 
 	}
 }
@@ -225,7 +228,7 @@ void AsyncCANJaguar::update()
 	//		AsyncPrinter::Printf("O");
 	if (m_setpoint.hasNewValue())
 	{
-		//			AsyncPrinter::Printf("Set %.4f\n", m_setpoint.getValue());
+		//		AsyncPrinter::Printf("Set %.4f\n", m_setpoint.getValue());
 		CANJaguar::Set(m_setpoint.getValue());
 	}
 

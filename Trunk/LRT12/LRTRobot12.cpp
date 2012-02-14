@@ -8,11 +8,12 @@ LRTRobot12::LRTRobot12() :
 			firstMember_(
 					"\n\n\n---------------------------------------------------------\n"
 						"Begin LRTRobot Constructor\n",
-					"LRTRobot Destroyed\n\n"), brain(), dc_CANBus_("CANbus\n"),
-			config(Config::GetInstance()), prevState(DISABLED),
+					"LRTRobot Destroyed\n\n"), dc_CANBus_("CANbus\n"),
 			lastMember_("LRTRobot.LastMember\n") //trace constructor.
 
 {
+	config = Config::GetInstance();
+	prevState = DISABLED;
 	ds = DriverStation::GetInstance();
 	components = Component::CreateComponents();
 
@@ -56,6 +57,7 @@ void LRTRobot12::RobotInit()
 					config->Get<int> ("Build", "RunNumber", 0))).c_str();
 
 	AsyncPrinter::Printf(build);
+	brain.Start();
 }
 
 static int ExecutionNotify(...)
@@ -74,7 +76,6 @@ void LRTRobot12::MainLoop()
 	GameState gameState = DetermineState();
 
 	//iterate though and output components
-	brain.takeActionSem();
 	for (list<Component::ComponentWithData>::iterator iter =
 			components->begin(); iter != components->end(); iter++)
 	{
@@ -91,7 +92,7 @@ void LRTRobot12::MainLoop()
 
 		}
 	}
-	brain.giveActionSem();
+	//	brain.giveActionSem();
 
 	//    if(prevState != gameState)
 	//        controller.ResetCache();

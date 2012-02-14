@@ -7,8 +7,10 @@
 
 Brain::Brain()
 {
-	m_teleop_task = new Task("Teleop", (FUNCPTR) Brain::teleopTaskEntryPoint);
-	m_auton_task = new Task("Auton", (FUNCPTR) Brain::autonTaskEntryPoint);
+	m_teleop_task = new Task("Teleop", (FUNCPTR) Brain::teleopTaskEntryPoint,
+			Task::kDefaultPriority - 2);
+	m_auton_task = new Task("Auton", (FUNCPTR) Brain::autonTaskEntryPoint,
+			Task::kDefaultPriority - 2);
 	m_driver_stick = new DebouncedJoystick(1,
 			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
 			DriverStationConfig::NUM_JOYSTICK_AXES);
@@ -23,8 +25,12 @@ Brain::Brain()
 	actionData = ActionData::GetInstance();
 	actionSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 
+}
+
+void Brain::Start()
+{
 	m_auton_task->Start((uint32_t) this);
-	m_teleop_task->Start((int32_t) this);
+	m_teleop_task->Start((uint32_t) this);
 }
 
 Brain::~Brain()
@@ -51,10 +57,10 @@ void Brain::autonTask()
 {
 	//TODO change me to linear 
 	//auton code
-	while (true)
-	{
-		process();
-	}
+	//	while (true)
+	//	{
+	//		process();
+	//	}
 }
 
 void Brain::teleopTask()
@@ -62,6 +68,7 @@ void Brain::teleopTask()
 	uint32_t lastPacketNum = 0;
 	while (true)
 	{
+		//		takeActionSem();
 		if (lastPacketNum != 0) //don't run this the first time
 		{
 			if (m_ds->GetPacketNumber() != lastPacketNum + 1)
@@ -115,14 +122,13 @@ void Brain::process()
 	}
 	else if (m_ds->IsOperatorControl())
 	{
-		takeActionSem();
-		if (m_driver_stick->GetThrottle() > 128)
+		if (m_driver_stick->IsButtonJustPressed(8))
 			actionData->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
-		else
+		if (m_driver_stick->IsButtonJustPressed(9))
 			actionData->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
-		
-		actionData->drivetrain->rate.drive_control = true;
-		actionData->drivetrain->rate.turn_control = true;
+
+		actionData->drivetrain->rate.drive_control = false;
+		actionData->drivetrain->rate.turn_control = false;
 		actionData->drivetrain->position.drive_control = false;
 		actionData->drivetrain->position.turn_control = false;
 		actionData->drivetrain->rate.desiredDriveRate
@@ -141,7 +147,7 @@ void Brain::process()
 		{
 			actionData->config->apply = true;
 		}
-		giveActionSem();
+		//		giveActionSem();
 	}
 }
 

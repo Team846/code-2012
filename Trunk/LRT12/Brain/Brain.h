@@ -46,6 +46,11 @@ public:
 	 * @brief releases the action semaphore
 	 */
 	void giveActionSem();
+
+	/*!
+	 * Starts the brain tasks
+	 */
+	void Brain::Start();
 private:
 	/*!
 	 * @brief processes the input
