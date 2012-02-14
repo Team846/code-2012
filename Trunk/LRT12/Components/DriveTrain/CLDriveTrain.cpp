@@ -140,7 +140,7 @@ void ClosedLoopDrivetrain::update()
 	{
 	case CL_POSITION:
 		m_pos_control[TRANSLATE]->setInput(m_encoders.getRobotDist());
-		m_pos_control[TRANSLATE]->update(1.0 / 50.0);
+		m_pos_control[TRANSLATE]->update(1.0 / RobotConfig::LOOP_RATE);
 		m_rate_control[TRANSLATE]->setSetpoint(
 				m_pos_control[TRANSLATE]->getOutput());
 		if (m_pos_control[TRANSLATE]->getError() < 0.5
@@ -152,7 +152,7 @@ void ClosedLoopDrivetrain::update()
 		m_rate_control[TRANSLATE]->setInput(
 				Util::Clamp<double>(
 						m_encoders.getNormalizedForwardMotorSpeed(), -1.0, 1.0));
-		m_rate_control[TRANSLATE]->update(1.0 / 50);
+		m_rate_control[TRANSLATE]->update(1.0 / RobotConfig::LOOP_RATE);
 		output[TRANSLATE] = m_rate_control[TRANSLATE]->getOutput();
 		break;
 	case CL_DISABLED:
@@ -167,7 +167,7 @@ void ClosedLoopDrivetrain::update()
 	{
 	case CL_POSITION:
 		m_pos_control[TURN]->setInput(fmod(m_encoders.getTurnAngle(), 360.0));
-		m_pos_control[TURN]->update(1.0 / 50.0);
+		m_pos_control[TURN]->update(1.0 / RobotConfig::LOOP_RATE);
 		m_rate_control[TURN]->setSetpoint(m_pos_control[TURN]->getOutput());
 		if (m_pos_control[TURN]->getError() < 0.5
 				&& m_pos_control[TURN]->getAccumulatedError() < 5.02 - 2)
@@ -178,7 +178,7 @@ void ClosedLoopDrivetrain::update()
 		m_rate_control[TURN]->setInput(
 				Util::Clamp<double>(
 						m_encoders.getNormalizedTurningMotorSpeed(), -1.0, 1.0));
-		m_rate_control[TURN]->update(1.0 / 50);
+		m_rate_control[TURN]->update(1.0 / RobotConfig::LOOP_RATE);
 		output[TURN] = m_rate_control[TURN]->getOutput();
 		break;
 	case CL_DISABLED:
