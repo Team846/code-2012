@@ -22,7 +22,7 @@ Brain::Brain()
 	missedPackets = 0;
 	isTeleop = false;
 
-	actionData = ActionData::GetInstance();
+	action = ActionData::GetInstance();
 	actionSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 
 }
@@ -122,30 +122,51 @@ void Brain::process()
 	}
 	else if (m_ds->IsOperatorControl())
 	{
-		if (m_driver_stick->IsButtonJustPressed(8))
-			actionData->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
-		if (m_driver_stick->IsButtonJustPressed(9))
-			actionData->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
+#warning position drive does not work yet
 
-		actionData->drivetrain->rate.drive_control = false;
-		actionData->drivetrain->rate.turn_control = false;
-		actionData->drivetrain->position.drive_control = false;
-		actionData->drivetrain->position.turn_control = false;
-		actionData->drivetrain->rate.desiredDriveRate
-				= -m_driver_stick->GetAxis(Joystick::kYAxis);
-		actionData->drivetrain->rate.desiredTurnRate
-				= -m_driver_stick->GetAxis(Joystick::kZAxis);
+		if (m_driver_stick->IsButtonJustPressed(8))
+			action->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
+		if (m_driver_stick->IsButtonJustPressed(9))
+			action->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
+
+		action->drivetrain->rate.drive_control = true;
+		action->drivetrain->rate.turn_control = true;
+		if (m_driver_stick->IsButtonJustPressed(6))
+		{
+			action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
+			action->drivetrain->position.desiredRelativeTurnPosition = 0.0;
+			action->drivetrain->position.drive_control = true;
+			action->drivetrain->position.turn_control = true;
+		}
+		else if (m_driver_stick->IsButtonJustPressed(7))
+		{
+			action->drivetrain->position.drive_control = false;
+			action->drivetrain->position.turn_control = false;
+		}
+		else if (m_driver_stick->IsButtonJustPressed(5))
+		{
+			action->drivetrain->position.drive_control = true;
+			action->drivetrain->position.turn_control = true;
+			action->drivetrain->position.desiredRelativeDrivePosition = 1.0;
+			action->drivetrain->position.desiredRelativeTurnPosition = 0.0;
+		}
+
+		action->drivetrain->rate.desiredDriveRate = -m_driver_stick->GetAxis(
+				Joystick::kYAxis);
+		action->drivetrain->rate.desiredTurnRate = -m_driver_stick->GetAxis(
+				Joystick::kZAxis);
+
 		if (m_driver_stick->IsButtonJustPressed(2))
 		{
-			actionData->config->save = true;
+			action->config->save = true;
 		}
 		if (m_driver_stick->IsButtonJustPressed(3))
 		{
-			actionData->config->load = true;
+			action->config->load = true;
 		}
 		if (m_driver_stick->IsButtonJustPressed(4))
 		{
-			actionData->config->apply = true;
+			action->config->apply = true;
 		}
 		//		giveActionSem();
 	}

@@ -46,13 +46,7 @@ void Drivetrain::Output()
 	if (m_drive_control.driveOperationComplete()
 			|| action->drivetrain->overrideOperationChecks)
 	{
-		if (action->drivetrain->rate.drive_control)
-		{
-			m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_RATE);
-			m_drive_control.setTranslateRate(
-					action->drivetrain->rate.desiredDriveRate);
-		}
-		else if (action->drivetrain->position.drive_control)
+		if (action->drivetrain->position.drive_control)
 		{
 			m_drive_control.setTranslateControl(
 					ClosedLoopDrivetrain::CL_POSITION);
@@ -61,6 +55,12 @@ void Drivetrain::Output()
 			// command has been set, so now zero the relative pos
 			// this serves as a crude one-command queue
 			action->drivetrain->position.desiredRelativeDrivePosition = 0;
+		}
+		else if (action->drivetrain->rate.drive_control)
+		{
+			m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_RATE);
+			m_drive_control.setTranslateRate(
+					action->drivetrain->rate.desiredDriveRate);
 		}
 		else
 		{
@@ -120,17 +120,17 @@ void Drivetrain::Output()
 	ClosedLoopDrivetrain::DriveCommand cmd = m_drive_control.getOutput();
 
 	// decrease one cycle until zero
-	if (action->drivetrain->synchronizedCyclesRemaining > 0)
-	{
-		action->drivetrain->synchronizedCyclesRemaining--;
-		cmd.rightDutyCycle = m_encoders.getNormalizedOpposingGearMotorSpeed(
-				m_encoders.getRightEncoder());
-		cmd.leftDutyCycle = m_encoders.getNormalizedOpposingGearMotorSpeed(
-				m_encoders.getLeftEncoder());
-
-		cmd.shouldLinearize = false;
-	}
-	printf("%.02f %.02f\r\n", cmd.leftDutyCycle, cmd.rightDutyCycle);
+	// DIS DOESN"T WORK -RY, BA
+	//	if (action->drivetrain->synchronizedCyclesRemaining > 0)
+	//	{
+	//		action->drivetrain->synchronizedCyclesRemaining--;
+	//		cmd.rightDutyCycle = m_encoders.getNormalizedOpposingGearMotorSpeed(
+	//				m_encoders.getRightEncoder());
+	//		cmd.leftDutyCycle = m_encoders.getNormalizedOpposingGearMotorSpeed(
+	//				m_encoders.getLeftEncoder());
+	//
+	//		cmd.shouldLinearize = false;
+	//	}
 
 	m_esc_left->SetDutyCycle(cmd.leftDutyCycle);
 	m_esc_right->SetDutyCycle(cmd.rightDutyCycle);

@@ -12,8 +12,6 @@
  * @author Robert Ying
  */
 
-#warning incomplete
-
 class Brain
 {
 public:
@@ -85,7 +83,7 @@ private:
 	Task* m_auton_task;
 	SEM_ID actionSemaphore;
 
-	ActionData *actionData;
+	ActionData *action;
 
 	DriverStation *m_ds;
 	DebouncedJoystick * m_driver_stick;
