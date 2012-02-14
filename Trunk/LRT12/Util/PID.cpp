@@ -1,4 +1,5 @@
 #include "PID.h"
+#include "AsyncPrinter.h"
 
 PID::PID(double p_gain, double i_gain, double d_gain, double ff_gain,
 		double i_decay, bool feedforward)
@@ -27,6 +28,7 @@ void PID::setParameters(double p_gain, double i_gain, double d_gain,
 double PID::update(double dt)
 {
 	m_error = m_setpoint - m_input;
+	//	AsyncPrinter::Printf("Error: %.02f\r\n", m_error);
 
 	// calculate discrete derivative
 	double delta = (m_error - m_prev_error) / dt;

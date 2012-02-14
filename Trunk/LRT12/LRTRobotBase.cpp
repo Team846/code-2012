@@ -9,7 +9,6 @@
 LRTRobotBase::LRTRobotBase()
 {
 	loopSynchronizer = new Notifier(&releaseLoop, this);
-	jagUpdater = new Notifier(&updateJaguars, this);
 	quitting_ = false;
 	cycleCount = 0;
 
@@ -24,9 +23,6 @@ LRTRobotBase::~LRTRobotBase()
 {
 	loopSynchronizer->Stop();
 	delete loopSynchronizer;
-
-	jagUpdater->Stop();
-	delete jagUpdater;
 
 	for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j = j->next_jaguar_)
 	{
@@ -57,14 +53,27 @@ void LRTRobotBase::StartCompetition()
 
 	AsyncPrinter::Printf("starting synchronizer");
 	loopSynchronizer->StartPeriodic(1.0 / 50.0); //arg is period in seconds
-	jagUpdater->StartPeriodic(1.0 / 200.0);
 
 	// loop until we are quitting -- must be set by the destructor of the derived class.
 
 	while (!quitting_)
 	{
-		cycleCount++;
+		// block the loop and allow other tasks to run until the notifier
+		// releases our semaphore
 		semTake(loopSemaphore, WAIT_FOREVER);
+		cycleCount++;
+		if (quitting_)
+		{
+			break;
+		}
+
+		// release jaggie semaphores
+		// NB: This loop must be quit *before* the Jaguars are deleted!
+		for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
+				= j->next_jaguar_)
+		{
+			j->ReleaseCommSemaphore();
+		}
 
 		profiler.StartNewCycle();
 
@@ -91,17 +100,13 @@ void LRTRobotBase::releaseLoop(void* param)
 	// RY: This was massively polluting the console
 	//	AsyncPrinter::Printf("%d\n", GetFPGATime());
 	semGive(((LRTRobotBase*) param)->loopSemaphore);
-	Wait(0.01); //give the thread up to 1 ms to start
-	//taskDelay(sysClkRateGet()/50/5);//check that this is at least 1 tick
-	semTake(((LRTRobotBase*) param)->loopSemaphore, NO_WAIT);
-}
 
-void LRTRobotBase::updateJaguars(void* param)
-{
-	// release jaggie semaphores
-	// NB: This loop must be quit *before* the Jaguars are deleted!
-	for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j = j->next_jaguar_)
-	{
-		j->BeginComm();
-	}
+	// there is no reason to retake the sem here... it should be taken in the loop
+	// and semaphores automatically block until they are taken / preempted by priority
+	// otherwise there will be issues when the 0.01 is not long enough to complete all tasks
+	// of lower priority
+
+	//	Wait(0.01); //give the thread up to 1 ms to start
+	//taskDelay(sysClkRateGet()/50/5);//check that this is at least 1 tick
+	//	semTake(((LRTRobotBase*) param)->loopSemaphore, NO_WAIT);
 }

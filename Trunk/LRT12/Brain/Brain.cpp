@@ -82,14 +82,14 @@ void Brain::teleopTask()
 	}
 }
 
-void Brain::getActionSem()
+void Brain::takeActionSem()
 {
-		semTake(actionSemaphore, WAIT_FOREVER);
+	semTake(actionSemaphore, WAIT_FOREVER);
 }
 
-void Brain::releaseActionSem()
+void Brain::giveActionSem()
 {
-		semGive(actionSemaphore);
+	semGive(actionSemaphore);
 }
 
 int Brain::autonTaskEntryPoint(uint32_t brain)
@@ -115,15 +115,15 @@ void Brain::process()
 	}
 	else if (m_ds->IsOperatorControl())
 	{
-		getActionSem();
+		takeActionSem();
 		actionData->drivetrain->rate.drive_control = true;
 		actionData->drivetrain->rate.turn_control = true;
 		actionData->drivetrain->position.drive_control = false;
 		actionData->drivetrain->position.turn_control = false;
 		actionData->drivetrain->rate.desiredDriveRate
 				= -m_driver_stick->GetAxis(Joystick::kYAxis);
-		actionData->drivetrain->rate.desiredTurnRate = -m_driver_stick->GetAxis(
-				Joystick::kZAxis);
+		actionData->drivetrain->rate.desiredTurnRate
+				= -m_driver_stick->GetAxis(Joystick::kZAxis);
 		if (m_driver_stick->IsButtonJustPressed(2))
 		{
 			actionData->config->save = true;
@@ -136,7 +136,7 @@ void Brain::process()
 		{
 			actionData->config->apply = true;
 		}
-		releaseActionSem();
+		giveActionSem();
 	}
 }
 

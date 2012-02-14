@@ -94,11 +94,11 @@ void AsyncCANJaguar::CommTask()
 {
 	while (!m_is_quitting)
 	{
-		static int e = 0;
-		if (e++ % 100 == 0)
-		{
-			//			AsyncPrinter::Printf("LOOP\n");
-		}
+		//		static int e = 0;
+		//		if (++e % 100 == 0)
+		//		{
+		//			//			AsyncPrinter::Printf("LOOP\n");
+		//		}
 		semTake(m_comm_semaphore, WAIT_FOREVER);
 		if (m_is_quitting)
 			break;
@@ -370,7 +370,7 @@ void AsyncCANJaguar::update()
 
 }
 
-void AsyncCANJaguar::BeginComm()
+void AsyncCANJaguar::ReleaseCommSemaphore()
 {
 	semGive(m_comm_semaphore);
 }

@@ -27,11 +27,22 @@ private:
 	Config *m_config;
 	std::string m_configsection;
 
-	LRTEncoder m_encoder_left;
-//	LRTEncoder m_useless_encoder;
-	LRTEncoder m_encoder_right;
+	LRTEncoder * m_encoder_left;
+	//	LRTEncoder m_useless_encoder;
+	LRTEncoder * m_encoder_right;
 
 	bool m_is_in_high_gear;
+
+	double PULSES_PER_REVOLUTION; // pulses per wheel revolution [BA]
+
+	double ENCODER_RATE_HIGH_GEAR;
+	double MAX_TURNING_RATE;
+
+	double TICKS_PER_FULL_TURN;
+	double WHEEL_DIAMETER; // in
+
+	// extrapolate max low gear speed
+	double HIGH_GEAR_MULTIPLIER;
 
 public:
 	/*!
@@ -44,17 +55,6 @@ public:
 	 * @brief Destructor
 	 */
 	virtual ~DriveEncoders();
-
-	const double PULSES_PER_REVOLUTION; // pulses per wheel revolution [BA]
-
-	const double ENCODER_RATE_HIGH_GEAR;
-	const double MAX_TURNING_RATE;
-
-	const double TICKS_PER_FULL_TURN;
-	const double WHEEL_DIAMETER; // in
-
-	// extrapolate max low gear speed
-	const double HIGH_GEAR_MULTIPLIER;
 
 	const static double PI = 3.14159;
 
@@ -176,14 +176,14 @@ public:
 	 * @param encoder other encoder
 	 * @return the normalized speed of the non-active gear
 	 */
-	double getNormalizedOpposingGearMotorSpeed(LRTEncoder& encoder);//gets the speed of the gear we are *NOT* in for shifting -BA
+	double getNormalizedOpposingGearMotorSpeed(LRTEncoder * encoder);//gets the speed of the gear we are *NOT* in for shifting -BA
 
 	/*!
 	 * @brief Normalized motor speed
 	 * @param encoder which motor
 	 * @return
 	 */
-	double getNormalizedMotorSpeed(LRTEncoder& encoder);
+	double getNormalizedMotorSpeed(LRTEncoder * encoder);
 
 	/*!
 	 * @brief Determines which gear will be used for calculation
@@ -193,15 +193,15 @@ public:
 
 	/*!
 	 * @brief The left encoder
-	 * @return a reference to the left encoder
+	 * @return a pointer to the left encoder
 	 */
-	LRTEncoder& getLeftEncoder();
+	LRTEncoder * getLeftEncoder();
 
 	/*!
 	 * @brief The right encoder
-	 * @return a reference to the right encoder
+	 * @return a pointer to the right encoder
 	 */
-	LRTEncoder& getRightEncoder();
+	LRTEncoder * getRightEncoder();
 
 protected:
 	DriveEncoders();DISALLOW_COPY_AND_ASSIGN(DriveEncoders);

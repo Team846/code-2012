@@ -425,7 +425,7 @@ public:
 	/*!
 	 * @brief Initializes communications
 	 */
-	void BeginComm();
+	void ReleaseCommSemaphore();
 
 	/*!
 	 * Simple wrapper for GetFaults() == 0

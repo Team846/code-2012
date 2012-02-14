@@ -39,6 +39,8 @@ void _GLOBAL__I__ZN3LCD8instanceE();
 
 void _GLOBAL__I__ZN3Log10m_instanceE();
 
+void _GLOBAL__I__ZN3PIDC2Edddddb();
+
 void _GLOBAL__I__ZN5BrainC2Ev();
 
 void _GLOBAL__I__ZN5Build6NUMBERE();
@@ -100,6 +102,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN3ESCC2EiP10LRTEncoderSs,
     _GLOBAL__I__ZN3LCD8instanceE,
     _GLOBAL__I__ZN3Log10m_instanceE,
+    _GLOBAL__I__ZN3PIDC2Edddddb,
     _GLOBAL__I__ZN5BrainC2Ev,
     _GLOBAL__I__ZN5Build6NUMBERE,
     _GLOBAL__I__ZN6Config8instanceE,
@@ -155,6 +158,8 @@ void _GLOBAL__D__ZN3ESCC2EiP10LRTEncoderSs();
 void _GLOBAL__D__ZN3LCD8instanceE();
 
 void _GLOBAL__D__ZN3Log10m_instanceE();
+
+void _GLOBAL__D__ZN3PIDC2Edddddb();
 
 void _GLOBAL__D__ZN5BrainC2Ev();
 
@@ -213,6 +218,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN3ESCC2EiP10LRTEncoderSs,
     _GLOBAL__D__ZN3LCD8instanceE,
     _GLOBAL__D__ZN3Log10m_instanceE,
+    _GLOBAL__D__ZN3PIDC2Edddddb,
     _GLOBAL__D__ZN5BrainC2Ev,
     _GLOBAL__D__ZN5Build6NUMBERE,
     _GLOBAL__D__ZN6Config8instanceE,

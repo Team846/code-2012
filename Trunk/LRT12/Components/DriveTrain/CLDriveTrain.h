@@ -14,7 +14,7 @@
  * @brief DOES implement closed-loop relative position control
  * @author Robert Ying
  */
-class ClosedLoopDrivetrain:  public Loggable
+class ClosedLoopDrivetrain: public Loggable
 {
 public:
 	/*!
@@ -24,11 +24,11 @@ public:
 	{
 		CL_DISABLED, CL_RATE, CL_POSITION
 	} CONTROL_TYPE;
-	
+
 	typedef struct
 	{
-	    double leftDutyCycle, rightDutyCycle;
-	    bool shouldLinearize;
+		double leftDutyCycle, rightDutyCycle;
+		bool shouldLinearize;
 	} DriveCommand;
 
 	/*!
@@ -178,14 +178,14 @@ private:
 	PID m_turn_disabled;
 
 	const static int TURN = 0, TRANSLATE = 1;
-	PID* m_pos_control[2];
-	PID* m_rate_control[2];
+	PID *m_pos_control[2];
+	PID *m_rate_control[2];
 	double output[2];
 
 	bool m_brake_left;
 	bool m_brake_right;
 
-	CONTROL_TYPE m_fwd_control_type;
+	CONTROL_TYPE m_translate_ctrl_type;
 	CONTROL_TYPE m_turn_control_type;
 	bool m_fwd_op_complete;
 	bool m_turn_op_complete;

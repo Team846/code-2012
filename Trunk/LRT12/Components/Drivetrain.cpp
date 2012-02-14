@@ -6,11 +6,12 @@
 Drivetrain::Drivetrain() :
 	Component(), m_name("Drivetrain"), m_encoders(DriveEncoders::GetInstance())
 {
-	m_esc_left = new ESC(RobotConfig::CAN::DRIVE_LEFT_A,
-			RobotConfig::CAN::DRIVE_LEFT_B, &m_encoders.getLeftEncoder(),
-			"left");
+	m_esc_left
+			= new ESC(RobotConfig::CAN::DRIVE_LEFT_A,
+					RobotConfig::CAN::DRIVE_LEFT_B,
+					m_encoders.getLeftEncoder(), "left");
 	m_esc_right = new ESC(RobotConfig::CAN::DRIVE_RIGHT_A,
-			RobotConfig::CAN::DRIVE_RIGHT_B, &m_encoders.getRightEncoder(),
+			RobotConfig::CAN::DRIVE_RIGHT_B, m_encoders.getRightEncoder(),
 			"right");
 }
 
@@ -53,7 +54,8 @@ void Drivetrain::Output()
 		}
 		else if (action->drivetrain->position.drive_control)
 		{
-			m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_POSITION);
+			m_drive_control.setTranslateControl(
+					ClosedLoopDrivetrain::CL_POSITION);
 			m_drive_control.setRelativeTranslatePosition(
 					action->drivetrain->position.desiredRelativeDrivePosition);
 			// command has been set, so now zero the relative pos
@@ -62,7 +64,8 @@ void Drivetrain::Output()
 		}
 		else
 		{
-			m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_DISABLED);
+			m_drive_control.setTranslateControl(
+					ClosedLoopDrivetrain::CL_DISABLED);
 			m_drive_control.setTranslateDriveDutyCycle(
 					action->drivetrain->rate.desiredDriveRate);
 		}

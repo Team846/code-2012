@@ -31,7 +31,7 @@ LRTRobot12::LRTRobot12() :
 LRTRobot12::~LRTRobot12()
 {
 	// try to free SmartDashboard resources
-	SmartDashboard::DeleteSingletons();
+	//	SmartDashboard::DeleteSingletons();
 	// Testing shows this to be the entry point for a Kill signal.
 	// Start shutting down processes here. -dg
 	printf("\n\nBegin Deleting LRTRobot12\n");
@@ -74,7 +74,7 @@ void LRTRobot12::MainLoop()
 	GameState gameState = DetermineState();
 
 	//iterate though and output components
-	brain.getActionSem();
+	brain.takeActionSem();
 	for (list<Component::ComponentWithData>::iterator iter =
 			components->begin(); iter != components->end(); iter++)
 	{
@@ -91,7 +91,7 @@ void LRTRobot12::MainLoop()
 
 		}
 	}
-	brain.releaseActionSem();
+	brain.giveActionSem();
 
 	//    if(prevState != gameState)
 	//        controller.ResetCache();

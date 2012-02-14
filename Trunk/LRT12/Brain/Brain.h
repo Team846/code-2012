@@ -36,16 +36,16 @@ public:
 	 * @brief starts the auton task
 	 */
 	void startAuton();
-	
+
 	/*!
 	 * @brief gets the action semaphore
 	 */
-	void getActionSem();
+	void takeActionSem();
 
 	/*!
 	 * @brief releases the action semaphore
 	 */
-	void releaseActionSem();
+	void giveActionSem();
 private:
 	/*!
 	 * @brief processes the input

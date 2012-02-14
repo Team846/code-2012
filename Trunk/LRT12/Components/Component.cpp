@@ -2,6 +2,7 @@
 
 #include "ConfigLoader.h"
 #include "Drivetrain.h"
+#include "Launcher.h"
 #include "Shifter.h"
 
 Component::ComponentData Component::createComponentData(
@@ -25,6 +26,8 @@ list<Component::ComponentWithData>* Component::CreateComponents()
 			ComponentWithData(new Shifter(), createComponentData(true, 5)));
 	components->push_back(
 			ComponentWithData(new Drivetrain(), createComponentData(true, 1)));
+	components->push_back(
+			ComponentWithData(new Launcher(), createComponentData(true, 5)));
 
 	//sample initialization of components
 	//    components->push_back(ComponentWithData(new Shifter(), createComponentData(true, 5)));
