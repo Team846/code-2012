@@ -8,11 +8,19 @@ namespace ACTION
 namespace BALLFEED
 {
 /*!
- * @brief Keeps track of the gearbox state
+ * @brief Keeps track of the ball collector state
  */
 enum collector_state
 {
 	NEUTRAL, COLLECTING, REJECTING
+};
+
+/*!
+ * @brief Controls ball feeder state
+ */
+enum feeder_state
+{
+	FEEDING, HOLDING, PURGING
 };
 }
 }
@@ -20,6 +28,8 @@ enum collector_state
 struct BallFeedAction
 {
 	ACTION::BALLFEED::collector_state collector_state;
+	ACTION::BALLFEED::feeder_state feeder_state;
 	bool sweepArmOut;
+	bool attemptToLoadRound;
 };
 #endif

@@ -9,6 +9,8 @@
 
 void _GLOBAL__I__ZN10ActionData8instanceE();
 
+void _GLOBAL__I__ZN10BallFeederC2Ev();
+
 void _GLOBAL__I__ZN10DrivetrainC2Ev();
 
 void _GLOBAL__I__ZN10LRTEncoderC2EPKcjjd();
@@ -89,6 +91,7 @@ extern void (*_ctors[])();
 void (*_ctors[])() =
     {
     _GLOBAL__I__ZN10ActionData8instanceE,
+    _GLOBAL__I__ZN10BallFeederC2Ev,
     _GLOBAL__I__ZN10DrivetrainC2Ev,
     _GLOBAL__I__ZN10LRTEncoderC2EPKcjjd,
     _GLOBAL__I__ZN10LRTRobot12C2Ev,
@@ -131,6 +134,8 @@ void (*_ctors[])() =
     };
 
 void _GLOBAL__D__ZN10ActionData8instanceE();
+
+void _GLOBAL__D__ZN10BallFeederC2Ev();
 
 void _GLOBAL__D__ZN10DrivetrainC2Ev();
 
@@ -208,6 +213,7 @@ extern void (*_dtors[])();
 void (*_dtors[])() =
     {
     _GLOBAL__D__ZN10ActionData8instanceE,
+    _GLOBAL__D__ZN10BallFeederC2Ev,
     _GLOBAL__D__ZN10DrivetrainC2Ev,
     _GLOBAL__D__ZN10LRTEncoderC2EPKcjjd,
     _GLOBAL__D__ZN10LRTRobot12C2Ev,

@@ -16,6 +16,8 @@ const uint32_t DRIVE_LEFT_A = 2;
 const uint32_t DRIVE_LEFT_B = 3;
 const uint32_t COLLECTOR = CHANGEME;
 const uint32_t LAUNCHER = CHANGEME;
+const uint32_t FEEDER_FWD = CHANGEME;
+const uint32_t FEEDER_REV = CHANGEME;
 }
 
 namespace PWM //ports 1-10
@@ -35,6 +37,7 @@ const uint32_t ENCODER_LEFT_A = 9;
 const uint32_t ENCODER_LEFT_B = 10;
 const uint32_t ENCODER_RIGHT_A = 13;
 const uint32_t ENCODER_RIGHT_B = 14;
+const uint32_t PRESSURE_PLATE = CHANGEME;
 const uint32_t ARM_CYLINDER = CHANGEME;
 const uint32_t WEDGE_SPIKE_PIN = CHANGEME;
 const uint32_t WEDGE_LIMIT_TOP = CHANGEME;
