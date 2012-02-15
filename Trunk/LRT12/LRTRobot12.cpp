@@ -16,6 +16,7 @@ LRTRobot12::LRTRobot12() :
 	prevState = DISABLED;
 	ds = DriverStation::GetInstance();
 	components = Component::CreateComponents();
+	m_action = ActionData::GetInstance();
 
 	//	compressor = new Compressor(RobotConfig::DIGITAL_IO::COMPRESSOR_RELAY_PIN,
 	//			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN);
@@ -71,9 +72,11 @@ void LRTRobot12::MainLoop()
 
 	// setup a watchdog to warn us if our loop takes too long
 	// sysClkRateGet returns the number of ticks per cycle at the current clock rate.
-	wdStart(mainLoopWatchDog, sysClkRateGet() / 50, ExecutionNotify, 0);
+	wdStart(mainLoopWatchDog, sysClkRateGet() / RobotConfig::LOOP_RATE,
+			ExecutionNotify, 0);
 
 	GameState gameState = DetermineState();
+	m_action->wasDisabled = (prevState == DISABLED);
 
 	//iterate though and output components
 	for (list<Component::ComponentWithData>::iterator iter =
@@ -103,8 +106,8 @@ void LRTRobot12::MainLoop()
 	static uint8_t counter = 0;
 	if (++counter >= 5)
 	{
-		counter = 0;
-		Log::logAll();
+			counter = 0;
+			Log::logAll();
 	}
 
 	// if we finish in time, cancel the watchdog's error message

@@ -74,7 +74,7 @@ void ClosedLoopDrivetrain::Configure()
 			"drivePosHighD", 0.0);
 
 	m_pos_drive_high_gear_pid.setParameters(drive_pos_p_high, drive_pos_i_high,
-			drive_pos_d_high, 1.0, FWD_DECAY, true);
+			drive_pos_d_high, 1.0, FWD_DECAY, false);
 
 	double drive_pos_p_low = m_config->Get<double> (configSection,
 			"drivePosLowP", 1.5);
@@ -84,7 +84,7 @@ void ClosedLoopDrivetrain::Configure()
 			"dri	vePosLowD", 0.0);
 
 	m_pos_drive_low_gear_pid.setParameters(drive_pos_p_low, drive_pos_i_low,
-			drive_pos_d_low, 1.0, FWD_DECAY, true);
+			drive_pos_d_low, 1.0, FWD_DECAY, false);
 
 	double turn_pos_p_high = m_config->Get<double> (configSection,
 			"turnPosHighP", 1.5);
@@ -94,7 +94,7 @@ void ClosedLoopDrivetrain::Configure()
 			"turnPosHighD", 0.0);
 
 	m_pos_turn_high_gear_pid.setParameters(turn_pos_p_high, turn_pos_i_high,
-			turn_pos_d_high, 1.0, FWD_DECAY, true);
+			turn_pos_d_high, 1.0, FWD_DECAY, false);
 
 	double turn_pos_p_low = m_config->Get<double> (configSection,
 			"turnPosLowP", 1.5);
@@ -104,7 +104,7 @@ void ClosedLoopDrivetrain::Configure()
 			"turnPosLowD", 0.0);
 
 	m_pos_turn_low_gear_pid.setParameters(turn_pos_p_low, turn_pos_i_low,
-			turn_pos_d_low, 1.0, FWD_DECAY, true);
+			turn_pos_d_low, 1.0, FWD_DECAY, false);
 }
 
 ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::Drive(double rawTurn,
@@ -139,6 +139,7 @@ void ClosedLoopDrivetrain::update()
 	switch (m_translate_ctrl_type)
 	{
 	case CL_POSITION:
+//		AsyncPrinter::Printf("Positioning\n");
 		m_pos_control[TRANSLATE]->setInput(m_encoders.getRobotDist());
 		m_pos_control[TRANSLATE]->update(1.0 / RobotConfig::LOOP_RATE);
 		m_rate_control[TRANSLATE]->setSetpoint(
@@ -246,6 +247,7 @@ void ClosedLoopDrivetrain::setRelativeTranslatePosition(double pos)
 {
 	setTranslateControl(CL_POSITION);
 	m_pos_control[TRANSLATE]->setSetpoint(pos + m_encoders.getRobotDist());
+	AsyncPrinter::Printf("pos %.2f,pre %.2f set %.2f\n", pos, (pos + m_encoders.getRobotDist()) , (m_pos_control[TRANSLATE]->getSetpoint()));
 	m_fwd_op_complete = false;
 }
 
@@ -293,6 +295,8 @@ void ClosedLoopDrivetrain::setRawTurnDutyCycle(double duty)
 
 bool ClosedLoopDrivetrain::driveOperationComplete()
 {
+	if (!m_fwd_op_complete)
+		AsyncPrinter::Printf("Not done\n");
 	return m_fwd_op_complete;
 }
 

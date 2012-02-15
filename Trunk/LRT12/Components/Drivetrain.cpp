@@ -52,6 +52,8 @@ void Drivetrain::Output()
 					ClosedLoopDrivetrain::CL_POSITION);
 			m_drive_control.setRelativeTranslatePosition(
 					action->drivetrain->position.desiredRelativeDrivePosition);
+			if (action->drivetrain->position.desiredRelativeDrivePosition > 0.01)
+				AsyncPrinter::Printf("setpoint %.2f\n", action->drivetrain->position.desiredRelativeDrivePosition);
 			// command has been set, so now zero the relative pos
 			// this serves as a crude one-command queue
 			action->drivetrain->position.desiredRelativeDrivePosition = 0;

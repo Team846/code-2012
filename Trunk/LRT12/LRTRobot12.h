@@ -28,6 +28,7 @@ public:
 
 private:
 	Brain brain;
+	ActionData *m_action;
 
 	PrintInConstructor dc_CANBus_;
 

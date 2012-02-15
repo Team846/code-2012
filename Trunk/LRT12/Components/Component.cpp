@@ -29,14 +29,14 @@ list<Component::ComponentWithData>* Component::CreateComponents()
 			ComponentWithData(new Drivetrain(), createComponentData(true, 1)));
 	components->push_back(
 			ComponentWithData(new Shifter(), createComponentData(true, 2)));
-	components->push_back(
-			ComponentWithData(new Launcher(), createComponentData(true, 3)));
-	components->push_back(
-			ComponentWithData(new BallCollector(), createComponentData(true, 4)));
-	components->push_back(
-			ComponentWithData(new Wedge(), createComponentData(true, 5)));
-	components->push_back(
-			ComponentWithData(new BallFeeder(), createComponentData(true, 6)));
+//	components->push_back(
+//			ComponentWithData(new Launcher(), createComponentData(true, 3)));
+//	components->push_back(
+//			ComponentWithData(new BallCollector(), createComponentData(true, 4)));
+//	components->push_back(
+//			ComponentWithData(new Wedge(), createComponentData(true, 5)));
+//	components->push_back(
+//			ComponentWithData(new BallFeeder(), createComponentData(true, 6)));
 
 	//sample initialization of components
 	//    components->push_back(ComponentWithData(new Shifter(), createComponentData(true, 5)));

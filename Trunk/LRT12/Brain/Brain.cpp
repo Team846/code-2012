@@ -3,6 +3,7 @@
 #include "../Config/DriverStationConfig.h"
 #include "../ActionData/ShifterAction.h"
 #include "../ActionData/ConfigAction.h"
+#include "../Util/AsyncPrinter.h"
 #include "Joystick.h"
 
 Brain::Brain()
@@ -129,6 +130,8 @@ void Brain::process()
 		if (m_driver_stick->IsButtonJustPressed(9))
 			action->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
 
+//		action->drivetrain->rate.drive_control = false;
+//		action->drivetrain->rate.turn_control = false;
 		action->drivetrain->rate.drive_control = true;
 		action->drivetrain->rate.turn_control = true;
 		if (m_driver_stick->IsButtonJustPressed(6))
@@ -147,12 +150,13 @@ void Brain::process()
 		{
 			action->drivetrain->position.drive_control = true;
 			action->drivetrain->position.turn_control = true;
-			action->drivetrain->position.desiredRelativeDrivePosition = 1.0;
+			action->drivetrain->position.desiredRelativeDrivePosition = 24.0;
 			action->drivetrain->position.desiredRelativeTurnPosition = 0.0;
 		}
 
 		action->drivetrain->rate.desiredDriveRate = -m_driver_stick->GetAxis(
 				Joystick::kYAxis);
+//		AsyncPrinter::Printf("Rate: %.2f\n", action->drivetrain->rate.desiredDriveRate);
 		action->drivetrain->rate.desiredTurnRate = -m_driver_stick->GetAxis(
 				Joystick::kZAxis);
 
