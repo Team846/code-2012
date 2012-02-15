@@ -1,56 +1,152 @@
 //
-#include "opencv2/core/core.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/highgui/highgui.hpp"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
 #include <string.h>
 #include <signal.h>
+
+#include "reportTarget.h"
+
 //
 using namespace cv;
 using namespace std;
 //
-static int thresh = 100;
-static int save = 0;
-//
-void
-printSeq (const vector < vector < Point > >&squares, int n)
-{
-  char name[32];
-  sprintf (name, "nseq%02i.txt", n);
-  FILE *fp = fopen (name, "w");
-  if (fp == NULL)
-    {
-      printf ("lazha\n");
-    }
 
+ReportSlop::ReportSlop ()
+{
+  rs_init ();
+}
+
+void
+ReportSlop::rs_init ()
+{
+  m_soc = socket (AF_INET, SOCK_DGRAM, 0);
+  if (m_soc < 0)
+    {
+      perror ("socket:");
+    }
   else
     {
 
-      // read 4 sequence elements at a time (all vertices of a square)
-      for (size_t i = 0; i < squares.size (); i++)
+      int bcast = 1;
+      if (setsockopt (m_soc, SOL_SOCKET, SO_BROADCAST, &bcast, sizeof (bcast))
+	  < 0)
 	{
-	  for (size_t j = 0; j < squares[i].size (); j++)
-	    {
-	      const Point *p = &squares[i][j];
-	      fprintf (fp, "(%i,%i), ", p->x, p->y);
-	    } fprintf (fp, "\n");
-	} fclose (fp);
+	  perror ("setsockopt:");
+	  rs_reset ();
+	}
+
+      int reuse = 1;
+      if (setsockopt (m_soc, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof (reuse))
+	  < 0)
+	{
+	  perror ("setsockopt:");
+	  rs_reset ();
+	}
+
+      m_dst.sin_family = AF_INET;
+      m_dst.sin_addr.s_addr = htonl (INADDR_BROADCAST);
+      m_dst.sin_port = htons (8000);
+
     }
 }
 
-//
+ReportSlop::~ReportSlop ()
+{
+  rs_reset ();
+}
+
 void
-getTarget (const vector < vector < Point > >&squares, int *slop, bool * top)
+ReportSlop::rs_reset ()
+{
+  close (m_soc);
+  m_soc = -1;
+}
+
+int
+ReportSlop::sendResults (int slop, bool top)
+{
+  if (m_soc < 0)
+    {
+      rs_init ();
+    }
+
+  if (m_soc < 0)
+    {
+      return -1;
+    }
+
+  char buf[2];
+  buf[0] = slop;
+  buf[1] = top;
+
+  if (sendto (m_soc, buf, sizeof (buf), 0, (struct sockaddr *) &m_dst,
+	      sizeof (m_dst)) < 0)
+    {
+      perror ("sendto:");
+      rs_reset ();
+      return -1;
+    }
+  return 0;
+}
+
+void
+FindTarget::tg_saveImageIfAsked (int saveN)
+{
+  static int saveNsave = 0;
+  if (saveNsave != saveN)
+    {
+      saveNsave = saveN;
+      char name[32];
+      sprintf (name, "ndata%02i.bmp", saveN);
+      imwrite (name, image);
+
+      sprintf (name, "nseq%02i.txt", saveN);
+      FILE *fp = fopen (name, "w");
+      if (fp == NULL)
+	{
+	  printf ("lazha\n");
+	}
+      else
+	{
+	  // read 4 sequence elements at a time (all vertices of a square)
+	  for (size_t i = 0; i < squares.size (); i++)
+	    {
+	      for (size_t j = 0; j < squares[i].size (); j++)
+		{
+		  const Point *p = &squares[i][j];
+		  fprintf (fp, "(%i,%i), ", p->x, p->y);
+		}
+	      fprintf (fp, "\n");
+	    }
+	  fclose (fp);
+	}
+    }
+}
+
+	//
+void
+FindTarget::tg_getTarget ()
 {
   const int width2 = 1280;
   int sum = 0;
-  int delta4X = width2;
-  int rowTarget = 0;
+  int delta4xAbsMin = width2;
+  int delta4xMin = width2;
+  int delta4x = 0;
   int *weight = new int[squares.size ()];
   memset (weight, 0, sizeof (int) * squares.size ());
 
+  for (size_t i = 0; i < squares.size (); i++)
+    {
+      for (size_t j = 0; j < squares[i].size (); j++)
+	{
+	  const Point *p = &squares[i][j];
+	  printf ("(%i,%i), ", p->x, p->y);
+	}
+      printf ("\n");
+    }
   // read 4 sequence elements at a time (all vertices of a square)
   for (size_t row = 0; row < squares.size (); row++)
     {
@@ -76,51 +172,53 @@ getTarget (const vector < vector < Point > >&squares, int *slop, bool * top)
 
 	    }
 	}
-      int deltaAbs = abs (sum - width2);
-      printf (" sum = %i width2 = %i deltaAbs = %i delta4x = %i\n",
-	      sum, width2, deltaAbs, delta4X);
-      if (delta4X > deltaAbs)
+      delta4x = sum - width2;
+      int delta4xAbs = abs (delta4x);
+      printf
+	(" row %i sum = %i width2 = %i delta4xAbsMin = %i delta4x = %i\n",
+	 row, sum, width2, delta4xAbsMin, delta4x);
+      if (delta4xAbs < delta4xAbsMin)
 	{
 	  rowTarget = row;
-	  printf ("here %i\n", rowTarget);
-	  delta4X = deltaAbs;
+	  delta4xAbsMin = delta4xAbs;
+	  delta4xMin = delta4x;
 	}
     }
   for (int k = 0; k < squares.size (); k++)
     {
-      printf ("%i = %i\n", k, weight[k]);
+      printf ("%i = %i,  ", k, weight[k]);
     }
-  printf ("size = %i rowTarget = %i\n", squares.size (), rowTarget);
-  *slop = delta4X / 4;
-  *top = weight[rowTarget] < 2;
+  printf ("\n");
+  slop = delta4xMin / 4;
+  top = weight[rowTarget] < 2;
   delete[]weight;
 }
 
-//
+	//
 double
-angle (Point & pt1, Point & pt2, Point & pt0)
+FindTarget::tg_angle (Point & pt1, Point & pt2, Point & pt0)
 {
 
-// finds a cosine of angle between vectors
-// from pt0->pt1 and from pt0->pt2
+  // finds a cosine of angle between vectors
+  // from pt0->pt1 and from pt0->pt2
   double dx1 = pt1.x - pt0.x;
   double dy1 = pt1.y - pt0.y;
   double dx2 = pt2.x - pt0.x;
   double dy2 = pt2.y - pt0.y;
-  return (dx1 * dx2 +
-	  dy1 * dy2) / sqrt ((dx1 * dx1 + dy1 * dy1) * (dx2 * dx2 +
+  return (dx1 * dx2 + dy1 * dy2) / sqrt ((dx1 * dx1 +
+					  dy1 * dy1) * (dx2 * dx2 +
 							dy2 * dy2) + 1e-10);
 }
 
-//
+	//
 void
-findSquares (const Mat & image, vector < vector < Point > >&squares)
+FindTarget::tg_findSquares (int thresh, bool showWin)
 {
 
-// returns sequence of squares detected on the image.
-// the sequence is stored in the specified memory storage
+  // returns sequence of squares detected on the image.
+  // the sequence is stored in the specified memory storage
   squares.clear ();
-  Mat colorPlane (image.size (), CV_8U), blackWhite;
+  Mat colorPlane (image.size (), CV_8U);
   vector < vector < Point > >contours;
 
   {
@@ -152,7 +250,9 @@ findSquares (const Mat & image, vector < vector < Point > >&squares)
 	blackWhite = colorPlane >= thresh;
       }
 #endif // USE_CANNY
-      imshow ("bw", blackWhite);
+      if (showWin) {
+	imshow ("bw", blackWhite);
+      }
 
       // find contours and store them all as a list
       findContours (blackWhite, contours, CV_RETR_LIST,
@@ -174,18 +274,17 @@ findSquares (const Mat & image, vector < vector < Point > >&squares)
 	  // Note: absolute value of an area is used because
 	  // area may be positive or negative - in accordance with the
 	  // contour orientation
-	  if (approx.size () == 4
-	      && fabs (contourArea (Mat (approx))) > 1000
-	      && isContourConvex (Mat (approx)))
+	  double area = fabs (contourArea (Mat (approx)));
+	  if ((approx.size () == 4) && (area < 200000) && (area > 1000) && isContourConvex (Mat (approx)))
 	    {
 	      double maxCosine = 0;
 	      for (int j = 2; j < 5; j++)
 		{
 
 		  // find the maximum cosine of the angle between joint edges
-		  double cosine = fabs (angle (approx[j % 4],
-					       approx[j - 2],
-					       approx[j - 1]));
+		  double cosine =
+		    fabs (tg_angle (approx[j % 4], approx[j - 2],
+				    approx[j - 1]));
 		  maxCosine = MAX (maxCosine, cosine);
 		}
 	      // if cosines of all angles are small
@@ -199,32 +298,34 @@ findSquares (const Mat & image, vector < vector < Point > >&squares)
   }
 }
 
-// the function draws all the squares in the image
+	// the function draws all the squares in the image
 void
-drawSquares (Mat & image, const vector < vector < Point > >&squares)
+FindTarget::tg_drawSquares ()
 {
   for (size_t i = 0; i < squares.size (); i++)
     {
       const Point *p = &squares[i][0];
       int n = (int) squares[i].size ();
-      polylines (image, &p, &n, 1, true, Scalar (0, 255, 0), 3, CV_AA);
-    } imshow ("squares", image);
+      if (i == rowTarget)
+	polylines (image, &p, &n, 1, true, Scalar (0, 0, 255), 3, CV_AA);
+      else
+	polylines (image, &p, &n, 1, true, Scalar (0, 255, 0), 3, CV_AA);
+    }
+  char buf[100];
+  sprintf (buf, "%i (%s %s)", slop,
+	   ((slop > 0) ? "right" : (slop == 0) ? "shoot" : "left"),
+	   ((top) ? "top" : "middle"));
+  Point pt (50, 50);
+  putText (image, buf, pt, FONT_HERSHEY_SCRIPT_SIMPLEX, 1,
+	   Scalar (255, 0, 255), 4);
+  imshow ("squares", image);
 }
 
-void
-on_trackbar (int a, void *unused)
-{
-}
 
-void
-saver (int a)
-{				//signal 10 handler. produces number used in save picture filename
-  save++;
-}
 
-//
+	//
 void
-printProperties (VideoCapture & cap)
+FindTarget::tg_printProperties ()
 {
   printf ("CV_CAP_PROP_POS_MSEC=%f\n", cap.get (CV_CAP_PROP_POS_MSEC));
   printf ("CV_CAP_PROP_POS_FRAMES=%f\n", cap.get (CV_CAP_PROP_POS_FRAMES));
@@ -249,43 +350,27 @@ printProperties (VideoCapture & cap)
 	  cap.get (CV_CAP_PROP_RECTIFICATION));
 }
 
-//
-int
-main (int /*argc */ , char ** /*argv */ )
+FindTarget::FindTarget ():
+cap (0), squares (), image (), slop (0), rowTarget (0), top (true)
 {
-  VideoCapture cap (0);
-  if (!cap.isOpened ())
-    return -1;
-  printProperties (cap);
-  namedWindow ("squares", CV_WINDOW_AUTOSIZE);
-  namedWindow ("bw", CV_WINDOW_AUTOSIZE);
-  signal (SIGUSR1, saver);
-  createTrackbar ("tresh", "bw", &thresh, 255, on_trackbar, NULL);
-  vector < vector < Point > >squares;
-
-  //int countt = 0;
-  int savesave = 0;
-  Mat image;
-  for (;;)
-    {
-
-      // printf ("==== %i ====\n", countt++);
-      cap >> image;		// get a new frame from camera
-      findSquares (image, squares);
-      drawSquares (image, squares);
-      int slop = 0;
-      bool top = false;
-      getTarget (squares, &slop, &top);
-      printf ("slop = %i, top = %i\n", slop, top);
-      if (savesave != save)
-	{
-	  savesave = save;
-	  char name[32];
-	  sprintf (name, "ndata%02i.bmp", save);
-	  imwrite (name, image);
-	  printSeq (squares, save);
-	}
-      waitKey (1);		//waits for a key: it also handles the GUI events.
-    }
-  return 0;
 }
+
+FindTarget::~FindTarget ()
+{
+
+}
+
+	//
+bool FindTarget::tg_ready ()
+{
+  return cap.isOpened ();
+}
+
+	//
+void
+FindTarget::tg_getFrame ()
+{
+  cap >> image;			// get a new frame from camera
+}
+
+
