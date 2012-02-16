@@ -18,7 +18,7 @@ using namespace std;
 //#undef PRODUCTION_BUILD
 
 #define DEBUGGING
-#undef DEBUGGING
+//#undef DEBUGGING
 
 #ifdef DEBUGGING
 #define DbgPrint(a) cout << a << endl
@@ -142,7 +142,7 @@ int main()
         cap_img = cvQueryFrame(cv_cap);
 
         if(cap_img != 0)
-        {   
+        {
             int width = cap_img->width;
             int height = cap_img->height;
             size = cvSize(width, height);
@@ -158,7 +158,7 @@ int main()
             //cvReleaseImage(&cRed);
             //cvReleaseImage(&cBlue); //*/
             //cvReleaseImage(&cRedThresh);
-            //cvReleaseImage(&cBlueThresh); 
+            //cvReleaseImage(&cBlueThresh);
 
         }
 

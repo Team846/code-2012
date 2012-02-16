@@ -1,0 +1,23 @@
+# depslib dependency file v1.0
+1329211536 source:c:\users\derek\documents\keytracker\main.cpp
+	<cv.h>
+	<ml.h>
+	<cxcore.h>
+	<highgui.h>
+	<stdio.h>
+
+1329228392 source:c:\users\raphael\documents\keytracker\main.cpp
+	<cv.h>
+	<ml.h>
+	<cxcore.h>
+	<highgui.h>
+	<stdio.h>
+
+1329294197 source:c:\users\tony\documents\keytracker\main.cpp
+	<stdio.h>
+	<ctime>
+	<cv.h>
+	<ml.h>
+	<cxcore.h>
+	<highgui.h>
+
