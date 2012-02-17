@@ -1,16 +1,14 @@
 #if defined(_WIN32) || defined(__MINGW32__) || defined(__GNUC__)
-#pragma region includes/usings
+//#pragma region includes/usings
 #include <stdio.h>
 #include <ctime>
 
+#include <opencv/cv.h>
+#include <opencv/ml.h>
+#include <opencv/cxcore.h>
+#include <opencv/highgui.h>
+
 using namespace std;
-
-#include <cv.h>
-#include <ml.h>
-#include <cxcore.h>
-#include <highgui.h>
-
-#pragma endregion
 
 //#pragma endregion
 
@@ -89,9 +87,6 @@ int getKeyPixels(IplImage * frameIn)
 
 	cvShowImage("red", redFrameOut);
 	cvShowImage("blue", blueFrameOut);
-
-	cvReleaseImage(&redFrameOut);
-	cvReleaseImage(&blueFrameOut);
 
     return count;
 }
