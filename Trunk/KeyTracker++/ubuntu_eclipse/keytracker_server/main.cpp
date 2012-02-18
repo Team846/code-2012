@@ -38,7 +38,7 @@ int main()
 	}
 
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(8001);
+	server_addr.sin_port = htons(port);
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 	writeln("Binding socket...");
