@@ -1,4 +1,6 @@
-#if defined(_WIN32) || defined(__MINGW32__) || defined(__GNUC__)
+#include "global.h"
+
+#if defined(_WIN32) || defined(__MINGW32__) || (defined(__GNUC__) && !defined(__BEAGLEBOARD__))
 //#pragma region includes/usings
 #include <stdio.h>
 #include <ctime>
