@@ -1,3 +1,5 @@
+#ifndef FIND_TARGET_H
+#define FIND_TARGET_H
 //
 
 #include <stdio.h>
@@ -42,7 +44,7 @@ public:
   bool tg_ready ();
   void tg_saveImageIfAsked (int saveN);
   void tg_getTarget ();
-  void tg_findSquares (int thresh, bool showWin);
+  void tg_findSquares (int thresh);
   void tg_drawSquares ();
   void tg_printProperties ();
 
@@ -70,3 +72,4 @@ private:
 
 };
 
+#endif	// FIND_TARGET_H

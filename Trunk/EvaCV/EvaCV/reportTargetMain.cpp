@@ -31,11 +31,17 @@ main (int argc  , char ** argv  )
 
   if (!target.tg_ready ())
     {
-      printf ("camera is nmot accessible\n");
+      printf ("camera is not accessible\n");
       return -1;
     }
 
   target.tg_printProperties ();
+
+  if (argc > 1)
+    {
+       thresh = atoi(argv[1]);
+    }
+  printf ("==== threshold %i ====\n", thresh);
 
   signal (SIGUSR1, onSignal);
 
@@ -45,7 +51,7 @@ main (int argc  , char ** argv  )
       target.tg_getFrame ();	// get a new frame from camera
       // printf ("==== %i ====\n", countt++);
 
-      target.tg_findSquares (thresh, argc > 1);
+      target.tg_findSquares (thresh);
       target.tg_getTarget ();
       printf ("slop = %i, top = %i, rowTarget = %i\n", target.tg_getSlop (),
 	      target.tg_getTop (), target.tg_getRowTarget ());

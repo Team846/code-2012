@@ -130,68 +130,79 @@ FindTarget::tg_saveImageIfAsked (int saveN)
 void
 FindTarget::tg_getTarget ()
 {
-  const int width2 = 1280;
-  int sum = 0;
-  int delta4xAbsMin = width2;
-  int delta4xMin = width2;
-  int delta4x = 0;
-  int *weight = new int[squares.size ()];
-  memset (weight, 0, sizeof (int) * squares.size ());
+  if (squares.size() != 0)
+    {
+      const int width2 = 1280;
+      int sum = 0;
+      int delta4xAbsMin = width2;
+      int delta4xMin = width2;
+      int delta4x = 0;
+      int *weight = new int[squares.size ()];
+      memset (weight, 0, sizeof (int) * squares.size ());
 
-  for (size_t i = 0; i < squares.size (); i++)
-    {
-      for (size_t j = 0; j < squares[i].size (); j++)
+      for (size_t i = 0; i < squares.size (); i++)
 	{
-	  const Point *p = &squares[i][j];
-	  printf ("(%i,%i), ", p->x, p->y);
-	}
-      printf ("\n");
-    }
-  // read 4 sequence elements at a time (all vertices of a square)
-  for (size_t row = 0; row < squares.size (); row++)
-    {
-      sum = 0;
-      for (size_t col = 0; col < squares[row].size (); col++)
-	{
-	  const Point *p = &squares[row][col];
-	  sum = sum + p->x;
-	  if ((col == 0) && (row < squares.size () - 1))
+	  for (size_t j = 0; j < squares[i].size (); j++)
 	    {
-	      for (size_t yRow = row + 1; yRow < squares.size (); yRow++)
-		{
-		  const Point *f = &squares[yRow][0];
-		  if (p->y > f->y)
-		    {
-		      weight[row]++;
-		    }
-		  else
-		    {
-		      weight[yRow]++;
-		    }
-		}
+	      const Point *p = &squares[i][j];
+	      printf ("(%i,%i), ", p->x, p->y);
+	    }
+	  printf ("\n");
+	}
 
+      // read 4 sequence elements at a time (all vertices of a square)
+      for (size_t row = 0; row < squares.size (); row++)
+	{
+	  sum = 0;
+	  for (size_t col = 0; col < squares[row].size (); col++)
+	    {
+	      const Point *p = &squares[row][col];
+	      sum = sum + p->x;
+	      if ((col == 0) && (row < squares.size () - 1))
+		{
+		  for (size_t yRow = row + 1; yRow < squares.size (); yRow++)
+		    {
+		      const Point *f = &squares[yRow][0];
+		      if (p->y > f->y)
+			{
+			  weight[row]++;
+			}
+		      else
+			{
+			  weight[yRow]++;
+			}
+		    }
+
+		}
+	    }
+	  delta4x = sum - width2;
+	  int delta4xAbs = abs (delta4x);
+	  printf
+	    (" row %i sum = %i width2 = %i delta4xAbsMin = %i delta4x = %i\n",
+	     row, sum, width2, delta4xAbsMin, delta4x);
+	  if (delta4xAbs < delta4xAbsMin)
+	    {
+	      rowTarget = row;
+	      delta4xAbsMin = delta4xAbs;
+	      delta4xMin = delta4x;
 	    }
 	}
-      delta4x = sum - width2;
-      int delta4xAbs = abs (delta4x);
-      printf
-	(" row %i sum = %i width2 = %i delta4xAbsMin = %i delta4x = %i\n",
-	 row, sum, width2, delta4xAbsMin, delta4x);
-      if (delta4xAbs < delta4xAbsMin)
+      for (int k = 0; k < squares.size (); k++)
 	{
-	  rowTarget = row;
-	  delta4xAbsMin = delta4xAbs;
-	  delta4xMin = delta4x;
+	  printf ("%i = %i,  ", k, weight[k]);
 	}
+      printf ("\n");
+
+      slop = delta4xMin / 4;
+      top = weight[rowTarget] < 2;
+      delete[]weight;
     }
-  for (int k = 0; k < squares.size (); k++)
+  else
     {
-      printf ("%i = %i,  ", k, weight[k]);
+      slop = 0xfff;
+      top = true;
+      rowTarget = -1;
     }
-  printf ("\n");
-  slop = delta4xMin / 4;
-  top = weight[rowTarget] < 2;
-  delete[]weight;
 }
 
 	//
@@ -212,7 +223,7 @@ FindTarget::tg_angle (Point & pt1, Point & pt2, Point & pt0)
 
 	//
 void
-FindTarget::tg_findSquares (int thresh, bool showWin)
+FindTarget::tg_findSquares (int thresh)
 {
 
   // returns sequence of squares detected on the image.
@@ -272,7 +283,8 @@ FindTarget::tg_findSquares (int thresh, bool showWin)
 	  // area may be positive or negative - in accordance with the
 	  // contour orientation
 	  double area = fabs (contourArea (Mat (approx)));
-	  if ((approx.size () == 4) && (area < 200000) && (area > 1000) && isContourConvex (Mat (approx)))
+	  if ((approx.size () == 4) && (area < 200000) && (area > 1000)
+	      && isContourConvex (Mat (approx)))
 	    {
 	      double maxCosine = 0;
 	      for (int j = 2; j < 5; j++)
@@ -323,7 +335,7 @@ FindTarget::tg_printProperties ()
 }
 
 FindTarget::FindTarget ():
-cap (0), squares (), image (), slop (0), rowTarget (0), top (true)
+cap (0), squares (), image (), slop (-1), rowTarget (-1), top (true)
 {
 }
 
@@ -333,7 +345,8 @@ FindTarget::~FindTarget ()
 }
 
 	//
-bool FindTarget::tg_ready ()
+bool
+FindTarget::tg_ready ()
 {
   return cap.isOpened ();
 }
@@ -344,5 +357,3 @@ FindTarget::tg_getFrame ()
 {
   cap >> image;			// get a new frame from camera
 }
-
-
