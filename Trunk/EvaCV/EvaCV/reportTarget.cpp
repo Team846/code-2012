@@ -250,9 +250,6 @@ FindTarget::tg_findSquares (int thresh, bool showWin)
 	blackWhite = colorPlane >= thresh;
       }
 #endif // USE_CANNY
-      if (showWin) {
-	imshow ("bw", blackWhite);
-      }
 
       // find contours and store them all as a list
       findContours (blackWhite, contours, CV_RETR_LIST,
@@ -298,32 +295,7 @@ FindTarget::tg_findSquares (int thresh, bool showWin)
   }
 }
 
-	// the function draws all the squares in the image
-void
-FindTarget::tg_drawSquares ()
-{
-  for (size_t i = 0; i < squares.size (); i++)
-    {
-      const Point *p = &squares[i][0];
-      int n = (int) squares[i].size ();
-      if (i == rowTarget)
-	polylines (image, &p, &n, 1, true, Scalar (0, 0, 255), 3, CV_AA);
-      else
-	polylines (image, &p, &n, 1, true, Scalar (0, 255, 0), 3, CV_AA);
-    }
-  char buf[100];
-  sprintf (buf, "%i (%s %s)", slop,
-	   ((slop > 0) ? "right" : (slop == 0) ? "shoot" : "left"),
-	   ((top) ? "top" : "middle"));
-  Point pt (50, 50);
-  putText (image, buf, pt, FONT_HERSHEY_SCRIPT_SIMPLEX, 1,
-	   Scalar (255, 0, 255), 4);
-  imshow ("squares", image);
-}
-
-
-
-	//
+//
 void
 FindTarget::tg_printProperties ()
 {
