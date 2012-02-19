@@ -94,6 +94,7 @@ void ESC::SetDutyCycle(float dutyCycle)
 #ifdef USE_DASHBOARD
 	//    SmartDashboard::Log(speed, name.c_str());
 #endif
+	DriveEncoders::GetInstance().setHighGear(true);
 	double speed = m_encoder->GetRate() / DriveEncoders::GetInstance().getMaxEncoderRate();
 	speed = Util::Clamp<double>(speed, -1, 1);
 	brakeAndDutyCycle command = CalculateBrakeAndDutyCycle(dutyCycle,
@@ -149,11 +150,16 @@ void ESC::SetDutyCycle(float dutyCycle)
 
 //	static int e = 0;
 //	if ((e++)%21 == 0)
-//		AsyncPrinter::Printf("In: %.3f out %.3f speed %.3f braking %.3f\n", origDutyCycle, command.dutyCycle, speed, command.braking);
+//		AsyncPrinter::Printf("In: %.3f out %.3f speed %.3f origspeed %.3f braking %.3f, %.3f max speed\n", origDutyCycle, command.dutyCycle, speed, (m_encoder->GetRate() / DriveEncoders::GetInstance().getMaxEncoderRate()) , command.braking, DriveEncoders::GetInstance().getMaxEncoderRate());
+	
+#define LINEARIZE 1
+#if LINEARIZE
 	m_jag1->SetDutyCycle(command.dutyCycle);
 	m_jag2->SetDutyCycle(command.dutyCycle);
-//	m_jag1->SetDutyCycle(origDutyCycle);
-//	m_jag2->SetDutyCycle(origDutyCycle);
+#else
+	m_jag1->SetDutyCycle(origDutyCycle);
+	m_jag2->SetDutyCycle(origDutyCycle);
+#endif
 }
 
 void ESC::ResetCache()

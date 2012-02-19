@@ -38,10 +38,9 @@ const uint32_t ENCODER_LEFT_B = 3;
 const uint32_t ENCODER_RIGHT_A = 1;
 const uint32_t ENCODER_RIGHT_B = 2;
 const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = 14;
-const uint32_t WEDGE_SPIKE_PIN = CHANGEME;
+const uint32_t HALL_EFFECT = CHANGEME;
 const uint32_t WEDGE_LIMIT_TOP = CHANGEME;
 const uint32_t WEDGE_LIMIT_BOTTOM = CHANGEME;
-const uint32_t HALL_EFFECT = CHANGEME;
 }
 
 namespace SOLENOID_IO // ports 1-8
@@ -54,6 +53,7 @@ const uint32_t SHIFTER_B = 8;
 
 namespace RELAY_IO // ports 1-8
 {
+const uint32_t WEDGE_SPIKE_PIN = CHANGEME;
 const uint32_t COMPRESSOR_RELAY = 1;
 }
 

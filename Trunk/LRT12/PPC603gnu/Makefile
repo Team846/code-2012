@@ -358,10 +358,10 @@ DEP_FILES := LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/InputParser.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/AsyncCANJaguar.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/Esc.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Log.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Loggable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/DriveEncoders.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/LRTEncoder.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsyncPrinter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PID.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.d
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Loggable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/DriveEncoders.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/KeyTracker.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/LRTEncoder.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsyncPrinter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PID.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.d
 -include $(DEP_FILES)
 
 

@@ -5,6 +5,7 @@
 
 #include "../ActionData/DriveTrainAction.h"
 #include "../ActionData/ShifterAction.h"
+#include "../ActionData/LauncherAction.h"
 #include "../ActionData/ConfigAction.h"
 #include "../ActionData/BallFeedAction.h"
 
@@ -34,7 +35,7 @@ void InputParser::ProcessInputs()
 	}
 
 	/***************** Drivetrain **********************/
-#define CLOSED_LOOP 1
+#define CLOSED_LOOP 0
 #if CLOSED_LOOP
 	m_action->drivetrain->rate.drive_control = true; //If driver control use velocity control
 	m_action->drivetrain->rate.turn_control = true;
@@ -52,8 +53,10 @@ void InputParser::ProcessInputs()
 
 	/***************** Shooter **********************/
 	//TODO SHOOT! 
-	if (m_operator_stick->IsButtonDown(SHOOT))
-		m_action->ballfeed->attemptToLoadRound = true;
+	m_action->launcher->speed = m_driver_stick->GetThrottle();
+	m_action->launcher->state = ACTION::LAUNCHER::RUNNING;
+//	if (m_operator_stick->IsButtonDown(SHOOT))
+//		m_action->ballfeed->attemptToLoadRound = true;
 	
 	/***************** Conveyor **********************/
 	m_action->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
