@@ -4,6 +4,7 @@
 #include <WPILib.h>
 #include "../ActionData/ActionData.h"
 #include "../DriverInputs/DebouncedJoystick.h"
+#include "../DriverInputs/InputParser.h"
 
 /**
  * @brief Processes inputs from {Autonomous|Joystick} and sets appropriate values in ActionData
@@ -84,10 +85,9 @@ private:
 	SEM_ID actionSemaphore;
 
 	ActionData *action;
+	InputParser *m_inputs;
 
 	DriverStation *m_ds;
-	DebouncedJoystick * m_driver_stick;
-	DebouncedJoystick * m_operator_stick;
 
 	uint32_t missedPackets;
 	bool isTeleop;

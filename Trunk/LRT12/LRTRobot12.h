@@ -27,6 +27,8 @@ public:
 	virtual void MainLoop();
 
 private:
+	Compressor *m_compressor;
+	DigitalInput *m_pressureSwitch;
 	Brain brain;
 	ActionData *m_action;
 

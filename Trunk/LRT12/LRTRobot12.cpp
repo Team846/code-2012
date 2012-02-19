@@ -18,9 +18,14 @@ LRTRobot12::LRTRobot12() :
 	components = Component::CreateComponents();
 	m_action = ActionData::GetInstance();
 
-	//	compressor = new Compressor(RobotConfig::DIGITAL_IO::COMPRESSOR_RELAY_PIN,
-	//			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN);
-	//	compressor->Start();
+	m_compressor = new Compressor(
+			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
+			RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
+	m_compressor->Start();
+//	m_compressor->SetRelayValue(Relay::kForward);
+//	m_relay = new Relay(RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
+//	m_pressureSwitch = new DigitalInput(RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN);
+//	m_relay->Set(Relay::kForward);
 
 	mainLoopWatchDog = wdCreate();
 
@@ -32,6 +37,10 @@ LRTRobot12::LRTRobot12() :
 
 LRTRobot12::~LRTRobot12()
 {
+
+	m_compressor->Stop();
+	delete m_compressor;
+//	delete m_relay;
 	// try to free SmartDashboard resources
 	//	SmartDashboard::DeleteSingletons();
 	// Testing shows this to be the entry point for a Kill signal.
@@ -74,7 +83,10 @@ void LRTRobot12::MainLoop()
 	// sysClkRateGet returns the number of ticks per cycle at the current clock rate.
 	wdStart(mainLoopWatchDog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			ExecutionNotify, 0);
-
+	{
+		
+	}
+	
 	GameState gameState = DetermineState();
 	m_action->wasDisabled = (prevState == DISABLED);
 
@@ -95,6 +107,11 @@ void LRTRobot12::MainLoop()
 
 		}
 	}
+	
+	if (ds->GetDigitalIn(RobotConfig::DRIVER_STATION::COMPRESSOR))
+		m_compressor->Start();
+	else
+		m_compressor->Stop();
 	//	brain.giveActionSem();
 
 	//    if(prevState != gameState)
@@ -104,10 +121,10 @@ void LRTRobot12::MainLoop()
 
 	// limit rate of logging 
 	static uint8_t counter = 0;
-	if (++counter >= 5)
+	if (++counter >= 10)
 	{
-			counter = 0;
-			Log::logAll();
+		counter = 0;
+		Log::logAll();
 	}
 
 	// if we finish in time, cancel the watchdog's error message

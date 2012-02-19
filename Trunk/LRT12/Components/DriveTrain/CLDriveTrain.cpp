@@ -295,8 +295,8 @@ void ClosedLoopDrivetrain::setRawTurnDutyCycle(double duty)
 
 bool ClosedLoopDrivetrain::driveOperationComplete()
 {
-	if (!m_fwd_op_complete)
-		AsyncPrinter::Printf("Not done\n");
+//	if (!m_fwd_op_complete)
+//		AsyncPrinter::Printf("Not done\n");
 	return m_fwd_op_complete;
 }
 
@@ -358,7 +358,7 @@ void ClosedLoopDrivetrain::log()
 	sdb->PutDouble("FWD Pos Drive Accumulated Error",
 			m_pos_control[TRANSLATE]->getAccumulatedError());
 
-	sdb->PutDouble("TURN Pos Drive P Setpoint",
+	sdb->PutDouble("TURN Pos Drive Setpoint",
 			m_pos_control[TURN]->getSetpoint());
 	sdb->PutDouble("TURN Pos Drive P Gain",
 			m_pos_control[TURN]->getProportionalGain());
@@ -397,7 +397,7 @@ void ClosedLoopDrivetrain::log()
 	sdb->PutDouble("FWD rate Drive Accumulated Error",
 			m_rate_control[TRANSLATE]->getAccumulatedError());
 
-	sdb->PutDouble("TURN rate Drive P Gain",
+	sdb->PutDouble("TURN rate Setpoint",
 			m_rate_control[TURN]->getSetpoint());
 	sdb->PutDouble("TURN rate Drive P Gain",
 			m_rate_control[TURN]->getProportionalGain());

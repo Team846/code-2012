@@ -54,14 +54,20 @@ public:
 private:
 	AsyncCANJaguar *m_jag1, *m_jag2;
 	std::string namea, nameb;
-//	CANJaguar *m_jag1, *m_jag2;
+	//	CANJaguar *m_jag1, *m_jag2;
 
 	LRTEncoder* m_encoder;
 
 	string m_name;
 	int m_cycle_count;
 
-	std::pair<float, float> CalculateBrakeAndDutyCycle(float target_speed,
+	typedef struct brakeAndDutyCycle
+	{
+		float dutyCycle;
+		float braking;
+	};
+
+	brakeAndDutyCycle CalculateBrakeAndDutyCycle(float target_speed,
 			float current_speed);
 };
 

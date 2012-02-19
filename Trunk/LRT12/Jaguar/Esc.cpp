@@ -39,27 +39,26 @@ void ESC::Configure()
 	string configSection("Esc");
 }
 
-//first is dutycycle, second is braking
-std::pair<float, float> ESC::CalculateBrakeAndDutyCycle(float desired_speed,
+ESC::brakeAndDutyCycle ESC::CalculateBrakeAndDutyCycle(float desired_speed,
 		float current_speed)
 {
-	std::pair<float, float> command;
+	brakeAndDutyCycle command;
 
-	command.first = 0.0;
-	command.second = 0.0;
+	command.dutyCycle = 0.0;
+	command.dutyCycle = 0.0;
 
 	if (current_speed < 0)
 	{
 		command = CalculateBrakeAndDutyCycle(-desired_speed, -current_speed);
-		command.first = -command.first;
+		command.dutyCycle = -command.dutyCycle;
 		return command;
 	}
 
 	// speed >= 0 at this point
 	if (desired_speed >= current_speed) // trying to go faster
 	{
-		command.first = desired_speed;
-		command.second = 0.0;
+		command.dutyCycle = desired_speed;
+		command.braking = 0.0;
 	}
 	// trying to slow down
 	else
@@ -68,33 +67,44 @@ std::pair<float, float> ESC::CalculateBrakeAndDutyCycle(float desired_speed,
 
 		if (desired_speed >= 0) // braking is based on speed alone; reverse power unnecessary
 		{
-			command.first = 0.0; // must set 0 to brake
+			command.dutyCycle = 0.0; // must set 0 to brake
 
-			if (current_speed > -error)
-				command.second = -error / current_speed; // speed always > 0
+			if (current_speed > -error + 0.05)
+				command.braking = -error / current_speed; // speed always > 0
 			else
-				command.second = 1.0;
+				command.braking = 1.0;
 		}
 		else // input < 0; braking with reverse power
 		{
-			command.second = 0.0; // not braking
-			command.first = error / (1.0 + current_speed); // dutyCycle <= 0 because error <= 0
+			command.braking = 0.0; // not braking
+			command.dutyCycle = error / (1.0 + current_speed); // dutyCycle <= 0 because error <= 0
 		}
 	}
 
+	command.braking = fabs(command.braking);
 	return command;
 }
 
 void ESC::SetDutyCycle(float dutyCycle)
 {
+//#warning DBS DISABLED
+//	m_jag1->SetDutyCycle(dutyCycle);
+//	m_jag2->SetDutyCycle(dutyCycle);
+//	return;
 #ifdef USE_DASHBOARD
 	//    SmartDashboard::Log(speed, name.c_str());
 #endif
 	double speed = m_encoder->GetRate() / DriveEncoders::GetInstance().getMaxEncoderRate();
-	std::pair<float, float> command = CalculateBrakeAndDutyCycle(dutyCycle,
+	speed = Util::Clamp<double>(speed, -1, 1);
+	brakeAndDutyCycle command = CalculateBrakeAndDutyCycle(dutyCycle,
 			speed);
+	
+//	static int e = 0; 
+//	if ( ++e % 5 == 0)
+//		AsyncPrinter::Printf("\nDuty %.3f Speed %.3f\n", dutyCycle, speed);
+	float origDutyCycle = dutyCycle;
 
-	if (fabs(command.first) < 1E-4) //brake only when duty cycle = 0
+	if (fabs(command.dutyCycle) < 1E-4) //brake only when duty cycle = 0
 	{
 		dutyCycle = 0.0;
 
@@ -118,7 +128,7 @@ void ESC::SetDutyCycle(float dutyCycle)
 		static const UINT8 ditherPattern[] =
 		{ 0x00, 0x01, 0x11, 0x25, 0x55, 0xD5, 0xEE, 0xFE, 0xFF };
 
-		int brake_level = (int) (fabs(command.second) * 8);
+		int brake_level = (int) (fabs(command.braking) * 8);
 		bool shouldBrakeThisCycle = ditherPattern[brake_level] & (1
 				<< m_cycle_count);
 
@@ -132,17 +142,18 @@ void ESC::SetDutyCycle(float dutyCycle)
 			m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 			m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 		}
+//		AsyncPrinter::Printf("Braking\n");
 	}
 
 	dutyCycle = Util::Clamp<float>(dutyCycle, -1.0, 1.0);
 
 //	static int e = 0;
 //	if ((e++)%21 == 0)
-//		AsyncPrinter::Printf("In: %.4f out %.4f speed %.4f\n", dutyCycle, command.first, speed);
-	m_jag1->SetDutyCycle(command.first);
-	m_jag2->SetDutyCycle(command.first);
-//	m_jag1->Set(command.first);
-//	m_jag2->Set(command.first);
+//		AsyncPrinter::Printf("In: %.3f out %.3f speed %.3f braking %.3f\n", origDutyCycle, command.dutyCycle, speed, command.braking);
+	m_jag1->SetDutyCycle(command.dutyCycle);
+	m_jag2->SetDutyCycle(command.dutyCycle);
+//	m_jag1->SetDutyCycle(origDutyCycle);
+//	m_jag2->SetDutyCycle(origDutyCycle);
 }
 
 void ESC::ResetCache()

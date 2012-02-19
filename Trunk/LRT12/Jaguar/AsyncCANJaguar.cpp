@@ -34,7 +34,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	next_jaguar_ = jaguar_list_;
 	jaguar_list_ = this;
 
-	disableLog();
+//	disableLog();
 
 	if (name == NULL)
 		m_name = "?";

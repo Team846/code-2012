@@ -7,12 +7,11 @@
 
 class Config;
 class DriveEncoders;
-class Solenoid;
 
 class PneumaticShifter: public Component, public Configurable, public Loggable
 {
 private:
-	Solenoid *m_left_sol, *m_right_sol;
+	DoubleSolenoid *m_solenoid;
 	DriveEncoders &encoders;
 	string config_section;
 

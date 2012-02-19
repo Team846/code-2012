@@ -6,20 +6,20 @@
 #include "..\Config\Config.h"
 #include "../ActionData/DriveTrainAction.h"
 #include "../ActionData/ShifterAction.h"
+#include "DoubleSolenoid.h"
 
 PneumaticShifter::PneumaticShifter() :
 	Component(), encoders(DriveEncoders::GetInstance()),
 			config_section("PneumaticShifter")
 {
-	m_left_sol = new Solenoid(RobotConfig::DIGITAL_IO::SHIFTER_LEFT_SOLENOID);
-	m_right_sol = new Solenoid(RobotConfig::DIGITAL_IO::SHIFTER_RIGHT_SOLENOID);
+	m_solenoid = new DoubleSolenoid(RobotConfig::SOLENOID_IO::SHIFTER_A,
+			RobotConfig::SOLENOID_IO::SHIFTER_B);
 	puts("Constructed PneumaticShifter");
 }
 
 PneumaticShifter::~PneumaticShifter()
 {
-	delete m_left_sol;
-	delete m_right_sol;
+	delete m_solenoid;
 }
 
 void PneumaticShifter::Configure()
@@ -31,14 +31,12 @@ void PneumaticShifter::Output()
 	switch (action->shifter->gear)
 	{
 	case ACTION::GEARBOX::LOW_GEAR:
-		m_left_sol->Set(false);
-		m_right_sol->Set(false);
+		m_solenoid->Set(DoubleSolenoid::kForward);
 		encoders.setHighGear(false);
 		break;
 
 	case ACTION::GEARBOX::HIGH_GEAR:
-		m_left_sol->Set(true);
-		m_right_sol->Set(true);
+		m_solenoid->Set(DoubleSolenoid::kReverse);
 		encoders.setHighGear(true);
 		break;
 

@@ -44,13 +44,13 @@ void DriveEncoders::Configure()
 	PULSES_PER_REVOLUTION = m_config->Get<double> (m_configsection,
 			"pulses_per_revolution", 1000.0);
 	ENCODER_RATE_HIGH_GEAR = m_config->Get<double> (m_configsection,
-			"high_gear_encoder_rate", 14750.0);
+			"high_gear_encoder_rate", 6100);
 	MAX_TURNING_RATE = m_config->Get<double> (m_configsection,
-			"max_turning_rate", 29500.0);
+			"max_turning_rate", 6100.0);
 	TICKS_PER_FULL_TURN = m_config->Get<double> (m_configsection,
-			"ticks_per_full_turn", 13500.0 * 180.0 / 165.0);
+			"ticks_per_full_turn", 2288.3 * 180.0 / 165.0);
 	WHEEL_DIAMETER = m_config->Get<double> (m_configsection, "wheel_diameter",
-			4.0); // inches
+			8.0); // inches
 	HIGH_GEAR_MULTIPLIER = m_config->Get<double> (m_configsection,
 			"low_gear_multiplier", 16.3 / 6.4);
 

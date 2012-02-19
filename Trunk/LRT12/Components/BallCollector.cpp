@@ -6,7 +6,7 @@ BallCollector::BallCollector() :
 	m_name("Ball Collector"), m_configsection("bc")
 {
 	m_roller = new AsyncCANJaguar(RobotConfig::CAN::COLLECTOR, "Collector");
-	m_arm = new Solenoid(RobotConfig::DIGITAL_IO::ARM_CYLINDER);
+	m_arm = new Solenoid(RobotConfig::SOLENOID_IO::ARM_CYLINDER);
 }
 
 BallCollector::~BallCollector()

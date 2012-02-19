@@ -1,8 +1,4 @@
 #include "Brain.h"
-#include "../ActionData/DriveTrainAction.h"
-#include "../Config/DriverStationConfig.h"
-#include "../ActionData/ShifterAction.h"
-#include "../ActionData/ConfigAction.h"
 #include "../Util/AsyncPrinter.h"
 #include "Joystick.h"
 
@@ -12,13 +8,8 @@ Brain::Brain()
 			Task::kDefaultPriority - 2);
 	m_auton_task = new Task("Auton", (FUNCPTR) Brain::autonTaskEntryPoint,
 			Task::kDefaultPriority - 2);
-	m_driver_stick = new DebouncedJoystick(1,
-			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
-			DriverStationConfig::NUM_JOYSTICK_AXES);
-	m_operator_stick = new DebouncedJoystick(2,
-			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
-			DriverStationConfig::NUM_JOYSTICK_AXES);
 
+	m_inputs = new InputParser();
 	m_ds = DriverStation::GetInstance();
 	missedPackets = 0;
 	isTeleop = false;
@@ -40,8 +31,6 @@ Brain::~Brain()
 	m_teleop_task->Stop();
 	delete m_auton_task;
 	delete m_teleop_task;
-	delete m_driver_stick;
-	delete m_operator_stick;
 }
 
 void Brain::startAuton()
@@ -78,9 +67,6 @@ void Brain::teleopTask()
 				missedPackets += m_ds->GetPacketNumber() - lastPacketNum - 1;
 			}
 		}
-
-		m_driver_stick->Update();
-		m_operator_stick->Update();
 
 		process();
 
@@ -124,54 +110,8 @@ void Brain::process()
 	else if (m_ds->IsOperatorControl())
 	{
 #warning position drive does not work yet
-
-		if (m_driver_stick->IsButtonJustPressed(8))
-			action->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
-		if (m_driver_stick->IsButtonJustPressed(9))
-			action->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
-
-//		action->drivetrain->rate.drive_control = false;
-//		action->drivetrain->rate.turn_control = false;
-		action->drivetrain->rate.drive_control = true;
-		action->drivetrain->rate.turn_control = true;
-		if (m_driver_stick->IsButtonJustPressed(6))
-		{
-			action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
-			action->drivetrain->position.desiredRelativeTurnPosition = 0.0;
-			action->drivetrain->position.drive_control = true;
-			action->drivetrain->position.turn_control = true;
-		}
-		else if (m_driver_stick->IsButtonJustPressed(7))
-		{
-			action->drivetrain->position.drive_control = false;
-			action->drivetrain->position.turn_control = false;
-		}
-		else if (m_driver_stick->IsButtonJustPressed(5))
-		{
-			action->drivetrain->position.drive_control = true;
-			action->drivetrain->position.turn_control = true;
-			action->drivetrain->position.desiredRelativeDrivePosition = 24.0;
-			action->drivetrain->position.desiredRelativeTurnPosition = 0.0;
-		}
-
-		action->drivetrain->rate.desiredDriveRate = -m_driver_stick->GetAxis(
-				Joystick::kYAxis);
-//		AsyncPrinter::Printf("Rate: %.2f\n", action->drivetrain->rate.desiredDriveRate);
-		action->drivetrain->rate.desiredTurnRate = -m_driver_stick->GetAxis(
-				Joystick::kZAxis);
-
-		if (m_driver_stick->IsButtonJustPressed(2))
-		{
-			action->config->save = true;
-		}
-		if (m_driver_stick->IsButtonJustPressed(3))
-		{
-			action->config->load = true;
-		}
-		if (m_driver_stick->IsButtonJustPressed(4))
-		{
-			action->config->apply = true;
-		}
+		m_inputs->ProcessInputs();
+		
 		//		giveActionSem();
 	}
 }

@@ -3,20 +3,26 @@
 #include "../Config/Config.h"
 #include "../ActionData/BallFeedAction.h"
 
+#define PRESSURE_PLATE_ENABLED 0
+
 BallFeeder::BallFeeder() :
 	m_name("Ball Feeder"), m_configsection("bf")
 {
 	m_roller[FRONT]
 			= new AsyncCANJaguar(RobotConfig::CAN::FEEDER_FWD, "BF_FWD");
 	m_roller[BACK] = new AsyncCANJaguar(RobotConfig::CAN::FEEDER_REV, "BF_REV");
-	m_pressure_plate = new Solenoid(RobotConfig::DIGITAL_IO::PRESSURE_PLATE);
+#if PRESSURE_PLATE_ENABLED
+	m_pressure_plate = new Solenoid(RobotConfig::SOLENOID_IO::PRESSURE_PLATE);
+#endif
 }
 
 BallFeeder::~BallFeeder()
 {
 	delete m_roller[FRONT];
 	delete m_roller[BACK];
+#if PRESSURE_PLATE_ENABLED
 	delete m_pressure_plate;
+#endif
 }
 
 void BallFeeder::Output()
@@ -36,17 +42,19 @@ void BallFeeder::Output()
 		m_roller[BACK]->SetDutyCycle(m_rev_duty[BACK]);
 		break;
 	}
+#if PRESSURE_PLATE_ENABLED
 	m_pressure_plate->Set(action->ballfeed->attemptToLoadRound);
+#endif
 }
 
 void BallFeeder::Configure()
 {
 	Config * c = Config::GetInstance();
 	m_fwd_duty[FRONT] = c->Get<double> (m_configsection, "front_fwd_duty", 0.3);
-	m_fwd_duty[BACK] = c->Get<double> (m_configsection, "back_fwd_duty", -0.3);
+	m_fwd_duty[BACK] = c->Get<double> (m_configsection, "back_fwd_duty", 0.3);
 	m_rev_duty[FRONT]
 			= c->Get<double> (m_configsection, "front_rev_duty", -0.3);
-	m_rev_duty[BACK] = c->Get<double> (m_configsection, "back_rev_duty", 0.3);
+	m_rev_duty[BACK] = c->Get<double> (m_configsection, "back_rev_duty", -0.3);
 }
 
 void BallFeeder::log()

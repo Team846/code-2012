@@ -8,7 +8,7 @@ namespace ACTION
 namespace LAUNCHER
 {
 /*!
- * @brief Keeps track of the gearbox state
+ * @brief Keeps track of the launcher state
  */
 enum launcherState
 {
@@ -22,6 +22,7 @@ struct LauncherAction
 	ACTION::LAUNCHER::launcherState state;
 	bool atSpeed;
 	double speed;
+	double distance;
 };
 
 #endif

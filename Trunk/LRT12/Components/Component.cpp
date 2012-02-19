@@ -7,6 +7,8 @@
 #include "BallCollector.h"
 #include "BallFeeder.h"
 #include "Wedge.h"
+#include "PneumaticShifter.h"
+#include "../Config/RobotConfig.h"
 
 Component::ComponentData Component::createComponentData(
 		bool RequiresEnabledState, int DIO)
@@ -26,17 +28,17 @@ list<Component::ComponentWithData>* Component::CreateComponents()
 					new ConfigLoader(),
 					createComponentData(false, ComponentData::NO_DS_DISABLE_DIO)));
 	components->push_back(
-			ComponentWithData(new Drivetrain(), createComponentData(true, 1)));
+			ComponentWithData(new Drivetrain(), createComponentData(true, RobotConfig::DRIVER_STATION::DRIVETRAIN)));
 	components->push_back(
-			ComponentWithData(new Shifter(), createComponentData(true, 2)));
+			ComponentWithData(new PneumaticShifter(), createComponentData(true, RobotConfig::DRIVER_STATION::SHIFTER)));
 //	components->push_back(
 //			ComponentWithData(new Launcher(), createComponentData(true, 3)));
 //	components->push_back(
 //			ComponentWithData(new BallCollector(), createComponentData(true, 4)));
 //	components->push_back(
 //			ComponentWithData(new Wedge(), createComponentData(true, 5)));
-//	components->push_back(
-//			ComponentWithData(new BallFeeder(), createComponentData(true, 6)));
+	components->push_back(
+			ComponentWithData(new BallFeeder(), createComponentData(true, RobotConfig::DRIVER_STATION::BALLFEEDER)));
 
 	//sample initialization of components
 	//    components->push_back(ComponentWithData(new Shifter(), createComponentData(true, 5)));
