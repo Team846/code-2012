@@ -39,7 +39,7 @@ int redLowThresh = 158;
 int redMaxOtherThresh = 135;
 
 int bluLowThresh = 80;
-int bluMaxOtherThresh = 80;
+int bluMaxOtherThresh = 90;
 
 int getKeyPixels(IplImage * frameIn)
 {
@@ -90,11 +90,6 @@ int main()
 
 			// DbgPrint(value);
 
-			/*
-			 * TODO:
-			 *
-			 * Implement packet sending
-			 */
 			int iSent = messenger.sendData(frameNumber, value);
 
 			DbgPrint(iSent);
