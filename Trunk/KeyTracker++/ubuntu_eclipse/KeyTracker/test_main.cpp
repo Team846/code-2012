@@ -10,6 +10,8 @@
 #include <opencv/cxcore.h>
 #include <opencv/highgui.h>
 
+#include "headers/messenger.h"
+
 using namespace std;
 
 //#pragma endregion
@@ -68,6 +70,8 @@ int getKeyPixels(IplImage * frameIn)
             int blue = CV_GETPIXEL(frameIn, x, y, 0);
             int red = CV_GETPIXEL(frameIn, x, y, 2);
 
+            bool alreadyset = false;
+
 			//int rPixel = CV_GETPIXEL(frameIn, x, y, 0);
 
 			//rPixel = red;
@@ -78,11 +82,13 @@ int getKeyPixels(IplImage * frameIn)
             {
             	cvSet2D(redFrameOut, y, x, cvScalar(0, 0, 255));
                 ++count;
+                alreadyset = true;
             }
             if(blue >= loBPosition && red <= hiBPosition)
             {
             	cvSet2D(blueFrameOut, y, x, cvScalar(255, 0, 0));
-            	++count;
+            	if(!alreadyset)
+            		++count;
             }
         }
     }
@@ -124,16 +130,16 @@ int main()
     cvCreateTrackbar("BlueMax", "operations", &hiBPosition, 255, onHiBThresholdSlide);
 
     int key;
-    int redPass;
-    int bluePass;
-    double percentage;
+    int frameNumber = 0;
+
+    Messenger messenger;
 
     CvSize size;
 
     while(true)
     {
         clock_t start = clock();
-
+        ++frameNumber;
         cap_img = cvQueryFrame(cv_cap);
 
         if(cap_img != 0)
@@ -141,14 +147,20 @@ int main()
             int width = cap_img->width;
             int height = cap_img->height;
             size = cvSize(width, height);
+            int matched = getKeyPixels(cap_img);
+            float matchedPixels = (float)matched / (float)(width*height);
 
         	cvSetMouseCallback("video", mouseHandler, (void*)cap_img);
 
 			cvShowImage("video", cap_img);
 
-			int value = getKeyPixels(cap_img);
+			int value = 255 * matchedPixels;
 
-			cout << value << endl;
+			// DbgPrint(value);
+
+			int iSent = messenger.sendData(frameNumber, value);
+
+			DbgPrint(value);
 
             // Remove double-slashes for death.
             // /*

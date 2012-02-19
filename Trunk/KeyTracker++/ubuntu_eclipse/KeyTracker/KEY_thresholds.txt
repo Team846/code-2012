@@ -1,0 +1,8 @@
+# min red
+158
+# max blue
+135
+# min blue
+80
+# max red
+90
