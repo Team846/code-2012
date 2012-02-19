@@ -1,30 +1,73 @@
 #include "KeyTracker.h"
 
+KeyTracker& KeyTracker::instance()
+{
+	static KeyTracker keyTracker;
+	
+	return keyTracker;
+}
+
 KeyTracker::KeyTracker()
 {
+	missedPackets = 0;
+	running = false;
+	
 	int iResult = setup();
 
 	if(iResult != 0)
 	{
 		AsyncPrinter::Printf("!!! KeyTracker: Some errors occurred during initialization.");
 	}
+	
+	m_task = new Task("KeyTracker::listen", (FUNCPTR)KeyTracker::listenTask());
+	m_task->Start();
+}
+
+KeyTracker::~KeyTracker()
+{
+	running = false;
+	disconnect();
 }
 
 void KeyTracker::listen()
 {
-	addr_len = sizeof(client_addr);
-	int retcode = recvfrom(m_socket, in_buf, sizeof(in_buf), 0, (struct sockaddr*)&client_addr, (socklen_t*)&addr_len);
+	int lastPacketID = 0;
 	
-	if (retcode < 0)
+	while(running)
 	{
-		AsyncPrinter::Printf("!!! KeyTracker: Error: recvfrom() failed. %d\n", retcode);
-		return;
+		addr_len = sizeof(client_addr);
+		int retcode = recvfrom(m_socket, in_buf, sizeof(in_buf), 0, (struct sockaddr*)&client_addr, &addr_len);
+		
+		if (retcode < 0)
+		{
+			AsyncPrinter::Printf("!!! KeyTracker: Error: recvfrom() failed. %d\n", retcode);
+			return;
+		}
+		
+		int pid = ((in_buf[0] << 24) | (in_buf[1] << 16) | (in_buf[2] << 8) | (in_buf[3] << 0));
+		keyValue = in_buf[4];
+		
+		if(pid - 1 != lastPacketID)
+		{
+			missedPackets = pid - lastPacketID - 1;
+		}
+		
+		lastPacketID = pid;
 	}
+}
+
+uint32_t KeyTracker::getKeyValue()
+{
+	return keyValue;
+}
+
+int KeyTracker::listenTask()
+{
+	instance().running = true;
+	instance().listen();
+	instance().running = false;
 	
-	int pid = ((in_buf[0] << 24) | (in_buf[1] << 16) | (in_buf[2] << 8) | (in_buf[3] << 0));
-	int value = in_buf[4];
-	
-	int speed = value / 255;
+	return 0;
 }
 
 int KeyTracker::setup()
