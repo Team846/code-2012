@@ -23,8 +23,6 @@ KeyTracker::~KeyTracker()
 
 void KeyTracker::listen()
 {
-	static int counter = 0;
-	
 	AsyncPrinter::Printf("Starting listen task...\n");
 	
 	int iResult = -1;
@@ -51,7 +49,6 @@ void KeyTracker::listen()
 		addr_len = sizeof(client_addr);
 		
 		int retcode = recvfrom(m_socket, in_buf, sizeof(in_buf), 0, (struct sockaddr *)&client_addr, &addr_len);
-		AsyncPrinter::Printf("Yay!\n");
 		if (retcode < 0)
 		{
 			AsyncPrinter::Printf("!!! KeyTracker: Error: recvfrom() failed. %d\n", retcode);
@@ -62,7 +59,6 @@ void KeyTracker::listen()
 		keyValue = in_buf[4];
 
 //		if(counter % 10 == 0)
-		AsyncPrinter::Printf("Packet ID: %d, value: %d", pid, keyValue);
 		
 		++counter;
 		
@@ -73,7 +69,6 @@ void KeyTracker::listen()
 		
 		lastPacketID = pid;
 	}
-	AsyncPrinter::Printf("COUNTER : %d\n", counter);
 }
 
 uint32_t KeyTracker::getKeyValue()

@@ -18,10 +18,10 @@ LRTRobot12::LRTRobot12() :
 	components = Component::CreateComponents();
 	m_action = ActionData::GetInstance();
 	
-	/* // */m_compressor = new Compressor(
-	/* //*/	RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
-	/* //*/	RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
-	/* //*/m_compressor->Start();
+	/* // *m_compressor = new Compressor(
+	/* //*	RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
+	/* //*	RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
+	/* //m_compressor->Start();*/
 //	m_compressor->SetRelayValue(Relay::kForward);
 //	m_relay = new Relay(RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
 //	m_pressureSwitch = new DigitalInput(RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN);
@@ -32,7 +32,7 @@ LRTRobot12::LRTRobot12() :
 	//set priority above default so that we get hgiher priority than default
 	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority
 
-	//m_keyTracker = new KeyTracker();
+	m_keyTracker = new KeyTracker();
 	
 	printf("---- Robot Initialized ----\n\n");
 }
@@ -109,11 +109,12 @@ void LRTRobot12::MainLoop()
 
 		}
 	}
-	
+
+	/*
 	if (ds->GetDigitalIn(RobotConfig::DRIVER_STATION::COMPRESSOR))
 		m_compressor->Start();
 	else
-		m_compressor->Stop();
+		m_compressor->Stop();*/
 	//	brain.giveActionSem();
 
 	//    if(prevState != gameState)

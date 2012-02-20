@@ -35,7 +35,7 @@ private:
 	Brain brain;
 	ActionData *m_action;
 	
-	//KeyTracker *m_keyTracker;
+	KeyTracker *m_keyTracker;
 
 	PrintInConstructor dc_CANBus_;
 
