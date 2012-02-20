@@ -108,7 +108,7 @@ int main() {
 	loadThresholds();
 
 	/* Open capture stream */
-	CvCapture *pCapture = cvCaptureFromCAM(0);
+	CvCapture *pCapture = cvCaptureFromCAM(1);
 	IplImage *pCaptureImg;
 
 	int frameNumber = 0;

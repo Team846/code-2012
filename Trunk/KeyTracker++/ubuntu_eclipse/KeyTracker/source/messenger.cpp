@@ -26,7 +26,7 @@ void Messenger::setup()
 	int broadcast = 1;
 	setsockopt(m_socket, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast));
 
-	m_remote.sin_addr.s_addr = inet_addr("127.0.0.1");
+	m_remote.sin_addr.s_addr = inet_addr("10.8.46.2"); // total time wasted on this line: one hour
 	m_remote.sin_family = AF_INET;
 	m_remote.sin_port = htons(8001);
 
