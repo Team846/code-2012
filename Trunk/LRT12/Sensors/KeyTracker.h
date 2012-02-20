@@ -20,15 +20,15 @@ class KeyTracker
 public:
 	KeyTracker();
 	~KeyTracker();
-	
-	static KeyTracker& instance();
-	static int listenTask();
+
+	static int listenTask(uint32_t obj);
 	
 	void listen();
 	
 	uint32_t getKeyValue();
 	
 private:
+	
 	int setup();
 	void disconnect();
 	

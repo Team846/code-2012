@@ -16,6 +16,9 @@
 
 #include "Jaguar/AsyncCANJaguar.h"
 
+// TESTING
+#include "Sensors/KeyTracker.h"
+
 class LRTRobot12: public LRTRobotBase
 {
 public:
@@ -31,6 +34,8 @@ private:
 	DigitalInput *m_pressureSwitch;
 	Brain brain;
 	ActionData *m_action;
+	
+	//KeyTracker *m_keyTracker;
 
 	PrintInConstructor dc_CANBus_;
 

@@ -13,7 +13,7 @@ void _GLOBAL__I__ZN10BallFeederC2Ev();
 
 void _GLOBAL__I__ZN10DrivetrainC2Ev();
 
-void _GLOBAL__I__ZN10KeyTracker8instanceEv();
+void _GLOBAL__I__ZN10KeyTrackerC2Ev();
 
 void _GLOBAL__I__ZN10LRTEncoderC2EPKcjjd();
 
@@ -95,7 +95,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN10ActionData8instanceE,
     _GLOBAL__I__ZN10BallFeederC2Ev,
     _GLOBAL__I__ZN10DrivetrainC2Ev,
-    _GLOBAL__I__ZN10KeyTracker8instanceEv,
+    _GLOBAL__I__ZN10KeyTrackerC2Ev,
     _GLOBAL__I__ZN10LRTEncoderC2EPKcjjd,
     _GLOBAL__I__ZN10LRTRobot12C2Ev,
     _GLOBAL__I__ZN11InputParserC2Ev,
@@ -142,7 +142,7 @@ void _GLOBAL__D__ZN10BallFeederC2Ev();
 
 void _GLOBAL__D__ZN10DrivetrainC2Ev();
 
-void _GLOBAL__D__ZN10KeyTracker8instanceEv();
+void _GLOBAL__D__ZN10KeyTrackerC2Ev();
 
 void _GLOBAL__D__ZN10LRTEncoderC2EPKcjjd();
 
@@ -220,7 +220,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN10ActionData8instanceE,
     _GLOBAL__D__ZN10BallFeederC2Ev,
     _GLOBAL__D__ZN10DrivetrainC2Ev,
-    _GLOBAL__D__ZN10KeyTracker8instanceEv,
+    _GLOBAL__D__ZN10KeyTrackerC2Ev,
     _GLOBAL__D__ZN10LRTEncoderC2EPKcjjd,
     _GLOBAL__D__ZN10LRTRobot12C2Ev,
     _GLOBAL__D__ZN11InputParserC2Ev,

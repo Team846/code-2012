@@ -17,11 +17,11 @@ LRTRobot12::LRTRobot12() :
 	ds = DriverStation::GetInstance();
 	components = Component::CreateComponents();
 	m_action = ActionData::GetInstance();
-
-	m_compressor = new Compressor(
-			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
-			RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
-	m_compressor->Start();
+	
+	/* // */m_compressor = new Compressor(
+	/* //*/	RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
+	/* //*/	RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
+	/* //*/m_compressor->Start();
 //	m_compressor->SetRelayValue(Relay::kForward);
 //	m_relay = new Relay(RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
 //	m_pressureSwitch = new DigitalInput(RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN);
@@ -32,14 +32,16 @@ LRTRobot12::LRTRobot12() :
 	//set priority above default so that we get hgiher priority than default
 	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority
 
+	//m_keyTracker = new KeyTracker();
+	
 	printf("---- Robot Initialized ----\n\n");
 }
 
 LRTRobot12::~LRTRobot12()
 {
 
-	m_compressor->Stop();
-	delete m_compressor;
+	//m_compressor->Stop();
+	//delete m_compressor;
 //	delete m_relay;
 	// try to free SmartDashboard resources
 	//	SmartDashboard::DeleteSingletons();
@@ -77,8 +79,7 @@ static int ExecutionNotify(...)
 }
 
 void LRTRobot12::MainLoop()
-{
-
+{	
 	// setup a watchdog to warn us if our loop takes too long
 	// sysClkRateGet returns the number of ticks per cycle at the current clock rate.
 	wdStart(mainLoopWatchDog, sysClkRateGet() / RobotConfig::LOOP_RATE,
@@ -87,6 +88,7 @@ void LRTRobot12::MainLoop()
 		
 	}
 	
+	// /*
 	GameState gameState = DetermineState();
 	m_action->wasDisabled = (prevState == DISABLED);
 
@@ -126,7 +128,7 @@ void LRTRobot12::MainLoop()
 		counter = 0;
 		Log::logAll();
 	}
-
+//*/
 	// if we finish in time, cancel the watchdog's error message
 	wdCancel(mainLoopWatchDog);
 }
