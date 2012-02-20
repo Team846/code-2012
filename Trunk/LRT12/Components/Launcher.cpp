@@ -49,6 +49,10 @@ void Launcher::Output()
 		m_pid.reset();
 		break;
 	}
+	
+	static int e = 0;
+	if (++e % 10 == 0)
+		AsyncPrinter::Printf("Speed %.5f\n", 1/m_enc->GetPeriod());
 }
 
 std::string Launcher::GetName()
