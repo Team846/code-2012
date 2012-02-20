@@ -1,8 +1,9 @@
 #include "InputParser.h"
-#include "../ActionData/ActionData.h"
 #include "DebouncedJoystick.h"
 #include "../Config/DriverStationConfig.h"
+#include "math.h"
 
+#include "../ActionData/ActionData.h"
 #include "../ActionData/DriveTrainAction.h"
 #include "../ActionData/ShifterAction.h"
 #include "../ActionData/LauncherAction.h"
@@ -53,11 +54,12 @@ void InputParser::ProcessInputs()
 
 	/***************** Shooter **********************/
 	//TODO SHOOT! 
-	m_action->launcher->speed = m_driver_stick->GetThrottle();
+	m_action->launcher->speed = fabs(
+			m_operator_stick->GetAxis(Joystick::kYAxis));
 	m_action->launcher->state = ACTION::LAUNCHER::RUNNING;
-//	if (m_operator_stick->IsButtonDown(SHOOT))
-//		m_action->ballfeed->attemptToLoadRound = true;
-	
+	//	if (m_operator_stick->IsButtonDown(SHOOT))
+	//		m_action->ballfeed->attemptToLoadRound = true;
+
 	/***************** Conveyor **********************/
 	m_action->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
 

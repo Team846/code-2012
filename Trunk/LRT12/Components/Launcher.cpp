@@ -38,7 +38,7 @@ void Launcher::Output()
 		double speed = (m_enc->GetStopped()) ? 0.0 : (1.0 / m_enc->GetPeriod());
 		m_pid.setInput(speed);
 		m_pid.update(1.0 / RobotConfig::LOOP_RATE); // 50 Hz
-//		m_roller->SetDutyCycle(m_pid.getOutput());
+		//		m_roller->SetDutyCycle(m_pid.getOutput());
 #warning SPEED CONTROL ON ROLLER NOT ENABLED
 		m_roller->SetDutyCycle(action->launcher->speed);
 		action->launcher->atSpeed = fabs(speed - action->launcher->speed) < 10; // w/i 10 rpm
@@ -49,10 +49,10 @@ void Launcher::Output()
 		m_pid.reset();
 		break;
 	}
-	
+
 	static int e = 0;
 	if (++e % 10 == 0)
-		AsyncPrinter::Printf("Speed %.5f\n", 1/m_enc->GetPeriod());
+		AsyncPrinter::Printf("Speed %.5f\n", 1 / m_enc->GetPeriod());
 }
 
 std::string Launcher::GetName()

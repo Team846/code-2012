@@ -12,7 +12,7 @@ BallFeeder::BallFeeder() :
 			= new AsyncCANJaguar(RobotConfig::CAN::FEEDER_FWD, "BF_FWD");
 	m_roller[BACK] = new AsyncCANJaguar(RobotConfig::CAN::FEEDER_REV, "BF_REV");
 #if PRESSURE_PLATE_ENABLED
-	m_pressure_plate = new Solenoid(RobotConfig::SOLENOID_IO::PRESSURE_PLATE);
+	m_pressure_plate = new Relay(RobotConfig::RELAY_IO::PRESSURE_PLATE);
 #endif
 }
 

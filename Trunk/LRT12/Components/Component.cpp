@@ -31,16 +31,16 @@ list<Component::ComponentWithData>* Component::CreateComponents()
 			ComponentWithData(new Drivetrain(), createComponentData(true, RobotConfig::DRIVER_STATION::DRIVETRAIN)));
 	
 	//Bug in pneumatic shifter
-//	components->push_back(
-//			ComponentWithData(new PneumaticShifter(), createComponentData(true, RobotConfig::DRIVER_STATION::SHIFTER)));
+	components->push_back(
+			ComponentWithData(new PneumaticShifter(), createComponentData(true, RobotConfig::DRIVER_STATION::SHIFTER)));
 	components->push_back(
 			ComponentWithData(new Launcher(), createComponentData(true, RobotConfig::DRIVER_STATION::LAUNCHER)));
-//	components->push_back(
-//			ComponentWithData(new BallCollector(), createComponentData(true, 4)));
-//	components->push_back(
-//			ComponentWithData(new Wedge(), createComponentData(true, 5)));
-//	components->push_back(
-//			ComponentWithData(new BallFeeder(), createComponentData(true, RobotConfig::DRIVER_STATION::BALLFEEDER)));
+	components->push_back(
+			ComponentWithData(new BallCollector(), createComponentData(true, 4)));
+	components->push_back(
+			ComponentWithData(new Wedge(), createComponentData(true, 5)));
+	components->push_back(
+			ComponentWithData(new BallFeeder(), createComponentData(true, RobotConfig::DRIVER_STATION::BALLFEEDER)));
 
 	//sample initialization of components
 	//    components->push_back(ComponentWithData(new Shifter(), createComponentData(true, 5)));

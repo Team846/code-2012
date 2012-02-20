@@ -6,7 +6,7 @@
 #include "../Config/Configurable.h"
 #include "../Jaguar/AsyncCANJaguar.h"
 #include "../Log/Loggable.h"
-#include "Solenoid.h"
+#include "Relay.h"
 
 /*!
  * Controls the collection of balls from the front
@@ -54,7 +54,7 @@ private:
 	std::string m_configsection;
 	double m_fwd_duty[2], m_rev_duty[2];
 	AsyncCANJaguar * m_roller[2];
-	Solenoid * m_pressure_plate;
+	Relay * m_pressure_plate;
 };
 
 #endif
