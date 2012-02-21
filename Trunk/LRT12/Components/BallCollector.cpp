@@ -30,6 +30,12 @@ void BallCollector::Output()
 	}
 }
 
+void BallCollector::Disable()
+{
+	m_arm->Set(DoubleSolenoid::kOff);
+	m_roller->SetDutyCycle(0.0);
+}
+
 void BallCollector::Configure()
 {
 	AsyncPrinter::Printf("Configured");

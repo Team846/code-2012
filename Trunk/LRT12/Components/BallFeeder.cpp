@@ -26,6 +26,13 @@ BallFeeder::~BallFeeder()
 	delete m_pressure_plate;
 }
 
+void BallFeeder::Disable()
+{
+	m_roller[FRONT]->SetDutyCycle(0.0);
+	m_roller[BACK]->SetDutyCycle(0.0);
+	m_roller[INTAKE]->SetDutyCycle(0.0);
+}
+
 void BallFeeder::Output()
 {
 	switch (action->ballfeed->feeder_state)

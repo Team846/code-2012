@@ -23,6 +23,7 @@ public:
 	virtual ~PneumaticShifter();
 
 	void virtual Output();
+	void virtual Disable();
 	virtual void Configure();
 	virtual string GetName();
 	virtual void log();

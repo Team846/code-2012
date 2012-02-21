@@ -30,6 +30,11 @@ void Wedge::Configure()
 	m_pulse_up = config->Get<int> (m_name, "pulseUp", 25);
 }
 
+void Wedge::Disable()
+{
+	m_spike->Set(Relay::kOff);
+}
+
 void Wedge::Output()
 {
 	//	bool updateNeeded = m_lastState != action->bridgePD->state;

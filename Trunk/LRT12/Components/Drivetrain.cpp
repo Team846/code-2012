@@ -31,6 +31,12 @@ std::string Drivetrain::GetName()
 	return m_name;
 }
 
+void Drivetrain::Disable()
+{
+	m_esc_left->Disable();
+	m_esc_right->Disable();
+}
+
 void Drivetrain::Output()
 {
 	bool isHighGear = action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR;

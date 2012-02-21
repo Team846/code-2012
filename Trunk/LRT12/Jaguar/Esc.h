@@ -51,6 +51,8 @@ public:
 	 * @brief Resets the caching.
 	 */
 	void ResetCache();
+	
+	void Disable();
 private:
 	AsyncCANJaguar *m_jag1, *m_jag2;
 	std::string namea, nameb;

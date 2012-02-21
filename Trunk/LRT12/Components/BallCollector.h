@@ -30,7 +30,12 @@ public:
 	 * Turns the ball collector on or off depending on action data
 	 */
 	virtual void Output();
-
+	
+	/*!
+	 * Disables ball collector
+	 */
+	virtual void Disable();
+	
 	/*!
 	 * Configures values from Config
 	 */

@@ -35,6 +35,12 @@ public:
 	 * @brief called every time the main loop iterates.
 	 */
 	virtual void Output() = 0;
+	
+	/*!
+	 * @brief called when the component is disabled
+	 */
+	
+	virtual void Disable() = 0;
 
 	/*!
 	 * @brief returns the name of the component which is helpful for debugging and profiling.

@@ -36,6 +36,11 @@ void Launcher::Configure()
 	m_pid.setParameters(p, i, d, ff);
 }
 
+void Launcher::Disable()
+{
+	m_roller->SetDutyCycle(0.0);
+}
+
 void Launcher::Output()
 {
 	m_speed = (m_enc->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc->GetPeriod());

@@ -12,6 +12,7 @@ public:
 	virtual ~ConfigLoader();
 
 	virtual void Output();
+	virtual void Disable(){}
 	virtual string GetName();
 private:
 	Config *m_config;

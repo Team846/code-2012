@@ -31,6 +31,7 @@ public:
 
 	// overloaded methods
 	virtual void Output();
+	virtual void Disable();
 	virtual void Configure();
 	virtual std::string GetName();
 	virtual void log();

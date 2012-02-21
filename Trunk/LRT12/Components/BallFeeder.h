@@ -30,6 +30,8 @@ public:
 	 * Turns the ball feeder on or off depending on action data
 	 */
 	virtual void Output();
+	
+	virtual void Disable();
 
 	/*!
 	 * Configures values from Config

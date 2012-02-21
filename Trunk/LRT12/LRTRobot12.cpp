@@ -106,6 +106,11 @@ void LRTRobot12::MainLoop()
 				ProfiledSection ps("Outputting " + (*iter).first->GetName());
 				(*iter).first->Output();
 			}
+			else
+			{
+				ProfiledSection ps("Disabling " + (*iter).first->GetName());
+				(*iter).first->Disable();
+			}
 
 		}
 	}

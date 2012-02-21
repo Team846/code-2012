@@ -26,6 +26,11 @@ void PneumaticShifter::Configure()
 {
 }
 
+void PneumaticShifter::Disable()
+{
+	m_solenoid->Set(DoubleSolenoid::kOff);
+}
+
 void PneumaticShifter::Output()
 {
 	switch (action->shifter->gear)

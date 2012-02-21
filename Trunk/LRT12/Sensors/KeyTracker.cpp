@@ -60,7 +60,7 @@ void KeyTracker::listen()
 
 //		if(counter % 10 == 0)
 		
-		++counter;
+//		++counter;
 		
 		if(pid - 1 != lastPacketID)
 		{

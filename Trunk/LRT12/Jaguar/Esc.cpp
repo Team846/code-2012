@@ -162,6 +162,12 @@ void ESC::SetDutyCycle(float dutyCycle)
 #endif
 }
 
+void ESC::Disable()
+{
+	m_jag1->SetDutyCycle(0.0);
+	m_jag2->SetDutyCycle(0.0);
+}
+
 void ESC::ResetCache()
 {
 	m_jag1->ResetCache();

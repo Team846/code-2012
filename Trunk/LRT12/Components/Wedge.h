@@ -50,6 +50,8 @@ public:
 	 * Drives the wedge according to the action data
 	 */
 	virtual void Output();
+	
+	virtual void Disable();
 
 	/*!
 	 * Returns the name of the wedge

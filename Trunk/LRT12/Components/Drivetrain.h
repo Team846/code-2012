@@ -27,6 +27,7 @@ public:
 	~Drivetrain();
 
 	virtual void Output();
+	virtual void Disable();
 
 	virtual std::string GetName();
 
