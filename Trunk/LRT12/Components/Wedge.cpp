@@ -1,14 +1,15 @@
 #include "Wedge.h"
+#include "Pneumatic/SharedCylinder.h"
 
 Wedge::Wedge() :
 	Component(), m_name("Wedge")
 {
 	m_spike = new Relay(RobotConfig::RELAY_IO::WEDGE_SPIKE,
 			Relay::kBothDirections);
-	m_bottomlimit = new DigitalInput(
-			RobotConfig::DIGITAL_IO::WEDGE_LIMIT_BOTTOM);
-	m_toplimit = new DigitalInput(RobotConfig::DIGITAL_IO::WEDGE_LIMIT_TOP);
-	m_latch = new Solenoid(RobotConfig::SOLENOID_IO::WEDGE_LATCH);
+	//	m_bottomlimit = new DigitalInput(
+	//			RobotConfig::DIGITAL_IO::WEDGE_LIMIT_BOTTOM);
+	//	m_toplimit = new DigitalInput(RobotConfig::DIGITAL_IO::WEDGE_LIMIT_TOP);
+	//	m_latch = new Solenoid(RobotConfig::SOLENOID_IO::WEDGE_LATCH);
 
 	Configure();
 
@@ -19,23 +20,24 @@ Wedge::Wedge() :
 
 Wedge::~Wedge()
 {
-	delete m_latch;
-	delete m_bottomlimit;
-	delete m_toplimit;
+	//	delete m_latch;
+	//	delete m_bottomlimit;
+	//	delete m_toplimit;
 	delete m_spike;
 }
 
 void Wedge::Configure()
 {
 	Config * config = Config::GetInstance();
-	m_pulse_down = config->Get<int> (m_name, "pulseDown", 25);
-	m_pulse_up = config->Get<int> (m_name, "pulseUp", 25);
+	m_pulse_down = config->Get<int> (m_name, "pulseDown", 50);
+	m_pulse_up = config->Get<int> (m_name, "pulseUp", 50);
 }
 
 void Wedge::Disable()
 {
-	m_latch->Set(false);
+	//	m_latch->Set(false);
 	m_spike->Set(Relay::kOff);
+	SharedSolenoid::GetInstance()->DisableLatch();
 }
 
 void Wedge::Output()
@@ -53,19 +55,19 @@ void Wedge::Output()
 	{
 	case ACTION::WEDGE::PRESET_TOP:
 		m_action->wedge->completion_status = ACTION::IN_PROGRESS;
+		SharedSolenoid::GetInstance()->EnableLatch();
+		//		m_latch->Set(true);
 
-		m_latch->Set(true);
-
-		if (m_toplimit->Get() || ++m_ctr >= m_pulse_up)
+		if (/*m_toplimit->Get() || */++m_ctr >= m_pulse_up)
 		{
-			if (m_ctr >= m_pulse_up && !m_toplimit->Get())
-			{
-				m_action->wedge->completion_status = ACTION::FAILURE;
-			}
-			else
-			{
-				m_action->wedge->completion_status = ACTION::SUCCESS;
-			}
+			//			if (m_ctr >= m_pulse_up && !m_toplimit->Get())
+			//			{
+			//				m_action->wedge->completion_status = ACTION::FAILURE;
+			//			}
+			//			else
+			//			{
+			m_action->wedge->completion_status = ACTION::SUCCESS;
+			//			}
 			m_spike->Set(Relay::kOff);
 		}
 		else
@@ -76,18 +78,19 @@ void Wedge::Output()
 	case ACTION::WEDGE::PRESET_BOTTOM:
 		m_action->wedge->completion_status = ACTION::IN_PROGRESS;
 
-		m_latch->Set(false);
+		SharedSolenoid::GetInstance()->DisableLatch();
+		//		m_latch->Set(false);
 
-		if (m_bottomlimit->Get() || ++m_ctr >= m_pulse_down)
+		if (/*m_bottomlimit->Get() || */++m_ctr >= m_pulse_down)
 		{
-			if (m_ctr >= m_pulse_down && !m_bottomlimit->Get())
-			{
-				m_action->wedge->completion_status = ACTION::FAILURE;
-			}
-			else
-			{
-				m_action->wedge->completion_status = ACTION::SUCCESS;
-			}
+			//			if (m_ctr >= m_pulse_down && !m_bottomlimit->Get())
+			//			{
+			//				m_action->wedge->completion_status = ACTION::FAILURE;
+			//			}
+			//			else
+			//			{
+			m_action->wedge->completion_status = ACTION::SUCCESS;
+			//			}
 
 			m_spike->Set(Relay::kOff);
 		}
@@ -99,12 +102,17 @@ void Wedge::Output()
 		}
 		break;
 	case ACTION::WEDGE::IDLE:
-		m_latch->Set(false);
+		//		m_latch->Set(false);
+		SharedSolenoid::GetInstance()->DisableLatch();
 		m_spike->Set(Relay::kOff);
 		break;
 	}
-
 	m_lastState = m_action->wedge->state;
+
+	if (!m_action->motorsEnabled)
+	{
+		m_spike->Set(Relay::kOff);
+	}
 }
 
 string Wedge::GetName()

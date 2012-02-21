@@ -71,6 +71,7 @@ const uint32_t LAUNCHER = 4;
 const uint32_t BALLCOLLECTOR = 5;
 const uint32_t WEDGE = 6;
 const uint32_t BALLFEEDER = 7;
+const uint32_t MOTORS = 8;
 }
 
 }

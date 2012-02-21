@@ -21,7 +21,14 @@ void BallCollector::Output()
 	if (m_action->ballfeed->sweepArmOut)
 	{
 		m_arm->Set(DoubleSolenoid::kForward);
-		m_roller->SetDutyCycle(m_fwd_duty);
+		if (m_action->motorsEnabled)
+		{
+			m_roller->SetDutyCycle(m_fwd_duty);
+		}
+		else
+		{
+			m_roller->SetDutyCycle(0.0);
+		}
 	}
 	else
 	{

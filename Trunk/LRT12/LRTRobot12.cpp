@@ -88,6 +88,9 @@ void LRTRobot12::MainLoop()
 	GameState gameState = DetermineState();
 	m_action->wasDisabled = (prevState == DISABLED);
 
+	m_action->motorsEnabled = ds->GetDigitalIn(
+			RobotConfig::DRIVER_STATION::MOTORS);
+
 	//iterate though and output components
 	for (list<Component::ComponentWithData>::iterator iter =
 			components->begin(); iter != components->end(); iter++)
@@ -107,7 +110,6 @@ void LRTRobot12::MainLoop()
 				ProfiledSection ps("Disabling " + (*iter).first->GetName());
 				(*iter).first->Disable();
 			}
-
 		}
 	}
 

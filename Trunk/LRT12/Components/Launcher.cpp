@@ -31,7 +31,7 @@ void Launcher::Configure()
 	double d = c->Get<double> (m_name, "rollerD", 0.0);
 	double ff = c->Get<double> (m_name, "rollerFF", 1);
 
-	m_max_speed = c->Get<double>(m_name, "maxSpeed", 5180);
+	m_max_speed = c->Get<double> (m_name, "maxSpeed", 5180);
 
 	m_pid.setParameters(p, i, d, ff);
 }
@@ -64,7 +64,7 @@ void Launcher::Output()
 		m_pid.reset();
 		break;
 	}
-	
+
 	static int e = 0;
 	if (++e % 10 == 0)
 		AsyncPrinter::Printf("Speed %.3f Output %.3f\n", m_speed, m_output);
@@ -73,7 +73,14 @@ void Launcher::Output()
 	m_output = min(max_output, m_output);
 	m_output = Util::Clamp<double>(m_output, 0, 0.8);
 
-	m_roller->SetDutyCycle(m_output);
+	if (m_action->motorsEnabled)
+	{
+		m_roller->SetDutyCycle(m_output);
+	}
+	else
+	{
+		m_roller->SetDutyCycle(0.0);
+	}
 	m_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 }
 

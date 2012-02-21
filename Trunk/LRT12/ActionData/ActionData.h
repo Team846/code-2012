@@ -62,7 +62,12 @@ public:
 	 * @brief contains commands relevant to the ball feeding system
 	 */
 	BallFeedAction* ballfeed;
-	
+
+	/*!
+	 * @brief enables motors across the robot
+	 */
+	bool motorsEnabled;
+
 	/*!
 	 * @brief contains data that is relevant to all/many components.
 	 */

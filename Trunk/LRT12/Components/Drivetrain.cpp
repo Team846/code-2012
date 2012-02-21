@@ -58,8 +58,11 @@ void Drivetrain::Output()
 					ClosedLoopDrivetrain::CL_POSITION);
 			m_drive_control.setRelativeTranslatePosition(
 					m_action->drivetrain->position.desiredRelativeDrivePosition);
-			if (m_action->drivetrain->position.desiredRelativeDrivePosition > 0.01)
-				AsyncPrinter::Printf("setpoint %.2f\n", m_action->drivetrain->position.desiredRelativeDrivePosition);
+			if (m_action->drivetrain->position.desiredRelativeDrivePosition
+					> 0.01)
+				AsyncPrinter::Printf(
+						"setpoint %.2f\n",
+						m_action->drivetrain->position.desiredRelativeDrivePosition);
 			// command has been set, so now zero the relative pos
 			// this serves as a crude one-command queue
 			m_action->drivetrain->position.desiredRelativeDrivePosition = 0;
@@ -140,8 +143,16 @@ void Drivetrain::Output()
 	//		cmd.shouldLinearize = false;
 	//	}
 
-	m_esc_left->SetDutyCycle(cmd.leftDutyCycle);
-	m_esc_right->SetDutyCycle(cmd.rightDutyCycle);
+	if (m_action->motorsEnabled)
+	{
+		m_esc_left->SetDutyCycle(cmd.leftDutyCycle);
+		m_esc_right->SetDutyCycle(cmd.rightDutyCycle);
+	}
+	else
+	{
+		m_esc_left->SetDutyCycle(0.0);
+		m_esc_right->SetDutyCycle(0.0);
+	}
 
 	m_action->drivetrain->raw.leftDutyCycle = cmd.leftDutyCycle;
 	//	m_action_ptr->drivetrain->raw.leftBrakingDutyCycle
