@@ -93,6 +93,8 @@ void Config::Load()
 				keyname + ".scaleMax", 1);
 	}
 	AsyncPrinter::Printf("Done loading file\n");
+	
+	ConfigureAll();
 }
 
 map<string, string> Config::tload(string path)
@@ -165,6 +167,7 @@ void Config::RegisterConfigurable(Configurable* configurable)
 
 void Config::ConfigureAll()
 {
+	AsyncPrinter::Printf("Applying Configuration\n");
 	for (unsigned int i = 0; i < configurables.size(); i++)
 		configurables.at(i)->Configure();
 }
@@ -183,10 +186,6 @@ void Config::CheckForFileUpdates()
 	if (configLastReadTime_ != statistics.st_mtime)
 	{
 		Load();
-
-		// must configure the new values
-		AsyncPrinter::Printf("Applying Configuration\n");
-		ConfigureAll();
 
 		//Wait for printing if this is the first time the program is read.
 		if (0 == configLastReadTime_)
@@ -243,11 +242,11 @@ template void Config::Set<string>(string section, string key, string val);
 
 template<typename T> void Config::Set(string sectionName, string key, T val)
 {
-//	int condition = sectionName == "Build" && key == "Number";
-//	if (condition)
-//	{
-//		printf("start set %s %s\n", sectionName.c_str(), key.c_str());
-//	}
+	//	int condition = sectionName == "Build" && key == "Number";
+	//	if (condition)
+	//	{
+	//		printf("start set %s %s\n", sectionName.c_str(), key.c_str());
+	//	}
 	string newVal = Util::ToString<T>(val);
 
 	if (ValueExists(sectionName, key)) // need to add in the value in such a way that preserves whitespace and comments
@@ -285,18 +284,18 @@ template<typename T> void Config::Set(string sectionName, string key, T val)
 			(*sectionsMap)[sectionName] = sectionLocation;
 		}
 
-//		printf("value does not exist\n");
+		//		printf("value does not exist\n");
 		list<string>::iterator sectionLocation = (*sectionsMap)[sectionName];
 		sectionLocation++;
-//		printf("incrementing iter\n");
+		//		printf("incrementing iter\n");
 		//        printf("section %s\n", sectionLocation->c_str());
 		//        string bad(*sectionLocation);
 		//        printf("have string \n");
 		//        printf("section %s\n", bad.c_str());
 		string str = key + "=" + newVal;
-//		printf("string %s\n", str.c_str());
+		//		printf("string %s\n", str.c_str());
 		configFile->insert(sectionLocation, str);
-//		printf("inserted\n");
+		//		printf("inserted\n");
 	}
 
 	(*newConfigData)[sectionName][key].val = newVal;
@@ -345,26 +344,26 @@ void Config::LoadFile(string path)
 				path.c_str());
 		return;
 	}
-//	printf("data structs started\n");
+	//	printf("data structs started\n");
 
 	//loading a the file discards all changes
 	if (configFile != NULL)
 		delete configFile;
 	configFile = new list<string> ();
 
-//	printf("Config file\n");
+	//	printf("Config file\n");
 
 	if (newConfigData != NULL)
 		delete newConfigData;
 	newConfigData = new config();
 
-//	printf("Config data\n");
+	//	printf("Config data\n");
 
 	if (sectionsMap != NULL)
 		delete sectionsMap;
 	sectionsMap = new map<string, list<string>::iterator> ();
 
-//	printf("data structs done\n");
+	//	printf("data structs done\n");
 
 	//read the file into memory
 	while (!fin.eof())
@@ -375,7 +374,7 @@ void Config::LoadFile(string path)
 	}
 	fin.close();
 
-//	printf("finished reading file\n");
+	//	printf("finished reading file\n");
 
 	//parse the file
 	string currentSection;
@@ -395,7 +394,7 @@ void Config::LoadFile(string path)
 		{
 			currentSection = line.substr(1, line.find_last_of("]") - 1);
 			(*sectionsMap)[currentSection] = iter;
-//			AsyncPrinter::Printf("%s\n", currentSection.c_str());
+			//			AsyncPrinter::Printf("%s\n", currentSection.c_str());
 			continue;
 		}
 
@@ -409,7 +408,7 @@ void Config::LoadFile(string path)
 		ConfigVal newVal;
 		newVal.val = val;
 		newVal.positionInFile = iter;
-//		AsyncPrinter::Printf("\t%s=%s\n", key.c_str(), val.c_str());
+		//		AsyncPrinter::Printf("\t%s=%s\n", key.c_str(), val.c_str());
 		(*newConfigData)[currentSection][key] = newVal;
 	}
 }
@@ -419,8 +418,8 @@ void Config::SaveToFile(string path)
 	ofstream fout(path.c_str());
 	if (!fout.is_open())
 	{
-//		AsyncPrinter::Printf("Config could not open %s for writing\n",
-//				path.c_str());
+		//		AsyncPrinter::Printf("Config could not open %s for writing\n",
+		//				path.c_str());
 		return;
 	}
 
@@ -428,7 +427,7 @@ void Config::SaveToFile(string path)
 			!= configFile->end(); iter++)
 	{
 		fout << *iter << '\n';
-//		cout << *iter << '\n';
+		//		cout << *iter << '\n';
 	}
 
 	fout.close();

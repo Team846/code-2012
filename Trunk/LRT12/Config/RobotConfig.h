@@ -14,10 +14,11 @@ const uint32_t DRIVE_LEFT_A = 2;
 const uint32_t DRIVE_LEFT_B = 3;
 const uint32_t DRIVE_RIGHT_A = 4;
 const uint32_t DRIVE_RIGHT_B = 5;
-const uint32_t FEEDER_FWD = 6;
+const uint32_t FEEDER_FRONT = 6;
 const uint32_t COLLECTOR = 7;
 const uint32_t LAUNCHER = 8;
-const uint32_t FEEDER_REV = 9;
+const uint32_t FEEDER_BACK = 9;
+const uint32_t FRONT_INTAKE = 10;
 }
 
 namespace PWM //ports 1-10
@@ -57,8 +58,8 @@ const uint32_t SHIFTER_B = 8;
 namespace RELAY_IO // ports 1-8
 {
 const uint32_t COMPRESSOR_RELAY = 1;
-const uint32_t PRESSURE_PLATE = 2;
-const uint32_t WEDGE_SPIKE_PIN = 3;
+const uint32_t PRESSURE_PLATE = 4;
+const uint32_t WEDGE_SPIKE = 8;
 }
 
 namespace DRIVER_STATION

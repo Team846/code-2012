@@ -62,7 +62,7 @@ public:
 	 * @brief contains commands relevant to the ball feeding system
 	 */
 	BallFeedAction* ballfeed;
-
+	
 	/*!
 	 * @brief contains data that is relevant to all/many components.
 	 */

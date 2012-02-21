@@ -81,7 +81,7 @@ void ClosedLoopDrivetrain::Configure()
 	double drive_pos_i_low = m_config->Get<double> (configSection,
 			"drivePosLowI", 0.0);
 	double drive_pos_d_low = m_config->Get<double> (configSection,
-			"dri	vePosLowD", 0.0);
+			"drivePosLowD", 0.0);
 
 	m_pos_drive_low_gear_pid.setParameters(drive_pos_p_low, drive_pos_i_low,
 			drive_pos_d_low, 1.0, FWD_DECAY, false);

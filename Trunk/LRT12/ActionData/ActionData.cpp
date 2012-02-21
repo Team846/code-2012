@@ -60,8 +60,9 @@ ActionData::ActionData()
 	bridgePD->completion_status = ACTION::UNSET;
 
 	ballfeed = (BallFeedAction*) malloc(sizeof(BallFeedAction));
-	ballfeed->collector_state = ACTION::BALLFEED::COLLECTING;
 	ballfeed->sweepArmOut = false;
+	
+	launcher->speed  = 2000;
 
 }
 

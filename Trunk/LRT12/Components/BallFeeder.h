@@ -50,11 +50,16 @@ public:
 private:
 	const static int FRONT = 0;
 	const static int BACK = 1;
+	const static int INTAKE = 2;
 	std::string m_name;
 	std::string m_configsection;
-	double m_fwd_duty[2], m_rev_duty[2];
-	AsyncCANJaguar * m_roller[2];
+	int cyclesToLoad;
+	double m_fwd_duty[3], m_rev_duty[3], m_holding_duty[3];
+	AsyncCANJaguar * m_roller[3];
 	Relay * m_pressure_plate;
+	
+	bool loading;
+	int loadTimer;
 };
 
 #endif

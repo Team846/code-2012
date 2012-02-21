@@ -17,6 +17,7 @@ private:
 	//button assignments shorted by button number
 	
 	//Driver stick
+	static const int LOWER_CONVEYOR = 1;
 	static const int APPLY_CONFIG = 5;
 	static const int LOAD_CONFIG  = 6;
 	static const int SAVE_CONFIG  = 7;
@@ -25,7 +26,10 @@ private:
 	//Operator Stick
 	static const int SHOOT		  = 2;
 	static const int DECREMENT_BALL_COUNT = 3;
-	static const int INCREMENT_BALL_COUNT = 3;
+	static const int INCREMENT_BALL_COUNT = 4;
+	static const int COLLECT_BALLS = 1;
+	static const int DECREMENT_SPEED = 7;
+	static const int INCREMENT_SPEED = 8;
 	
 };
 

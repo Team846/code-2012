@@ -3,7 +3,7 @@
 Wedge::Wedge() :
 	Component(), m_name("Wedge")
 {
-	m_spike = new Relay(RobotConfig::RELAY_IO::WEDGE_SPIKE_PIN,
+	m_spike = new Relay(RobotConfig::RELAY_IO::WEDGE_SPIKE,
 			Relay::kBothDirections);
 	m_bottomlimit = new DigitalInput(
 			RobotConfig::DIGITAL_IO::WEDGE_LIMIT_BOTTOM);

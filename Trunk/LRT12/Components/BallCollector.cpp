@@ -6,7 +6,8 @@ BallCollector::BallCollector() :
 	m_name("Ball Collector"), m_configsection("bc")
 {
 	m_roller = new AsyncCANJaguar(RobotConfig::CAN::COLLECTOR, "Collector");
-	m_arm = new Solenoid(RobotConfig::SOLENOID_IO::WEDGE_LATCH);
+	m_arm = new DoubleSolenoid(RobotConfig::SOLENOID_IO::BALL_COLLECTOR_A,
+			RobotConfig::SOLENOID_IO::BALL_COLLECTOR_B);
 }
 
 BallCollector::~BallCollector()
@@ -17,24 +18,21 @@ BallCollector::~BallCollector()
 
 void BallCollector::Output()
 {
-	switch (action->ballfeed->collector_state)
+	if (action->ballfeed->sweepArmOut)
 	{
-	case ACTION::BALLFEED::COLLECTING:
+		m_arm->Set(DoubleSolenoid::kForward);
 		m_roller->SetDutyCycle(m_fwd_duty);
-		break;
-	case ACTION::BALLFEED::REJECTING:
-		m_roller->SetDutyCycle(m_rev_duty);
-		break;
-	case ACTION::BALLFEED::NEUTRAL:
-	default:
-		m_roller->SetDutyCycle(0.0);
-		break;
 	}
-	m_arm->Set(action->ballfeed->sweepArmOut);
+	else
+	{
+		m_arm->Set(DoubleSolenoid::kReverse);
+		m_roller->SetDutyCycle(0.0);
+	}
 }
 
 void BallCollector::Configure()
 {
+	AsyncPrinter::Printf("Configured");
 	m_fwd_duty = Config::GetInstance()->Get<double> (m_configsection,
 			"fwdSpeed", 0.3);
 	m_rev_duty = Config::GetInstance()->Get<double> (m_configsection,
@@ -50,17 +48,13 @@ void BallCollector::log()
 {
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	std::string s;
-	switch (action->ballfeed->collector_state)
+	if (action->ballfeed->sweepArmOut)
 	{
-	case ACTION::BALLFEED::COLLECTING:
-		s = "Collecting";
-		break;
-	case ACTION::BALLFEED::REJECTING:
-		s = "Rejecting";
-		break;
-	case ACTION::BALLFEED::NEUTRAL:
-		s = "Neutral";
-		break;
+		s = "Down/Collecting";
+	}
+	else
+	{
+		s = "Up/Idle";
 	}
 	sdb->PutString("Ball Collector Status", s);
 }

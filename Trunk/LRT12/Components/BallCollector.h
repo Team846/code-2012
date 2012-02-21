@@ -52,7 +52,7 @@ private:
 	std::string m_configsection;
 	double m_fwd_duty, m_rev_duty;
 	AsyncCANJaguar * m_roller;
-	Solenoid * m_arm;
+	DoubleSolenoid * m_arm;
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include "InputParser.h"
 #include "DebouncedJoystick.h"
 #include "../Config/DriverStationConfig.h"
+#include "../Util/AsyncPrinter.h"
 #include "math.h"
 
 #include "../ActionData/ActionData.h"
@@ -29,6 +30,7 @@ void InputParser::ProcessInputs()
 	/***************** Shifter **********************/
 	if (m_driver_stick->IsButtonJustPressed(SHIFT)) //Shift gear
 	{
+		AsyncPrinter::Printf("Shift button\n");
 		if (m_action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR)
 			m_action->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
 		else
@@ -54,14 +56,32 @@ void InputParser::ProcessInputs()
 
 	/***************** Shooter **********************/
 	//TODO SHOOT! 
-	m_action->launcher->speed = fabs(
-			m_operator_stick->GetAxis(Joystick::kYAxis));
+//	m_action->launcher->speed += m_operator_stick->GetAxis(Joystick::kYAxis)*5;
+	if (m_operator_stick->IsButtonJustPressed(DECREMENT_SPEED))
+		m_action->launcher->speed -= 500;
+	else if (m_operator_stick->IsButtonJustPressed(INCREMENT_SPEED))
+		m_action->launcher->speed += 500;
+		
 	m_action->launcher->state = ACTION::LAUNCHER::RUNNING;
-	//	if (m_operator_stick->IsButtonDown(SHOOT))
-	//		m_action->ballfeed->attemptToLoadRound = true;
 
 	/***************** Conveyor **********************/
 	m_action->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
+	if (m_operator_stick->IsButtonDown(SHOOT))
+		m_action->ballfeed->attemptToLoadRound = true;
+	
+	
+	/***************** Ball Collector **********************/
+	m_action->ballfeed->sweepArmOut = m_operator_stick->IsButtonDown(LOWER_CONVEYOR);
+		
+	/***************** Ball Feeder **********************/
+	if (m_operator_stick->IsButtonDown(COLLECT_BALLS))
+	{
+		m_action->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
+	}
+	else
+	{
+		m_action->ballfeed->feeder_state = ACTION::BALLFEED::HOLDING;
+	}
 
 	/***************** Config **********************/
 	if (m_driver_stick->IsButtonJustPressed(SAVE_CONFIG))

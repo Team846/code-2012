@@ -3,26 +3,27 @@
 #include "../Config/Config.h"
 #include "../ActionData/BallFeedAction.h"
 
-#define PRESSURE_PLATE_ENABLED 0
 
 BallFeeder::BallFeeder() :
 	m_name("Ball Feeder"), m_configsection("bf")
 {
-	m_roller[FRONT]
-			= new AsyncCANJaguar(RobotConfig::CAN::FEEDER_FWD, "BF_FWD");
-	m_roller[BACK] = new AsyncCANJaguar(RobotConfig::CAN::FEEDER_REV, "BF_REV");
-#if PRESSURE_PLATE_ENABLED
+	m_roller[FRONT] = new AsyncCANJaguar(RobotConfig::CAN::FEEDER_FRONT,
+			"BF_FWD");
+	m_roller[BACK]
+			= new AsyncCANJaguar(RobotConfig::CAN::FEEDER_BACK, "BF_REV");
+	m_roller[INTAKE] = new AsyncCANJaguar(RobotConfig::CAN::FRONT_INTAKE,
+			"INTAKE");
 	m_pressure_plate = new Relay(RobotConfig::RELAY_IO::PRESSURE_PLATE);
-#endif
+	
+	loadTimer = 0;
 }
 
 BallFeeder::~BallFeeder()
 {
 	delete m_roller[FRONT];
 	delete m_roller[BACK];
-#if PRESSURE_PLATE_ENABLED
+	delete m_roller[INTAKE];
 	delete m_pressure_plate;
-#endif
 }
 
 void BallFeeder::Output()
@@ -32,19 +33,37 @@ void BallFeeder::Output()
 	case ACTION::BALLFEED::FEEDING:
 		m_roller[FRONT]->SetDutyCycle(m_fwd_duty[FRONT]);
 		m_roller[BACK]->SetDutyCycle(m_fwd_duty[BACK]);
+		m_roller[INTAKE]->SetDutyCycle(m_fwd_duty[INTAKE]);
 		break;
 	case ACTION::BALLFEED::HOLDING:
-		m_roller[FRONT]->SetDutyCycle(0.0);
-		m_roller[BACK]->SetDutyCycle(0.0);
+		m_roller[FRONT]->SetDutyCycle(m_holding_duty[FRONT]);
+		m_roller[BACK]->SetDutyCycle(m_holding_duty[BACK]);
+		m_roller[INTAKE]->SetDutyCycle(0.0);
 		break;
 	case ACTION::BALLFEED::PURGING:
 		m_roller[FRONT]->SetDutyCycle(m_rev_duty[FRONT]);
 		m_roller[BACK]->SetDutyCycle(m_rev_duty[BACK]);
+		m_roller[INTAKE]->SetDutyCycle(m_rev_duty[INTAKE]);
 		break;
 	}
-#if PRESSURE_PLATE_ENABLED
-	m_pressure_plate->Set(action->ballfeed->attemptToLoadRound);
-#endif
+	
+	if (loading)
+	{
+		m_pressure_plate->Set(Relay::kForward);
+		loadTimer++;
+		if (loadTimer >= cyclesToLoad)
+			loading = false;
+	}
+	else
+	{
+		m_pressure_plate->Set(Relay::kOff);
+	}
+	
+	if (action->ballfeed->attemptToLoadRound)
+	{
+		loading = true;
+		action->ballfeed->attemptToLoadRound = false;
+	}
 }
 
 void BallFeeder::Configure()
@@ -52,9 +71,17 @@ void BallFeeder::Configure()
 	Config * c = Config::GetInstance();
 	m_fwd_duty[FRONT] = c->Get<double> (m_configsection, "front_fwd_duty", 0.3);
 	m_fwd_duty[BACK] = c->Get<double> (m_configsection, "back_fwd_duty", 0.3);
+	m_fwd_duty[INTAKE] = c->Get<double> (m_configsection, "intake_fwd_duty",
+			1.0);
 	m_rev_duty[FRONT]
 			= c->Get<double> (m_configsection, "front_rev_duty", -0.3);
 	m_rev_duty[BACK] = c->Get<double> (m_configsection, "back_rev_duty", -0.3);
+	m_rev_duty[INTAKE] = c->Get<double> (m_configsection, "intake_fwd_duty",
+			-1.0);
+	cyclesToLoad = c->Get<int>(m_configsection, "cyclesToLoad", 40);
+	
+	m_holding_duty[FRONT] = c->Get<double> (m_configsection, "front_holding_duty", 0.3);
+	m_holding_duty[BACK] = c->Get<double> (m_configsection, "back_holding_duty", 0.3);
 }
 
 void BallFeeder::log()

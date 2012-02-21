@@ -31,11 +31,13 @@ void PneumaticShifter::Output()
 	switch (action->shifter->gear)
 	{
 	case ACTION::GEARBOX::LOW_GEAR:
+//		AsyncPrinter::Printf("Low\n");
 		m_solenoid->Set(DoubleSolenoid::kForward);
 		encoders.setHighGear(false);
 		break;
 
 	case ACTION::GEARBOX::HIGH_GEAR:
+//		AsyncPrinter::Printf("High\n");
 		m_solenoid->Set(DoubleSolenoid::kReverse);
 		encoders.setHighGear(true);
 		break;
