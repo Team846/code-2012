@@ -26,8 +26,8 @@ private:
 	//Operator Stick
 	static const int SHOOT		  		  = 1;
 	static const int COLLECT_BALLS        = 2;
-	static const int LOW_SPEED        	  = 2;
-	static const int HIGH_SPEED           = 2;
+	static const int LOW_SPEED        	  = 3;
+	static const int HIGH_SPEED           = 4;
 	static const int TRAJECTORY_UP	 	  = 5;
 	static const int TRAJECTORY_DOWN	  = 6;
 	static const int DECREMENT_SPEED      = 7;

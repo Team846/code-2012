@@ -80,7 +80,7 @@ void InputParser::ProcessInputs()
 	{
 		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::SLOW;
 	}
-	if (m_operator_stick->IsButtonDown(HIGH_SPEED))
+	else if (m_operator_stick->IsButtonDown(HIGH_SPEED))
 	{
 		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::FASTEST;
 	}
@@ -92,7 +92,6 @@ void InputParser::ProcessInputs()
 	m_action_ptr->launcher->state = ACTION::LAUNCHER::RUNNING;
 
 	/***************** Conveyor **********************/
-	m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
 
 	if (m_operator_stick->IsButtonDown(SHOOT))
 	{

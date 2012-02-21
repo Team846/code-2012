@@ -80,7 +80,7 @@ void Launcher::Output()
 		m_output = m_pid.getOutput() / m_max_speed;
 
 		static int atSpeedCounter = 0;
-		if (fabs(m_speed - m_action->launcher->speed) < m_speed_threshold)
+		if (fabs(m_pid.getError()) < m_speed_threshold)
 		{
 			atSpeedCounter++;
 		}
@@ -98,24 +98,6 @@ void Launcher::Output()
 		{
 			m_action->launcher->atSpeed = false; // w/i 10 rpm
 		}
-
-		//		static bool wasAtSpeed = true;
-		//		static int e = 0;
-		//		if (!m_action->launcher->atSpeed)
-		//		{
-		//			AsyncPrinter::Printf("Not at speed\n");
-		//		}
-		//		if (wasAtSpeed != m_action->launcher->atSpeed
-		//				&& !m_action->launcher->atSpeed)
-		//		{
-		//			e = 100;
-		//		}
-		//		wasAtSpeed = m_action->launcher->atSpeed;
-		//		if (--e >= 0)
-		//		{
-		//			AsyncPrinter::Printf("Delaying\n");
-		//			m_action->launcher->atSpeed = false;
-		//		}
 
 		break;
 	case ACTION::LAUNCHER::DISABLED:
@@ -140,7 +122,7 @@ void Launcher::Output()
 
 	double max_output = m_speed / m_max_speed + m_duty_cycle_delta;
 	m_output = min(max_output, m_output);
-	m_output = Util::Clamp<double>(m_output, 0, 0.8);
+	m_output = Util::Clamp<double>(m_output, 0, 1.0);
 
 	if (m_action->motorsEnabled)
 	{
@@ -181,5 +163,8 @@ void Launcher::log()
 
 	SmartDashboard::GetInstance()->PutString("Launcher Trajectory",
 			(m_action->launcher->topTrajectory) ? "High" : "Low");
+
+	SmartDashboard::GetInstance()->PutBoolean("Launcher at speed",
+			(m_action->launcher->atSpeed));
 
 }

@@ -49,16 +49,19 @@ void BallFeeder::Output()
 		switch (m_action->ballfeed->feeder_state)
 		{
 		case ACTION::BALLFEED::FEEDING:
+//			AsyncPrinter::Printf("Feeding\n");
 			front = (m_fwd_duty[FRONT]);
 			back = (m_fwd_duty[BACK]);
 			intake = (m_fwd_duty[INTAKE]);
 			break;
 		case ACTION::BALLFEED::HOLDING:
+//			AsyncPrinter::Printf("Holding\n");
 			front = (m_holding_duty[FRONT]);
 			back = (m_holding_duty[BACK]);
 			intake = (0.0);
 			break;
 		case ACTION::BALLFEED::PURGING:
+//			AsyncPrinter::Printf("Purging\n");
 			front = (m_rev_duty[FRONT]);
 			back = (m_rev_duty[BACK]);
 			intake = (m_rev_duty[INTAKE]);
