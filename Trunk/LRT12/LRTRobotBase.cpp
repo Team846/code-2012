@@ -1,5 +1,6 @@
 #include "LRTRobotBase.h"
 #include "Jaguar/AsyncCANJaguar.h"
+#include "Components/Pneumatic/Pneumatics.h"
 #include "Config/RobotConfig.h"
 #include "Utility.h"
 #include "sysLib.h"
@@ -30,6 +31,8 @@ LRTRobotBase::~LRTRobotBase()
 		j->StopBackgroundTask();
 	}
 
+	Pneumatics::getInstance()->stopBackgroundTask();
+
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
 	AsyncPrinter::Quit();
 }
@@ -54,6 +57,9 @@ void LRTRobotBase::StartCompetition()
 	AsyncPrinter::Printf("starting synchronizer\r\n");
 	loopSynchronizer->StartPeriodic(1.0 / RobotConfig::LOOP_RATE); //arg is period in seconds
 
+	AsyncPrinter::Printf("Starting Pneumatics\r\n");
+	Pneumatics::getInstance()->startBackgroundTask();
+
 	AsyncPrinter::Printf("Starting Profiler\r\n");
 	Profiler& profiler = Profiler::GetInstance();
 	// loop until we are quitting -- must be set by the destructor of the derived class.
@@ -69,6 +75,13 @@ void LRTRobotBase::StartCompetition()
 			break;
 		}
 
+		profiler.StartNewCycle();
+
+		{
+			ProfiledSection ps("Main Loop");
+			MainLoop();
+		}
+
 		// release jaggie semaphores
 		// NB: This loop must be quit *before* the Jaguars are deleted!
 		for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
@@ -77,12 +90,7 @@ void LRTRobotBase::StartCompetition()
 			j->ReleaseCommSemaphore();
 		}
 
-		profiler.StartNewCycle();
-
-		{
-			ProfiledSection ps("Main Loop");
-			MainLoop();
-		}
+		Pneumatics::getInstance()->releaseSemaphore();
 
 		if (cycleCount % 100 == 0)
 		{

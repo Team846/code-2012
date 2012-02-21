@@ -4,7 +4,7 @@
 #include "../ActionData/BallFeedAction.h"
 #include "../ActionData/BPDAction.h"
 #include "../ActionData/LauncherAction.h"
-#include "Pneumatic/SharedCylinder.h"
+#include "Pneumatic/Pneumatics.h"
 
 BallFeeder::BallFeeder() :
 	m_name("Ball Feeder"), m_configsection("bf")
@@ -31,12 +31,13 @@ void BallFeeder::Disable()
 	m_roller[FRONT]->SetDutyCycle(0.0);
 	m_roller[BACK]->SetDutyCycle(0.0);
 	m_roller[INTAKE]->SetDutyCycle(0.0);
-	SharedSolenoid::GetInstance()->DisablePressurePlate();
+	Pneumatics::getInstance()->setPressurePlate(false);
+	//	SharedSolenoid::GetInstance()->DisablePressurePlate();
 }
 
 void BallFeeder::Output()
 {
-	if (m_action->motorsEnabled || m_action->wedge->state
+	if (m_action->motorsEnabled && m_action->wedge->state
 			!= ACTION::WEDGE::PRESET_BOTTOM)
 	{
 		switch (m_action->ballfeed->feeder_state)
@@ -67,11 +68,13 @@ void BallFeeder::Output()
 
 	if (m_action->ballfeed->attemptToLoadRound)
 	{
-		SharedSolenoid::GetInstance()->EnablePressurePlate();
+		Pneumatics::getInstance()->setPressurePlate(true);
+		//		SharedSolenoid::GetInstance()->EnablePressurePlate();
 	}
 	else
 	{
-		SharedSolenoid::GetInstance()->DisablePressurePlate();
+		Pneumatics::getInstance()->setPressurePlate(false);
+		//		SharedSolenoid::GetInstance()->DisablePressurePlate();
 	}
 	//	if (loading)
 	//	{

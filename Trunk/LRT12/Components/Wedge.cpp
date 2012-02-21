@@ -1,5 +1,5 @@
 #include "Wedge.h"
-#include "Pneumatic/SharedCylinder.h"
+#include "Pneumatic/Pneumatics.h"
 
 Wedge::Wedge() :
 	Component(), m_name("Wedge")
@@ -37,7 +37,7 @@ void Wedge::Disable()
 {
 	//	m_latch->Set(false);
 	m_spike->Set(Relay::kOff);
-	SharedSolenoid::GetInstance()->DisableLatch();
+	Pneumatics::getInstance()->setLatch(true);
 }
 
 void Wedge::Output()
@@ -55,7 +55,8 @@ void Wedge::Output()
 	{
 	case ACTION::WEDGE::PRESET_TOP:
 		m_action->wedge->completion_status = ACTION::IN_PROGRESS;
-		SharedSolenoid::GetInstance()->EnableLatch();
+		//		SharedSolenoid::GetInstance()->EnableLatch();
+		Pneumatics::getInstance()->setLatch(false);
 		//		m_latch->Set(true);
 
 		if (/*m_toplimit->Get() || */++m_ctr >= m_pulse_up)
@@ -78,7 +79,8 @@ void Wedge::Output()
 	case ACTION::WEDGE::PRESET_BOTTOM:
 		m_action->wedge->completion_status = ACTION::IN_PROGRESS;
 
-		SharedSolenoid::GetInstance()->DisableLatch();
+		Pneumatics::getInstance()->setLatch(true);
+		//		SharedSolenoid::GetInstance()->DisableLatch();
 		//		m_latch->Set(false);
 
 		if (/*m_bottomlimit->Get() || */++m_ctr >= m_pulse_down)
@@ -103,7 +105,8 @@ void Wedge::Output()
 		break;
 	case ACTION::WEDGE::IDLE:
 		//		m_latch->Set(false);
-		SharedSolenoid::GetInstance()->DisableLatch();
+		//		SharedSolenoid::GetInstance()->DisableLatch();
+		Pneumatics::getInstance()->setLatch(false);
 		m_spike->Set(Relay::kOff);
 		break;
 	}

@@ -30,12 +30,12 @@ public:
 	 * Turns the ball collector on or off depending on m_action_ptr data
 	 */
 	virtual void Output();
-	
+
 	/*!
 	 * Disables ball collector
 	 */
 	virtual void Disable();
-	
+
 	/*!
 	 * Configures values from Config
 	 */
@@ -57,7 +57,7 @@ private:
 	std::string m_configsection;
 	double m_fwd_duty, m_rev_duty;
 	AsyncCANJaguar * m_roller;
-	DoubleSolenoid * m_arm;
+	//	DoubleSolenoid * m_arm;
 };
 
 #endif

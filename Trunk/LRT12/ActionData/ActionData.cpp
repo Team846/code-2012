@@ -61,8 +61,8 @@ ActionData::ActionData()
 
 	ballfeed = (BallFeedAction*) malloc(sizeof(BallFeedAction));
 	ballfeed->sweepArmOut = false;
-	
-	launcher->speed  = 2000;
+
+	launcher->speed = 2000;
 
 }
 

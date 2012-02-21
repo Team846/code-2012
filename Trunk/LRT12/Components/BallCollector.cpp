@@ -1,26 +1,28 @@
 #include "BallCollector.h"
 #include "../ActionData/BallFeedAction.h"
 #include "../Config/RobotConfig.h"
+#include "Pneumatic/Pneumatics.h"
 
 BallCollector::BallCollector() :
 	m_name("Ball Collector"), m_configsection("bc")
 {
 	m_roller = new AsyncCANJaguar(RobotConfig::CAN::COLLECTOR, "Collector");
-	m_arm = new DoubleSolenoid(RobotConfig::SOLENOID_IO::BALL_COLLECTOR_A,
-			RobotConfig::SOLENOID_IO::BALL_COLLECTOR_B);
+	//	m_arm = new DoubleSolenoid(RobotConfig::SOLENOID_IO::BALL_COLLECTOR_A,
+	//			RobotConfig::SOLENOID_IO::BALL_COLLECTOR_B);
 }
 
 BallCollector::~BallCollector()
 {
 	delete m_roller;
-	delete m_arm;
+	//	delete m_arm;
 }
 
 void BallCollector::Output()
 {
 	if (m_action->ballfeed->sweepArmOut)
 	{
-		m_arm->Set(DoubleSolenoid::kForward);
+		//		m_arm->Set(DoubleSolenoid::kForward);
+		Pneumatics::getInstance()->setBallCollector(true);
 		if (m_action->motorsEnabled)
 		{
 			m_roller->SetDutyCycle(m_fwd_duty);
@@ -32,14 +34,16 @@ void BallCollector::Output()
 	}
 	else
 	{
-		m_arm->Set(DoubleSolenoid::kReverse);
+		Pneumatics::getInstance()->setBallCollector(false);
+		//		m_arm->Set(DoubleSolenoid::kReverse);
 		m_roller->SetDutyCycle(0.0);
 	}
 }
 
 void BallCollector::Disable()
 {
-	m_arm->Set(DoubleSolenoid::kOff);
+	Pneumatics::getInstance()->setBallCollector(false);
+	//	m_arm->Set(DoubleSolenoid::kOff);
 	m_roller->SetDutyCycle(0.0);
 }
 

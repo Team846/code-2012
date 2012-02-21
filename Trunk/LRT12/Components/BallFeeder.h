@@ -57,7 +57,7 @@ private:
 	std::string m_configsection;
 	double m_fwd_duty[3], m_rev_duty[3], m_holding_duty[3];
 	AsyncCANJaguar * m_roller[3];
-	DoubleSolenoid * m_pressure_plate;
+//	DoubleSolenoid * m_pressure_plate;
 	
 	bool loading;
 	int loadTimer;
