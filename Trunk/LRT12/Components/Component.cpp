@@ -39,8 +39,8 @@ list<Component::ComponentWithData>* Component::CreateComponents()
 			ComponentWithData(new Launcher(), createComponentData(true, RobotConfig::DRIVER_STATION::LAUNCHER)));
 	components->push_back(
 			ComponentWithData(new BallCollector(), createComponentData(true, RobotConfig::DRIVER_STATION::BALLCOLLECTOR)));
-//	components->push_back(
-//			ComponentWithData(new Wedge(), createComponentData(true, 5)));
+	components->push_back(
+			ComponentWithData(new Wedge(), createComponentData(true, RobotConfig::DRIVER_STATION::WEDGE)));
 	components->push_back(
 			ComponentWithData(new BallFeeder(), createComponentData(true, RobotConfig::DRIVER_STATION::BALLFEEDER)));
 

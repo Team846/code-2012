@@ -52,14 +52,14 @@ void Shifter::Output()
 	if (servoDisableTimer > 0)
 		servoDisableTimer--;
 
-	//	const bool robotTryingToMove = (action.driveTrain->rate.rawForward != 0.0
-	//			|| action.driveTrain->rate.rawTurn != 0.0);
+	//	const bool robotTryingToMove = (m_action_ptr.driveTrain->rate.rawForward != 0.0
+	//			|| m_action_ptr.driveTrain->rate.rawTurn != 0.0);
 
-	DriveTrainAction * dtptr = action->drivetrain;
+	DriveTrainAction * dtptr = m_action->drivetrain;
 	const bool robotTryingToMove = dtptr->raw.leftDutyCycle != 0.0
 			|| dtptr->raw.rightDutyCycle != 0.0;
 
-	if (robotTryingToMove || action->shifter->force)
+	if (robotTryingToMove || m_action->shifter->force)
 		servoDisableTimer = servoDisableDelay; //reset timer
 
 	bool enableServo = servoDisableTimer > 0;
@@ -67,7 +67,7 @@ void Shifter::Output()
 	leftServo->SetEnabled(enableServo);
 	rightServo->SetEnabled(enableServo);
 
-	switch (action->shifter->gear)
+	switch (m_action->shifter->gear)
 	{
 	case ACTION::GEARBOX::LOW_GEAR:
 		leftServo->SetMicroseconds(lowGearServoValLeft);
@@ -96,6 +96,6 @@ void Shifter::log()
 {
 	SmartDashboard::GetInstance()->PutString(
 			"Robot Gear",
-			(action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR) ? "High Gear"
+			(m_action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR) ? "High Gear"
 					: "Low Gear");
 }

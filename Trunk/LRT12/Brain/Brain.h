@@ -37,12 +37,12 @@ public:
 	void startAuton();
 
 	/*!
-	 * @brief gets the action semaphore
+	 * @brief gets the m_action_ptr semaphore
 	 */
 	void takeActionSem();
 
 	/*!
-	 * @brief releases the action semaphore
+	 * @brief releases the m_action_ptr semaphore
 	 */
 	void giveActionSem();
 

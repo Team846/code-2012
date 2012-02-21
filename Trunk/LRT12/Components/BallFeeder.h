@@ -27,7 +27,7 @@ public:
 	~BallFeeder();
 
 	/*!
-	 * Turns the ball feeder on or off depending on action data
+	 * Turns the ball feeder on or off depending on m_action_ptr data
 	 */
 	virtual void Output();
 	
@@ -55,10 +55,9 @@ private:
 	const static int INTAKE = 2;
 	std::string m_name;
 	std::string m_configsection;
-	int cyclesToLoad;
 	double m_fwd_duty[3], m_rev_duty[3], m_holding_duty[3];
 	AsyncCANJaguar * m_roller[3];
-	Relay * m_pressure_plate;
+	DoubleSolenoid * m_pressure_plate;
 	
 	bool loading;
 	int loadTimer;

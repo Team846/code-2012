@@ -33,7 +33,7 @@ void PneumaticShifter::Disable()
 
 void PneumaticShifter::Output()
 {
-	switch (action->shifter->gear)
+	switch (m_action->shifter->gear)
 	{
 	case ACTION::GEARBOX::LOW_GEAR:
 //		AsyncPrinter::Printf("Low\n");
@@ -62,6 +62,6 @@ void PneumaticShifter::log()
 {
 	SmartDashboard::GetInstance()->PutString(
 			"Robot Gear",
-			(action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR) ? "High Gear"
+			(m_action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR) ? "High Gear"
 					: "Low Gear");
 }

@@ -17,15 +17,11 @@ LRTRobot12::LRTRobot12() :
 	ds = DriverStation::GetInstance();
 	components = Component::CreateComponents();
 	m_action = ActionData::GetInstance();
-	
-	/* // *m_compressor = new Compressor(
-	/* //*	RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
-	/* //*	RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
-	/* //m_compressor->Start();*/
-//	m_compressor->SetRelayValue(Relay::kForward);
-//	m_relay = new Relay(RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
-//	m_pressureSwitch = new DigitalInput(RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN);
-//	m_relay->Set(Relay::kForward);
+
+	m_compressor = new Compressor(
+			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
+			RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
+	m_compressor->Start();
 
 	mainLoopWatchDog = wdCreate();
 
@@ -33,16 +29,15 @@ LRTRobot12::LRTRobot12() :
 	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority
 
 	m_keyTracker = new KeyTracker();
-	
+
 	printf("---- Robot Initialized ----\n\n");
 }
 
 LRTRobot12::~LRTRobot12()
 {
 
-	//m_compressor->Stop();
-	//delete m_compressor;
-//	delete m_relay;
+	m_compressor->Stop();
+	delete m_compressor;
 	// try to free SmartDashboard resources
 	//	SmartDashboard::DeleteSingletons();
 	// Testing shows this to be the entry point for a Kill signal.
@@ -57,6 +52,7 @@ LRTRobot12::~LRTRobot12()
 	//End background printing; Request print task to stop and die.
 	//Premature?  We could move this to ~LRTRobotBase()
 	//	AsyncPrinter::Quit();
+	delete m_keyTracker;
 }
 
 void LRTRobot12::RobotInit()
@@ -79,15 +75,15 @@ static int ExecutionNotify(...)
 }
 
 void LRTRobot12::MainLoop()
-{	
+{
 	// setup a watchdog to warn us if our loop takes too long
 	// sysClkRateGet returns the number of ticks per cycle at the current clock rate.
 	wdStart(mainLoopWatchDog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			ExecutionNotify, 0);
 	{
-		
+
 	}
-	
+
 	// /*
 	GameState gameState = DetermineState();
 	m_action->wasDisabled = (prevState == DISABLED);
@@ -115,11 +111,14 @@ void LRTRobot12::MainLoop()
 		}
 	}
 
-	/*
 	if (ds->GetDigitalIn(RobotConfig::DRIVER_STATION::COMPRESSOR))
+	{
 		m_compressor->Start();
+	}
 	else
-		m_compressor->Stop();*/
+	{
+		m_compressor->Stop();
+	}
 	//	brain.giveActionSem();
 
 	//    if(prevState != gameState)
@@ -134,7 +133,7 @@ void LRTRobot12::MainLoop()
 		counter = 0;
 		Log::logAll();
 	}
-//*/
+	//*/
 	// if we finish in time, cancel the watchdog's error message
 	wdCancel(mainLoopWatchDog);
 }

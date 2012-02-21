@@ -55,9 +55,9 @@ ActionData::ActionData()
 	launcher->speed = 0.0;
 	launcher->atSpeed = false;
 
-	bridgePD = (BPDAction*) malloc(sizeof(BPDAction));
-	bridgePD->state = ACTION::BPD::IDLE;
-	bridgePD->completion_status = ACTION::UNSET;
+	wedge = (BPDAction*) malloc(sizeof(BPDAction));
+	wedge->state = ACTION::WEDGE::IDLE;
+	wedge->completion_status = ACTION::UNSET;
 
 	ballfeed = (BallFeedAction*) malloc(sizeof(BallFeedAction));
 	ballfeed->sweepArmOut = false;
@@ -72,6 +72,6 @@ ActionData::~ActionData()
 	free(drivetrain);
 	free(launcher);
 	free(shifter);
-	free(bridgePD);
+	free(wedge);
 	free(ballfeed);
 }

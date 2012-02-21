@@ -50,7 +50,8 @@ const uint32_t BALL_COLLECTOR_A = 1;
 const uint32_t BALL_COLLECTOR_B = 2;
 const uint32_t SHOOTER_SELECT_A = 3;
 const uint32_t SHOOTER_SELECT_B = 4;
-const uint32_t WEDGE_LATCH = 6;
+const uint32_t WEDGE_LATCH = 5;
+const uint32_t PRESSURE_PLATE = 6;
 const uint32_t SHIFTER_A = 7;
 const uint32_t SHIFTER_B = 8;
 }
@@ -58,7 +59,6 @@ const uint32_t SHIFTER_B = 8;
 namespace RELAY_IO // ports 1-8
 {
 const uint32_t COMPRESSOR_RELAY = 1;
-const uint32_t PRESSURE_PLATE = 4;
 const uint32_t WEDGE_SPIKE = 8;
 }
 

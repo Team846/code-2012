@@ -56,7 +56,7 @@ public:
 	/*!
 	 * @brief contains commands relevant to the wedge
 	 */
-	BPDAction* bridgePD;
+	BPDAction* wedge;
 
 	/*!
 	 * @brief contains commands relevant to the ball feeding system

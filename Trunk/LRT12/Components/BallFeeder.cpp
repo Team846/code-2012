@@ -2,6 +2,7 @@
 #include "../Config/RobotConfig.h"
 #include "../Config/Config.h"
 #include "../ActionData/BallFeedAction.h"
+#include "../ActionData/LauncherAction.h"
 
 
 BallFeeder::BallFeeder() :
@@ -13,7 +14,9 @@ BallFeeder::BallFeeder() :
 			= new AsyncCANJaguar(RobotConfig::CAN::FEEDER_BACK, "BF_REV");
 	m_roller[INTAKE] = new AsyncCANJaguar(RobotConfig::CAN::FRONT_INTAKE,
 			"INTAKE");
-	m_pressure_plate = new Relay(RobotConfig::RELAY_IO::PRESSURE_PLATE);
+//	m_pressure_plate = new Relay(RobotConfig::RELAY_IO::PRESSURE_PLATE);
+//	m_pressure_plate = new Solenoid(RobotConfig::SOLENOID_IO::PRESSURE_PLATE);
+	m_pressure_plate = new DoubleSolenoid(RobotConfig::SOLENOID_IO::PRESSURE_PLATE, RobotConfig::SOLENOID_IO::WEDGE_LATCH);
 	
 	loadTimer = 0;
 }
@@ -31,11 +34,13 @@ void BallFeeder::Disable()
 	m_roller[FRONT]->SetDutyCycle(0.0);
 	m_roller[BACK]->SetDutyCycle(0.0);
 	m_roller[INTAKE]->SetDutyCycle(0.0);
+//	m_pressure_plate->Set(Relay::kReverse);
+	m_pressure_plate->Set(DoubleSolenoid::kOff);
 }
 
 void BallFeeder::Output()
 {
-	switch (action->ballfeed->feeder_state)
+	switch (m_action->ballfeed->feeder_state)
 	{
 	case ACTION::BALLFEED::FEEDING:
 		m_roller[FRONT]->SetDutyCycle(m_fwd_duty[FRONT]);
@@ -54,23 +59,35 @@ void BallFeeder::Output()
 		break;
 	}
 	
-	if (loading)
+	if (m_action->ballfeed->attemptToLoadRound)
 	{
-		m_pressure_plate->Set(Relay::kForward);
-		loadTimer++;
-		if (loadTimer >= cyclesToLoad)
-			loading = false;
+//		m_pressure_plate->Set(true);
+		m_pressure_plate->Set(DoubleSolenoid::kForward);
+		AsyncPrinter::Printf("F\n");
 	}
-	else
+	else 
 	{
-		m_pressure_plate->Set(Relay::kOff);
+		m_pressure_plate->Set(DoubleSolenoid::kReverse);
+//		m_pressure_plate->Set(false);
+		AsyncPrinter::Printf("R\n");
 	}
-	
-	if (action->ballfeed->attemptToLoadRound)
-	{
-		loading = true;
-		action->ballfeed->attemptToLoadRound = false;
-	}
+//	if (loading)
+//	{
+//		static int e = 0;
+//		if (++e > 70)
+//			loading = false;
+////		if (!m_action->launcher->atSpeed)
+////			loading = false;
+//	}
+//	else
+//	{
+//	}
+//	
+//	if (m_action->ballfeed->attemptToLoadRound)
+//	{
+//		loading = true;
+//		m_action->ballfeed->attemptToLoadRound = false;
+//	}
 }
 
 void BallFeeder::Configure()
@@ -85,7 +102,6 @@ void BallFeeder::Configure()
 	m_rev_duty[BACK] = c->Get<double> (m_configsection, "back_rev_duty", -0.3);
 	m_rev_duty[INTAKE] = c->Get<double> (m_configsection, "intake_fwd_duty",
 			-1.0);
-	cyclesToLoad = c->Get<int>(m_configsection, "cyclesToLoad", 40);
 	
 	m_holding_duty[FRONT] = c->Get<double> (m_configsection, "front_holding_duty", 0.3);
 	m_holding_duty[BACK] = c->Get<double> (m_configsection, "back_holding_duty", 0.3);
@@ -94,9 +110,9 @@ void BallFeeder::Configure()
 void BallFeeder::log()
 {
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
-	sdb->PutBoolean("Round status", action->ballfeed->attemptToLoadRound);
+	sdb->PutBoolean("Round status", m_action->ballfeed->attemptToLoadRound);
 	std::string s;
-	switch (action->ballfeed->feeder_state)
+	switch (m_action->ballfeed->feeder_state)
 	{
 	case ACTION::BALLFEED::FEEDING:
 		s = "Feeding";

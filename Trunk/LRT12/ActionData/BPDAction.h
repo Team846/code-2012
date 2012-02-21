@@ -4,15 +4,15 @@
 
 namespace ACTION
 {
-	enum eCompletionStatus
+	enum completionStatus
 	{ UNSET = 0, IN_PROGRESS = 1, SUCCESS = 2, FAILURE = 3, ABORTED = 4};
 	
 	char* const status_string[4 + 1] = 
 	{ "ERROR", "In Progress", "Success", "Failure", "Aborted" };
 
-	namespace BPD
+	namespace WEDGE
 	{
-		enum eStates
+		enum state
 		{
 			IDLE = 1, PRESET_BOTTOM = 2, PRESET_TOP = 3
 		};
@@ -23,7 +23,7 @@ namespace ACTION
 
 struct BPDAction
 {
-    ACTION::BPD::eStates state;
-    ACTION::eCompletionStatus completion_status;
+    ACTION::WEDGE::state state;
+    ACTION::completionStatus completion_status;
 };
 #endif //BPDACTION_H

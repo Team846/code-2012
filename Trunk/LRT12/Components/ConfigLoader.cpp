@@ -16,23 +16,23 @@ ConfigLoader::~ConfigLoader()
 
 void ConfigLoader::Output()
 {
-	if (action->config->load)
+	if (m_action->config->load)
 	{
 		AsyncPrinter::Printf("Loading Configuration\n");
 		m_config->Load();
-		action->config->load = false;
+		m_action->config->load = false;
 	}
-	if (action->config->save)
+	if (m_action->config->save)
 	{
 		AsyncPrinter::Printf("Saving Configuration\n");
 		m_config->Save();
-		action->config->save = false;
+		m_action->config->save = false;
 	}
-	if (action->config->apply)
+	if (m_action->config->apply)
 	{
 		AsyncPrinter::Printf("Applying Configuration\n");
 		m_config->ConfigureAll();
-		action->config->apply = false;
+		m_action->config->apply = false;
 	}
 	
 	static int e = 0; 

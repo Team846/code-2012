@@ -27,7 +27,7 @@ public:
 	~BallCollector();
 
 	/*!
-	 * Turns the ball collector on or off depending on action data
+	 * Turns the ball collector on or off depending on m_action_ptr data
 	 */
 	virtual void Output();
 	

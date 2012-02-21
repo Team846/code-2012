@@ -17,7 +17,6 @@ KeyTracker::~KeyTracker()
 	
 	m_task->Stop();
 	delete m_task;
-	
 	disconnect();
 }
 

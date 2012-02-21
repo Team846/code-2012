@@ -18,7 +18,7 @@ BallCollector::~BallCollector()
 
 void BallCollector::Output()
 {
-	if (action->ballfeed->sweepArmOut)
+	if (m_action->ballfeed->sweepArmOut)
 	{
 		m_arm->Set(DoubleSolenoid::kForward);
 		m_roller->SetDutyCycle(m_fwd_duty);
@@ -54,7 +54,7 @@ void BallCollector::log()
 {
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	std::string s;
-	if (action->ballfeed->sweepArmOut)
+	if (m_action->ballfeed->sweepArmOut)
 	{
 		s = "Down/Collecting";
 	}

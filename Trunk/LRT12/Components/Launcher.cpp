@@ -46,20 +46,20 @@ void Launcher::Output()
 	m_speed = (m_enc->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc->GetPeriod());
 	m_speed = Util::Clamp<double>(m_speed, 0, m_max_speed * 1.3);
 
-	switch (action->launcher->state)
+	switch (m_action->launcher->state)
 	{
 	case ACTION::LAUNCHER::RUNNING:
 		m_pid.setSetpoint(
-				Util::Clamp<double>(action->launcher->speed, 0, m_max_speed));
+				Util::Clamp<double>(m_action->launcher->speed, 0, m_max_speed));
 
 		m_pid.setInput(m_speed);
 		m_pid.update(1.0 / RobotConfig::LOOP_RATE); // 50 Hz
 		m_output = m_pid.getOutput() / m_max_speed;
-		action->launcher->atSpeed = fabs(m_speed - action->launcher->speed)
+		m_action->launcher->atSpeed = fabs(m_speed - m_action->launcher->speed)
 				< 10; // w/i 10 rpm
 		break;
 	case ACTION::LAUNCHER::DISABLED:
-		action->launcher->atSpeed = false;
+		m_action->launcher->atSpeed = false;
 		m_output = 0.0;
 		m_pid.reset();
 		break;
@@ -86,7 +86,7 @@ void Launcher::log()
 {
 	SmartDashboard::GetInstance()->PutString(
 			"Launcher State",
-			(action->launcher->state == ACTION::LAUNCHER::RUNNING) ? "Running"
+			(m_action->launcher->state == ACTION::LAUNCHER::RUNNING) ? "Running"
 					: "Disabled");
 	SmartDashboard::GetInstance()->PutDouble("Launcher Speed", m_speed);
 	SmartDashboard::GetInstance()->PutDouble("Launcher Output", m_output);

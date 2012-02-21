@@ -10,7 +10,7 @@ public:
 	InputParser();
 	void ProcessInputs();
 private:
-	ActionData *m_action;
+	ActionData *m_action_ptr;
 	DebouncedJoystick * m_driver_stick;
 	DebouncedJoystick * m_operator_stick;
 	
@@ -18,18 +18,19 @@ private:
 	
 	//Driver stick
 	static const int LOWER_CONVEYOR = 1;
-	static const int APPLY_CONFIG = 5;
-	static const int LOAD_CONFIG  = 6;
-	static const int SAVE_CONFIG  = 7;
-	static const int SHIFT 		  = 8;
+	static const int APPLY_CONFIG   = 5;
+	static const int LOAD_CONFIG    = 6;
+	static const int SAVE_CONFIG    = 7;
+	static const int SHIFT 		    = 8;
 	
 	//Operator Stick
-	static const int SHOOT		  = 2;
+	static const int SHOOT		  		  = 1;
+	static const int COLLECT_BALLS        = 2;
 	static const int DECREMENT_BALL_COUNT = 3;
 	static const int INCREMENT_BALL_COUNT = 4;
-	static const int COLLECT_BALLS = 1;
-	static const int DECREMENT_SPEED = 7;
-	static const int INCREMENT_SPEED = 8;
+	static const int DECREMENT_SPEED      = 7;
+	static const int INCREMENT_SPEED 	  = 8;
+	static const int WEDGE_TOGGLE		  = 9;
 	
 };
 

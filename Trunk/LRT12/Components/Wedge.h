@@ -11,6 +11,7 @@
 #include "..\ActionData\BPDAction.h"
 #include "../Log/Loggable.h"
 #include "Relay.h"
+#include "Solenoid.h"
 
 class Config;
 
@@ -26,13 +27,14 @@ class Wedge: public Component, public Configurable
 private:
 	std::string m_name;
 
-	Relay* m_spike;
+	Relay *m_spike;
+	Solenoid *m_latch;
 	DigitalInput *m_bottomlimit, *m_toplimit;
 
 	int m_pulse_down, m_pulse_up;
 	int m_ctr;
 
-	ACTION::BPD::eStates m_lastState;
+	ACTION::WEDGE::state m_lastState;
 
 public:
 	/*!
@@ -47,10 +49,10 @@ public:
 	virtual void Configure();
 
 	/*!
-	 * Drives the wedge according to the action data
+	 * Drives the wedge according to the m_action_ptr data
 	 */
 	virtual void Output();
-	
+
 	virtual void Disable();
 
 	/*!
@@ -58,7 +60,7 @@ public:
 	 * @return name
 	 */
 	virtual string GetName();
-	
+
 	/*!
 	 * Logs data
 	 */

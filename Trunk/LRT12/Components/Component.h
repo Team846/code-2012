@@ -17,7 +17,7 @@ protected:
 	/*!
 	 * @brief a reference to the ActionData class which contains the commands for all the components.
 	 */
-	ActionData* action;
+	ActionData* m_action;
 public:
 	typedef struct ComponentData
 	{
@@ -27,7 +27,7 @@ public:
 	};
 	typedef pair<Component*, ComponentData> ComponentWithData;
 	Component() :
-		action(ActionData::GetInstance())
+		m_action(ActionData::GetInstance())
 	{
 	}
 
