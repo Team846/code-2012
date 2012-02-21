@@ -16,6 +16,7 @@ Launcher::Launcher() :
 	m_output = 0.0;
 	m_duty_cycle_delta = 0.55;
 	m_speed = 0;
+	m_speed_threshold = 10;
 }
 
 Launcher::~Launcher()
@@ -32,33 +33,90 @@ void Launcher::Configure()
 	double d = c->Get<double> (m_name, "rollerD", 0.0);
 	double ff = c->Get<double> (m_name, "rollerFF", 1);
 
+	m_speed_threshold = c->Get<double> (m_name, "speedThreshold", 10);
 	m_max_speed = c->Get<double> (m_name, "maxSpeed", 5180);
 	m_action->launcher->speed = c->Get<double> (m_name, "targetSpeed", 3000);
+	m_atSpeedCycles = c->Get<int> (m_name, "cyclesAtSpeed", 1);
 
+	m_speeds[SLOW] = c->Get<double>(m_name, "lowSpeed", 2000);
+	m_speeds[MEDIUM] = c->Get<double>(m_name, "mediumSpeed", 3000);
+	m_speeds[FASTEST] = c->Get<double>(m_name, "fastestSpeed", 4000);
+	
 	m_pid.setParameters(p, i, d, ff);
 }
 
 void Launcher::Disable()
 {
 	m_roller->SetDutyCycle(0.0);
+	m_action->launcher->atSpeed = true;
 }
 
 void Launcher::Output()
 {
 	m_speed = (m_enc->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc->GetPeriod());
 	m_speed = Util::Clamp<double>(m_speed, 0, m_max_speed * 1.3);
+	double targetSpeed;
+	switch (m_action->launcher->desiredSpeed)
+	{
+	case ACTION::LAUNCHER::SLOW:
+		targetSpeed = m_speeds[SLOW];
+		break;
+	case ACTION::LAUNCHER::MEDIUM:
+		targetSpeed = m_speeds[MEDIUM];
+		break;
+	case ACTION::LAUNCHER::FASTEST:
+		targetSpeed = m_speeds[FASTEST];
+		break;
+	}
 
 	switch (m_action->launcher->state)
 	{
 	case ACTION::LAUNCHER::RUNNING:
 		m_pid.setSetpoint(
-				Util::Clamp<double>(m_action->launcher->speed, 0, m_max_speed));
+				Util::Clamp<double>(targetSpeed, 0, m_max_speed));
 
 		m_pid.setInput(m_speed);
 		m_pid.update(1.0 / RobotConfig::LOOP_RATE); // 50 Hz
 		m_output = m_pid.getOutput() / m_max_speed;
-		m_action->launcher->atSpeed = fabs(m_speed - m_action->launcher->speed)
-				< 10; // w/i 10 rpm
+
+		static int atSpeedCounter = 0;
+		if (fabs(m_speed - m_action->launcher->speed) < m_speed_threshold)
+		{
+			atSpeedCounter++;
+		}
+		else
+		{
+			AsyncPrinter::Printf("not at speed\n");
+			atSpeedCounter = 0;
+		}
+
+		if (atSpeedCounter > m_atSpeedCycles)
+		{
+			m_action->launcher->atSpeed = true; // w/i 10 rpm
+		}
+		else
+		{
+			m_action->launcher->atSpeed = false; // w/i 10 rpm
+		}
+
+		//		static bool wasAtSpeed = true;
+		//		static int e = 0;
+		//		if (!m_action->launcher->atSpeed)
+		//		{
+		//			AsyncPrinter::Printf("Not at speed\n");
+		//		}
+		//		if (wasAtSpeed != m_action->launcher->atSpeed
+		//				&& !m_action->launcher->atSpeed)
+		//		{
+		//			e = 100;
+		//		}
+		//		wasAtSpeed = m_action->launcher->atSpeed;
+		//		if (--e >= 0)
+		//		{
+		//			AsyncPrinter::Printf("Delaying\n");
+		//			m_action->launcher->atSpeed = false;
+		//		}
+
 		break;
 	case ACTION::LAUNCHER::DISABLED:
 		m_action->launcher->atSpeed = false;

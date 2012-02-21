@@ -28,48 +28,67 @@ BallFeeder::~BallFeeder()
 
 void BallFeeder::Disable()
 {
-	m_roller[FRONT]->SetDutyCycle(0.0);
-	m_roller[BACK]->SetDutyCycle(0.0);
-	m_roller[INTAKE]->SetDutyCycle(0.0);
+	double front, back, intake;
+	front = (0.0);
+	back = (0.0);
+	intake = (0.0);
+
+	m_roller[FRONT]->SetDutyCycle(front);
+	m_roller[BACK]->SetDutyCycle(back);
+	m_roller[INTAKE]->SetDutyCycle(intake);
 	Pneumatics::getInstance()->setPressurePlate(false);
 	//	SharedSolenoid::GetInstance()->DisablePressurePlate();
 }
 
 void BallFeeder::Output()
 {
+	double front, back, intake;
 	if (m_action->motorsEnabled && m_action->wedge->state
 			!= ACTION::WEDGE::PRESET_BOTTOM)
 	{
 		switch (m_action->ballfeed->feeder_state)
 		{
 		case ACTION::BALLFEED::FEEDING:
-			m_roller[FRONT]->SetDutyCycle(m_fwd_duty[FRONT]);
-			m_roller[BACK]->SetDutyCycle(m_fwd_duty[BACK]);
-			m_roller[INTAKE]->SetDutyCycle(m_fwd_duty[INTAKE]);
+			front = (m_fwd_duty[FRONT]);
+			back = (m_fwd_duty[BACK]);
+			intake = (m_fwd_duty[INTAKE]);
 			break;
 		case ACTION::BALLFEED::HOLDING:
-			m_roller[FRONT]->SetDutyCycle(m_holding_duty[FRONT]);
-			m_roller[BACK]->SetDutyCycle(m_holding_duty[BACK]);
-			m_roller[INTAKE]->SetDutyCycle(0.0);
+			front = (m_holding_duty[FRONT]);
+			back = (m_holding_duty[BACK]);
+			intake = (0.0);
 			break;
 		case ACTION::BALLFEED::PURGING:
-			m_roller[FRONT]->SetDutyCycle(m_rev_duty[FRONT]);
-			m_roller[BACK]->SetDutyCycle(m_rev_duty[BACK]);
-			m_roller[INTAKE]->SetDutyCycle(m_rev_duty[INTAKE]);
+			front = (m_rev_duty[FRONT]);
+			back = (m_rev_duty[BACK]);
+			intake = (m_rev_duty[INTAKE]);
 			break;
 		}
 	}
 	else
 	{
-		m_roller[FRONT]->SetDutyCycle(0.0);
-		m_roller[BACK]->SetDutyCycle(0.0);
-		m_roller[INTAKE]->SetDutyCycle(0.0);
+		front = (0.0);
+		back = (0.0);
+		intake = (0.0);
 	}
 
 	if (m_action->ballfeed->attemptToLoadRound)
 	{
-		Pneumatics::getInstance()->setPressurePlate(true);
-		//		SharedSolenoid::GetInstance()->EnablePressurePlate();
+		if (m_action->launcher->atSpeed)
+		{
+			Pneumatics::getInstance()->setPressurePlate(true);
+			front = (m_fwd_duty[FRONT]);
+			back = (m_fwd_duty[BACK]);
+		}
+		else
+		{
+			Pneumatics::getInstance()->setPressurePlate(false);
+			//			front=(m_holding_duty[FRONT]);
+			//			back=(m_holding_duty[BACK]);
+			front = (0.0);
+			back = (0.0);
+
+		}
 	}
 	else
 	{
@@ -93,6 +112,9 @@ void BallFeeder::Output()
 	//		loading = true;
 	//		m_action->ballfeed->attemptToLoadRound = false;
 	//	}
+	m_roller[FRONT]->SetDutyCycle(front);
+	m_roller[BACK]->SetDutyCycle(back);
+	m_roller[INTAKE]->SetDutyCycle(intake);
 }
 
 void BallFeeder::Configure()

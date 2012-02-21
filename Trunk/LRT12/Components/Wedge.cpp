@@ -6,10 +6,6 @@ Wedge::Wedge() :
 {
 	m_spike = new Relay(RobotConfig::RELAY_IO::WEDGE_SPIKE,
 			Relay::kBothDirections);
-	//	m_bottomlimit = new DigitalInput(
-	//			RobotConfig::DIGITAL_IO::WEDGE_LIMIT_BOTTOM);
-	//	m_toplimit = new DigitalInput(RobotConfig::DIGITAL_IO::WEDGE_LIMIT_TOP);
-	//	m_latch = new Solenoid(RobotConfig::SOLENOID_IO::WEDGE_LATCH);
 
 	Configure();
 
@@ -20,9 +16,6 @@ Wedge::Wedge() :
 
 Wedge::~Wedge()
 {
-	//	delete m_latch;
-	//	delete m_bottomlimit;
-	//	delete m_toplimit;
 	delete m_spike;
 }
 
@@ -36,7 +29,6 @@ void Wedge::Configure()
 
 void Wedge::Disable()
 {
-	//	m_latch->Set(false);
 	m_spike->Set(Relay::kOff);
 	Pneumatics::getInstance()->setLatch(true);
 }

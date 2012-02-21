@@ -14,6 +14,9 @@ enum launcherState
 {
 	DISABLED, RUNNING
 };
+enum launcherSpeed{
+	SLOW, MEDIUM, FASTEST
+};
 }
 }
 
@@ -22,6 +25,7 @@ struct LauncherAction
 	ACTION::LAUNCHER::launcherState state;
 	bool atSpeed;
 	double speed;
+	ACTION::LAUNCHER::launcherSpeed desiredSpeed;
 	double distance;
 	bool topTrajectory;
 };

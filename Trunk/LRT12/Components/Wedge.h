@@ -28,8 +28,6 @@ private:
 	std::string m_name;
 
 	Relay *m_spike;
-	Solenoid *m_latch;
-	DigitalInput *m_bottomlimit, *m_toplimit;
 
 	int m_pulse_down, m_pulse_up;
 	int m_ctr;

@@ -38,6 +38,16 @@ void InputParser::ProcessInputs()
 			m_action_ptr->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
 	}
 
+	/***************** Ball Feeder **********************/
+	if (m_operator_stick->IsButtonDown(COLLECT_BALLS))
+	{
+		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
+	}
+	else
+	{
+		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::HOLDING;
+	}
+
 	/***************** Drivetrain **********************/
 #define CLOSED_LOOP 0
 #if CLOSED_LOOP
@@ -66,6 +76,18 @@ void InputParser::ProcessInputs()
 		m_action_ptr->launcher->topTrajectory = false;
 	}
 	
+	if (m_operator_stick->IsButtonDown(LOW_SPEED))
+	{
+		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::SLOW;
+	}
+	if (m_operator_stick->IsButtonDown(HIGH_SPEED))
+	{
+		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::FASTEST;
+	}
+	else
+	{
+		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::MEDIUM;
+	}
 
 	m_action_ptr->launcher->state = ACTION::LAUNCHER::RUNNING;
 
@@ -82,28 +104,32 @@ void InputParser::ProcessInputs()
 	}
 
 	/***************** WEDGE **********************/
-	if (m_operator_stick->IsButtonJustPressed(WEDGE_UP))
+	if (m_operator_stick->IsButtonJustPressed(WEDGE_UP)
+			|| m_action_ptr->ballfeed->sweepArmOut)
 	{
-			m_action_ptr->wedge->state = ACTION::WEDGE::PRESET_TOP;
+		m_action_ptr->wedge->state = ACTION::WEDGE::PRESET_TOP;
 	}
 	else if (m_operator_stick->IsButtonJustPressed(WEDGE_DOWN))
 	{
-			m_action_ptr->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
+		m_action_ptr->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
 	}
-	
-	/***************** Ball Collector **********************/
-	m_action_ptr->ballfeed->sweepArmOut = m_driver_stick->IsButtonDown(
-			LOWER_CONVEYOR);
 
-	/***************** Ball Feeder **********************/
-	if (m_operator_stick->IsButtonDown(COLLECT_BALLS))
+	/***************** Ball Collector **********************/
+	if (!(m_action_ptr->wedge->state == ACTION::WEDGE::PRESET_BOTTOM))
 	{
-		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
+		m_action_ptr->ballfeed->sweepArmOut = m_driver_stick->IsButtonDown(
+				LOWER_COLLECTOR);
+		if (m_driver_stick->IsButtonDown(
+				LOWER_COLLECTOR))
+		{
+			m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
+		}
 	}
 	else
 	{
-		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::HOLDING;
+		m_action_ptr->ballfeed->sweepArmOut = false;
 	}
+
 
 	/***************** Config **********************/
 	if (m_driver_stick->IsButtonJustPressed(SAVE_CONFIG))

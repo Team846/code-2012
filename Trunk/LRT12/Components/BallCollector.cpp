@@ -7,21 +7,17 @@ BallCollector::BallCollector() :
 	m_name("Ball Collector"), m_configsection("bc")
 {
 	m_roller = new AsyncCANJaguar(RobotConfig::CAN::COLLECTOR, "Collector");
-	//	m_arm = new DoubleSolenoid(RobotConfig::SOLENOID_IO::BALL_COLLECTOR_A,
-	//			RobotConfig::SOLENOID_IO::BALL_COLLECTOR_B);
 }
 
 BallCollector::~BallCollector()
 {
 	delete m_roller;
-	//	delete m_arm;
 }
 
 void BallCollector::Output()
 {
 	if (m_action->ballfeed->sweepArmOut)
 	{
-		//		m_arm->Set(DoubleSolenoid::kForward);
 		Pneumatics::getInstance()->setBallCollector(true);
 		if (m_action->motorsEnabled)
 		{
@@ -35,7 +31,6 @@ void BallCollector::Output()
 	else
 	{
 		Pneumatics::getInstance()->setBallCollector(false);
-		//		m_arm->Set(DoubleSolenoid::kReverse);
 		m_roller->SetDutyCycle(0.0);
 	}
 }
@@ -43,7 +38,6 @@ void BallCollector::Output()
 void BallCollector::Disable()
 {
 	Pneumatics::getInstance()->setBallCollector(false);
-	//	m_arm->Set(DoubleSolenoid::kOff);
 	m_roller->SetDutyCycle(0.0);
 }
 

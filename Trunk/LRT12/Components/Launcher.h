@@ -40,12 +40,19 @@ private:
 	AsyncCANJaguar *m_roller;
 	Counter *m_enc;
 	std::string m_name;
-	
+
 	bool started;
-	
+
 	double m_output;
 	double m_max_speed;
 	double m_duty_cycle_delta;
 	double m_speed;
+	double m_speed_threshold;
+	int m_atSpeedCycles;
+	
+	const static int SLOW   = 0;
+	const static int MEDIUM = 1;
+	const static int FASTEST= 2;
+	double m_speeds[3];
 };
 #endif

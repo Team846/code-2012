@@ -11,7 +11,6 @@ class DriveEncoders;
 class PneumaticShifter: public Component, public Configurable, public Loggable
 {
 private:
-//	DoubleSolenoid *m_solenoid;
 	DriveEncoders &encoders;
 	string config_section;
 
