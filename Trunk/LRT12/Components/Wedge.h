@@ -33,6 +33,7 @@ private:
 
 	int m_pulse_down, m_pulse_up;
 	int m_ctr;
+	int m_dither;
 
 	ACTION::WEDGE::state m_lastState;
 

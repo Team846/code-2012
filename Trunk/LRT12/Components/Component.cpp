@@ -29,10 +29,6 @@ list<Component::ComponentWithData>* Component::CreateComponents()
 					createComponentData(false, ComponentData::NO_DS_DISABLE_DIO)));
 	components->push_back(
 			ComponentWithData(new Drivetrain(), createComponentData(true, RobotConfig::DRIVER_STATION::DRIVETRAIN)));
-	
-	
-	
-	//Bug in pneumatic shifter
 	components->push_back(
 			ComponentWithData(new PneumaticShifter(), createComponentData(true, RobotConfig::DRIVER_STATION::SHIFTER)));
 	components->push_back(

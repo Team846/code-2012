@@ -23,6 +23,7 @@ struct LauncherAction
 	bool atSpeed;
 	double speed;
 	double distance;
+	bool topTrajectory;
 };
 
 #endif

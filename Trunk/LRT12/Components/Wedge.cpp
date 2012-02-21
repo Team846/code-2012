@@ -29,8 +29,9 @@ Wedge::~Wedge()
 void Wedge::Configure()
 {
 	Config * config = Config::GetInstance();
-	m_pulse_down = config->Get<int> (m_name, "pulseDown", 50);
-	m_pulse_up = config->Get<int> (m_name, "pulseUp", 50);
+	m_pulse_down = config->Get<int> (m_name, "pulseDown", 70);
+	m_pulse_up = config->Get<int> (m_name, "pulseUp", 45);
+	m_dither = config->Get<int> (m_name, "dither", 5);
 }
 
 void Wedge::Disable()
@@ -55,44 +56,33 @@ void Wedge::Output()
 	{
 	case ACTION::WEDGE::PRESET_TOP:
 		m_action->wedge->completion_status = ACTION::IN_PROGRESS;
-		//		SharedSolenoid::GetInstance()->EnableLatch();
 		Pneumatics::getInstance()->setLatch(false);
-		//		m_latch->Set(true);
 
-		if (/*m_toplimit->Get() || */++m_ctr >= m_pulse_up)
+		if (++m_ctr >= m_pulse_up)
 		{
-			//			if (m_ctr >= m_pulse_up && !m_toplimit->Get())
-			//			{
-			//				m_action->wedge->completion_status = ACTION::FAILURE;
-			//			}
-			//			else
-			//			{
 			m_action->wedge->completion_status = ACTION::SUCCESS;
-			//			}
 			m_spike->Set(Relay::kOff);
 		}
 		else
 		{
-			m_spike->Set(Relay::kForward);
+			if (m_ctr % m_dither <= 1)
+			{
+				m_spike->Set(Relay::kReverse);
+			}
+			else
+			{
+				m_spike->Set(Relay::kOff);
+			}
 		}
 		break;
 	case ACTION::WEDGE::PRESET_BOTTOM:
 		m_action->wedge->completion_status = ACTION::IN_PROGRESS;
 
 		Pneumatics::getInstance()->setLatch(true);
-		//		SharedSolenoid::GetInstance()->DisableLatch();
-		//		m_latch->Set(false);
 
-		if (/*m_bottomlimit->Get() || */++m_ctr >= m_pulse_down)
+		if (++m_ctr >= m_pulse_down)
 		{
-			//			if (m_ctr >= m_pulse_down && !m_bottomlimit->Get())
-			//			{
-			//				m_action->wedge->completion_status = ACTION::FAILURE;
-			//			}
-			//			else
-			//			{
 			m_action->wedge->completion_status = ACTION::SUCCESS;
-			//			}
 
 			m_spike->Set(Relay::kOff);
 		}
@@ -100,12 +90,17 @@ void Wedge::Output()
 		{
 			m_action->wedge->completion_status = ACTION::IN_PROGRESS;
 
-			m_spike->Set(Relay::kReverse);
+			if (m_ctr % m_dither <= 1)
+			{
+				m_spike->Set(Relay::kForward);
+			}
+			else
+			{
+				m_spike->Set(Relay::kOff);
+			}
 		}
 		break;
 	case ACTION::WEDGE::IDLE:
-		//		m_latch->Set(false);
-		//		SharedSolenoid::GetInstance()->DisableLatch();
 		Pneumatics::getInstance()->setLatch(false);
 		m_spike->Set(Relay::kOff);
 		break;

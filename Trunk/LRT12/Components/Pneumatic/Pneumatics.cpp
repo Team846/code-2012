@@ -1,5 +1,7 @@
 #include "Pneumatics.h"
 
+Pneumatics* Pneumatics::m_instance = NULL;
+
 #define INIT_PULSED_SOLENOID(x, y) (x).solenoid = (y);\
 	(x).counter = (m_pulse_length); \
 	(x).state = false; \
@@ -19,9 +21,8 @@ Pneumatics::Pneumatics() :
 					RobotConfig::SOLENOID_IO::SHOOTER_SELECT_B));
 
 	INIT_PULSED_SOLENOID(m_shifter, new DoubleSolenoid(
-					RobotConfig::SOLENOID_IO::SHOOTER_SELECT_A,
-					RobotConfig::SOLENOID_IO::SHOOTER_SELECT_B));
-	m_shifter.pulsed = false;
+					RobotConfig::SOLENOID_IO::SHIFTER_A,
+					RobotConfig::SOLENOID_IO::SHIFTER_B));
 
 	INIT_PULSED_SOLENOID(m_ballcollector, new DoubleSolenoid(
 					RobotConfig::SOLENOID_IO::BALL_COLLECTOR_A,
@@ -38,17 +39,17 @@ Pneumatics::Pneumatics() :
 
 Pneumatics * Pneumatics::getInstance()
 {
-	static Pneumatics me;
-	return &me;
+	if (m_instance == NULL)
+	{
+		m_instance = new Pneumatics();
+	}
+	return m_instance;
 }
 
 void Pneumatics::startBackgroundTask()
 {
-	if (m_is_running = false)
-	{
-		m_is_running = true;
-		m_task->Start();
-	}
+	m_is_running = true;
+	m_task->Start();
 }
 
 void Pneumatics::stopBackgroundTask()
@@ -91,16 +92,18 @@ void Pneumatics::setTrajectory(bool on)
 
 void Pneumatics::setLatch(bool on)
 {
-	m_mutex = !on;
-	if (!on != m_shared.state)
+	m_mutex = on;
+	on = !on;
+	if (on != m_shared.state)
 	{
-		m_shared.state = !on;
+		m_shared.state = on;
 		m_shared.counter = m_pulse_length;
 	}
 }
 
 void Pneumatics::setPressurePlate(bool on)
 {
+	on = !on;
 	if (!m_mutex)
 	{
 		if (on != m_shared.state)
@@ -152,7 +155,7 @@ void Pneumatics::pulse(PulsedSolenoid * ptr)
 	{
 		if (ptr->counter > 0)
 		{
-			--ptr->counter;
+			ptr->counter = ptr->counter - 1;
 			if (ptr->state)
 			{
 				ptr->solenoid->Set(DoubleSolenoid::kForward);
@@ -198,7 +201,7 @@ Pneumatics::~Pneumatics()
 	delete m_ballcollector.solenoid;
 }
 
-void Pneumatics::taskEntryPoint(UINT32 ptr)
+void Pneumatics::taskEntryPoint()
 {
 	Pneumatics * p = Pneumatics::getInstance();
 	p->task();

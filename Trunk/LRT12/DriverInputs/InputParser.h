@@ -28,9 +28,12 @@ private:
 	static const int COLLECT_BALLS        = 2;
 	static const int DECREMENT_BALL_COUNT = 3;
 	static const int INCREMENT_BALL_COUNT = 4;
+	static const int TRAJECTORY_UP	 	  = 5;
+	static const int TRAJECTORY_DOWN	  = 6;
 	static const int DECREMENT_SPEED      = 7;
 	static const int INCREMENT_SPEED 	  = 8;
-	static const int WEDGE_TOGGLE		  = 9;
+	static const int WEDGE_DOWN		  	  = 9;
+	static const int WEDGE_UP		  	  = 10;
 	
 };
 

@@ -95,7 +95,7 @@ private:
 	 * Entry point for task
 	 * @param ptr
 	 */
-	static void taskEntryPoint(UINT32 ptr);
+	static void taskEntryPoint();
 
 	/*!
 	 * Actual task
@@ -109,6 +109,8 @@ private:
 	void pulse(PulsedSolenoid * ptr);
 
 	PulsedSolenoid m_shifter, m_ballcollector, m_trajectory, m_shared;
+
+	static Pneumatics* m_instance;
 
 	std::string m_name;
 

@@ -55,16 +55,17 @@ void InputParser::ProcessInputs()
 	m_action_ptr->drivetrain->rate.desiredTurnRate = -m_driver_stick->GetAxis(
 			Joystick::kZAxis);
 
-	/***************** Shooter **********************/
+	/***************** Launcher **********************/
 	//	m_action_ptr->launcher->speed += m_operator_stick->GetAxis(Joystick::kYAxis)*5;
-	if (m_operator_stick->IsButtonJustPressed(DECREMENT_SPEED))
+	if (m_operator_stick->IsButtonJustPressed(TRAJECTORY_UP))
 	{
-		m_action_ptr->launcher->speed -= 500;
+		m_action_ptr->launcher->topTrajectory = true;
 	}
-	else if (m_operator_stick->IsButtonJustPressed(INCREMENT_SPEED))
+	else if (m_operator_stick->IsButtonJustPressed(TRAJECTORY_DOWN))
 	{
-		m_action_ptr->launcher->speed += 500;
+		m_action_ptr->launcher->topTrajectory = false;
 	}
+	
 
 	m_action_ptr->launcher->state = ACTION::LAUNCHER::RUNNING;
 
@@ -81,18 +82,15 @@ void InputParser::ProcessInputs()
 	}
 
 	/***************** WEDGE **********************/
-	if (m_operator_stick->IsButtonJustPressed(WEDGE_TOGGLE))
+	if (m_operator_stick->IsButtonJustPressed(WEDGE_UP))
 	{
-		if (m_action_ptr->wedge->state == ACTION::WEDGE::PRESET_BOTTOM)
-		{
 			m_action_ptr->wedge->state = ACTION::WEDGE::PRESET_TOP;
-		}
-		else
-		{
-			m_action_ptr->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
-		}
 	}
-
+	else if (m_operator_stick->IsButtonJustPressed(WEDGE_DOWN))
+	{
+			m_action_ptr->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
+	}
+	
 	/***************** Ball Collector **********************/
 	m_action_ptr->ballfeed->sweepArmOut = m_driver_stick->IsButtonDown(
 			LOWER_CONVEYOR);

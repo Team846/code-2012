@@ -19,7 +19,7 @@ void _GLOBAL__I__ZN10LRTEncoderC2EPKcjjd();
 
 void _GLOBAL__I__ZN10LRTRobot12C2Ev();
 
-void _GLOBAL__I__ZN10PneumaticsC2Ev();
+void _GLOBAL__I__ZN10Pneumatics10m_instanceE();
 
 void _GLOBAL__I__ZN11InputParserC2Ev();
 
@@ -102,7 +102,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN10KeyTrackerC2Ev,
     _GLOBAL__I__ZN10LRTEncoderC2EPKcjjd,
     _GLOBAL__I__ZN10LRTRobot12C2Ev,
-    _GLOBAL__I__ZN10PneumaticsC2Ev,
+    _GLOBAL__I__ZN10Pneumatics10m_instanceE,
     _GLOBAL__I__ZN11InputParserC2Ev,
     _GLOBAL__I__ZN12AsyncPrinter8InstanceEv,
     _GLOBAL__I__ZN12ConfigLoaderC2Ev,
@@ -154,7 +154,7 @@ void _GLOBAL__D__ZN10LRTEncoderC2EPKcjjd();
 
 void _GLOBAL__D__ZN10LRTRobot12C2Ev();
 
-void _GLOBAL__D__ZN10PneumaticsC2Ev();
+void _GLOBAL__D__ZN10Pneumatics10m_instanceE();
 
 void _GLOBAL__D__ZN11InputParserC2Ev();
 
@@ -233,7 +233,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN10KeyTrackerC2Ev,
     _GLOBAL__D__ZN10LRTEncoderC2EPKcjjd,
     _GLOBAL__D__ZN10LRTRobot12C2Ev,
-    _GLOBAL__D__ZN10PneumaticsC2Ev,
+    _GLOBAL__D__ZN10Pneumatics10m_instanceE,
     _GLOBAL__D__ZN11InputParserC2Ev,
     _GLOBAL__D__ZN12AsyncPrinter8InstanceEv,
     _GLOBAL__D__ZN12ConfigLoaderC2Ev,

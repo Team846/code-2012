@@ -1,4 +1,5 @@
 #include "Launcher.h"
+#include "Pneumatic/Pneumatics.h"
 
 Launcher::Launcher() :
 	Component(), m_name("Launcher")
@@ -32,6 +33,7 @@ void Launcher::Configure()
 	double ff = c->Get<double> (m_name, "rollerFF", 1);
 
 	m_max_speed = c->Get<double> (m_name, "maxSpeed", 5180);
+	m_action->launcher->speed = c->Get<double> (m_name, "targetSpeed", 3000);
 
 	m_pid.setParameters(p, i, d, ff);
 }
@@ -65,6 +67,15 @@ void Launcher::Output()
 		break;
 	}
 
+	if (m_action->launcher->topTrajectory)
+	{
+		Pneumatics::getInstance()->setTrajectory(true);
+	}
+	else
+	{
+		Pneumatics::getInstance()->setTrajectory(false);
+	}
+
 	static int e = 0;
 	if (++e % 10 == 0)
 		AsyncPrinter::Printf("Speed %.3f Output %.3f\n", m_speed, m_output);
@@ -82,6 +93,7 @@ void Launcher::Output()
 		m_roller->SetDutyCycle(0.0);
 	}
 	m_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+
 }
 
 std::string Launcher::GetName()
@@ -108,5 +120,8 @@ void Launcher::log()
 			m_pid.getIntegralGain());
 	SmartDashboard::GetInstance()->PutDouble("Launcher D",
 			m_pid.getDerivativeGain());
+
+	SmartDashboard::GetInstance()->PutString("Launcher Trajectory",
+			(m_action->launcher->topTrajectory) ? "High" : "Low");
 
 }
