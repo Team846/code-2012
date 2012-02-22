@@ -34,6 +34,7 @@ private:
 	static const int INCREMENT_SPEED 	  = 8;
 	static const int WEDGE_DOWN		  	  = 9;
 	static const int WEDGE_UP		  	  = 10;
+	static const int PURGE		  	  	  = 11;
 	
 };
 

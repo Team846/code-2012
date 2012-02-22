@@ -33,12 +33,12 @@ void PneumaticShifter::Output()
 	switch (m_action->shifter->gear)
 	{
 	case ACTION::GEARBOX::LOW_GEAR:
-		Pneumatics::getInstance()->setShifter(true);
+		Pneumatics::getInstance()->setShifter(false);
 		encoders.setHighGear(false);
 		break;
 
 	case ACTION::GEARBOX::HIGH_GEAR:
-		Pneumatics::getInstance()->setShifter(false);
+		Pneumatics::getInstance()->setShifter(true);
 		encoders.setHighGear(true);
 		break;
 

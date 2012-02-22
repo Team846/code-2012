@@ -23,6 +23,7 @@ Pneumatics::Pneumatics() :
 	INIT_PULSED_SOLENOID(m_shifter, new DoubleSolenoid(
 					RobotConfig::SOLENOID_IO::SHIFTER_A,
 					RobotConfig::SOLENOID_IO::SHIFTER_B));
+	m_shifter.pulsed = false;
 
 	INIT_PULSED_SOLENOID(m_ballcollector, new DoubleSolenoid(
 					RobotConfig::SOLENOID_IO::BALL_COLLECTOR_A,

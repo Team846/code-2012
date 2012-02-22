@@ -43,36 +43,26 @@ void BallFeeder::Disable()
 void BallFeeder::Output()
 {
 	double front, back, intake;
-	if (m_action->motorsEnabled && m_action->wedge->state
-			!= ACTION::WEDGE::PRESET_BOTTOM)
+	switch (m_action->ballfeed->feeder_state)
 	{
-		switch (m_action->ballfeed->feeder_state)
-		{
-		case ACTION::BALLFEED::FEEDING:
+	case ACTION::BALLFEED::FEEDING:
 //			AsyncPrinter::Printf("Feeding\n");
-			front = (m_fwd_duty[FRONT]);
-			back = (m_fwd_duty[BACK]);
-			intake = (m_fwd_duty[INTAKE]);
-			break;
-		case ACTION::BALLFEED::HOLDING:
+		front = (m_fwd_duty[FRONT]);
+		back = (m_fwd_duty[BACK]);
+		intake = (m_fwd_duty[INTAKE]);
+		break;
+	case ACTION::BALLFEED::HOLDING:
 //			AsyncPrinter::Printf("Holding\n");
-			front = (m_holding_duty[FRONT]);
-			back = (m_holding_duty[BACK]);
-			intake = (0.0);
-			break;
-		case ACTION::BALLFEED::PURGING:
-//			AsyncPrinter::Printf("Purging\n");
-			front = (m_rev_duty[FRONT]);
-			back = (m_rev_duty[BACK]);
-			intake = (m_rev_duty[INTAKE]);
-			break;
-		}
-	}
-	else
-	{
-		front = (0.0);
-		back = (0.0);
+		front = (m_holding_duty[FRONT]);
+		back = (m_holding_duty[BACK]);
 		intake = (0.0);
+		break;
+	case ACTION::BALLFEED::PURGING:
+//			AsyncPrinter::Printf("Purging\n");
+		front = (m_rev_duty[FRONT]);
+		back = (m_rev_duty[BACK]);
+		intake = (m_rev_duty[INTAKE]);
+		break;
 	}
 
 	if (m_action->ballfeed->attemptToLoadRound)
@@ -115,9 +105,16 @@ void BallFeeder::Output()
 	//		loading = true;
 	//		m_action->ballfeed->attemptToLoadRound = false;
 	//	}
+	if (!m_action->motorsEnabled)
+	{
+		front = (0.0);
+		back = (0.0);
+		intake = (0.0);
+	}
 	m_roller[FRONT]->SetDutyCycle(front);
 	m_roller[BACK]->SetDutyCycle(back);
 	m_roller[INTAKE]->SetDutyCycle(intake);
+	
 }
 
 void BallFeeder::Configure()

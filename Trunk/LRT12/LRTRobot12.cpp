@@ -5,6 +5,7 @@
 //#include "Config/joystickdg.h"
 
 LRTRobot12::LRTRobot12() :
+		jagTest(2,10),
 			firstMember_(
 					"\n\n\n---------------------------------------------------------\n"
 						"Begin LRTRobot Constructor\n",

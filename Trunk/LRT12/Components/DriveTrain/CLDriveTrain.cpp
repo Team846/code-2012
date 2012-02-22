@@ -2,6 +2,8 @@
 #include "../../Util/AsyncPrinter.h"
 #include <math.h>
 
+#define INCREASE_MIN_POWER 0
+
 ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	m_encoders(DriveEncoders::GetInstance())
 {
@@ -149,12 +151,16 @@ void ClosedLoopDrivetrain::update()
 		{
 			m_fwd_op_complete = true;
 		}
-	case CL_RATE:
+	case CL_RATE: //Fall through switch
 		m_rate_control[TRANSLATE]->setInput(
 				Util::Clamp<double>(
 						m_encoders.getNormalizedForwardMotorSpeed(), -1.0, 1.0));
 		m_rate_control[TRANSLATE]->update(1.0 / RobotConfig::LOOP_RATE);
 		output[TRANSLATE] = m_rate_control[TRANSLATE]->getOutput();
+#if INCREASE_MIN_POWER
+		if (fabs(output[TRANSLATE]) < 0.08)
+			output[TRANSLATE] = output[TRANSLATE] * Util::Sign<double>(output[TRANSLATE]);
+#endif
 		break;
 	case CL_DISABLED:
 		m_fwd_op_complete = true;
@@ -181,6 +187,10 @@ void ClosedLoopDrivetrain::update()
 						m_encoders.getNormalizedTurningMotorSpeed(), -1.0, 1.0));
 		m_rate_control[TURN]->update(1.0 / RobotConfig::LOOP_RATE);
 		output[TURN] = m_rate_control[TURN]->getOutput();
+#if INCREASE_MIN_POWER
+		if (fabs(output[TURN]) < 0.2)
+			output[TURN] = output[TURN] * Util::Sign<double>(output[TURN]);
+#endif
 		break;
 	case CL_DISABLED:
 		m_fwd_op_complete = true;

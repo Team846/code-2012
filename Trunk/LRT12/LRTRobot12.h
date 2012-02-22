@@ -10,6 +10,7 @@
 #include "wdLib.h"
 #include "sysLib.h"
 #include "Compressor.h"
+#include "Jaguar/JaguarTester.h"
 
 #include "Util/AsyncPrinter.h"
 #include "Util/PrintInConstructor.h"
@@ -27,6 +28,7 @@ public:
 	virtual void MainLoop();
 
 private:
+	JaguarTester jagTest;
 	Compressor *m_compressor;
 	DigitalInput *m_pressureSwitch;
 	Brain brain;

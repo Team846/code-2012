@@ -49,7 +49,7 @@ void InputParser::ProcessInputs()
 	}
 
 	/***************** Drivetrain **********************/
-#define CLOSED_LOOP 0
+#define CLOSED_LOOP 1
 #if CLOSED_LOOP
 	m_action_ptr->drivetrain->rate.drive_control = true; //If driver control use velocity control
 	m_action_ptr->drivetrain->rate.turn_control = true;
@@ -60,10 +60,10 @@ void InputParser::ProcessInputs()
 	m_action_ptr->drivetrain->position.drive_control = false;
 	m_action_ptr->drivetrain->position.turn_control = false;
 
-	m_action_ptr->drivetrain->rate.desiredDriveRate = -m_driver_stick->GetAxis(
-			Joystick::kYAxis);
-	m_action_ptr->drivetrain->rate.desiredTurnRate = -m_driver_stick->GetAxis(
-			Joystick::kZAxis);
+	m_action_ptr->drivetrain->rate.desiredDriveRate = pow(-m_driver_stick->GetAxis(
+			Joystick::kYAxis), 1);
+	m_action_ptr->drivetrain->rate.desiredTurnRate = pow(-m_driver_stick->GetAxis(
+			Joystick::kZAxis),3);
 
 	/***************** Launcher **********************/
 	//	m_action_ptr->launcher->speed += m_operator_stick->GetAxis(Joystick::kYAxis)*5;
@@ -128,7 +128,12 @@ void InputParser::ProcessInputs()
 	{
 		m_action_ptr->ballfeed->sweepArmOut = false;
 	}
-
+	
+	if(m_operator_stick->IsButtonDown(PURGE))
+	{
+		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::PURGING;
+		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::SLOW;
+	}
 
 	/***************** Config **********************/
 	if (m_driver_stick->IsButtonJustPressed(SAVE_CONFIG))
