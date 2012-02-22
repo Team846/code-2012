@@ -127,7 +127,7 @@ void BallFeeder::Configure()
 	m_rev_duty[FRONT]
 			= c->Get<double> (m_configsection, "front_rev_duty", -0.3);
 	m_rev_duty[BACK] = c->Get<double> (m_configsection, "back_rev_duty", -0.3);
-	m_rev_duty[INTAKE] = c->Get<double> (m_configsection, "intake_fwd_duty",
+	m_rev_duty[INTAKE] = c->Get<double> (m_configsection, "intake_rev_duty",
 			-1.0);
 
 	m_holding_duty[FRONT] = c->Get<double> (m_configsection,

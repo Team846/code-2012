@@ -157,10 +157,10 @@ void ClosedLoopDrivetrain::update()
 						m_encoders.getNormalizedForwardMotorSpeed(), -1.0, 1.0));
 		m_rate_control[TRANSLATE]->update(1.0 / RobotConfig::LOOP_RATE);
 		output[TRANSLATE] = m_rate_control[TRANSLATE]->getOutput();
-#if INCREASE_MIN_POWER
-		if (fabs(output[TRANSLATE]) < 0.08)
-			output[TRANSLATE] = output[TRANSLATE] * Util::Sign<double>(output[TRANSLATE]);
-#endif
+//#if INCREASE_MIN_POWER
+//		if (fabs(output[TRANSLATE]) < 0.08)
+//			output[TRANSLATE] += 0.08 * Util::Sign<double>(output[TRANSLATE]);
+//#endif
 		break;
 	case CL_DISABLED:
 		m_fwd_op_complete = true;
@@ -188,8 +188,11 @@ void ClosedLoopDrivetrain::update()
 		m_rate_control[TURN]->update(1.0 / RobotConfig::LOOP_RATE);
 		output[TURN] = m_rate_control[TURN]->getOutput();
 #if INCREASE_MIN_POWER
-		if (fabs(output[TURN]) < 0.2)
-			output[TURN] = output[TURN] * Util::Sign<double>(output[TURN]);
+		if (fabs(output[TRANSLATE] < 0.1))
+		{
+			if (fabs(output[TURN]) < 0.2 /*&& fabs(output[TURN]) > 0.05*/)
+				output[TURN] += 0.2 * Util::Sign<double>(output[TURN]);
+		}
 #endif
 		break;
 	case CL_DISABLED:

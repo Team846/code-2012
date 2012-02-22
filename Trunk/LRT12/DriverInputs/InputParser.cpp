@@ -60,10 +60,10 @@ void InputParser::ProcessInputs()
 	m_action_ptr->drivetrain->position.drive_control = false;
 	m_action_ptr->drivetrain->position.turn_control = false;
 
-	m_action_ptr->drivetrain->rate.desiredDriveRate = pow(-m_driver_stick->GetAxis(
-			Joystick::kYAxis), 1);
-	m_action_ptr->drivetrain->rate.desiredTurnRate = pow(-m_driver_stick->GetAxis(
-			Joystick::kZAxis),3);
+	m_action_ptr->drivetrain->rate.desiredDriveRate = pow(
+			-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
+	m_action_ptr->drivetrain->rate.desiredTurnRate = pow(
+			-m_driver_stick->GetAxis(Joystick::kZAxis), 3);
 
 	/***************** Launcher **********************/
 	//	m_action_ptr->launcher->speed += m_operator_stick->GetAxis(Joystick::kYAxis)*5;
@@ -75,7 +75,7 @@ void InputParser::ProcessInputs()
 	{
 		m_action_ptr->launcher->topTrajectory = false;
 	}
-	
+
 	if (m_operator_stick->IsButtonDown(LOW_SPEED))
 	{
 		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::SLOW;
@@ -118,8 +118,7 @@ void InputParser::ProcessInputs()
 	{
 		m_action_ptr->ballfeed->sweepArmOut = m_driver_stick->IsButtonDown(
 				LOWER_COLLECTOR);
-		if (m_driver_stick->IsButtonDown(
-				LOWER_COLLECTOR))
+		if (m_driver_stick->IsButtonDown(LOWER_COLLECTOR))
 		{
 			m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
 		}
@@ -128,8 +127,8 @@ void InputParser::ProcessInputs()
 	{
 		m_action_ptr->ballfeed->sweepArmOut = false;
 	}
-	
-	if(m_operator_stick->IsButtonDown(PURGE))
+
+	if (m_operator_stick->IsButtonDown(PURGE))
 	{
 		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::PURGING;
 		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::SLOW;
