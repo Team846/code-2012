@@ -1,17 +1,19 @@
-#include "KeyTracker.h"
+#include "Trackers.h"
 
 #define DEBUG 0
 
-KeyTracker::KeyTracker()
+Trackers::Trackers()
 {
-	missedPackets = 0;
+	key_missedPackets = 0;
+	target_missedPackets = 0;
+	
 	running = false;
 	disconnect();
-	m_task = new Task("KeyTracker::listen", (FUNCPTR)KeyTracker::listenTask);
+	m_task = new Task("KeyTracker::listen", (FUNCPTR)Trackers::listenTask);
 	m_task->Start((uint32_t) this);
 }
 
-KeyTracker::~KeyTracker()
+Trackers::~Trackers()
 {
 	running = false;
 	
@@ -20,7 +22,7 @@ KeyTracker::~KeyTracker()
 	disconnect();
 }
 
-void KeyTracker::listen()
+void Trackers::listen()
 {
 	AsyncPrinter::Printf("Starting listen task...\n");
 	
@@ -40,7 +42,8 @@ void KeyTracker::listen()
 	
 	AsyncPrinter::Printf("Socket listening...\n");
 	
-	int lastPacketID = 0;
+	int key_lastPacketID = 0;
+	int target_lastPacketID = 0;
 	
 	while(running)
 	{
@@ -48,36 +51,71 @@ void KeyTracker::listen()
 		addr_len = sizeof(client_addr);
 		
 		int retcode = recvfrom(m_socket, in_buf, sizeof(in_buf), 0, (struct sockaddr *)&client_addr, &addr_len);
+		
 		if (retcode < 0)
 		{
 			AsyncPrinter::Printf("!!! KeyTracker: Error: recvfrom() failed. %d\n", retcode);
 			return;
 		}
 		
-		int pid = ((in_buf[0] << 24) | (in_buf[1] << 16) | (in_buf[2] << 8) | (in_buf[3] << 0));
-		keyValue = in_buf[4];
+		uint8_t header = in_buf[0];
+		
+		int pid = -1;
+		
+		switch(header)
+		{
+			case 0:
+				pid = ((in_buf[1] << 24) | (in_buf[2] << 16) | (in_buf[3] << 8) | (in_buf[4] << 0));
+				
+				if(pid - 1 != target_lastPacketID)
+				{
+					target_missedPackets = pid - target_lastPacketID - 1;
+				}
+				
+				target_slop = in_buf[5];
+				target_top = in_buf[6];
+				
+				target_lastPacketID = pid;
+				
+				break;
+			case 1:
+				pid = ((in_buf[1] << 24) | (in_buf[2] << 16) | (in_buf[3] << 8) | (in_buf[4] << 0));
+				
+				if(pid - 1 != key_lastPacketID)
+				{
+					key_missedPackets = pid - key_lastPacketID - 1;
+				}
+				
+				keyValue = in_buf[5];
+				
+				key_lastPacketID = pid;
+			break;
+		}
 
 //		if(counter % 10 == 0)
 		
 //		++counter;
-		
-		if(pid - 1 != lastPacketID)
-		{
-			missedPackets = pid - lastPacketID - 1;
-		}
-		
-		lastPacketID = pid;
 	}
 }
 
-uint32_t KeyTracker::getKeyValue()
+uint8_t Trackers::getKeyValue()
 {
 	return keyValue;
 }
 
-int KeyTracker::listenTask(uint32_t obj)
+uint8_t Trackers::getTargetSlop()
 {
-	KeyTracker *pKeyTracker = (KeyTracker *)obj;
+	return target_slop;
+}
+
+bool Trackers::getTargetTop()
+{
+	return target_top;
+}
+
+int Trackers::listenTask(uint32_t obj)
+{
+	Trackers *pKeyTracker = (Trackers *)obj;
 	
 	pKeyTracker->running = true;
 	pKeyTracker->listen();
@@ -86,7 +124,7 @@ int KeyTracker::listenTask(uint32_t obj)
 	return 0;
 }
 
-int KeyTracker::setup()
+int Trackers::setup()
 {
 	int retcode;
 	
@@ -101,7 +139,7 @@ int KeyTracker::setup()
 	AsyncPrinter::Printf("KeyTracker: Socket created.\n");
 	
 	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(8001);
+	server_addr.sin_port = htons(8000);
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 	char ra = '1';
@@ -123,7 +161,7 @@ int KeyTracker::setup()
 	return 0;
 }
 
-void KeyTracker::disconnect()
+void Trackers::disconnect()
 {
 	close(m_socket);
 }

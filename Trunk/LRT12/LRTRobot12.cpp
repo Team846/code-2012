@@ -28,8 +28,6 @@ LRTRobot12::LRTRobot12() :
 	//set priority above default so that we get hgiher priority than default
 	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority
 
-	m_keyTracker = new KeyTracker();
-
 	printf("---- Robot Initialized ----\n\n");
 }
 
@@ -52,7 +50,6 @@ LRTRobot12::~LRTRobot12()
 	//End background printing; Request print task to stop and die.
 	//Premature?  We could move this to ~LRTRobotBase()
 	//	AsyncPrinter::Quit();
-	delete m_keyTracker;
 }
 
 void LRTRobot12::RobotInit()

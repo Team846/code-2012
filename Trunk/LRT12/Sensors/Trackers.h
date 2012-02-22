@@ -15,17 +15,19 @@
 
 using namespace std;
 
-class KeyTracker
+class Trackers
 {
 public:
-	KeyTracker();
-	~KeyTracker();
+	Trackers();
+	~Trackers();
 
 	static int listenTask(uint32_t obj);
 	
 	void listen();
 	
-	uint32_t getKeyValue();
+	uint8_t getKeyValue();
+	uint8_t getTargetSlop();
+	bool getTargetTop();
 	
 private:
 	
@@ -38,10 +40,14 @@ private:
 	struct sockaddr_in server_addr;
 	struct sockaddr_in client_addr;
 	int addr_len;
-	char in_buf[5];
+	char in_buf[7];
 	bool running;
 	
-	uint32_t keyValue;
-	int missedPackets;
+	uint8_t keyValue;
+	uint8_t target_slop;
+	bool target_top;
+	
+	int key_missedPackets;
+	int target_missedPackets;
 };
 #endif // KEY_TRACKER_H_
