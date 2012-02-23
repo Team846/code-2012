@@ -2,14 +2,14 @@
 
 #define DEBUG 0
 
-Trackers::Trackers()
+Trackers::Trackers(int task_priority)
 {
 	key_missedPackets = 0;
 	target_missedPackets = 0;
 	
 	running = false;
 	disconnect();
-	m_task = new Task("KeyTracker::listen", (FUNCPTR)Trackers::listenTask);
+	m_task = new Task("KeyTracker::listen", (FUNCPTR)Trackers::listenTask, task_priority);
 	m_task->Start((uint32_t) this);
 }
 
@@ -19,11 +19,15 @@ Trackers::~Trackers()
 	
 	m_task->Stop();
 	delete m_task;
+	
 	disconnect();
 }
 
 void Trackers::listen()
 {
+	running = true;
+	taskDone = false;
+	
 	AsyncPrinter::Printf("Starting listen task...\n");
 	
 	int iResult = -1;
@@ -86,7 +90,8 @@ void Trackers::listen()
 					key_missedPackets = pid - key_lastPacketID - 1;
 				}
 				
-				keyValue = in_buf[5];
+				keyValue_R = in_buf[5];
+				keyValue_B = in_buf[6];
 				
 				key_lastPacketID = pid;
 			break;
@@ -96,11 +101,39 @@ void Trackers::listen()
 		
 //		++counter;
 	}
+	
+	taskDone = true;
 }
 
-uint8_t Trackers::getKeyValue()
+void Trackers::stop(bool force)
 {
-	return keyValue;
+	if(running)
+	{
+		running = false;
+		
+		if(force)
+		{
+			m_task->Stop();
+			taskDone = true;
+			
+			return;
+		}
+		
+		while(!taskDone)
+			Wait(0.01);
+		
+		m_task->Stop();
+	}
+	
+	return;
+}
+
+uint8_t Trackers::getKeyValue(bool abool)
+{
+	if(abool)
+		return keyValue_R;
+	
+	return keyValue_B;
 }
 
 uint8_t Trackers::getTargetSlop()
@@ -116,11 +149,9 @@ bool Trackers::getTargetTop()
 int Trackers::listenTask(uint32_t obj)
 {
 	Trackers *pKeyTracker = (Trackers *)obj;
-	
-	pKeyTracker->running = true;
+
 	pKeyTracker->listen();
-	pKeyTracker->running = false;
-	
+
 	return 0;
 }
 
