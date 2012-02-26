@@ -66,7 +66,7 @@ ReportSlop::rs_reset ()
 }
 
 int
-ReportSlop::sendResults (int slop, bool top)
+ReportSlop::sendResults (int slop, bool top, int frameNumber)
 {
   if (m_soc < 0)
     {
@@ -78,9 +78,14 @@ ReportSlop::sendResults (int slop, bool top)
       return -1;
     }
 
-  char buf[2];
-  buf[0] = slop;
-  buf[1] = top;
+  char buf[7];
+  buf[0] = 1;
+  buf[1] = frameNumber << 24;
+  buf[2] = frameNumber << 16;
+  buf[3] = frameNumber << 8;
+  buf[4] = frameNumber << 0;
+  buf[5] = slop;
+  buf[6] = top;
 
   if (sendto (m_soc, buf, sizeof (buf), 0, (struct sockaddr *) &m_dst,
 	      sizeof (m_dst)) < 0)

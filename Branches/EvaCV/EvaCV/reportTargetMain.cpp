@@ -28,6 +28,7 @@ main (int argc  , char ** argv  )
 {
   FindTarget target;
   ReportSlop reportSlop;
+  int count = 0;
 
   if (!target.tg_ready ())
     {
@@ -47,7 +48,7 @@ main (int argc  , char ** argv  )
 
   for (;;)
     {
-
+	  ++count;
       target.tg_getFrame ();	// get a new frame from camera
       // printf ("==== %i ====\n", countt++);
 
@@ -55,7 +56,7 @@ main (int argc  , char ** argv  )
       target.tg_getTarget ();
       printf ("slop = %i, top = %i, rowTarget = %i\n", target.tg_getSlop (),
 	      target.tg_getTop (), target.tg_getRowTarget ());
-      reportSlop.sendResults (target.tg_getSlop (), target.tg_getTop ());
+      reportSlop.sendResults (target.tg_getSlop (), target.tg_getTop (), count);
       target.tg_saveImageIfAsked (saveN);
 //      waitKey (1);		//waits for a key: it also handles the GUI events.
     }
