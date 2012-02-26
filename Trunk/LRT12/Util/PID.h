@@ -147,6 +147,17 @@ public:
 	 * @brief Enables PID
 	 */
 	void enablePID();
+	
+	/*!
+	 * @brief Enables an IFR filter on output
+	 */
+	void setIFREnabled(bool enabled);
+	
+	/*!
+	 * @brief Sets the IFR Decay rate
+	 */
+	void setIFRDecay(double decay);
+	
 
 private:
 	double m_proportional_gain;
@@ -162,5 +173,8 @@ private:
 	double m_acc_error;
 	bool m_is_feed_forward;
 	bool m_enabled;
+	
+	bool m_IFREnabled;
+	RunningSum m_runningSum;
 };
 #endif

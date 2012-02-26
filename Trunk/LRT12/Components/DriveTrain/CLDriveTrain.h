@@ -109,7 +109,7 @@ public:
 	void setTurnRate(double rate);
 
 	/*!
-	 * Gets current turn setpoint
+	 * @brief Gets current turn setpoint
 	 * @return
 	 */
 	double getTurnSetpoint();

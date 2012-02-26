@@ -5,11 +5,13 @@ PID::PID(double p_gain, double i_gain, double d_gain, double ff_gain,
 		double i_decay, bool feedforward)
 {
 	setParameters(p_gain, i_gain, d_gain, ff_gain, i_decay, feedforward);
+	m_IFREnabled = false;
 }
 
 PID::PID()
 {
 	setParameters(0, 0, 0);
+	m_IFREnabled = false;
 }
 
 void PID::setParameters(double p_gain, double i_gain, double d_gain,
@@ -54,7 +56,12 @@ double PID::update(double dt)
 	}
 
 	m_prev_error = m_error;
-
+	
+	if (m_IFREnabled)
+	{
+		m_output = m_runningSum.UpdateSum(m_output);
+	}
+	
 	return m_output;
 }
 
@@ -144,4 +151,16 @@ void PID::reset()
 	m_input = 0.0;
 	m_output = 0.0;
 	m_setpoint = 0.0;
+}
+
+void PID::setIFREnabled(bool enabled)
+{
+	m_IFREnabled = enabled;
+	if (!enabled)
+		m_runningSum.Clear();
+}
+
+void PID::setIFRDecay(double decay)
+{
+	m_runningSum.setDecayConstant(decay);
 }

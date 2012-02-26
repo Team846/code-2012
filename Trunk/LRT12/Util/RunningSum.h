@@ -12,7 +12,7 @@ public:
 	 * @brief Constructs a m_is_running sum
 	 * @param decayConstant rate of decay
 	 */
-	RunningSum(double decayConstant) :
+	RunningSum(double decayConstant = 1.0) :
 		decayConstant(decayConstant), runningSum(0)
 	{
 
@@ -36,6 +36,15 @@ public:
 	void Clear()
 	{
 		runningSum = 0;
+	}
+	
+	/*!
+	 * @brief sets the decay constant
+	 * @param decayConstant
+	 */
+	void setDecayConstant(double decayConstant)
+	{
+		decayConstant = 0;
 	}
 
 private:

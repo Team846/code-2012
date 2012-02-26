@@ -146,6 +146,7 @@ void ClosedLoopDrivetrain::update()
 		m_pos_control[TRANSLATE]->update(1.0 / RobotConfig::LOOP_RATE);
 		m_rate_control[TRANSLATE]->setSetpoint(
 				m_pos_control[TRANSLATE]->getOutput());
+		
 		if (m_pos_control[TRANSLATE]->getError() < 0.5
 				&& m_pos_control[TRANSLATE]->getAccumulatedError() < 5.02 - 2)
 		{
