@@ -1,5 +1,7 @@
 #include "WPILib.h"
-#include "WPILib/Encoder.h"
+#include "IMU.h"
+
+#include <taskLib.h>
 
 /**
  * This is a demo program showing the use of the RobotBase class.
@@ -7,47 +9,45 @@
  * Autonomous and OperatorControl methods at the right time as controlled by the switches on
  * the driver station or the field controls.
  */
-class RobotDemo: public SimpleRobot {
-	//	RobotDrive myRobot; // robot drive system
-	Joystick stick; // only joystick
-
+class RobotDemo: public SimpleRobot
+{
+	IMU *imu;
 public:
-	RobotDemo(void) :
-		stick(1) // as they are declared above.
+	RobotDemo(void)
 	{
+		printf("Start constructor\n");
+		imu = new IMU();
+		printf("finish constructor\n");
 	}
 
 	/**
 	 * Drive left & right motors for 2 seconds then stop
 	 */
-	void Autonomous(void) {
-		Wait(2.0); //    for 2 seconds
+	void Autonomous(void)
+	{
 	}
 
 	/**
 	 * Runs the motors with arcade steering. 
 	 */
-	void OperatorControl(void) {
-		Encoder enc_useless(9, 10);
-		DigitalInput a(13);
-		DigitalInput b(14);
-		Encoder enc(a, b, true, Encoder::k2X);
-
-		while (IsOperatorControl()) {
-			//			printf("Encoder: Speed: [%f] [%f] Position: [%d] [%d]\r\n",
-			//					test.GetRate(), test1.GetRate(), test.Get(), test1.Get());
-#define p printf
-#define j(x) (x.Get())
-#define e(x) "Encoder: %d | %f ", x.Get(), x.GetRate()
-#define d(x,y) "Inputs: %d %d", x.Get(), y.Get()
-			p(d(a,b));
-			p(" ");
-			p(e(enc));
-			p("\r\n");
-			Wait(0.001); // wait for a motor update time
+	void OperatorControl(void)
+	{
+		while (true)
+		{
 		}
 	}
-private:
+
+	virtual void Disabled(void)
+	{
+		while (true)
+		{
+			//printf("start Disabled\n");
+			imu->update();
+			//			imu->printAll();
+			//			Wait(1.0);
+			//printf("end Disabled\n");
+		}
+	}
 };
 
 START_ROBOT_CLASS(RobotDemo)
