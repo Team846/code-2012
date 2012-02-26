@@ -116,8 +116,8 @@ public:
 	double getError();
 
 	/*!
-	 * @brief Gets the accumulated running sum
-	 * @return running sum
+	 * @brief Gets the accumulated m_is_running sum
+	 * @return m_is_running sum
 	 */
 	double getAccumulatedError();
 

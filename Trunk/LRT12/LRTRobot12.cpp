@@ -5,12 +5,11 @@
 //#include "Config/joystickdg.h"
 
 LRTRobot12::LRTRobot12() :
-		jagTest(2,10),
 			firstMember_(
 					"\n\n\n---------------------------------------------------------\n"
 						"Begin LRTRobot Constructor\n",
-					"LRTRobot Destroyed\n\n"), dc_CANBus_("CANbus\n"),
-			lastMember_("LRTRobot.LastMember\n") //trace constructor.
+					"LRTRobot Destroyed\n\n"), jagTest(2, 10),
+			dc_CANBus_("CANbus\n"), lastMember_("LRTRobot.LastMember\n") //trace constructor.
 
 {
 	config = Config::GetInstance();

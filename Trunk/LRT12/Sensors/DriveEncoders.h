@@ -9,7 +9,9 @@
 #include "../Util/AsyncPrinter.h"
 #include "../Log/Loggable.h"
 
+#ifndef CHANGEME
 #define CHANGEME 0
+#endif
 
 #define LEFT 0
 #define RIGHT 1

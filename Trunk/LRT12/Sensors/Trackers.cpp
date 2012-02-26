@@ -4,151 +4,168 @@
 
 Trackers::Trackers(int task_priority)
 {
-	key_missedPackets = 0;
-	target_missedPackets = 0;
-	
-	running = false;
+	m_key_missed_packets = 0;
+	m_target_missed_packets = 0;
+
+	m_is_running = false;
 	disconnect();
-	m_task = new Task("KeyTracker::listen", (FUNCPTR)Trackers::listenTask, task_priority);
+	m_task = new Task("KeyTracker::listen", (FUNCPTR) Trackers::listenTask,
+			task_priority);
 	m_task->Start((uint32_t) this);
 }
 
 Trackers::~Trackers()
 {
-	running = false;
-	
+	m_is_running = false;
+
 	m_task->Stop();
 	delete m_task;
-	
+
 	disconnect();
 }
 
 void Trackers::listen()
 {
-	running = true;
-	taskDone = false;
-	
+	m_is_running = true;
+	m_task_is_done = false;
+
 	AsyncPrinter::Printf("Starting listen task...\n");
-	
+
 	int iResult = -1;
-	
+
 	/* TODO: Change loop to only bind, not setup. */
-	while(iResult != 0)
+	while (iResult != 0)
 	{
 		iResult = setup();
-	
-		if(iResult != 0)
+
+		if (iResult != 0)
 		{
 			AsyncPrinter::Printf("!!! KeyTracker: Retrying bind...\n");
 			Wait(0.5);
 		}
 	}
-	
+
 	AsyncPrinter::Printf("Socket listening...\n");
-	
+
 	int key_lastPacketID = 0;
 	int target_lastPacketID = 0;
-	
-	while(running)
+
+	while (m_is_running)
 	{
-//		if(counter % 10 == 0)
-		addr_len = sizeof(client_addr);
-		
-		int retcode = recvfrom(m_socket, in_buf, sizeof(in_buf), 0, (struct sockaddr *)&client_addr, &addr_len);
-		
+		//		if(counter % 10 == 0)
+		m_address_length = sizeof(m_client_address);
+
+		int retcode = recvfrom(m_socket, m_input_buffer, sizeof(m_input_buffer), 0,
+				(struct sockaddr *) &m_client_address, &m_address_length);
+
 		if (retcode < 0)
 		{
-			AsyncPrinter::Printf("!!! KeyTracker: Error: recvfrom() failed. %d\n", retcode);
+			AsyncPrinter::Printf(
+					"!!! KeyTracker: Error: recvfrom() failed. %d\n", retcode);
 			return;
 		}
-		
-		uint8_t header = in_buf[0];
-		
+
+		uint8_t header = m_input_buffer[0];
+
 		int pid = -1;
-		
-		switch(header)
+
+		switch (header)
 		{
-			case 0:
-				pid = ((in_buf[1] << 24) | (in_buf[2] << 16) | (in_buf[3] << 8) | (in_buf[4] << 0));
-				
-				if(pid - 1 != target_lastPacketID)
-				{
-					target_missedPackets = pid - target_lastPacketID - 1;
-				}
-				
-				target_slop = in_buf[5];
-				target_top = in_buf[6];
-				
-				target_lastPacketID = pid;
-				
-				break;
-			case 1:
-				pid = ((in_buf[1] << 24) | (in_buf[2] << 16) | (in_buf[3] << 8) | (in_buf[4] << 0));
-				
-				if(pid - 1 != key_lastPacketID)
-				{
-					key_missedPackets = pid - key_lastPacketID - 1;
-				}
-				
-				keyValue_R = in_buf[5];
-				keyValue_B = in_buf[6];
-				
-				key_lastPacketID = pid;
+		case 0:
+			pid = ((m_input_buffer[1] << 24) | (m_input_buffer[2] << 16) | (m_input_buffer[3] << 8)
+					| (m_input_buffer[4] << 0));
+
+			if (pid - 1 != target_lastPacketID)
+			{
+				m_target_missed_packets = pid - target_lastPacketID - 1;
+			}
+
+			m_target_slop = m_input_buffer[5];
+			m_target_top = m_input_buffer[6];
+
+			target_lastPacketID = pid;
+
+			break;
+		case 1:
+			pid = ((m_input_buffer[1] << 24) | (m_input_buffer[2] << 16) | (m_input_buffer[3] << 8)
+					| (m_input_buffer[4] << 0));
+
+			if (pid - 1 != key_lastPacketID)
+			{
+				m_key_missed_packets = pid - key_lastPacketID - 1;
+			}
+
+			m_key_value_r = m_input_buffer[5];
+			m_key_value_b = m_input_buffer[6];
+
+			key_lastPacketID = pid;
 			break;
 		}
 
-//		if(counter % 10 == 0)
-		
-//		++counter;
+		//		if(counter % 10 == 0)
+
+		//		++counter;
 	}
-	
-	taskDone = true;
+
+	m_task_is_done = true;
 }
 
 void Trackers::stop(bool force)
 {
-	if(running)
+	if (m_is_running)
 	{
-		running = false;
-		
-		if(force)
+		m_is_running = false;
+
+		if (force)
 		{
 			m_task->Stop();
-			taskDone = true;
-			
+			m_task_is_done = true;
+
 			return;
 		}
-		
-		while(!taskDone)
+
+		while (!m_task_is_done)
 			Wait(0.01);
-		
+
 		m_task->Stop();
 	}
-	
+
 	return;
 }
 
-uint8_t Trackers::getKeyValue(bool abool)
+uint8_t Trackers::getKeyValue(KeyValue v)
 {
-	if(abool)
-		return keyValue_R;
-	
-	return keyValue_B;
+	switch (v)
+	{
+	case HIGHER:
+		return (m_key_value_r > m_key_value_b) ? m_key_value_r : m_key_value_b;
+		break;
+	case LOWER:
+		return (m_key_value_r < m_key_value_b) ? m_key_value_r : m_key_value_b;
+		break;
+	case RED:
+		return m_key_value_r;
+		break;
+	case BLUE:
+		return m_key_value_b;
+		break;
+	}
+	return m_key_value_r;
 }
 
 uint8_t Trackers::getTargetSlop()
 {
-	return target_slop;
+	return m_target_slop;
 }
 
 bool Trackers::getTargetTop()
 {
-	return target_top;
+	return m_target_top;
 }
 
 int Trackers::listenTask(uint32_t obj)
 {
-	Trackers *pKeyTracker = (Trackers *)obj;
+	Trackers *pKeyTracker = (Trackers *) obj;
 
 	pKeyTracker->listen();
 
@@ -158,37 +175,40 @@ int Trackers::listenTask(uint32_t obj)
 int Trackers::setup()
 {
 	int retcode;
-	
+
 	m_socket = socket(AF_INET, SOCK_DGRAM, 0);
-	
-	if(m_socket < 0)
+
+	if (m_socket < 0)
 	{
-		AsyncPrinter::Printf("!!! KeyTracker: Error: socket() failed. %d\n", m_socket);
+		AsyncPrinter::Printf("!!! KeyTracker: Error: socket() failed. %d\n",
+				m_socket);
 		return m_socket;
 	}
-	
+
 	AsyncPrinter::Printf("KeyTracker: Socket created.\n");
-	
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_port = htons(8000);
-	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	
+
+	m_server_address.sin_family = AF_INET;
+	m_server_address.sin_port = htons(8000);
+	m_server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+
 	char ra = '1';
-	
+
 	setsockopt(m_socket, SOL_SOCKET, SO_REUSEADDR, &ra, sizeof(ra));
-	
-	retcode = bind(m_socket, (struct sockaddr *)&server_addr, sizeof(server_addr));
-	
-	if(retcode < 0)
+
+	retcode = bind(m_socket, (struct sockaddr *) &m_server_address,
+			sizeof(m_server_address));
+
+	if (retcode < 0)
 	{
-		AsyncPrinter::Printf("!!! KeyTracker: Error: bind() failed. %d\n", retcode);
+		AsyncPrinter::Printf("!!! KeyTracker: Error: bind() failed. %d\n",
+				retcode);
 		return retcode;
 	}
-	
+
 	AsyncPrinter::Printf("KeyTracker: Socket successfully binded.\n");
-	
+
 	AsyncPrinter::Printf("Socket successfully initialized.\n");
-	
+
 	return 0;
 }
 

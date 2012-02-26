@@ -34,7 +34,7 @@ private:
 	int PrinterTask();
 
 	bool quitting_; //if true, then we are exiting and closing down the print queue.
-	bool running_; //true if print task is running.
+	bool running_; //true if print task is m_is_running.
 
 	SEM_ID semaphore_;
 	int queue_bytes_;

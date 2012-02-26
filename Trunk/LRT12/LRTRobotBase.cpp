@@ -104,7 +104,7 @@ void LRTRobotBase::StartCompetition()
 	}
 }
 
-//called by interupt on timer. This structure with the semaphores is to avoid the restrictions of running an ISR.
+//called by interupt on timer. This structure with the semaphores is to avoid the restrictions of m_is_running an ISR.
 void LRTRobotBase::releaseLoop(void* param)
 {
 	// RY: This was massively polluting the console

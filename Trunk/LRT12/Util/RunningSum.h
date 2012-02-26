@@ -2,14 +2,14 @@
 #define RUNNING_SUM_H_
 
 /*!
- * @brief Maintains a running sum
+ * @brief Maintains a m_is_running sum
  */
 
 class RunningSum
 {
 public:
 	/*!
-	 * @brief Constructs a running sum
+	 * @brief Constructs a m_is_running sum
 	 * @param decayConstant rate of decay
 	 */
 	RunningSum(double decayConstant) :
@@ -31,7 +31,7 @@ public:
 	}
 
 	/*!
-	 * @brief clears the running sum
+	 * @brief clears the m_is_running sum
 	 */
 	void Clear()
 	{
