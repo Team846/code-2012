@@ -1,6 +1,7 @@
 #ifndef PID_CONTROLLER_H_
 #define PID_CONTROLLER_H_
 
+#include "RunningSum.h"
 /*!
  * @brief Simple implementation of a PID controller
  * @author Robert Ying
