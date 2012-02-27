@@ -2,6 +2,7 @@
 #include "../Util/AsyncPrinter.h"
 #include "../ActionData/DriveTrainAction.h"
 #include "../ActionData/ShifterAction.h"
+#include "../ActionData/IMUData.h"
 
 Drivetrain::Drivetrain() :
 	Component(), m_name("Drivetrain"), m_encoders(DriveEncoders::GetInstance())
@@ -23,7 +24,11 @@ Drivetrain::~Drivetrain()
 
 void Drivetrain::Configure()
 {
-	Config::GetInstance()->Get(m_name, "numCyclesToSync", 25);
+	Config * c = Config::GetInstance();
+	NUM_CYCLES_TO_SYNC = c->Get(m_name, "numCyclesToSync", 25);
+	m_forward_accel_limit = c->Get(m_name, "forwardAccelLimit", 4.9);
+	m_reverse_accel_limit = c->Get(m_name, "reverseAccelLimit", -1.0);
+	m_delta_power_limit = c->Get(m_name, "deltaPowerLimit", 0.25);
 }
 
 std::string Drivetrain::GetName()
@@ -129,6 +134,26 @@ void Drivetrain::Output()
 	m_drive_control.update();
 
 	ClosedLoopDrivetrain::DriveCommand cmd = m_drive_control.getOutput();
+
+	if (m_action->imu->accel_x > m_forward_accel_limit
+			|| m_action->imu->accel_x < m_reverse_accel_limit)
+	{
+		double lspeed = m_encoders.getNormalizedMotorSpeed(
+				m_encoders.getLeftEncoder());
+		double rspeed = m_encoders.getNormalizedMotorSpeed(
+				m_encoders.getRightEncoder());
+		if (fabs(cmd.leftDutyCycle - lspeed) > m_delta_power_limit)
+		{
+			cmd.leftDutyCycle = lspeed + Util::Sign<double>(
+					cmd.leftDutyCycle - lspeed) * m_delta_power_limit;
+		}
+
+		if (fabs(cmd.rightDutyCycle - rspeed) > m_delta_power_limit)
+		{
+			cmd.rightDutyCycle = rspeed + Util::Sign<double>(
+					cmd.rightDutyCycle - rspeed) * m_delta_power_limit;
+		}
+	}
 
 	// decrease one cycle until zero
 	// DIS DOESN"T WORK -RY, BA

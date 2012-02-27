@@ -109,10 +109,7 @@ void Brain::process()
 	}
 	else if (m_ds->IsOperatorControl())
 	{
-#warning position drive does not work yet
 		m_inputs->ProcessInputs();
-		
-		//		giveActionSem();
 	}
 }
 

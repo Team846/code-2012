@@ -60,19 +60,19 @@ public:
 	 * Returns raw acceleration in x
 	 * @return acceleration in x
 	 */
-	int16_t getAccelX();
+	double getAccelX();
 
 	/*!
 	 * Returns raw acceleration in y
 	 * @return acceleration in y
 	 */
-	int16_t getAccelY();
+	double getAccelY();
 
 	/*!
 	 * Returns raw acceleration in z
 	 * @return acceleration in z
 	 */
-	int16_t getAccelZ();
+	double getAccelZ();
 
 	/*!
 	 * Returns raw angular rate about x
@@ -111,7 +111,8 @@ private:
 
 	const static uint8_t kAddress = (0x29); // 7-bit default address
 	const static uint8_t kNumPackets = 4; // number of 7-byte packets to concatenate
-
+	const static double kAccelConversion = 9.81 / 4096; // 4G, 4096 = 1G
+	
 	/*!
 	 * indices in the data packet of various variables
 	 */

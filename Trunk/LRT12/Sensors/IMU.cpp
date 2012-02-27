@@ -80,9 +80,9 @@ void IMU::log()
 	sdb->PutDouble("IMU Pitch", getPitch());
 	sdb->PutDouble("IMU Yaw", getYaw());
 
-	sdb->PutInt("IMU Accel X", getAccelX());
-	sdb->PutInt("IMU Accel Y", getAccelY());
-	sdb->PutInt("IMU Accel Z", getAccelZ());
+	sdb->PutDouble("IMU Accel X", getAccelX());
+	sdb->PutDouble("IMU Accel Y", getAccelY());
+	sdb->PutDouble("IMU Accel Z", getAccelZ());
 
 	sdb->PutInt("IMU Gyro X", getGyroX());
 	sdb->PutInt("IMU Gyro Y", getGyroY());
@@ -143,19 +143,19 @@ double IMU::getPitch()
 	return m_pitch;
 }
 
-int16_t IMU::getAccelX()
+double IMU::getAccelX()
 {
-	return m_accel_x;
+	return m_accel_x * kAccelConversion;
 }
 
-int16_t IMU::getAccelY()
+double IMU::getAccelY()
 {
-	return m_accel_y;
+	return m_accel_y * kAccelConversion;
 }
 
-int16_t IMU::getAccelZ()
+double IMU::getAccelZ()
 {
-	return m_accel_z;
+	return m_accel_z * kAccelConversion;
 }
 
 int16_t IMU::getGyroX()
@@ -179,6 +179,8 @@ void IMU::printAll()
 	printf("Roll: %.02f Pitch: %.02f Yaw: %.02f\r\n", m_roll, m_pitch, m_yaw);
 	printf("Gyro: [%d, %d, %d]\r\n", m_gyro_x, m_gyro_y, m_gyro_z);
 	printf("Accel: [%d, %d, %d]\r\n", m_accel_x, m_accel_y, m_accel_z);
+	printf("Scaled AcceL: [%.02f, %.02f, %.02f]\r\n", getAccelX(), getAccelY(),
+			getAccelZ());
 	printf("\r\n");
 }
 

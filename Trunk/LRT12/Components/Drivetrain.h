@@ -41,6 +41,8 @@ private:
 	DriveEncoders& m_encoders;
 	ESC *m_esc_left, *m_esc_right;
 	int NUM_CYCLES_TO_SYNC;
+	double m_forward_accel_limit, m_reverse_accel_limit;
+	double m_delta_power_limit;
 };
 
 #endif
