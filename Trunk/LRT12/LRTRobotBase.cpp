@@ -94,12 +94,7 @@ void LRTRobotBase::StartCompetition()
 
 		if (cycleCount % 100 == 0)
 		{
-			//          printf("Cycle count: %d\n", cycleCount);
-			//			AsyncPrinter::Printf("Sleep time: %.2fms\n\n",
-			//sleepTime_us		* 1.0e-3);
 			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-3);
-			//          printf("Target Time: %.4fms\n", cycleExpire_us * 1.0e-3);
-			//          fflush(stdout);
 		}
 	}
 }
@@ -107,16 +102,5 @@ void LRTRobotBase::StartCompetition()
 //called by interupt on timer. This structure with the semaphores is to avoid the restrictions of m_is_running an ISR.
 void LRTRobotBase::releaseLoop(void* param)
 {
-	// RY: This was massively polluting the console
-	//	AsyncPrinter::Printf("%d\n", GetFPGATime());
 	semGive(((LRTRobotBase*) param)->loopSemaphore);
-
-	// there is no reason to retake the sem here... it should be taken in the loop
-	// and semaphores automatically block until they are taken / preempted by priority
-	// otherwise there will be issues when the 0.01 is not long enough to complete all tasks
-	// of lower priority
-
-	//	Wait(0.01); //give the thread up to 1 ms to start
-	//taskDelay(sysClkRateGet()/50/5);//check that this is at least 1 tick
-	//	semTake(((LRTRobotBase*) param)->loopSemaphore, NO_WAIT);
 }

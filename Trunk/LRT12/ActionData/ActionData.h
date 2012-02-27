@@ -14,6 +14,7 @@ struct DriveTrainAction;
 struct ShifterAction;
 struct LauncherAction;
 struct BallFeedAction;
+struct IMU_Data;
 
 class ActionData
 {
@@ -62,6 +63,11 @@ public:
 	 * @brief contains commands relevant to the ball feeding system
 	 */
 	BallFeedAction* ballfeed;
+
+	/*!
+	 * @brief contains the imu data
+	 */
+	IMU_Data * imu;
 
 	/*!
 	 * @brief enables motors across the robot

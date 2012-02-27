@@ -5,6 +5,7 @@
 #include "BPDAction.h"
 #include "BallFeedAction.h"
 #include "ConfigAction.h"
+#include "IMUData.h"
 
 ActionData* ActionData::instance = NULL;
 
@@ -54,6 +55,7 @@ ActionData::ActionData()
 	launcher->state = ACTION::LAUNCHER::RUNNING;
 	launcher->speed = 0.0;
 	launcher->atSpeed = false;
+	launcher->speed = 2000;
 
 	wedge = (BPDAction*) malloc(sizeof(BPDAction));
 	wedge->state = ACTION::WEDGE::IDLE;
@@ -62,8 +64,10 @@ ActionData::ActionData()
 	ballfeed = (BallFeedAction*) malloc(sizeof(BallFeedAction));
 	ballfeed->sweepArmOut = false;
 
-	launcher->speed = 2000;
-
+	imu = (IMU_Data *) malloc(sizeof(IMU_Data));
+	imu->accel_x = imu->accel_y = imu->accel_z = 0;
+	imu->gyro_x = imu->gyro_y = imu->gyro_z = 0;
+	imu->pitch = imu->roll = imu->yaw = 0.0;
 }
 
 ActionData::~ActionData()

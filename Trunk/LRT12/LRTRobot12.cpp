@@ -18,6 +18,8 @@ LRTRobot12::LRTRobot12() :
 	components = Component::CreateComponents();
 	m_action = ActionData::GetInstance();
 
+	m_imu = new IMU();
+
 	m_compressor = new Compressor(
 			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
 			RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
@@ -25,7 +27,7 @@ LRTRobot12::LRTRobot12() :
 
 	mainLoopWatchDog = wdCreate();
 
-	//set priority above default so that we get hgiher priority than default
+	//set priority above default so that we get higher priority than default
 	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority
 
 	printf("---- Robot Initialized ----\n\n");
@@ -36,20 +38,15 @@ LRTRobot12::~LRTRobot12()
 
 	m_compressor->Stop();
 	delete m_compressor;
-	// try to free SmartDashboard resources
-	//	SmartDashboard::DeleteSingletons();
-	// Testing shows this to be the entry point for a Kill signal.
-	// Start shutting down processes here. -dg
+
+	delete m_imu;
+
 	printf("\n\nBegin Deleting LRTRobot12\n");
 
 	// Kill the main loop, so we don't access deleted objects. -dg
 	LRTRobotBase::quitting_ = true;
 	printf("LRTRobot12 says to LRTRobotBase: \"Quit Main Loop please\"\n");
 	Wait(0.100); //Wait for main loop to exec one last time and then exit.  Should take < 20ms.
-
-	//End background printing; Request print task to stop and die.
-	//Premature?  We could move this to ~LRTRobotBase()
-	//	AsyncPrinter::Quit();
 }
 
 void LRTRobot12::RobotInit()
@@ -88,6 +85,8 @@ void LRTRobot12::MainLoop()
 	m_action->motorsEnabled = ds->GetDigitalIn(
 			RobotConfig::DRIVER_STATION::MOTORS);
 
+	m_imu->update(m_action);
+
 	//iterate though and output components
 	for (list<Component::ComponentWithData>::iterator iter =
 			components->begin(); iter != components->end(); iter++)
@@ -118,10 +117,6 @@ void LRTRobot12::MainLoop()
 	{
 		m_compressor->Stop();
 	}
-	//	brain.giveActionSem();
-
-	//    if(prevState != gameState)
-	//        controller.ResetCache();
 
 	prevState = gameState;
 

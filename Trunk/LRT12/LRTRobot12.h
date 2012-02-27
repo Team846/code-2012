@@ -1,21 +1,23 @@
 #ifndef LRT_ROBOT_12_H_
 #define LRT_ROBOT_12_H_
 
+#include "wdLib.h"
+#include "sysLib.h"
+
 #include "LRTRobotBase.h"
 #include "Brain/Brain.h"
 #include "Components/Component.h"
 #include "Config/Config.h"
 #include "Config/RobotConfig.h"
 #include "Log/Log.h"
-#include "wdLib.h"
-#include "sysLib.h"
+
 #include "Compressor.h"
-#include "Jaguar/JaguarTester.h"
+#include "Sensors/IMU.h"
 
 #include "Util/AsyncPrinter.h"
 #include "Util/PrintInConstructor.h"
-
 #include "Jaguar/AsyncCANJaguar.h"
+#include "Jaguar/JaguarTester.h"
 
 class LRTRobot12: public LRTRobotBase
 {
@@ -33,6 +35,7 @@ private:
 	DigitalInput *m_pressureSwitch;
 	Brain brain;
 	ActionData *m_action;
+	IMU *m_imu;
 
 	PrintInConstructor dc_CANBus_;
 
@@ -45,7 +48,6 @@ private:
 
 	list<Component::ComponentWithData>* components;
 
-	//    AnalogChannel armPot;
 	WDOG_ID mainLoopWatchDog;
 	PrintInConstructor lastMember_; //trace constructor/destructor.
 };
