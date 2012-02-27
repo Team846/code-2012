@@ -22,6 +22,7 @@ IMU::IMU()
 		printf("Module %d, Addess %d\n", moduleNumber, kAddress);
 		m_i2c = module->GetI2C(kAddress);
 	}
+	PacketNumberExpected = 0;
 	m_accel_x = m_accel_y = m_accel_z = 0;
 	m_gyro_x = m_gyro_y = m_gyro_z = 0;
 	m_roll = m_pitch = m_yaw = 0.0;
@@ -45,7 +46,7 @@ void IMU::update()
 	uint8_t status = getUint8(STATUS);
 	if (status == 0x00 || status == 0xff)
 	{
-		printf("Error bad IMU packet\r\n");
+		printf("Status: Bad IMU packet\r\n");
 		return;
 	}
 	m_pitch = getInt16(PITCH) / 100.0;
@@ -74,12 +75,19 @@ int IMU::getPacket()
 			return -1;
 		}
 		else
-		{
-			for (uint8_t j = 0; j < 6; ++j)
+			if (data[0] == PacketNumberExpected)
 			{
-				m_i2c_buf[data[0] * 6 + j] = data[j + 1];
+				PacketNumberExpected = ++PacketNumberExpected % kNumPackets;
+				for (uint8_t j = 0; j < 6; ++j)
+				{
+					m_i2c_buf[data[0] * 6 + j] = data[j + 1];
+				}
 			}
-		}
+			else
+			{
+				PacketNumberExpected = 0;
+				return 1;
+			}
 	}
 	printf("Packet: ");
 	for (uint8_t i = 0; i < kNumPackets * 6; i++)
@@ -92,7 +100,9 @@ int IMU::getPacket()
 
 int16_t IMU::getInt16(uint8_t index)
 {
-	return (int16_t) (m_i2c_buf[index] << 8) | (m_i2c_buf[index + 1]);
+	//return (int16_t) (m_i2c_buf[index] << 8) | (m_i2c_buf[index + 1]); // No Good
+	//return (int16_t) (m_i2c_buf[index+1] << 8) | (m_i2c_buf[index]);   // Good
+	return *((int16_t *)(&m_i2c_buf[index]));                            // Better
 }
 
 uint8_t IMU::getUint8(uint8_t index)
@@ -112,7 +122,7 @@ double IMU::getYaw()
 
 double IMU::getPitch()
 {
-	m_pitch;
+	return m_pitch;
 }
 
 int16_t IMU::getAccelX()
@@ -153,3 +163,4 @@ void IMU::printAll()
 	printf("Accel: [%d, %d, %d]\r\n", m_accel_x, m_accel_y, m_accel_z);
 	printf("\r\n");
 }
+

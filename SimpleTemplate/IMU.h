@@ -59,7 +59,7 @@ private:
 	uint8_t m_i2c_buf[kNumPackets * 6 + 1];
 	int16_t getInt16(uint8_t index);
 	uint8_t getUint8(uint8_t index);
-
+	uint8_t PacketNumberExpected;
 	int16_t m_accel_x, m_accel_y, m_accel_z, m_gyro_x, m_gyro_y, m_gyro_z;
 	double m_roll, m_pitch, m_yaw;
 };
