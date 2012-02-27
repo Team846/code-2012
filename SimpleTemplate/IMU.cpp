@@ -90,10 +90,11 @@ int IMU::getPacket()
 			}
 	}
 	printf("Packet: ");
-	for (uint8_t i = 0; i < kNumPackets * 6; i++)
-	{
-		printf("%d ", m_i2c_buf[i]);
-	}
+	printAll();
+//	for (uint8_t i = 0; i < kNumPackets * 6; i++)
+//	{
+//		printf("%d ", m_i2c_buf[i]);
+//	}
 	printf("\r\n");
 	return 0;
 }
@@ -101,8 +102,8 @@ int IMU::getPacket()
 int16_t IMU::getInt16(uint8_t index)
 {
 	//return (int16_t) (m_i2c_buf[index] << 8) | (m_i2c_buf[index + 1]); // No Good
-	//return (int16_t) (m_i2c_buf[index+1] << 8) | (m_i2c_buf[index]);   // Good
-	return *((int16_t *)(&m_i2c_buf[index]));                            // Better
+	return (int16_t) (m_i2c_buf[index+1] << 8) | (m_i2c_buf[index]);   // Good
+	//return *((int16_t *)(&m_i2c_buf[index]));                            // Better
 }
 
 uint8_t IMU::getUint8(uint8_t index)

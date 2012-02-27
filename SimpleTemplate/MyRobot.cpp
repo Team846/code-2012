@@ -43,6 +43,7 @@ public:
 		{
 			//printf("start Disabled\n");
 			imu->update();
+			Wait(0.02);
 			//			imu->printAll();
 			//			Wait(1.0);
 			//printf("end Disabled\n");
