@@ -1,10 +1,12 @@
 #include "ActionData.h"
+#include "AutonomousAction.h"
 #include "DriveTrainAction.h"
 #include "LauncherAction.h"
 #include "ShifterAction.h"
 #include "BPDAction.h"
 #include "BallFeedAction.h"
 #include "ConfigAction.h"
+#include "CameraData.h"
 #include "IMUData.h"
 
 ActionData* ActionData::instance = NULL;
@@ -64,10 +66,19 @@ ActionData::ActionData()
 	ballfeed = (BallFeedAction*) malloc(sizeof(BallFeedAction));
 	ballfeed->sweepArmOut = false;
 
+	auton = (AutonomousAction *) malloc(sizeof(AutonomousAction));
+	auton->state = ACTION::AUTONOMOUS::TELEOP;
+	auton->completion_status = ACTION::UNSET;
+
 	imu = (IMU_Data *) malloc(sizeof(IMU_Data));
 	imu->accel_x = imu->accel_y = imu->accel_z = 0;
 	imu->gyro_x = imu->gyro_y = imu->gyro_z = 0;
 	imu->pitch = imu->roll = imu->yaw = 0.0;
+
+	cam = (camera *) malloc(sizeof(camera));
+	cam->key.blue = cam->key.red = cam->key.higher = 0;
+	cam->align.top = false;
+	cam->align.slop = 0;
 }
 
 ActionData::~ActionData()

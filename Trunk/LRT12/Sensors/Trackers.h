@@ -14,6 +14,8 @@
 
 #include <WPILib.h>
 #include "../Util/AsyncPrinter.h"
+#include "../ActionData/ActionData.h"
+#include "../ActionData/CameraData.h"
 
 /*!
  * @brief Receives data from the key and target trackers.
@@ -69,6 +71,7 @@ public:
 	 * @brief Gets the target slop value 
 	 */
 	uint8_t getTargetSlop();
+	
 	/*! 
 	 * @brief Gets the top status of the target.
 	 */
@@ -80,10 +83,16 @@ private:
 	 * @brief Sets up the socket. 
 	 */
 	int setup();
+	
 	/*! 
 	 * @brief Disconnects and closes the socket. 
 	 */
 	void disconnect();
+	
+	/*!
+	 * Updates actiondata
+	 */
+	void update();
 
 	Task *m_task;
 

@@ -1,6 +1,7 @@
 #include "LRTRobotBase.h"
 #include "Jaguar/AsyncCANJaguar.h"
 #include "Components/Pneumatic/Pneumatics.h"
+#include "Brain/AutonomousFunctions.h"
 #include "Config/RobotConfig.h"
 #include "Utility.h"
 #include "sysLib.h"
@@ -31,6 +32,7 @@ LRTRobotBase::~LRTRobotBase()
 		j->StopBackgroundTask();
 	}
 
+	AutonomousFunctions::getInstance()->stopBackgroundTask();
 	Pneumatics::getInstance()->stopBackgroundTask();
 
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
@@ -59,6 +61,7 @@ void LRTRobotBase::StartCompetition()
 
 	AsyncPrinter::Printf("Starting Pneumatics\r\n");
 	Pneumatics::getInstance()->startBackgroundTask();
+	AutonomousFunctions::getInstance()->startBackgroundTask();
 
 	AsyncPrinter::Printf("Starting Profiler\r\n");
 	Profiler& profiler = Profiler::GetInstance();
@@ -74,6 +77,8 @@ void LRTRobotBase::StartCompetition()
 		{
 			break;
 		}
+
+		AutonomousFunctions::getInstance()->releaseSemaphore();
 
 		profiler.StartNewCycle();
 

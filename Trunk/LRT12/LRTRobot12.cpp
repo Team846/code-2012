@@ -74,9 +74,6 @@ void LRTRobot12::MainLoop()
 	// sysClkRateGet returns the number of ticks per cycle at the current clock rate.
 	wdStart(mainLoopWatchDog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			ExecutionNotify, 0);
-	{
-
-	}
 
 	// /*
 	GameState gameState = DetermineState();

@@ -166,6 +166,10 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.o : $(PRJ_ROO
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates -mno-strict-align -fvolatile $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/AutonomousFunctions.o : $(PRJ_ROOT_DIR)/Brain/AutonomousFunctions.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates -mno-strict-align -fvolatile $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.o : $(PRJ_ROOT_DIR)/Brain/Brain.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates -mno-strict-align -fvolatile $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
@@ -315,6 +319,7 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.o : $(PRJ_ROOT_DIR)/Util/
 
 
 OBJECTS_LRT12_partialImage = LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/AutonomousFunctions.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/BallCollector.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/BallFeeder.o \
@@ -365,19 +370,19 @@ LRT12_partialImage/$(MODE_DIR)/LRT12_partialImage_clean :
 
 force : 
 
-DEP_FILES := LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/BallCollector.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/BallFeeder.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Component.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/ConfigLoader.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DriveTrain/CLDriveTrain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Drivetrain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/LRTServo.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Launcher.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Pneumatic/Pneumatics.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Pneumatic/SharedCylinder.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/PneumaticShifter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Shifter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Wedge.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/InputParser.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/AsyncCANJaguar.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/Esc.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Log.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Loggable.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/DriveEncoders.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/IMU.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/LRTEncoder.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/Trackers.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsyncPrinter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PID.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.d
+DEP_FILES := LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/AutonomousFunctions.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Brain/Brain.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/BallCollector.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/BallFeeder.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Component.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/ConfigLoader.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/DriveTrain/CLDriveTrain.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Drivetrain.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/LRTServo.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Launcher.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Pneumatic/Pneumatics.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Pneumatic/SharedCylinder.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/PneumaticShifter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Shifter.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Components/Wedge.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Build.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Config.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/Configurable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Config/DriverStationButtons.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/DebouncedJoystick.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/DriverInputs/InputParser.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/AsyncCANJaguar.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Jaguar/Esc.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobot12.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/LRTRobotBase.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Log.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Loggable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/DriveEncoders.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/IMU.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/LRTEncoder.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/Trackers.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsyncPrinter.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PID.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.d
 -include $(DEP_FILES)
 
 

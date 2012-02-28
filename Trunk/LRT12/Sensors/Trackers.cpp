@@ -55,7 +55,8 @@ void Trackers::listen()
 		//		if(counter % 10 == 0)
 		m_address_length = sizeof(m_client_address);
 
-		int retcode = recvfrom(m_socket, m_input_buffer, sizeof(m_input_buffer), 0,
+		int retcode = recvfrom(m_socket, m_input_buffer,
+				sizeof(m_input_buffer), 0,
 				(struct sockaddr *) &m_client_address, &m_address_length);
 
 		if (retcode < 0)
@@ -72,8 +73,8 @@ void Trackers::listen()
 		switch (header)
 		{
 		case 0:
-			pid = ((m_input_buffer[1] << 24) | (m_input_buffer[2] << 16) | (m_input_buffer[3] << 8)
-					| (m_input_buffer[4] << 0));
+			pid = ((m_input_buffer[1] << 24) | (m_input_buffer[2] << 16)
+					| (m_input_buffer[3] << 8) | (m_input_buffer[4] << 0));
 
 			if (pid - 1 != target_lastPacketID)
 			{
@@ -87,8 +88,8 @@ void Trackers::listen()
 
 			break;
 		case 1:
-			pid = ((m_input_buffer[1] << 24) | (m_input_buffer[2] << 16) | (m_input_buffer[3] << 8)
-					| (m_input_buffer[4] << 0));
+			pid = ((m_input_buffer[1] << 24) | (m_input_buffer[2] << 16)
+					| (m_input_buffer[3] << 8) | (m_input_buffer[4] << 0));
 
 			if (pid - 1 != key_lastPacketID)
 			{
@@ -105,9 +106,20 @@ void Trackers::listen()
 		//		if(counter % 10 == 0)
 
 		//		++counter;
+		update();
 	}
 
 	m_task_is_done = true;
+}
+
+void Trackers::update()
+{
+	camera * c = ActionData::GetInstance()->cam;
+	c->key.blue = getKeyValue(BLUE);
+	c->key.red = getKeyValue(RED);
+	c->key.higher = getKeyValue(HIGHER);
+	c->align.slop = getTargetSlop();
+	c->align.top = getTargetTop();
 }
 
 void Trackers::stop(bool force)

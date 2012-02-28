@@ -5,6 +5,7 @@
 #include "math.h"
 
 #include "../ActionData/ActionData.h"
+#include "../ActionData/AutonomousAction.h"
 #include "../ActionData/DriveTrainAction.h"
 #include "../ActionData/ShifterAction.h"
 #include "../ActionData/LauncherAction.h"
@@ -48,25 +49,45 @@ void InputParser::ProcessInputs()
 		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::HOLDING;
 	}
 
+	/***************** Drive assistance ****************/
+	if (m_driver_stick->IsButtonDown(KEYTRACK))
+	{
+		if (m_action_ptr->auton->state != ACTION::AUTONOMOUS::AUTOALIGN)
+		{
+			m_action_ptr->auton->state = ACTION::AUTONOMOUS::KEYTRACK;
+		}
+	}
+	else if (m_driver_stick->IsButtonDown(BRIDGEBALANCE))
+	{
+		m_action_ptr->auton->state = ACTION::AUTONOMOUS::BRIDGEBALANCE;
+	}
+	else
+	{
+		m_action_ptr->auton->state = ACTION::AUTONOMOUS::TELEOP;
+	}
+
 	/***************** Drivetrain **********************/
+
+	if (m_action_ptr->auton->state == ACTION::AUTONOMOUS::TELEOP)
+	{
 #define CLOSED_LOOP 1
 #if CLOSED_LOOP
-	m_action_ptr->drivetrain->rate.drive_control = true; //If driver control use velocity control
-	m_action_ptr->drivetrain->rate.turn_control = true;
+		m_action_ptr->drivetrain->rate.drive_control = true; //If driver control use velocity control
+		m_action_ptr->drivetrain->rate.turn_control = true;
 #else
-	m_action_ptr->drivetrain->rate.drive_control = false; //If driver control use velocity control
-	m_action_ptr->drivetrain->rate.turn_control = false;
+		m_action_ptr->drivetrain->rate.drive_control = false; //If driver control use velocity control
+		m_action_ptr->drivetrain->rate.turn_control = false;
 #endif 
-	m_action_ptr->drivetrain->position.drive_control = false;
-	m_action_ptr->drivetrain->position.turn_control = false;
+		m_action_ptr->drivetrain->position.drive_control = false;
+		m_action_ptr->drivetrain->position.turn_control = false;
 
-	m_action_ptr->drivetrain->rate.desiredDriveRate = pow(
-			-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
-	m_action_ptr->drivetrain->rate.desiredTurnRate = pow(
-			-m_driver_stick->GetAxis(Joystick::kZAxis), 3);
+		m_action_ptr->drivetrain->rate.desiredDriveRate = pow(
+				-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
+		m_action_ptr->drivetrain->rate.desiredTurnRate = pow(
+				-m_driver_stick->GetAxis(Joystick::kZAxis), 3);
+	}
 
 	/***************** Launcher **********************/
-	//	m_action_ptr->launcher->speed += m_operator_stick->GetAxis(Joystick::kYAxis)*5;
 	if (m_operator_stick->IsButtonJustPressed(TRAJECTORY_UP))
 	{
 		m_action_ptr->launcher->topTrajectory = true;

@@ -18,6 +18,8 @@ private:
 	
 	//Driver stick
 	static const int LOWER_COLLECTOR = 1;
+	static const int KEYTRACK 		= 3;
+	static const int BRIDGEBALANCE	= 4;
 	static const int APPLY_CONFIG   = 5;
 	static const int LOAD_CONFIG    = 6;
 	static const int SAVE_CONFIG    = 7;

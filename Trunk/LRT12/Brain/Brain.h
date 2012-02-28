@@ -50,6 +50,7 @@ public:
 	 * Starts the brain tasks
 	 */
 	void Brain::Start();
+
 private:
 	/*!
 	 * @brief processes the input
