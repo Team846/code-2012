@@ -29,16 +29,7 @@ using namespace std;
 #define DbgPrint(a)
 #endif
 
-/*
- * TODO: <- a big special thanks to brent for fixing "to-do", a crucial part of the code.
- * (comment placed at request of brent)
- *
- * HARD-CODE! FIX!
- *
- * IT'S BURNING MY EYES
- * */
-
-int thresholds[4];
+int thresholds[2];
 
 int getKeyPixels(IplImage * frameIn) {
 	int count = 0;
@@ -46,10 +37,11 @@ int getKeyPixels(IplImage * frameIn) {
 	for (int y = 0; y < frameIn->height; y++) {
 		for (int x = 0; x < frameIn->width; x++) {
 			int blue = CV_GETPIXEL(frameIn, x, y, 0);
+			int green = CV_GETPIXEL(frameIn, x, y, 1);
 			int red = CV_GETPIXEL(frameIn, x, y, 2);
 
-			if ((red >= thresholds[0] && blue <= thresholds[1])
-					|| (blue >= thresholds[2] && red <= thresholds[3])) {
+			if ((red - blue >= thresholds[0] && red - green >= thresholds[0])
+					|| (blue - red >= thresholds[1] && blue - green >= thresholds[1])) {
 				++count;
 			}
 		}
@@ -60,11 +52,8 @@ int getKeyPixels(IplImage * frameIn) {
 
 void setPresetThresholds()
 {
-	thresholds[0] = 158;
-	thresholds[1] = 135;
-
-	thresholds[2] = 80;
-	thresholds[3] = 90;
+	thresholds[0] = 71;
+	thresholds[1] = 19;
 }
 
 void loadThresholds()
@@ -83,7 +72,7 @@ void loadThresholds()
 
 	int linesread = 0;
 
-	while(!file.eof() && linesread < 4)
+	while(!file.eof() && linesread < 2)
 	{
 		getline(file, line);
 
@@ -95,7 +84,7 @@ void loadThresholds()
 		linesread++;
 	}
 
-	if(linesread != 4)
+	if(linesread != 2)
 	{
 		printf("!!! INVALID KEY THRESHOLD FILE - DEFAULTING TO PRESETS\n");
 
@@ -133,7 +122,7 @@ int main() {
 
 			int iSent = messenger.sendData(frameNumber, value);
 
-			DbgPrint(value);
+			DbgPrint(matched);
 
 		} else {
 

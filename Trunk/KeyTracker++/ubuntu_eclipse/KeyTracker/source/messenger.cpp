@@ -28,7 +28,7 @@ void Messenger::setup()
 
 	m_remote.sin_addr.s_addr = inet_addr("10.8.46.2"); // total time wasted on this line: one hour
 	m_remote.sin_family = AF_INET;
-	m_remote.sin_port = htons(8001);
+	m_remote.sin_port = htons(8000);
 
 	writeln("Done.\r\n");
 }
@@ -49,13 +49,14 @@ int Messenger::sendData(int pid, int value)
 			return -1;
 	}
 
-	unsigned char buffer[5];
+	unsigned char buffer[6];
 
-	buffer[0] = pid >> 24;
-	buffer[1] = pid >> 16;
-	buffer[2] = pid >> 8;
-	buffer[3] = pid >> 0;
-	buffer[4] = value;
+	buffer[0] = 1;
+	buffer[1] = pid >> 24;
+	buffer[2] = pid >> 16;
+	buffer[3] = pid >> 8;
+	buffer[4] = pid >> 0;
+	buffer[5] = value;
 
 	int iResult = sendto(m_socket, buffer, sizeof(buffer), 0, (struct sockaddr *) &m_remote, sizeof(m_remote));
 

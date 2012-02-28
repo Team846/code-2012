@@ -1,8 +1,8 @@
+
 #include "global.h"
 
 #if defined(_WIN32) || defined(__MINGW32__) || (defined(__GNUC__) && !defined(__BEAGLEBOARD__))
-
-#if !defined(USE_SATURATION_)
+#if defined(USE_SATURATION_)
 //#pragma region includes/usings
 #include <stdio.h>
 #include <ctime>
@@ -48,13 +48,12 @@ mouseHandler(int event, int x, int y, int flags, void* param)
         IplImage *img0 = (IplImage*) param;
         IplImage *img1 = cvCloneImage(img0);
 
-        /* read pixel *
+        /* read pixel */
         ptr = cvPtr2D(img1, y, x, NULL);
 
         /*
          * display the BGR value
-         * */
-
+         */
         cout << (int)ptr[0] << ", " << (int)ptr[1] << ", " << (int)ptr[2] << endl;
     }
 }
@@ -70,30 +69,30 @@ int getKeyPixels(IplImage * frameIn)
     {
         for(int x = 0; x < frameIn->width; x++)
         {
-            int blue = CV_GETPIXEL(frameIn, x, y, 0);
-            int red = CV_GETPIXEL(frameIn, x, y, 2);
-            int green = CV_GETPIXEL(frameIn, x, y, 1);
+            int hue = CV_GETPIXEL(frameIn, x, y, 0);
+            int val = CV_GETPIXEL(frameIn, x, y, 2);
+            int sat = CV_GETPIXEL(frameIn, x, y, 1);
 
             bool alreadyset = false;
 
 			//int rPixel = CV_GETPIXEL(frameIn, x, y, 0);
 
 			//rPixel = red;
-			cvSet2D(redFrameOut, y, x, cvScalar(red, red, red));
-			cvSet2D(blueFrameOut, y, x, cvScalar(blue, blue, blue));
+			cvSet2D(redFrameOut, y, x, cvScalar(val, val, val));
+			cvSet2D(blueFrameOut, y, x, cvScalar(sat, sat, sat));
 
-            if(/*red >= loRPosition && */red - blue >= hiRPosition && red - green >= hiRPosition)
+            if(sat >= loRPosition)
             {
             	cvSet2D(redFrameOut, y, x, cvScalar(0, 0, 255));
                 ++count;
                 alreadyset = true;
-            }
-            if(/*blue >= loBPosition && */blue - red >= hiBPosition && blue - green >= hiBPosition)
+            }/*
+            if(sat >= loBPosition)
             {
-            	cvSet2D(blueFrameOut, y, x, cvScalar(255, 0, 0));
+            	//cvSet2D(blueFrameOut, y, x, cvScalar(255, 0, 0));
             	if(!alreadyset)
             		++count;
-            }
+            }*/
         }
     }
 
@@ -111,7 +110,7 @@ void onHiBThresholdSlide(int slideValue) { hiBPosition = slideValue; }
 int main()
 {
     IplImage * cap_img;
-    CvCapture * cv_cap = cvCaptureFromCAM(1);
+    CvCapture * cv_cap = cvCaptureFromCAM(0);
 /*
     CvFont font;
 
@@ -148,10 +147,14 @@ int main()
 
         if(cap_img != 0)
         {
+        	IplImage *hsv_img = cvCreateImage(cvSize(cap_img->width, cap_img->height), IPL_DEPTH_8U, 3);
+
+        	cvCvtColor(cap_img, hsv_img, CV_RGB2HSV);
+
             int width = cap_img->width;
             int height = cap_img->height;
             size = cvSize(width, height);
-            int matched = getKeyPixels(cap_img);
+            int matched = getKeyPixels(hsv_img);
             float matchedPixels = (float)matched / (float)(width*height);
 
         	cvSetMouseCallback("video", mouseHandler, (void*)cap_img);
@@ -164,12 +167,14 @@ int main()
 
 			int iSent = messenger.sendData(frameNumber, value);
 
-			DbgPrint(matched);
+			cvReleaseImage(&hsv_img);
+
+			//DbgPrint(value);
 
             // Remove double-slashes for death.
             // /*
             //cvReleaseImage(&cRed);
-            //cvReleaseImage(&cBlue); // */
+            //cvReleaseImage(&cBlue); //*/
             //cvReleaseImage(&cRedThresh);
             //cvReleaseImage(&cBlueThresh);
 
