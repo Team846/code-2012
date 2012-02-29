@@ -111,6 +111,9 @@ int main() {
 	CvCapture *pCapture = cvCaptureFromCAM(1);
 	IplImage *pCaptureImg;
 
+	cvSetCaptureProperty(pCapture,  CV_CAP_PROP_FRAME_WIDTH, 320);
+	cvSetCaptureProperty(pCapture,  CV_CAP_PROP_FRAME_HEIGHT, 240);
+
 	int frameNumber = 0;
 
 	Messenger messenger;
