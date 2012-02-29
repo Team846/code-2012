@@ -80,6 +80,11 @@ private:
 	void bridgeBalance();
 
 	/*!
+	 * Alternate iterative method to balance the bridge
+	 */
+	void alternateBridgeBalance();
+
+	/*!
 	 * Iterative method to track the key
 	 */
 	void keyTrack();
@@ -106,8 +111,11 @@ private:
 	PID *m_bridgebalance_pid;
 	double m_keytrack_forward_rate;
 	double m_align_turn_rate;
-	double m_bridgebalance_setpoint;
+	double m_bridgebalance_setpoint, m_align_setpoint;
+	double m_bridgebalance_angular_rate_threshold;
 	double m_bridgebalance_threshold, m_keytrack_threshold, m_align_threshold;
+	
+	bool m_prev_key_state;
 
 	DISALLOW_COPY_AND_ASSIGN( AutonomousFunctions);
 };

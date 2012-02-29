@@ -88,6 +88,7 @@ void AutonomousFunctions::task()
 				break;
 			case ACTION::AUTONOMOUS::KEYTRACK:
 				m_counter = m_timeout_keytrack;
+				m_prev_key_state = false;
 				break;
 			case ACTION::AUTONOMOUS::AUTOALIGN:
 				m_counter = m_timeout_autoalign;
@@ -126,16 +127,43 @@ void AutonomousFunctions::task()
 	}
 }
 
+void AutonomousFunctions::alternateBridgeBalance()
+{
+	m_action->drivetrain->rate.drive_control = true;
+	m_action->drivetrain->rate.turn_control = true;
+	m_action->drivetrain->position.drive_control = false;
+	m_action->drivetrain->position.turn_control = false;
+
+	if (m_action->imu->pitch > m_bridgebalance_setpoint)
+	{
+		m_action->drivetrain->rate.desiredDriveRate = m_keytrack_forward_rate;
+	}
+	else
+	{
+		m_action->drivetrain->rate.desiredDriveRate = -m_keytrack_forward_rate;
+	}
+
+	if (fabs(m_action->imu->pitch - m_bridgebalance_setpoint)
+			< m_bridgebalance_threshold)
+	{
+		m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+		m_action->auton->completion_status = ACTION::SUCCESS;
+		m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		m_action ->drivetrain->rate.desiredTurnRate = 0.0;
+	}
+
+}
+
 void AutonomousFunctions::bridgeBalance()
 {
 	m_bridgebalance_pid->setSetpoint(m_bridgebalance_setpoint);
 	m_bridgebalance_pid->setInput(m_action->imu->pitch);
 	m_bridgebalance_pid->update(1.0 / RobotConfig::LOOP_RATE);
 
-	// drive on position control, turn on rate control
-	m_action->drivetrain->rate.drive_control = false;
+	// drive on rate control, turn on rate control
+	m_action->drivetrain->rate.drive_control = true;
 	m_action->drivetrain->rate.turn_control = true;
-	m_action->drivetrain->position.drive_control = true;
+	m_action->drivetrain->position.drive_control = false;
 	m_action->drivetrain->position.turn_control = false;
 
 	// set drivetrain
@@ -164,7 +192,7 @@ void AutonomousFunctions::keyTrack()
 	m_action->drivetrain->position.turn_control = false;
 	m_action->drivetrain->rate.desiredDriveRate = m_keytrack_forward_rate;
 	m_action->drivetrain->rate.desiredTurnRate = 0.0;
-	if (m_action->cam->key.higher > m_keytrack_threshold)
+	if (m_action->cam->key.higher < m_keytrack_threshold && m_prev_key_state)
 	{
 #warning This should change state to ACTION::AUTONOMOUS::AUTOALIGN
 		m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
@@ -172,12 +200,13 @@ void AutonomousFunctions::keyTrack()
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 		m_action ->drivetrain->rate.desiredTurnRate = 0.0;
 	}
+	m_prev_key_state = m_action->cam->key.higher > m_keytrack_threshold;
 }
 
 void AutonomousFunctions::autoAlign()
 {
-#warning ERROR IS NOT DEFINED
-	double error;
+	double error = m_align_setpoint
+			- m_action->cam->align.arbitraryOffsetFromUDP;
 	m_action->drivetrain->rate.drive_control = true;
 	m_action->drivetrain->rate.turn_control = true;
 	m_action->drivetrain->position.drive_control = false;
@@ -219,12 +248,15 @@ void AutonomousFunctions::Configure()
 	m_bridgebalance_pid->setParameters(p, i, d, 0, 1.0, false);
 	m_bridgebalance_setpoint = c->Get<double> (m_name, "bridgeSetpoint", 90);
 	m_bridgebalance_threshold = c->Get<double> (m_name, "bridgeThreshold", 1);
+	m_bridgebalance_angular_rate_threshold = c->Get<double> (m_name,
+			"bridgeAngularRateThreshold", 30);
 
 	m_keytrack_forward_rate = c->Get<double> (m_name, "keyForwardRate", 0.1);
 	m_keytrack_threshold = c->Get<double> (m_name, "keyThreshold", 127);
 
-	m_align_turn_rate = c->Get<double> (m_name, "alignSetpoint", 320);
+	m_align_turn_rate = c->Get<double> (m_name, "alignTurnRate", 0.15);
 	m_align_threshold = c->Get<double> (m_name, "alignThreshold", 20);
+	m_align_setpoint = c->Get<double> (m_name, "alignSetpoint", 0.0);
 }
 
 void AutonomousFunctions::log()

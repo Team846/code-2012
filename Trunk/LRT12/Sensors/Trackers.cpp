@@ -118,8 +118,8 @@ void Trackers::update()
 	c->key.blue = getKeyValue(BLUE);
 	c->key.red = getKeyValue(RED);
 	c->key.higher = getKeyValue(HIGHER);
-	c->align.slop = getTargetSlop();
-	c->align.top = getTargetTop();
+	c->align.arbitraryOffsetFromUDP = getTargetSlop();
+	c->align.isUpperTarget = getTargetTop();
 }
 
 void Trackers::stop(bool force)

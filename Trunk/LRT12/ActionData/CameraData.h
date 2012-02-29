@@ -10,9 +10,8 @@ struct KeyTrackerData
 
 struct AlignmentData
 {
-#warning Figure out what goes here
-	uint8_t slop;
-	bool top;
+	uint8_t arbitraryOffsetFromUDP;
+	bool isUpperTarget;
 };
 
 struct camera

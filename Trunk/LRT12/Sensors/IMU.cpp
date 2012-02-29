@@ -84,9 +84,9 @@ void IMU::log()
 	sdb->PutDouble("IMU Accel Y", getAccelY());
 	sdb->PutDouble("IMU Accel Z", getAccelZ());
 
-	sdb->PutInt("IMU Gyro X", getGyroX());
-	sdb->PutInt("IMU Gyro Y", getGyroY());
-	sdb->PutInt("IMU Gyro Z", getGyroZ());
+	sdb->PutDouble("IMU Gyro X", getGyroX());
+	sdb->PutDouble("IMU Gyro Y", getGyroY());
+	sdb->PutDouble("IMU Gyro Z", getGyroZ());
 }
 
 int IMU::getPacket()
@@ -158,19 +158,19 @@ double IMU::getAccelZ()
 	return m_accel_z * kAccelConversion;
 }
 
-int16_t IMU::getGyroX()
+double IMU::getGyroX()
 {
-	return m_gyro_x;
+	return m_gyro_x * kGyroConversion;
 }
 
-int16_t IMU::getGyroY()
+double IMU::getGyroY()
 {
-	return m_gyro_y;
+	return m_gyro_y * kGyroConversion;
 }
 
-int16_t IMU::getGyroZ()
+double IMU::getGyroZ()
 {
-	return m_gyro_z;
+	return m_gyro_z * kGyroConversion;
 }
 
 void IMU::printAll()

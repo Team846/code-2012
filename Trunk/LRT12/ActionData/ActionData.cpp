@@ -77,8 +77,8 @@ ActionData::ActionData()
 
 	cam = (camera *) malloc(sizeof(camera));
 	cam->key.blue = cam->key.red = cam->key.higher = 0;
-	cam->align.top = false;
-	cam->align.slop = 0;
+	cam->align.isUpperTarget = false;
+	cam->align.arbitraryOffsetFromUDP = 0;
 }
 
 ActionData::~ActionData()

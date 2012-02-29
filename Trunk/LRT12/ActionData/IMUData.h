@@ -5,7 +5,7 @@ struct IMU_Data
 {
 	double roll, pitch, yaw;
 	double accel_x, accel_y, accel_z;
-	int16_t gyro_x, gyro_y, gyro_z;
+	double gyro_x, gyro_y, gyro_z;
 };
 
 #endif

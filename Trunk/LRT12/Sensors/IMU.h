@@ -12,7 +12,7 @@ class ActionData;
  * @author Brian Axelrod
  * @author Alexander Kanaris
  */
-class IMU : public Loggable
+class IMU: public Loggable
 {
 public:
 	/*!
@@ -31,7 +31,7 @@ public:
 	 * To be called before any get() methods, such that data is fresh. blocking.
 	 */
 	void update();
-	
+
 	/*!
 	 * Updates actiondata directly
 	 * @param action pointer to actiondata
@@ -57,46 +57,46 @@ public:
 	double getPitch();
 
 	/*!
-	 * Returns raw acceleration in x
+	 * Returns raw acceleration in x in m/s^2
 	 * @return acceleration in x
 	 */
 	double getAccelX();
 
 	/*!
-	 * Returns raw acceleration in y
+	 * Returns raw acceleration in y in m/s^2
 	 * @return acceleration in y
 	 */
 	double getAccelY();
 
 	/*!
-	 * Returns raw acceleration in z
+	 * Returns raw acceleration in z in m/s^2
 	 * @return acceleration in z
 	 */
 	double getAccelZ();
 
 	/*!
-	 * Returns raw angular rate about x
+	 * Returns raw angular rate about x in degrees per second
 	 * @return angular rate about x
 	 */
-	int16_t getGyroX();
+	double getGyroX();
 
 	/*!
-	 * Returns raw angular rate about y
+	 * Returns raw angular rate about y in degrees per second
 	 * @return angular rate about y
 	 */
-	int16_t getGyroY();
+	double getGyroY();
 
 	/*!
-	 * Returns raw angular rate about z
+	 * Returns raw angular rate about z in degrees per second
 	 * @return angular rate about z
 	 */
-	int16_t getGyroZ();
+	double getGyroZ();
 
 	/*!
 	 * Prints all data via printf for debug
 	 */
 	void printAll();
-	
+
 	/*!
 	 * Logs data
 	 */
@@ -112,7 +112,8 @@ private:
 	const static uint8_t kAddress = (0x29); // 7-bit default address
 	const static uint8_t kNumPackets = 4; // number of 7-byte packets to concatenate
 	const static double kAccelConversion = 9.81 / 4096; // 4G, 4096 = 1G
-	
+	const static double kGyroConversion = 0.94; // 3.33mV/deg
+
 	/*!
 	 * indices in the data packet of various variables
 	 */
