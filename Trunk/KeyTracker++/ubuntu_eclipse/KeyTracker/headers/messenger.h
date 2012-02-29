@@ -19,7 +19,7 @@ public:
 	Messenger();
 	~Messenger();
 
-	int sendData(int pid, int value);
+	int sendData(int pid, int value_r, int value_b);
 
 private:
 	void setup();

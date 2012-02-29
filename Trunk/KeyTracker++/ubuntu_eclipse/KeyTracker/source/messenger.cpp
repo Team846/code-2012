@@ -39,7 +39,7 @@ void Messenger::disconnect()
 	writeln("Disconnected");
 }
 
-int Messenger::sendData(int pid, int value)
+int Messenger::sendData(int pid, int value_r, int value_b)
 {
 	if(m_socket < 0)
 	{
@@ -56,7 +56,8 @@ int Messenger::sendData(int pid, int value)
 	buffer[2] = pid >> 16;
 	buffer[3] = pid >> 8;
 	buffer[4] = pid >> 0;
-	buffer[5] = value;
+	buffer[5] = value_r;
+	buffer[6] = value_b;
 
 	int iResult = sendto(m_socket, buffer, sizeof(buffer), 0, (struct sockaddr *) &m_remote, sizeof(m_remote));
 

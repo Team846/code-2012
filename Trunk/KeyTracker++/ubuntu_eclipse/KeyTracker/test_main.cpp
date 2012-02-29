@@ -59,7 +59,7 @@ mouseHandler(int event, int x, int y, int flags, void* param)
     }
 }
 
-int getKeyPixels(IplImage * frameIn)
+int getKeyPixels(IplImage * frameIn, int &red_out, int &blue_out)
 {
 	IplImage * redFrameOut = cvCreateImage(cvSize(frameIn->width, frameIn->height), IPL_DEPTH_8U, 3);
 	IplImage * blueFrameOut = cvCreateImage(cvSize(frameIn->width, frameIn->height), IPL_DEPTH_8U, 3);
@@ -86,11 +86,15 @@ int getKeyPixels(IplImage * frameIn)
             {
             	cvSet2D(redFrameOut, y, x, cvScalar(0, 0, 255));
                 ++count;
+                ++red_out;
                 alreadyset = true;
             }
             if(/*blue >= loBPosition && */blue - red >= hiBPosition && blue - green >= hiBPosition)
             {
             	cvSet2D(blueFrameOut, y, x, cvScalar(255, 0, 0));
+
+            	++blue_out;
+
             	if(!alreadyset)
             		++count;
             }
@@ -111,7 +115,7 @@ void onHiBThresholdSlide(int slideValue) { hiBPosition = slideValue; }
 int main()
 {
     IplImage * cap_img;
-    CvCapture * cv_cap = cvCaptureFromCAM(1);
+    CvCapture * cv_cap = cvCaptureFromCAM(0);
 /*
     CvFont font;
 
@@ -148,23 +152,28 @@ int main()
 
         if(cap_img != 0)
         {
-            int width = cap_img->width;
-            int height = cap_img->height;
-            size = cvSize(width, height);
-            int matched = getKeyPixels(cap_img);
-            float matchedPixels = (float)matched / (float)(width*height);
+        	float totalPixels = (float)(cap_img->width * cap_img->height);
+
+            int red=0, blue=0;
+
+            int matched = getKeyPixels(cap_img, red, blue);
+            float matchedPixels = (float)matched / totalPixels,
+            		matchedPixels_R = (float)red / totalPixels,
+            		matchedPixels_B = (float)blue / totalPixels;
 
         	cvSetMouseCallback("video", mouseHandler, (void*)cap_img);
 
 			cvShowImage("video", cap_img);
 
-			int value = 255 * matchedPixels;
+			int value = 255 * matchedPixels,
+					value_r = 255 * matchedPixels_R,
+					value_b = 255 * matchedPixels_R;
 
 			// DbgPrint(value);
 
-			int iSent = messenger.sendData(frameNumber, value);
+			int iSent = messenger.sendData(frameNumber, value_r, value_b);
 
-			DbgPrint(matched);
+			DbgPrint(matched << ";" << red << ";" << blue);
 
             // Remove double-slashes for death.
             // /*

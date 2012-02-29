@@ -31,8 +31,9 @@ using namespace std;
 
 int thresholds[2];
 
-int getKeyPixels(IplImage * frameIn) {
+int getKeyPixels(IplImage * frameIn, int &red_out, int &blue_out) {
 	int count = 0;
+	int red = 0, blue = 0;
 
 	for (int y = 0; y < frameIn->height; y++) {
 		for (int x = 0; x < frameIn->width; x++) {
@@ -40,12 +41,22 @@ int getKeyPixels(IplImage * frameIn) {
 			int green = CV_GETPIXEL(frameIn, x, y, 1);
 			int red = CV_GETPIXEL(frameIn, x, y, 2);
 
-			if ((red - blue >= thresholds[0] && red - green >= thresholds[0])
-					|| (blue - red >= thresholds[1] && blue - green >= thresholds[1])) {
+			bool redPass = (red - blue >= thresholds[0] && red - green >= thresholds[0]);
+			bool bluePass = (blue - red >= thresholds[1] && blue - green >= thresholds[1]);
+
+			if (redPass || bluePass) {
 				++count;
+
+				if(redPass)
+					++red;
+				if(bluePass)
+					++blue;
 			}
 		}
 	}
+
+	red_out = red;
+	blue_out = blue;
 
 	return count;
 }
@@ -112,15 +123,24 @@ int main() {
 
 		/* Verify that the image is valid */
 		if (pCaptureImg != 0) {
-			int matched = getKeyPixels(pCaptureImg);
-			float matchedPixels = (float) matched
-					/ (float) (pCaptureImg->width * pCaptureImg->height);
 
-			int value = 255 * matchedPixels;
+			float totalPixels = (float)(pCaptureImg->width * pCaptureImg->height);
+
+			int red=0,blue=0;
+
+			int matched = getKeyPixels(pCaptureImg, red, blue);
+
+			float matchedPixels = (float) matched / totalPixels,
+					matchedPixels_R = (float)red / totalPixels,
+					matchedPixels_B = (float)blue / totalPixels;
+
+			int value = 255 * matchedPixels,
+					value_R = 255 * matchedPixels_R,
+					value_B = 255 * matchedPixels_B;
 
 			// DbgPrint(value);
 
-			int iSent = messenger.sendData(frameNumber, value);
+			int iSent = messenger.sendData(frameNumber, value_R, value_B);
 
 			DbgPrint(matched);
 
