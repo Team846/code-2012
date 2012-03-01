@@ -68,17 +68,28 @@ void loadThresholds() {
 	}
 }
 
-int main() {
+int main(int argc, char** argv) {
 
 #ifndef BEAGLEBOARD
 	cout << "WARNING: Not Beagleboard" << endl;
-	return;
+	return 0;
 #endif
 
 	loadThresholds();
 
+    CvCapture *pCapture;
+
 	/* Open capture stream */
-	CvCapture *pCapture = cvCaptureFromCAM(BEAGLEBOARD);
+    if (argc == 0) {
+	    pCapture = cvCaptureFromCAM(0);
+    } else {
+        pCapture = cvCaptureFromCAM(atoi(argv[1]));
+    }
+
+    if (pCapture == NULL) {
+        return 0;
+    }
+
 	IplImage *pCaptureImg;
 
 	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_WIDTH, 320);

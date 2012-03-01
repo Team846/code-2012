@@ -119,6 +119,10 @@ void onHiBThresholdSlide(int slideValue) {
 int main() {
 	IplImage * cap_img;
 	CvCapture * cv_cap = cvCaptureFromCAM(0);
+    
+    cvSetCaptureProperty(cv_cap, CV_CAP_PROP_FRAME_WIDTH, 320);
+    cvSetCaptureProperty(cv_cap, CV_CAP_PROP_FRAME_HEIGHT, 240);
+
 	/*
 	 CvFont font;
 
