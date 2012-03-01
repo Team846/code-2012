@@ -34,8 +34,10 @@ void processImage(IplImage * img, int redThreshold, int blueThreshold, int *redc
     *redcount = cvCountNonZero(r);
     *bluecount = cvCountNonZero(b);
 
+#ifndef BEAGLEBOARD
     cvShowImage("red", r);
     cvShowImage("blue", b);
+#endif
     cvReleaseImage(&r);
     cvReleaseImage(&g);
     cvReleaseImage(&b);
