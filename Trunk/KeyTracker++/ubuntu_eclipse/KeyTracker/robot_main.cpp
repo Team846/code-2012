@@ -92,8 +92,8 @@ int main(int argc, char** argv) {
 
 	IplImage *pCaptureImg;
 
-	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_WIDTH, 320);
-	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_HEIGHT, 240);
+	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_WIDTH, 640);
+	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_HEIGHT, 320);
 
 	int frameNumber = 0;
 
@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
     clock_t start, end;
     int avgFrameCount = 30;
 
-	while (true) {
+	while (cvGrabFrame(pCapture)) {
 		/* Increment frame number */
 		++frameNumber;
 
@@ -110,13 +110,13 @@ int main(int argc, char** argv) {
             start = clock();
         }
 
-		pCaptureImg = cvQueryFrame(pCapture);
+		pCaptureImg = cvRetrieveFrame(pCapture);
 
 		/* Verify that the image is valid */
 		if (pCaptureImg != NULL) {
 
 			float totalPixels = (float) (pCaptureImg->width
-					* pCaptureImg->height);
+					* pCaptureImg->height / 4);
 
 			int red = 0, blue = 0;
 
@@ -128,8 +128,10 @@ int main(int argc, char** argv) {
 
 			int value_R = 255 * matchedPixels_R;
 		    int value_B = 255 * matchedPixels_B;
-            
-            DbgPrint(matchedPixels_R << " " << matchedPixels_B);
+           
+            char buf[100];
+            sprintf(buf, "%.02f %.02f", matchedPixels_R, matchedPixels_B);
+            DbgPrint(buf);
 
 			// DbgPrint(value);
 

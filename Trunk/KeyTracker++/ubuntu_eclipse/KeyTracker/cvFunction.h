@@ -5,18 +5,28 @@
 #include <ml.h>
 #include <cxcore.h>
 
-void processImage(IplImage * img, int redThreshold, int blueThreshold, int *redcount, int *bluecount) {
+#define USE_DIFFERENCE_METHOD 1
+
+void processImage(IplImage * cap_img, int redThreshold, int blueThreshold, int *redcount, int *bluecount) {
+    IplImage * img = cvCreateImage(cvSize(cap_img->width / 2, cap_img->height / 2), cap_img->depth, cap_img->nChannels);
+    
+    cvPyrDown(cap_img, img);
+
     IplImage * r = cvCreateImage(cvGetSize(img), 8, 1);
     IplImage * g = cvCreateImage(cvGetSize(img), 8, 1);
     IplImage * b = cvCreateImage(cvGetSize(img), 8, 1);
+
+#if USE_DIFFERENCE_METHOD
     IplImage * rdiff = cvCreateImage(cvGetSize(img), 8, 1);
     IplImage * rdiffb = cvCreateImage(cvGetSize(img), 8, 1);
     IplImage * bdiff = cvCreateImage(cvGetSize(img), 8, 1);
     IplImage * bdiffr = cvCreateImage(cvGetSize(img), 8, 1);
+#endif
 
     // split into rgb
     cvSplit(img, b, g, r, NULL);
 
+#if USE_DIFFERENCE_METHOD
     // get differences
     cvSub(r, g, rdiff);
     cvSub(r, b, rdiffb);
@@ -33,8 +43,7 @@ void processImage(IplImage * img, int redThreshold, int blueThreshold, int *redc
     // recombine
     cvAdd(rdiff, rdiffb, r);
     cvAdd(bdiff, bdiffr, b);
-
-    /*
+#else
     // get rid of white in the red channel
     cvAdd(b, g, g);
     cvSub(r, g, r);
@@ -53,7 +62,7 @@ void processImage(IplImage * img, int redThreshold, int blueThreshold, int *redc
     //cvCmpS(b, loBPosition, b, CV_CMP_LE);
     //cvCmpS(b, hiBPosition, b, CV_CMP_GE);
     cvThreshold(b, b, blueThreshold, 255, CV_THRESH_BINARY);
-    */
+#endif
 
     *redcount = cvCountNonZero(r);
     *bluecount = cvCountNonZero(b);
@@ -65,10 +74,13 @@ void processImage(IplImage * img, int redThreshold, int blueThreshold, int *redc
     cvReleaseImage(&r);
     cvReleaseImage(&g);
     cvReleaseImage(&b);
+#if USE_DIFFERENCE_METHOD
     cvReleaseImage(&rdiff);
     cvReleaseImage(&rdiffb);
     cvReleaseImage(&bdiff);
     cvReleaseImage(&bdiffr);
+#endif
+    cvReleaseImage(&img);
 }
 
 #endif

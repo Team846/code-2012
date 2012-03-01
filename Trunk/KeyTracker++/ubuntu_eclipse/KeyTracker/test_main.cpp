@@ -116,9 +116,16 @@ void onHiBThresholdSlide(int slideValue) {
 	hiBPosition = slideValue;
 }
 
-int main() {
+int main(int argc, char **argv) {
 	IplImage * cap_img;
-	CvCapture * cv_cap = cvCaptureFromCAM(0);
+
+    CvCapture *cv_cap;
+
+    if (argc <= 1) {
+	    cv_cap = cvCaptureFromCAM(0);
+    } else {
+        cv_cap = cvCaptureFromCAM(atoi(argv[1]));
+    }
     
     cvSetCaptureProperty(cv_cap, CV_CAP_PROP_FRAME_WIDTH, 320);
     cvSetCaptureProperty(cv_cap, CV_CAP_PROP_FRAME_HEIGHT, 240);
@@ -157,15 +164,15 @@ int main() {
     
     clock_t start, end;
 
-	while (true) {
+	while (cvGrabFrame(cv_cap)) {
 		++frameNumber;
         if (frameNumber % 30 == 1) {
             start = clock();
         }
-		cap_img = cvQueryFrame(cv_cap);
+		cap_img = cvRetrieveFrame(cv_cap);
 
 		if (cap_img != NULL) {
-			float totalPixels = (float) (cap_img->width * cap_img->height);
+			float totalPixels = (float) (cap_img->width * cap_img->height) / 4;
 
 			//int red = 0, blue = 0;
 
@@ -200,7 +207,6 @@ int main() {
 			//cvReleaseImage(&cBlue); // */
 			//cvReleaseImage(&cRedThresh);
 			//cvReleaseImage(&cBlueThresh);
-
 		}
 
         if (frameNumber % 30 == 0) {
