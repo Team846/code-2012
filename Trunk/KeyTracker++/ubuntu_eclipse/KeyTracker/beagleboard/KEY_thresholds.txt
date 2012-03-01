@@ -1,4 +1,4 @@
 # min red - blue / red - green
-28
+127
 # min blue - red / blue - green
-107
+46

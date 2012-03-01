@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
     CvCapture *pCapture;
 
 	/* Open capture stream */
-    if (argc == 0) {
+    if (argc <= 1) {
 	    pCapture = cvCaptureFromCAM(0);
     } else {
         pCapture = cvCaptureFromCAM(atoi(argv[1]));

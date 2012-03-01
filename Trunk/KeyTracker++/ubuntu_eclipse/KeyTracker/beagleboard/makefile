@@ -1,5 +1,5 @@
-CFLAGS := `pkg-config --cflags opencv`
-LDFLAGS := `pkg-config --libs opencv`
+CFLAGS := `$(CROSS_COMPILE)pkg-config --cflags opencv`
+LDFLAGS := `$(CROSS_COMPILE)pkg-config --libs opencv`
 CC = $(CROSS_COMPILE)g++
 EXEFILES = 
 
