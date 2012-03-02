@@ -49,7 +49,7 @@ int Messenger::sendData(int pid, int value_r, int value_b)
 			return -1;
 	}
 
-	unsigned char buffer[6];
+	unsigned char buffer[7];
 
 	buffer[0] = 1;
 	buffer[1] = pid >> 24;
