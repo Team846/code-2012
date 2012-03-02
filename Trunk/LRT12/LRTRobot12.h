@@ -13,6 +13,7 @@
 
 #include "Compressor.h"
 #include "Sensors/IMU.h"
+#include "Sensors/Trackers.h"
 
 #include "Util/AsyncPrinter.h"
 #include "Util/PrintInConstructor.h"
@@ -37,6 +38,8 @@ private:
 	ActionData *m_action;
 	IMU *m_imu;
 
+	Trackers *m_trackers;
+	
 	PrintInConstructor dc_CANBus_;
 
 	Config *config;

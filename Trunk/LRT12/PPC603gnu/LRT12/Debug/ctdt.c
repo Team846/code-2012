@@ -41,7 +41,7 @@ void _GLOBAL__I__ZN16PneumaticShifterC2Ev();
 
 void _GLOBAL__I__ZN17DebouncedJoystickC2Ejii();
 
-void _GLOBAL__I__ZN19AutonomousFunctionsC2Ev();
+void _GLOBAL__I__ZN19AutonomousFunctions10m_instanceE();
 
 void _GLOBAL__I__ZN20ClosedLoopDrivetrainC2Ev();
 
@@ -117,7 +117,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN14SharedSolenoid8instanceE,
     _GLOBAL__I__ZN16PneumaticShifterC2Ev,
     _GLOBAL__I__ZN17DebouncedJoystickC2Ejii,
-    _GLOBAL__I__ZN19AutonomousFunctionsC2Ev,
+    _GLOBAL__I__ZN19AutonomousFunctions10m_instanceE,
     _GLOBAL__I__ZN20ClosedLoopDrivetrainC2Ev,
     _GLOBAL__I__ZN3ESCC2EiP10LRTEncoderSs,
     _GLOBAL__I__ZN3IMU8kAddressE,
@@ -182,7 +182,7 @@ void _GLOBAL__D__ZN16PneumaticShifterC2Ev();
 
 void _GLOBAL__D__ZN17DebouncedJoystickC2Ejii();
 
-void _GLOBAL__D__ZN19AutonomousFunctionsC2Ev();
+void _GLOBAL__D__ZN19AutonomousFunctions10m_instanceE();
 
 void _GLOBAL__D__ZN20ClosedLoopDrivetrainC2Ev();
 
@@ -254,7 +254,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN14SharedSolenoid8instanceE,
     _GLOBAL__D__ZN16PneumaticShifterC2Ev,
     _GLOBAL__D__ZN17DebouncedJoystickC2Ejii,
-    _GLOBAL__D__ZN19AutonomousFunctionsC2Ev,
+    _GLOBAL__D__ZN19AutonomousFunctions10m_instanceE,
     _GLOBAL__D__ZN20ClosedLoopDrivetrainC2Ev,
     _GLOBAL__D__ZN3ESCC2EiP10LRTEncoderSs,
     _GLOBAL__D__ZN3IMU8kAddressE,

@@ -44,11 +44,13 @@ void Drivetrain::Disable()
 
 void Drivetrain::Output()
 {
+	static bool wasHighGear = false;
 	bool isHighGear = m_action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR;
-	if (m_drive_control.getHighGear() != isHighGear)
+	if (wasHighGear != isHighGear)
 	{
 		m_action->drivetrain->synchronizedCyclesRemaining = NUM_CYCLES_TO_SYNC;
 	}
+	wasHighGear = isHighGear;
 
 	//	m_encoders.setHighGear(isHighGear); // set by shifter
 	m_drive_control.setHighGear(isHighGear);
@@ -157,16 +159,16 @@ void Drivetrain::Output()
 
 	// decrease one cycle until zero
 	// DIS DOESN"T WORK -RY, BA
-	//	if (m_action_ptr->drivetrain->synchronizedCyclesRemaining > 0)
-	//	{
-	//		m_action_ptr->drivetrain->synchronizedCyclesRemaining--;
-	//		cmd.rightDutyCycle = m_encoders.getNormalizedOpposingGearMotorSpeed(
-	//				m_encoders.getRightEncoder());
-	//		cmd.leftDutyCycle = m_encoders.getNormalizedOpposingGearMotorSpeed(
-	//				m_encoders.getLeftEncoder());
-	//
-	//		cmd.shouldLinearize = false;
-	//	}
+	if (m_action->drivetrain->synchronizedCyclesRemaining > 0)
+	{
+		m_action->drivetrain->synchronizedCyclesRemaining--;
+		cmd.rightDutyCycle = m_encoders.getNormalizedOpposingGearMotorSpeed(
+				m_encoders.getRightEncoder());
+		cmd.leftDutyCycle = m_encoders.getNormalizedOpposingGearMotorSpeed(
+				m_encoders.getLeftEncoder());
+
+		cmd.shouldLinearize = false;
+	}
 
 	if (m_action->motorsEnabled)
 	{

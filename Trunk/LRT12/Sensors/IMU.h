@@ -102,12 +102,28 @@ public:
 	 */
 	virtual void log();
 
+	/*!
+	 * Starts the task
+	 */
+	void startUpdate();
 private:
 	/*!
 	 * Helper method to get kNumPackets of data and fill m_i2c_buf
 	 * @return 0 on success
 	 */
 	int getPacket();
+	
+	/*!
+	 * starts the task
+	 * @param ptr to the IMU
+	 */
+	static void taskEntryPoint(int ptr);
+	
+	
+	/*!
+	 * Is the task
+	 */
+	void task();
 
 	const static uint8_t kAddress = (0x29); // 7-bit default address
 	const static uint8_t kNumPackets = 4; // number of 7-byte packets to concatenate
@@ -139,6 +155,10 @@ private:
 	uint8_t m_expected_packet_num;
 	int16_t m_accel_x, m_accel_y, m_accel_z, m_gyro_x, m_gyro_y, m_gyro_z;
 	double m_roll, m_pitch, m_yaw;
+	int m_time;
+	
+	SEM_ID m_sem;
+	Task *m_task;
 };
 
 #endif

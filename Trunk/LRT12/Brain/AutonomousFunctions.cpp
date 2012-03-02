@@ -11,6 +11,9 @@
 
 #define TIMEOUT_ENABLED 0
 
+AutonomousFunctions* AutonomousFunctions::m_instance = NULL;
+
+
 AutonomousFunctions::AutonomousFunctions() :
 	Configurable(), Loggable(), m_name("AutonomousFunctions")
 {
@@ -37,6 +40,11 @@ AutonomousFunctions::~AutonomousFunctions()
 	}
 
 	delete m_bridgebalance_pid;
+}
+
+void AutonomousFunctions::taskEntryPoint()
+{
+	getInstance()->task();
 }
 
 void AutonomousFunctions::startBackgroundTask()

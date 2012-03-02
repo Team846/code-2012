@@ -100,6 +100,8 @@ void Trackers::listen()
 			m_key_value_b = m_input_buffer[6];
 
 			key_lastPacketID = pid;
+			
+			AsyncPrinter::Printf("%d: r: %d, b: %d\n", pid, m_key_value_r, m_key_value_b);
 			break;
 		}
 

@@ -3,6 +3,7 @@
 #include <I2C.h>
 #include "../ActionData/ActionData.h"
 #include "../ActionData/IMUData.h"
+#include "../Util/AsyncPrinter.h"
 #include "IMU.h"
 
 const UINT8 IMU::kAddress;
@@ -10,10 +11,11 @@ const UINT8 IMU::kAddress;
 IMU::IMU(uint8_t address, uint8_t module_num) :
 	Loggable()
 {
+	m_task = new Task("IMU_TASK", (FUNCPTR) taskEntryPoint, Task::kDefaultPriority - 2);
 	DigitalModule *module = DigitalModule::GetInstance(module_num);
 	if (module)
 	{
-		printf("Module %d, Addess 0x%x\n", module_num, address);
+		AsyncPrinter::Printf("Module %d, Addess 0x%x\n", module_num, address);
 		// left shift the address to get the required 8-bit form
 		m_i2c = module->GetI2C((address << 1));
 	}
@@ -21,6 +23,8 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 	m_accel_x = m_accel_y = m_accel_z = 0;
 	m_gyro_x = m_gyro_y = m_gyro_z = 0;
 	m_roll = m_pitch = m_yaw = 0.0;
+	m_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
+	m_task->Start((UINT32) this);
 }
 
 IMU::~IMU()
@@ -29,16 +33,32 @@ IMU::~IMU()
 	m_i2c = NULL;
 }
 
+void IMU::taskEntryPoint(int ptr)
+{
+	IMU* imu = (IMU*) ptr;
+	imu->task();
+}
+
+void IMU::task()
+{
+	while (true)
+	{
+		semTake(m_sem, WAIT_FOREVER);
+		update(ActionData::GetInstance());
+	}
+}
+
 void IMU::update()
 {
+	m_time = GetFPGATime();
 	if (getPacket())
 	{
 		return;
 	}
 	uint8_t status = getUint8(STATUS);
-	if (status == 0x00 || status == 0xff)
+	if (/*status == 0x00 ||*/ status == 0xff)
 	{
-		printf("Status: Bad IMU packet\r\n");
+		AsyncPrinter::Printf("Status: Bad IMU packet\r\n");
 		return;
 	}
 	m_pitch = getInt16(PITCH) / 100.0;
@@ -52,11 +72,22 @@ void IMU::update()
 	m_gyro_x = getInt16(GYRO_X);
 	m_gyro_y = getInt16(GYRO_Y);
 	m_gyro_z = getInt16(GYRO_Z);
+	
+	m_time = GetFPGATime() - m_time;
+	
+	static int e  = 0;
+	if (++e % 100 == 0)
+		printAll();
+}
+
+void IMU::startUpdate()
+{
+	semGive(m_sem); // update I2C data
 }
 
 void IMU::update(ActionData * action)
 {
-	update(); // update I2C data
+	update();
 	IMU_Data * imu = action->imu;
 
 	imu->roll = getRoll();
@@ -98,7 +129,7 @@ int IMU::getPacket()
 		bool readstatus = m_i2c->Transaction(NULL, 0, data, 7);
 		if (data[0] >= kNumPackets || readstatus)
 		{
-			printf("I2C error status=%d offset=%d\r\n", readstatus, data[0]);
+			AsyncPrinter::Printf("I2C error status=%d offset=%d\r\n", readstatus, data[0]);
 			return -1;
 		}
 		else if (data[0] == m_expected_packet_num)
@@ -175,12 +206,12 @@ double IMU::getGyroZ()
 
 void IMU::printAll()
 {
-	printf("IMU Data: \r\n");
-	printf("Roll: %.02f Pitch: %.02f Yaw: %.02f\r\n", m_roll, m_pitch, m_yaw);
-	printf("Gyro: [%d, %d, %d]\r\n", m_gyro_x, m_gyro_y, m_gyro_z);
-	printf("Accel: [%d, %d, %d]\r\n", m_accel_x, m_accel_y, m_accel_z);
-	printf("Scaled AcceL: [%.02f, %.02f, %.02f]\r\n", getAccelX(), getAccelY(),
+	AsyncPrinter::Printf("IMU Data: \r\n");
+	AsyncPrinter::Printf("Roll: %.02f Pitch: %.02f Yaw: %.02f\r\n", m_roll, m_pitch, m_yaw);
+	AsyncPrinter::Printf("Gyro: [%d, %d, %d]\r\n", m_gyro_x, m_gyro_y, m_gyro_z);
+	AsyncPrinter::Printf("Accel: [%d, %d, %d]\r\n", m_accel_x, m_accel_y, m_accel_z);
+	AsyncPrinter::Printf("Scaled AcceL: [%.02f, %.02f, %.02f]\r\n", getAccelX(), getAccelY(),
 			getAccelZ());
-	printf("\r\n");
+	AsyncPrinter::Printf("\r\n");
 }
 

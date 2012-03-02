@@ -30,6 +30,8 @@ LRTRobot12::LRTRobot12() :
 	//set priority above default so that we get higher priority than default
 	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority
 
+	m_trackers = new Trackers();
+	
 	printf("---- Robot Initialized ----\n\n");
 }
 
@@ -38,9 +40,9 @@ LRTRobot12::~LRTRobot12()
 
 	m_compressor->Stop();
 	delete m_compressor;
-
 	delete m_imu;
-
+	delete m_trackers;
+	
 	printf("\n\nBegin Deleting LRTRobot12\n");
 
 	// Kill the main loop, so we don't access deleted objects. -dg
@@ -82,7 +84,7 @@ void LRTRobot12::MainLoop()
 	m_action->motorsEnabled = ds->GetDigitalIn(
 			RobotConfig::DRIVER_STATION::MOTORS);
 
-	m_imu->update(m_action);
+	m_imu->startUpdate();
 
 	//iterate though and output components
 	for (list<Component::ComponentWithData>::iterator iter =
