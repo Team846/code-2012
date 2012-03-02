@@ -66,7 +66,7 @@ ReportSlop::rs_reset ()
 }
 
 int
-ReportSlop::sendResults (int slop, bool top, int frameNumber)
+ReportSlop::sendResults (int slop, bool top)
 {
   if (m_soc < 0)
     {
@@ -78,14 +78,9 @@ ReportSlop::sendResults (int slop, bool top, int frameNumber)
       return -1;
     }
 
-  char buf[7];
-  buf[0] = 1;
-  buf[1] = frameNumber << 24;
-  buf[2] = frameNumber << 16;
-  buf[3] = frameNumber << 8;
-  buf[4] = frameNumber << 0;
-  buf[5] = slop;
-  buf[6] = top;
+  char buf[2];
+  buf[0] = slop;
+  buf[1] = top;
 
   if (sendto (m_soc, buf, sizeof (buf), 0, (struct sockaddr *) &m_dst,
 	      sizeof (m_dst)) < 0)
@@ -182,9 +177,7 @@ FindTarget::tg_getTarget ()
 	    }
 	  delta4x = sum - width2;
 	  int delta4xAbs = abs (delta4x);
-	  printf
-	    (" row %i sum = %i width2 = %i delta4xAbsMin = %i delta4x = %i\n",
-	     row, sum, width2, delta4xAbsMin, delta4x);
+	  //printf (" row %i sum = %i width2 = %i delta4xAbsMin = %i delta4x = %i\n", row, sum, width2, delta4xAbsMin, delta4x);
 	  if (delta4xAbs < delta4xAbsMin)
 	    {
 	      rowTarget = row;
@@ -192,11 +185,13 @@ FindTarget::tg_getTarget ()
 	      delta4xMin = delta4x;
 	    }
 	}
+#if DDDDDD
       for (int k = 0; k < squares.size (); k++)
 	{
-	  printf ("%i = %i,  ", k, weight[k]);
+	  //printf ("%i = %i,  ", k, weight[k]);
 	}
-      printf ("\n");
+      //printf ("\n");
+#endif
 
       slop = delta4xMin / 4;
       top = weight[rowTarget] < 2;
@@ -217,6 +212,17 @@ FindTarget::tg_angle (Point & pt1, Point & pt2, Point & pt0)
 
   // finds a cosine of angle between vectors
   // from pt0->pt1 and from pt0->pt2
+#if 0
+  int dx1 = pt1.x - pt0.x;
+  int dy1 = pt1.y - pt0.y;
+  int dx2 = pt2.x - pt0.x;
+  int dy2 = pt2.y - pt0.y;
+	int dx12y12 = dx1 * dx2 + dy1 * dy2;
+	int dx11y11 = dx1 * dx1 + dy1 * dy1;
+	int dx22y22 = dx2 * dx2 + dy2 * dy2;
+	int dxy = dx11y11 *dx22y22;
+  return (dx12y12) / sqrt (dxy + 1e-10);
+#endif
   double dx1 = pt1.x - pt0.x;
   double dy1 = pt1.y - pt0.y;
   double dx2 = pt2.x - pt0.x;
@@ -243,7 +249,6 @@ FindTarget::tg_findSquares (int thresh)
     mixChannels (&image, 1, &colorPlane, 1, ch, 1);
 
     {
-
 #ifdef USE_CANNY
       // hack: use Canny instead of zero threshold level.
       // Canny helps to catch squares with gradient shading
@@ -342,6 +347,8 @@ FindTarget::tg_printProperties ()
 FindTarget::FindTarget ():
 cap (0), squares (), image (), slop (-1), rowTarget (-1), top (true)
 {
+	cap.set(CV_CAP_PROP_FRAME_WIDTH, 320);
+	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
 }
 
 FindTarget::~FindTarget ()
