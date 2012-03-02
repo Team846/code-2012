@@ -92,8 +92,8 @@ int main(int argc, char** argv) {
 
 	IplImage *pCaptureImg;
 
-	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_WIDTH, 640);
-	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_HEIGHT, 320);
+	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_WIDTH, 320);
+	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_HEIGHT, 240);
 
 	int frameNumber = 0;
 
