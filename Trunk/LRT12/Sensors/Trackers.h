@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include <WPILib.h>
+#include "../Log/Loggable.h"
 #include "../Util/AsyncPrinter.h"
 #include "../ActionData/ActionData.h"
 #include "../ActionData/CameraData.h"
@@ -23,7 +24,7 @@
  * @author Tony Peng
  */
 
-class Trackers
+class Trackers: public Loggable
 {
 public:
 	/*!
@@ -66,16 +67,20 @@ public:
 	 * */
 	uint8_t getKeyValue(KeyValue v);
 
-	/* TODO: Ask Eva what "slop" and "top" mean... */
 	/*! 
-	 * @brief Gets the target slop value 
+	 * @brief Gets the target offset from center of frame 
 	 */
-	uint8_t getTargetSlop();
-	
+	uint8_t getTargetOffset();
+
 	/*! 
-	 * @brief Gets the top status of the target.
+	 * @brief Gets the target that is being tracked
 	 */
-	bool getTargetTop();
+	bool getSelectedTarget();
+
+	/*!
+	 * logs data
+	 */
+	virtual void log();
 
 private:
 
@@ -83,12 +88,12 @@ private:
 	 * @brief Sets up the socket. 
 	 */
 	int setup();
-	
+
 	/*! 
 	 * @brief Disconnects and closes the socket. 
 	 */
 	void disconnect();
-	
+
 	/*!
 	 * Updates actiondata
 	 */
@@ -113,5 +118,7 @@ private:
 
 	int m_key_missed_packets;
 	int m_target_missed_packets;
+
+	DISALLOW_COPY_AND_ASSIGN(Trackers);
 };
 #endif // TRACKERS_H_

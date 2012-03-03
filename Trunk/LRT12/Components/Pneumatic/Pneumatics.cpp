@@ -2,6 +2,8 @@
 
 Pneumatics* Pneumatics::m_instance = NULL;
 
+#define PNEUMATICS_DISABLED 1
+
 #define INIT_PULSED_SOLENOID(x, y) (x).solenoid = (y);\
 	(x).counter = (m_pulse_length); \
 	(x).state = false; \
@@ -12,6 +14,9 @@ Pneumatics::Pneumatics() :
 {
 	Configure();
 
+#if PNEUMATICS_DISABLED
+#warning pneumatics disabled
+#else
 	INIT_PULSED_SOLENOID(m_shared, new DoubleSolenoid(
 					RobotConfig::SOLENOID_IO::WEDGE_LATCH,
 					RobotConfig::SOLENOID_IO::PRESSURE_PLATE));
@@ -28,6 +33,9 @@ Pneumatics::Pneumatics() :
 	INIT_PULSED_SOLENOID(m_ballcollector, new DoubleSolenoid(
 					RobotConfig::SOLENOID_IO::BALL_COLLECTOR_A,
 					RobotConfig::SOLENOID_IO::BALL_COLLECTOR_B));
+#endif
+
+	disableLog();
 
 	m_task = new Task("PneumaticsTask", (FUNCPTR) Pneumatics::taskEntryPoint,
 			Task::kDefaultPriority - 2);
@@ -147,11 +155,21 @@ void Pneumatics::log()
 
 void Pneumatics::releaseSemaphore()
 {
-	semGive(m_task_sem);
+	if (m_task_sem)
+		semGive(m_task_sem);
 }
 
 void Pneumatics::pulse(PulsedSolenoid * ptr)
 {
+#if PNEUMATICS_DISABLED
+	static uint32_t ctr = 0;
+	if (++ctr > 1000)
+	{
+		AsyncPrinter::Printf("Pneumatics Disabled\r\n");
+		ctr = 0;
+	}
+	return;
+#endif
 	if (ptr->pulsed)
 	{
 		if (ptr->counter > 0)
@@ -196,10 +214,12 @@ Pneumatics::~Pneumatics()
 		printf("SemDelete Error=%d\n", error);
 	}
 
+#if not PNEUMATICS_DISABLED
 	delete m_shared.solenoid;
 	delete m_trajectory.solenoid;
 	delete m_shifter.solenoid;
 	delete m_ballcollector.solenoid;
+#endif
 }
 
 void Pneumatics::taskEntryPoint()

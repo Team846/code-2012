@@ -2,10 +2,14 @@
 
 #define DEBUG 0
 
-Trackers::Trackers(int task_priority)
+Trackers::Trackers(int task_priority) :
+	Loggable()
 {
 	m_key_missed_packets = 0;
 	m_target_missed_packets = 0;
+
+	m_key_value_r = 0;
+	m_key_value_b = 0;
 
 	m_is_running = false;
 	disconnect();
@@ -100,8 +104,8 @@ void Trackers::listen()
 			m_key_value_b = m_input_buffer[6];
 
 			key_lastPacketID = pid;
-			
-			AsyncPrinter::Printf("%d: r: %d, b: %d\n", pid, m_key_value_r, m_key_value_b);
+
+			//			AsyncPrinter::Printf("%d: r: %d, b: %d\n", pid, m_key_value_r, m_key_value_b);
 			break;
 		}
 
@@ -120,8 +124,8 @@ void Trackers::update()
 	c->key.blue = getKeyValue(BLUE);
 	c->key.red = getKeyValue(RED);
 	c->key.higher = getKeyValue(HIGHER);
-	c->align.arbitraryOffsetFromUDP = getTargetSlop();
-	c->align.isUpperTarget = getTargetTop();
+	c->align.arbitraryOffsetFromUDP = getTargetOffset();
+	c->align.isUpperTarget = getSelectedTarget();
 }
 
 void Trackers::stop(bool force)
@@ -167,12 +171,12 @@ uint8_t Trackers::getKeyValue(KeyValue v)
 	return m_key_value_r;
 }
 
-uint8_t Trackers::getTargetSlop()
+uint8_t Trackers::getTargetOffset()
 {
 	return m_target_slop;
 }
 
-bool Trackers::getTargetTop()
+bool Trackers::getSelectedTarget()
 {
 	return m_target_top;
 }
@@ -229,4 +233,15 @@ int Trackers::setup()
 void Trackers::disconnect()
 {
 	close(m_socket);
+}
+
+void Trackers::log()
+{
+	SmartDashboard *sdb = SmartDashboard::GetInstance();
+	camera * c = ActionData::GetInstance()->cam;
+	sdb->PutInt("Key Blue", c->key.blue);
+	sdb->PutInt("Key Red", c->key.red);
+	sdb->PutInt("Key Higher", c->key.higher);
+	sdb->PutInt("Target Offset", c->align.arbitraryOffsetFromUDP);
+	sdb->PutInt("Target Selected", c->align.isUpperTarget);
 }

@@ -11,7 +11,8 @@ const UINT8 IMU::kAddress;
 IMU::IMU(uint8_t address, uint8_t module_num) :
 	Loggable()
 {
-	m_task = new Task("IMU_TASK", (FUNCPTR) taskEntryPoint, Task::kDefaultPriority - 2);
+	m_task = new Task("IMU_TASK", (FUNCPTR) taskEntryPoint,
+			Task::kDefaultPriority - 2);
 	DigitalModule *module = DigitalModule::GetInstance(module_num);
 	if (module)
 	{
@@ -56,7 +57,7 @@ void IMU::update()
 		return;
 	}
 	uint8_t status = getUint8(STATUS);
-	if (/*status == 0x00 ||*/ status == 0xff)
+	if (/*status == 0x00 ||*/status == 0xff)
 	{
 		AsyncPrinter::Printf("Status: Bad IMU packet\r\n");
 		return;
@@ -72,15 +73,15 @@ void IMU::update()
 	m_gyro_x = getInt16(GYRO_X);
 	m_gyro_y = getInt16(GYRO_Y);
 	m_gyro_z = getInt16(GYRO_Z);
-	
+
 	m_time = GetFPGATime() - m_time;
-	
-	static int e  = 0;
-	if (++e % 100 == 0)
+
+	static int e = 0;
+	if (++e % 10 == 0)
 		printAll();
 }
 
-void IMU::startUpdate()
+void IMU::releaseSemaphore()
 {
 	semGive(m_sem); // update I2C data
 }
@@ -129,7 +130,8 @@ int IMU::getPacket()
 		bool readstatus = m_i2c->Transaction(NULL, 0, data, 7);
 		if (data[0] >= kNumPackets || readstatus)
 		{
-			AsyncPrinter::Printf("I2C error status=%d offset=%d\r\n", readstatus, data[0]);
+			AsyncPrinter::Printf("I2C error status=%d offset=%d\r\n",
+					readstatus, data[0]);
 			return -1;
 		}
 		else if (data[0] == m_expected_packet_num)
@@ -207,11 +209,12 @@ double IMU::getGyroZ()
 void IMU::printAll()
 {
 	AsyncPrinter::Printf("IMU Data: \r\n");
-	AsyncPrinter::Printf("Roll: %.02f Pitch: %.02f Yaw: %.02f\r\n", m_roll, m_pitch, m_yaw);
-	AsyncPrinter::Printf("Gyro: [%d, %d, %d]\r\n", m_gyro_x, m_gyro_y, m_gyro_z);
-	AsyncPrinter::Printf("Accel: [%d, %d, %d]\r\n", m_accel_x, m_accel_y, m_accel_z);
-	AsyncPrinter::Printf("Scaled AcceL: [%.02f, %.02f, %.02f]\r\n", getAccelX(), getAccelY(),
-			getAccelZ());
+	AsyncPrinter::Printf("Roll: %.02f Pitch: %.02f Yaw: %.02f\r\n", getRoll(),
+			getPitch(), getYaw());
+	AsyncPrinter::Printf("Scaled Gyro: [%d, %d, %d]\r\n", getGyroX(),
+			getGyroY(), getGyroZ());
+	AsyncPrinter::Printf("Scaled Accel: [%.02f, %.02f, %.02f]\r\n",
+			getAccelX(), getAccelY(), getAccelZ());
 	AsyncPrinter::Printf("\r\n");
 }
 

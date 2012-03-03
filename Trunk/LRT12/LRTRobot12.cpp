@@ -31,7 +31,7 @@ LRTRobot12::LRTRobot12() :
 	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority
 
 	m_trackers = new Trackers();
-	
+
 	printf("---- Robot Initialized ----\n\n");
 }
 
@@ -42,7 +42,7 @@ LRTRobot12::~LRTRobot12()
 	delete m_compressor;
 	delete m_imu;
 	delete m_trackers;
-	
+
 	printf("\n\nBegin Deleting LRTRobot12\n");
 
 	// Kill the main loop, so we don't access deleted objects. -dg
@@ -84,7 +84,10 @@ void LRTRobot12::MainLoop()
 	m_action->motorsEnabled = ds->GetDigitalIn(
 			RobotConfig::DRIVER_STATION::MOTORS);
 
-	m_imu->startUpdate();
+	static bool shouldCheckIMU = true;
+	shouldCheckIMU = !shouldCheckIMU;
+	if (shouldCheckIMU)
+		m_imu->releaseSemaphore();
 
 	//iterate though and output components
 	for (list<Component::ComponentWithData>::iterator iter =
@@ -120,12 +123,12 @@ void LRTRobot12::MainLoop()
 	prevState = gameState;
 
 	// limit rate of logging 
-	static uint8_t counter = 0;
-	if (++counter >= 10)
-	{
-		counter = 0;
-		Log::logAll();
-	}
+	//	static uint8_t counter = 0;
+	//	if (++counter >= 10)
+	//	{
+	//		counter = 0;
+	//		Log::logAll();
+	//	}
 	//*/
 	// if we finish in time, cancel the watchdog's error message
 	wdCancel(mainLoopWatchDog);

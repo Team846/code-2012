@@ -22,6 +22,8 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	setTranslateControl(m_translate_ctrl_type);
 	setTurnControl(m_turn_control_type);
 	printf("Constructed CLRateTrain\n");
+
+	disableLog();
 }
 
 void ClosedLoopDrivetrain::Configure()
@@ -141,12 +143,12 @@ void ClosedLoopDrivetrain::update()
 	switch (m_translate_ctrl_type)
 	{
 	case CL_POSITION:
-//		AsyncPrinter::Printf("Positioning\n");
+		//		AsyncPrinter::Printf("Positioning\n");
 		m_pos_control[TRANSLATE]->setInput(m_encoders.getRobotDist());
 		m_pos_control[TRANSLATE]->update(1.0 / RobotConfig::LOOP_RATE);
 		m_rate_control[TRANSLATE]->setSetpoint(
 				m_pos_control[TRANSLATE]->getOutput());
-		
+
 		if (m_pos_control[TRANSLATE]->getError() < 0.5
 				&& m_pos_control[TRANSLATE]->getAccumulatedError() < 5.02 - 2)
 		{
@@ -158,10 +160,10 @@ void ClosedLoopDrivetrain::update()
 						m_encoders.getNormalizedForwardMotorSpeed(), -1.0, 1.0));
 		m_rate_control[TRANSLATE]->update(1.0 / RobotConfig::LOOP_RATE);
 		output[TRANSLATE] = m_rate_control[TRANSLATE]->getOutput();
-//#if INCREASE_MIN_POWER
-//		if (fabs(output[TRANSLATE]) < 0.08)
-//			output[TRANSLATE] += 0.08 * Util::Sign<double>(output[TRANSLATE]);
-//#endif
+		//#if INCREASE_MIN_POWER
+		//		if (fabs(output[TRANSLATE]) < 0.08)
+		//			output[TRANSLATE] += 0.08 * Util::Sign<double>(output[TRANSLATE]);
+		//#endif
 		break;
 	case CL_DISABLED:
 		m_fwd_op_complete = true;
@@ -192,7 +194,7 @@ void ClosedLoopDrivetrain::update()
 		if (fabs(output[TRANSLATE] < 0.1))
 		{
 			if (fabs(output[TURN]) < 0.2 /*&& fabs(output[TURN]) > 0.05*/)
-				output[TURN] += 0.2 * Util::Sign<double>(output[TURN]);
+			output[TURN] += 0.2 * Util::Sign<double>(output[TURN]);
 		}
 #endif
 		break;
@@ -261,7 +263,9 @@ void ClosedLoopDrivetrain::setRelativeTranslatePosition(double pos)
 {
 	setTranslateControl(CL_POSITION);
 	m_pos_control[TRANSLATE]->setSetpoint(pos + m_encoders.getRobotDist());
-	AsyncPrinter::Printf("pos %.2f,pre %.2f set %.2f\n", pos, (pos + m_encoders.getRobotDist()) , (m_pos_control[TRANSLATE]->getSetpoint()));
+	AsyncPrinter::Printf("pos %.2f,pre %.2f set %.2f\n", pos,
+			(pos + m_encoders.getRobotDist()),
+			(m_pos_control[TRANSLATE]->getSetpoint()));
 	m_fwd_op_complete = false;
 }
 
@@ -309,8 +313,8 @@ void ClosedLoopDrivetrain::setRawTurnDutyCycle(double duty)
 
 bool ClosedLoopDrivetrain::driveOperationComplete()
 {
-//	if (!m_fwd_op_complete)
-//		AsyncPrinter::Printf("Not done\n");
+	//	if (!m_fwd_op_complete)
+	//		AsyncPrinter::Printf("Not done\n");
 	return m_fwd_op_complete;
 }
 
@@ -411,8 +415,7 @@ void ClosedLoopDrivetrain::log()
 	sdb->PutDouble("FWD rate Drive Accumulated Error",
 			m_rate_control[TRANSLATE]->getAccumulatedError());
 
-	sdb->PutDouble("TURN rate Setpoint",
-			m_rate_control[TURN]->getSetpoint());
+	sdb->PutDouble("TURN rate Setpoint", m_rate_control[TURN]->getSetpoint());
 	sdb->PutDouble("TURN rate Drive P Gain",
 			m_rate_control[TURN]->getProportionalGain());
 	sdb->PutDouble("TURN rate Drive I Gain",

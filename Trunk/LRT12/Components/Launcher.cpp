@@ -17,6 +17,7 @@ Launcher::Launcher() :
 	m_duty_cycle_delta = 0.55;
 	m_speed = 0;
 	m_speed_threshold = 10;
+	disableLog();
 }
 
 Launcher::~Launcher()
@@ -38,10 +39,10 @@ void Launcher::Configure()
 	m_action->launcher->speed = c->Get<double> (m_name, "targetSpeed", 3000);
 	m_atSpeedCycles = c->Get<int> (m_name, "cyclesAtSpeed", 1);
 
-	m_speeds[SLOW] = c->Get<double>(m_name, "lowSpeed", 2000);
-	m_speeds[MEDIUM] = c->Get<double>(m_name, "mediumSpeed", 3000);
-	m_speeds[FASTEST] = c->Get<double>(m_name, "fastestSpeed", 4000);
-	
+	m_speeds[SLOW] = c->Get<double> (m_name, "lowSpeed", 2000);
+	m_speeds[MEDIUM] = c->Get<double> (m_name, "mediumSpeed", 3000);
+	m_speeds[FASTEST] = c->Get<double> (m_name, "fastestSpeed", 4000);
+
 	m_pid.setParameters(p, i, d, ff);
 }
 
@@ -72,8 +73,7 @@ void Launcher::Output()
 	switch (m_action->launcher->state)
 	{
 	case ACTION::LAUNCHER::RUNNING:
-		m_pid.setSetpoint(
-				Util::Clamp<double>(targetSpeed, 0, m_max_speed));
+		m_pid.setSetpoint(Util::Clamp<double>(targetSpeed, 0, m_max_speed));
 
 		m_pid.setInput(m_speed);
 		m_pid.update(1.0 / RobotConfig::LOOP_RATE); // 50 Hz

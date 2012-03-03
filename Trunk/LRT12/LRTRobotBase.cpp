@@ -34,6 +34,7 @@ LRTRobotBase::~LRTRobotBase()
 
 	AutonomousFunctions::getInstance()->stopBackgroundTask();
 	Pneumatics::getInstance()->stopBackgroundTask();
+	Log::getInstance()->stopTask();
 
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
 	AsyncPrinter::Quit();
@@ -61,6 +62,7 @@ void LRTRobotBase::StartCompetition()
 
 	AsyncPrinter::Printf("Starting Pneumatics\r\n");
 	Pneumatics::getInstance()->startBackgroundTask();
+	Log::getInstance()->startTask();
 	AutonomousFunctions::getInstance()->startBackgroundTask();
 
 	AsyncPrinter::Printf("Starting Profiler\r\n");
@@ -100,6 +102,11 @@ void LRTRobotBase::StartCompetition()
 		if (cycleCount % 100 == 0)
 		{
 			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-3);
+		}
+
+		if (cycleCount % 10 == 0)
+		{
+			Log::getInstance()->releaseSemaphore();
 		}
 	}
 }
