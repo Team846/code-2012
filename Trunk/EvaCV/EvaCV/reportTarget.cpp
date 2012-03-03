@@ -66,7 +66,7 @@ ReportSlop::rs_reset ()
 }
 
 int
-ReportSlop::sendResults (int slop, bool top)
+ReportSlop::sendResults (int slop, bool top, int packetID)
 {
   if (m_soc < 0)
     {
@@ -78,9 +78,14 @@ ReportSlop::sendResults (int slop, bool top)
       return -1;
     }
 
-  char buf[2];
-  buf[0] = slop;
-  buf[1] = top;
+  char buf[7];
+  buf[0] = 0;
+  buf[1] = packetID << 24;
+  buf[2] = packetID << 16;
+  buf[3] = packetID << 8;
+  buf[4] = packetID << 0;
+  buf[5] = slop;
+  buf[6] = top;
 
   if (sendto (m_soc, buf, sizeof (buf), 0, (struct sockaddr *) &m_dst,
 	      sizeof (m_dst)) < 0)
@@ -345,7 +350,7 @@ FindTarget::tg_printProperties ()
 }
 
 FindTarget::FindTarget ():
-cap (0), squares (), image (), slop (-1), rowTarget (-1), top (true)
+cap (6), squares (), image (), slop (-1), rowTarget (-1), top (true)
 {
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, 320);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 240);

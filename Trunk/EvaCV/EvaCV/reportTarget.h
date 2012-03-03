@@ -22,7 +22,7 @@ using namespace cv;
 class ReportSlop
 {
 public:
-  int sendResults (int slop, bool top);
+  int sendResults (int slop, bool top, int packetID);
     ReportSlop ();
    ~ReportSlop ();
 private:

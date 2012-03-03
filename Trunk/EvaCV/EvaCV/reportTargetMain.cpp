@@ -55,6 +55,9 @@ main (int argc  , char ** argv  )
     int avgFrameCount = 30;
 
 int countt = 0;
+
+  int nextPacketID = 1;
+
   for (;;)
     {
 //if (countt++ >= 10) exit(0);
@@ -71,8 +74,10 @@ int countt = 0;
       target.tg_getTarget ();
       //printf ("slop = %i, top = %i, rowTarget = %i sendConstantly = %i\n", target.tg_getSlop (), target.tg_getTop (), target.tg_getRowTarget (), sendConstantly);
 	if ((target.tg_getSlop() != 0xfff) || sendConstantly) {
-	      reportSlop.sendResults (target.tg_getSlop (), target.tg_getTop ());
-	}
+	      reportSlop.sendResults (target.tg_getSlop (), target.tg_getTop (), nextPacketID);
+	      
+              ++nextPacketID;
+        }
       //DDDtarget.tg_saveImageIfAsked (saveN);
 //      waitKey (1);		//waits for a key: it also handles the GUI events.
         if (countt % avgFrameCount == 0) {
