@@ -1,5 +1,5 @@
 #!/bin/bash
-CAMERA=0
+CAMERA=5
 
 # enable white balance auto
 # disable exposure auto

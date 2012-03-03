@@ -6,10 +6,7 @@
 #include <fstream>
 #include <string>
 
-#include <opencv/cv.h>
-#include <opencv/ml.h>
-#include <opencv/cxcore.h>
-#include <opencv/highgui.h>
+#include <opencv2/opencv.hpp>
 
 #include "cvFunction.h"
 
@@ -76,24 +73,20 @@ int main(int argc, char** argv) {
 #endif
 
 	loadThresholds();
-
-    CvCapture *pCapture;
+    
+    int index = 0;
+    if (argc > 1) {
+	    index = atoi(argv[1]);
+    }
 
 	/* Open capture stream */
-    if (argc <= 1) {
-	    pCapture = cvCaptureFromCAM(0);
-    } else {
-        pCapture = cvCaptureFromCAM(atoi(argv[1]));
-    }
+    cv::VideoCapture pCapture = cv::VideoCapture(index);
 
-    if (pCapture == NULL) {
-        return 0;
-    }
+    pCapture.set(CV_CAP_PROP_FRAME_WIDTH, 320);
+    pCapture.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
 
-	IplImage *pCaptureImg;
+    cv::Mat pCaptureImg;
 
-	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_WIDTH, 320);
-	cvSetCaptureProperty(pCapture, CV_CAP_PROP_FRAME_HEIGHT, 240);
 
 	int frameNumber = 0;
 
@@ -102,7 +95,7 @@ int main(int argc, char** argv) {
     clock_t start, end;
     int avgFrameCount = 30;
 
-	while (cvGrabFrame(pCapture)) {
+	while (true) {
 		/* Increment frame number */
 		++frameNumber;
 
@@ -110,35 +103,28 @@ int main(int argc, char** argv) {
             start = clock();
         }
 
-		pCaptureImg = cvRetrieveFrame(pCapture);
+		pCapture >> pCaptureImg; // retrieve image frame
 
-		/* Verify that the image is valid */
-		if (pCaptureImg != NULL) {
+        float totalPixels = (float) (pCaptureImg.rows
+                * pCaptureImg.cols / 4);
 
-			float totalPixels = (float) (pCaptureImg->width
-					* pCaptureImg->height / 4);
+        int red = 0, blue = 0;
 
-			int red = 0, blue = 0;
+        processImage(pCaptureImg, thresholds[0], thresholds[1], &red, &blue);
 
-            //int matched = getKeyPixels(pCaptureImg, red, blue);
-            processImage(pCaptureImg, thresholds[0], thresholds[1], &red, &blue);
+        float matchedPixels_R = (float) red / totalPixels;
+        float matchedPixels_B = (float) blue / totalPixels;
 
-            float matchedPixels_R = (float) red / totalPixels;
-            float matchedPixels_B = (float) blue / totalPixels;
+        int value_R = 255 * matchedPixels_R;
+        int value_B = 255 * matchedPixels_B;
+       
+        char buf[100];
+        sprintf(buf, "%.02f %.02f", matchedPixels_R, matchedPixels_B);
+        DbgPrint(buf);
 
-			int value_R = 255 * matchedPixels_R;
-		    int value_B = 255 * matchedPixels_B;
-           
-            char buf[100];
-            sprintf(buf, "%.02f %.02f", matchedPixels_R, matchedPixels_B);
-            DbgPrint(buf);
+        // DbgPrint(value);
 
-			// DbgPrint(value);
-
-			int iSent = messenger.sendData(frameNumber, value_R, value_B);
-		} else {
-
-		}
+        int iSent = messenger.sendData(frameNumber, value_R, value_B);
 
         if (frameNumber % avgFrameCount == 0) {
             end = clock();

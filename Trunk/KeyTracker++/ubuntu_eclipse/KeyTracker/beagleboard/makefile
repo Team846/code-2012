@@ -7,7 +7,8 @@ XLDFLAGS := `$(CROSS_COMPILE)pkg-config --libs opencv`
 XCC = $(CROSS_COMPILE)g++
 
 TRANSFER = scp -C
-DESTINATION = ubuntu@omap.local:/home/ubuntu/KeyTracker/beagleboard
+HOST = ubuntu@omap.local
+DESTINATION = /home/ubuntu/KeyTracker/beagleboard
 
 all: x86 test bb
 
@@ -21,8 +22,8 @@ bb: ../headers/messenger.h ../source/messenger.cpp ../global.h ../cvFunction.h .
 	$(XCC) $(XCFLAGS) -o KeyTracker ../source/messenger.cpp ../robot_main.cpp $(XLDFLAGS) -D BEAGLEBOARD
 
 install: bb
-	ssh ubuntu@omap.local -C "rm -f /home/ubuntu/KeyTracker/beagleboard/KeyTracker"
-	$(TRANSFER) ./KeyTracker $(DESTINATION)
+	ssh $(HOST) -C "rm -f $(DESTINATION)/KeyTracker"
+	$(TRANSFER) ./KeyTracker $(HOST):$(DESTINATION)
 
 clean:
 	rm -rf KeyTracker*
