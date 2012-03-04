@@ -14,6 +14,8 @@ using namespace cv;
 using namespace std;
 //
 static int thresh = 200;
+static int vThresh = 0;
+static int camN = 6;
 static int saveN = 0;
 static bool sendConstantly = false;
 //
@@ -27,8 +29,33 @@ onSignal (int a)
 int
 main (int argc  , char ** argv  )
 {
-  FindTarget target;
+	// arguments: <brightnessThreshold(200)> <verticalThreshold(0)> <camera#(6)> <sendConstantly(false)>
   ReportSlop reportSlop;
+
+  if (argc > 1)
+    {
+       thresh = atoi(argv[1]);
+    }
+  if (argc > 2)
+  {
+       vThresh = atoi(argv[2]);
+  }
+  if (argc > 3)
+  {
+       camN = atoi(argv[3]);
+  }
+  if (argc > 4)
+    {
+       sendConstantly = true;
+    }
+  printf ("==== bThreshold %i ====\n", thresh);
+  printf ("==== vThreshold %i ====\n", vThresh);
+  printf ("==== camera %i ====\n", camN);
+  printf ("==== sendConst %i ====\n", sendConstantly);
+
+  FindTarget target(camN);
+  target.tg_setBrightThresh (thresh);
+  target.tg_setVertThresh (vThresh);
 
   if (!target.tg_ready ())
     {
@@ -37,16 +64,6 @@ main (int argc  , char ** argv  )
     }
 
   //target.tg_printProperties ();
-
-  if (argc > 1)
-    {
-       thresh = atoi(argv[1]);
-    }
-  if (argc > 2)
-    {
-       sendConstantly = true;
-    }
-  printf ("==== threshold %i ====\n", thresh);
 
   signal (SIGUSR1, onSignal);
 
@@ -75,6 +92,7 @@ int countt = 0;
       //printf ("slop = %i, top = %i, rowTarget = %i sendConstantly = %i\n", target.tg_getSlop (), target.tg_getTop (), target.tg_getRowTarget (), sendConstantly);
 	if ((target.tg_getSlop() != 0xfff) || sendConstantly) {
 	      reportSlop.sendResults (target.tg_getSlop (), target.tg_getTop (), nextPacketID);
+	      printf("---- %i --- %i \n",target.tg_getSlop (), target.tg_getTop ());
 	      
               ++nextPacketID;
         }

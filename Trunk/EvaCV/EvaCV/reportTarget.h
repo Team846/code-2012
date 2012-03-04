@@ -37,7 +37,7 @@ class FindTarget
 {
 
 public:
-  FindTarget ();
+  FindTarget (int camN);
   ~FindTarget ();
 
   void tg_getFrame ();
@@ -60,6 +60,14 @@ public:
   {
     return top;
   };
+  inline void tg_setVertThresh (int vThresh)
+  {
+    vertThresh = vThresh;
+  };
+  inline void tg_setBrightThresh (int bThresh)
+  {
+    brightThresh = bThresh;
+  };
 private:
   VideoCapture cap;
   vector < vector < Point > >squares;
@@ -68,7 +76,10 @@ private:
   int slop;
   int rowTarget;
   bool top;
+  int vertThresh;
+  int brightThresh;
   double tg_angle (Point & pt1, Point & pt2, Point & pt0);
+  FindTarget ();
 
 };
 

@@ -78,13 +78,23 @@ ReportSlop::sendResults (int slop, bool top, int packetID)
       return -1;
     }
 
+  char slopToSend = 0;
+
+  if (slop > 127) {
+    slopToSend = 127;
+  } else if (slop < -128) {
+    slopToSend = -128;
+  } else {
+    slopToSend = (char) slop;
+  }
+
   char buf[7];
   buf[0] = 0;
   buf[1] = packetID << 24;
   buf[2] = packetID << 16;
   buf[3] = packetID << 8;
   buf[4] = packetID << 0;
-  buf[5] = slop;
+  buf[5] = slopToSend;
   buf[6] = top;
 
   if (sendto (m_soc, buf, sizeof (buf), 0, (struct sockaddr *) &m_dst,
@@ -137,7 +147,7 @@ FindTarget::tg_getTarget ()
 {
   if (squares.size() != 0)
     {
-      const int width2 = 1280;
+      const int width2 = 640; 	//  2 x screenWidth
       int sum = 0;
       int delta4xAbsMin = width2;
       int delta4xMin = width2;
@@ -199,12 +209,25 @@ FindTarget::tg_getTarget ()
 #endif
 
       slop = delta4xMin / 4;
+      if (slop == -128) {
+        slop = -127;
+      }
       top = weight[rowTarget] < 2;
+      if (top == true) {
+	      const Point *p0 = &squares[rowTarget][0];
+	      const Point *p3 = &squares[rowTarget][3];
+		int y = (p0->y < p3->y) ? p0->y : p3->y;
+	      if (y > vertThresh) {
+		      top = false;
+	      }
+      }
+
+      
       delete[]weight;
     }
   else
     {
-      slop = 0xfff;
+      slop = -128;
       top = true;
       rowTarget = -1;
     }
@@ -349,8 +372,8 @@ FindTarget::tg_printProperties ()
 	  cap.get (CV_CAP_PROP_RECTIFICATION));
 }
 
-FindTarget::FindTarget ():
-cap (6), squares (), image (), slop (-1), rowTarget (-1), top (true)
+FindTarget::FindTarget (int camN):
+cap (camN), squares (), image (), slop (-1), rowTarget (-1), top (true), vertThresh(0), brightThresh(200)
 {
 	cap.set(CV_CAP_PROP_FRAME_WIDTH, 320);
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 240);
