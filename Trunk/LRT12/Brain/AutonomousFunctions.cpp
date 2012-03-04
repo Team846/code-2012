@@ -125,6 +125,9 @@ void AutonomousFunctions::task()
 			bridgeBalance();
 			break;
 		case ACTION::AUTONOMOUS::KEYTRACK:
+			static int e = 0;
+//			if (++e %10 == 0)
+//				AsyncPrinter::Printf("Key\n");
 			keyTrack();
 			break;
 		case ACTION::AUTONOMOUS::AUTOALIGN:
@@ -222,9 +225,11 @@ void AutonomousFunctions::keyTrack()
 	{
 		if (!state)
 		{
+			AsyncPrinter::Printf("Key Align done\n");
 #warning This should change state to ACTION::AUTONOMOUS::AUTOALIGN
 			m_hit_key_flag = false;
-			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+//			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+			m_action->auton->state = ACTION::AUTONOMOUS::AUTOALIGN;
 			m_action->auton->completion_status = ACTION::SUCCESS;
 			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 			m_action ->drivetrain->rate.desiredTurnRate = 0.0;
@@ -236,23 +241,33 @@ void AutonomousFunctions::keyTrack()
 
 void AutonomousFunctions::autoAlign()
 {
-	double error = m_align_setpoint
-			- m_action->cam->align.arbitraryOffsetFromUDP;
-	m_action->drivetrain->rate.drive_control = true;
-	m_action->drivetrain->rate.turn_control = true;
-	m_action->drivetrain->position.drive_control = false;
-	m_action->drivetrain->position.turn_control = false;
-
-	// switch directions depending on error
-	m_action->drivetrain->rate.desiredTurnRate = Util::Sign<double>(error)
-			* m_align_turn_rate;
-
-	if (fabs(error) < m_align_threshold)
+	if (m_action->cam->align.status != ACTION::CAMERA::NO_TARGET)
 	{
-		m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
-		m_action->auton->completion_status = ACTION::SUCCESS;
+		double error = m_align_setpoint
+				- m_action->cam->align.arbitraryOffsetFromUDP;
+		m_action->drivetrain->rate.drive_control = true;
+		m_action->drivetrain->rate.turn_control = true;
+		m_action->drivetrain->position.drive_control = false;
+		m_action->drivetrain->position.turn_control = false;
+	
+		// switch directions depending on error
+		m_action->drivetrain->rate.desiredTurnRate = Util::Sign<double>(error)
+				* m_align_turn_rate;
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
-		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+	
+		static int debouncer = 0;
+		if (fabs(error) < m_align_threshold /*&& ++debouncer > 1*/)
+		{
+			AsyncPrinter::Printf("Aiming done\n");
+			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+			m_action->auton->completion_status = ACTION::SUCCESS;
+			m_action->drivetrain->rate.desiredDriveRate = 0.0;
+			m_action->drivetrain->rate.desiredTurnRate = 0.0;
+		}
+		else 
+		{
+			debouncer = 0;
+		}
 	}
 }
 

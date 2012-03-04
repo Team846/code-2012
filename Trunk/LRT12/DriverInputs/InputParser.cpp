@@ -49,14 +49,15 @@ void InputParser::ProcessInputs()
 		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::HOLDING;
 	}
 
+	static bool hasBeenReleased = true;
 	/***************** Drive assistance ****************/
 	if (m_driver_stick->IsButtonDown(KEYTRACK))
 	{
-		if (m_action_ptr->auton->state != ACTION::AUTONOMOUS::AUTOALIGN
-				&& m_action_ptr->auton->completion_status != ACTION::SUCCESS)
+		if (hasBeenReleased)
 		{
 			m_action_ptr->auton->state = ACTION::AUTONOMOUS::KEYTRACK;
 		}
+		hasBeenReleased = false;
 	}
 	//	else if (m_driver_stick->IsButtonDown(BRIDGEBALANCE))
 	//	{
@@ -64,6 +65,7 @@ void InputParser::ProcessInputs()
 	//	}
 	else
 	{
+		hasBeenReleased = true;
 		m_action_ptr->auton->state = ACTION::AUTONOMOUS::TELEOP;
 	}
 

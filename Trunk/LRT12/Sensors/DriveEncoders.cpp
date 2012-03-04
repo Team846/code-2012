@@ -117,9 +117,9 @@ double DriveEncoders::getWheelDist(int side)
 {
 	// pulses / ( pulses / revolution ) * distance / revolution = inch distance
 	LRTEncoder * e = (side == LEFT ? m_encoder_left : m_encoder_right);
-	double rate = (double) ((e->Get() * 1.0) / PULSES_PER_REVOLUTION
+	double dist = (double) ((e->Get() * 1.0) / PULSES_PER_REVOLUTION
 			* WHEEL_DIAMETER * PI);
-	return rate;
+	return dist;
 }
 
 double DriveEncoders::getLeftSpeed()

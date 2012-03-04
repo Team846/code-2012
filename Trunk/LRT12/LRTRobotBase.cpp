@@ -114,7 +114,7 @@ void LRTRobotBase::StartCompetition()
 			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-3);
 		}
 
-		if (cycleCount % 5 == 0)
+		if (cycleCount % 10 == 0)
 		{
 			Log::getInstance()->releaseSemaphore();
 		}
