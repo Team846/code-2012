@@ -22,7 +22,7 @@ void PID::setParameters(double p_gain, double i_gain, double d_gain,
 	m_integral_gain = i_gain;
 	m_derivative_gain = d_gain;
 	m_feedforward_gain = ff_gain;
-	m_integral_decay = i_decay;
+	m_integral_decay = i_decay != 1.0 ? i_decay : 0.9999999999999;
 	m_is_feed_forward = feedforward;
 	enablePID();
 }
@@ -38,6 +38,8 @@ double PID::update(double dt)
 	// approximate with riemann sum and decay
 	m_acc_error *= m_integral_decay;
 	m_acc_error += m_error * dt;
+	if (m_acc_error != m_acc_error)
+		m_acc_error = 0.0; //just a random high value
 	double integral = m_acc_error / (1 - m_integral_decay);
 
 	// magic PID line
@@ -56,12 +58,12 @@ double PID::update(double dt)
 	}
 
 	m_prev_error = m_error;
-	
+
 	if (m_IFREnabled)
 	{
 		m_output = m_runningSum.UpdateSum(m_output);
 	}
-	
+
 	return m_output;
 }
 

@@ -12,7 +12,6 @@
 #include "Log/Log.h"
 
 #include "Compressor.h"
-#include "Sensors/IMU.h"
 #include "Sensors/Trackers.h"
 
 #include "Util/AsyncPrinter.h"
@@ -36,7 +35,6 @@ private:
 	DigitalInput *m_pressureSwitch;
 	Brain brain;
 	ActionData *m_action;
-	IMU *m_imu;
 
 	Trackers *m_trackers;
 	

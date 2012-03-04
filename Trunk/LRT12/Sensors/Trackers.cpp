@@ -85,7 +85,7 @@ void Trackers::listen()
 				m_target_missed_packets = pid - target_lastPacketID - 1;
 			}
 
-			m_target_slop = m_input_buffer[5];
+			m_target_slop = (int8_t) m_input_buffer[5];
 			m_target_top = m_input_buffer[6];
 
 			target_lastPacketID = pid;
@@ -125,7 +125,18 @@ void Trackers::update()
 	c->key.red = getKeyValue(RED);
 	c->key.higher = getKeyValue(HIGHER);
 	c->align.arbitraryOffsetFromUDP = getTargetOffset();
-	c->align.isUpperTarget = getSelectedTarget();
+	if (c->align.arbitraryOffsetFromUDP == ACTION::CAMERA::INVALID_DATA)
+	{
+		c->align.status = ACTION::CAMERA::NO_TARGET;
+	}
+	else
+	{
+		c->align.status = getSelectedTarget() ? ACTION::CAMERA::TOP
+				: ACTION::CAMERA::BOTTOM;
+	}
+	//	c->align.canSeeTarget = c->align.arbitraryOffsetFromUDP != 128;
+	//		
+	//	c->align.isUpperTarget = getSelectedTarget();
 }
 
 void Trackers::stop(bool force)
@@ -171,7 +182,7 @@ uint8_t Trackers::getKeyValue(KeyValue v)
 	return m_key_value_r;
 }
 
-uint8_t Trackers::getTargetOffset()
+int8_t Trackers::getTargetOffset()
 {
 	return m_target_slop;
 }
@@ -243,5 +254,18 @@ void Trackers::log()
 	sdb->PutInt("Key Red", c->key.red);
 	sdb->PutInt("Key Higher", c->key.higher);
 	sdb->PutInt("Target Offset", c->align.arbitraryOffsetFromUDP);
-	sdb->PutInt("Target Selected", c->align.isUpperTarget);
+	string s;
+	switch (c->align.status)
+	{
+	case ACTION::CAMERA::NO_TARGET:
+		s = "None";
+		break;
+	case ACTION::CAMERA::TOP:
+		s = "Top";
+		break;
+	case ACTION::CAMERA::BOTTOM:
+		s = "Bottom";
+		break;
+	}
+	sdb->PutString("Target Selected", s.c_str());
 }

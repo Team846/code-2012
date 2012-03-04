@@ -12,7 +12,7 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 	Loggable()
 {
 	m_task = new Task("IMU_TASK", (FUNCPTR) taskEntryPoint,
-			Task::kDefaultPriority - 2);
+			Task::kDefaultPriority - 1);
 	DigitalModule *module = DigitalModule::GetInstance(module_num);
 	if (module)
 	{
@@ -25,13 +25,36 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 	m_gyro_x = m_gyro_y = m_gyro_z = 0;
 	m_roll = m_pitch = m_yaw = 0.0;
 	m_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
-	m_task->Start((UINT32) this);
+	m_is_running = false;
 }
 
 IMU::~IMU()
 {
+	stopTask();
+	delete m_task;
+	int error = semDelete(m_sem);
+	if (error)
+	{
+		printf("SemDelete Error=%d\n", error);
+	}
 	delete m_i2c;
 	m_i2c = NULL;
+}
+
+void IMU::startTask()
+{
+	m_is_running = true;
+	m_task->Start((UINT32) this);
+}
+
+void IMU::stopTask()
+{
+	if (m_is_running)
+	{
+		UINT32 task_id = m_task->GetID();
+		m_task->Stop();
+		printf("Task 0x%x killed for Pneumatics\n", task_id);
+	}
 }
 
 void IMU::taskEntryPoint(int ptr)
@@ -42,9 +65,14 @@ void IMU::taskEntryPoint(int ptr)
 
 void IMU::task()
 {
-	while (true)
+	while (m_is_running)
 	{
 		semTake(m_sem, WAIT_FOREVER);
+		if (!m_is_running)
+		{
+			break;
+		}
+
 		update(ActionData::GetInstance());
 	}
 }
@@ -76,9 +104,9 @@ void IMU::update()
 
 	m_time = GetFPGATime() - m_time;
 
-	static int e = 0;
-	if (++e % 10 == 0)
-		printAll();
+	//	static int e = 0;
+	//	if (++e % 10 == 0)
+	//		printAll();
 }
 
 void IMU::releaseSemaphore()

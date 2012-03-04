@@ -77,6 +77,19 @@ public:
 	 * @param pos relative position
 	 */
 	void setRelativeTranslatePosition(double pos);
+	
+	/*!
+	 * @brief Set drive position setpoint
+	 * @param pos absolute position
+	 */
+	void setAbsoluteTranslatePosition(double pos);
+
+	/*!
+	 * @brief Set current drive position as zero
+	 * @param pos relative position
+	 */
+	void SetCurrentTranslatePositionAsZero();
+	
 
 	/*!
 	 * Gets current drive setpoint
@@ -189,6 +202,7 @@ private:
 	CONTROL_TYPE m_turn_control_type;
 	bool m_fwd_op_complete;
 	bool m_turn_op_complete;
+	double m_translate_zero;
 
 	bool m_in_high_gear;
 

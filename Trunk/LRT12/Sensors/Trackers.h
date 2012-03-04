@@ -70,7 +70,7 @@ public:
 	/*! 
 	 * @brief Gets the target offset from center of frame 
 	 */
-	uint8_t getTargetOffset();
+	int8_t getTargetOffset();
 
 	/*! 
 	 * @brief Gets the target that is being tracked
@@ -113,7 +113,7 @@ private:
 	uint8_t m_key_value_r;
 	uint8_t m_key_value_b;
 
-	uint8_t m_target_slop;
+	int8_t m_target_slop;
 	bool m_target_top;
 
 	int m_key_missed_packets;

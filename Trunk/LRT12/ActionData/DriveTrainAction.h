@@ -20,6 +20,8 @@ struct DriveTrainAction
 
 		double desiredRelativeDrivePosition;
 		double desiredRelativeTurnPosition;
+		
+		bool reset_translate_zero;
 	} position;
 
 	struct

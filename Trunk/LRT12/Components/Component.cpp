@@ -28,17 +28,25 @@ list<Component::ComponentWithData>* Component::CreateComponents()
 					new ConfigLoader(),
 					createComponentData(false, ComponentData::NO_DS_DISABLE_DIO)));
 	components->push_back(
-			ComponentWithData(new Drivetrain(), createComponentData(true, RobotConfig::DRIVER_STATION::DRIVETRAIN)));
+			ComponentWithData(
+					new Drivetrain(),
+					createComponentData(true,
+							RobotConfig::DRIVER_STATION::DRIVETRAIN)));
+	AsyncPrinter::Printf(
+			"Components not compatible with Hand of the monkey disabled in component factory\n");
 	components->push_back(
-			ComponentWithData(new PneumaticShifter(), createComponentData(true, RobotConfig::DRIVER_STATION::SHIFTER)));
-	components->push_back(
-			ComponentWithData(new Launcher(), createComponentData(true, RobotConfig::DRIVER_STATION::LAUNCHER)));
-	components->push_back(
-			ComponentWithData(new BallCollector(), createComponentData(true, RobotConfig::DRIVER_STATION::BALLCOLLECTOR)));
-	components->push_back(
-			ComponentWithData(new Wedge(), createComponentData(true, RobotConfig::DRIVER_STATION::WEDGE)));
-	components->push_back(
-			ComponentWithData(new BallFeeder(), createComponentData(true, RobotConfig::DRIVER_STATION::BALLFEEDER)));
+			ComponentWithData(
+					new PneumaticShifter(),
+					createComponentData(true,
+							RobotConfig::DRIVER_STATION::SHIFTER)));
+	//	components->push_back(
+	//			ComponentWithData(new Launcher(), createComponentData(true, RobotConfig::DRIVER_STATION::LAUNCHER)));
+	//	components->push_back(
+	//			ComponentWithData(new BallCollector(), createComponentData(true, RobotConfig::DRIVER_STATION::BALLCOLLECTOR)));
+	//	components->push_back(
+	//			ComponentWithData(new Wedge(), createComponentData(true, RobotConfig::DRIVER_STATION::WEDGE)));
+	//	components->push_back(
+	//			ComponentWithData(new BallFeeder(), createComponentData(true, RobotConfig::DRIVER_STATION::BALLFEEDER)));
 
 	//sample initialization of components
 	//    components->push_back(ComponentWithData(new Shifter(), createComponentData(true, 5)));

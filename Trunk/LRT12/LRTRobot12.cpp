@@ -18,7 +18,6 @@ LRTRobot12::LRTRobot12() :
 	components = Component::CreateComponents();
 	m_action = ActionData::GetInstance();
 
-	m_imu = new IMU();
 
 	m_compressor = new Compressor(
 			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
@@ -40,7 +39,7 @@ LRTRobot12::~LRTRobot12()
 
 	m_compressor->Stop();
 	delete m_compressor;
-	delete m_imu;
+	
 	delete m_trackers;
 
 	printf("\n\nBegin Deleting LRTRobot12\n");
@@ -84,10 +83,6 @@ void LRTRobot12::MainLoop()
 	m_action->motorsEnabled = ds->GetDigitalIn(
 			RobotConfig::DRIVER_STATION::MOTORS);
 
-	static bool shouldCheckIMU = true;
-	shouldCheckIMU = !shouldCheckIMU;
-	if (shouldCheckIMU)
-		m_imu->releaseSemaphore();
 
 	//iterate though and output components
 	for (list<Component::ComponentWithData>::iterator iter =

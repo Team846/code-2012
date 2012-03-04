@@ -40,7 +40,7 @@ public:
 	 */
 	void
 			setParameters(double p_gain, double i_gain, double d_gain,
-					double ff_gain = 1.0, double i_decay = 0.5,
+					double ff_gain = 1.0, double i_decay = 0.87,
 					bool feedforward = true);
 
 	/*!

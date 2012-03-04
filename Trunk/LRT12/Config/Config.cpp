@@ -402,8 +402,8 @@ void Config::LoadFile(string path)
 		string key, val;
 		getline(sstream, key, '=');
 		getline(sstream, val);
-		if (val.find("=") != string::npos)//we don't allow more than 1 equals sign per line leave a comment stating that
-			(*iter) += " ; more than 1 equals sign per line is illegal";
+//		if (val.find("=") != string::npos)//we don't allow more than 1 equals sign per line leave a comment stating that
+//			(*iter) += " ; more than 1 equals sign per line is illegal";
 
 		ConfigVal newVal;
 		newVal.val = val;

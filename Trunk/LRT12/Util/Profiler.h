@@ -32,7 +32,8 @@ public:
 	void ClearLogBuffer();
 
 protected:
-	Profiler();DISALLOW_COPY_AND_ASSIGN(Profiler);
+	Profiler();
+	DISALLOW_COPY_AND_ASSIGN(Profiler);
 
 private:
 	static Profiler* instance;

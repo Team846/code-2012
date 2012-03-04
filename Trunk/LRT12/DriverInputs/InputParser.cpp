@@ -52,39 +52,62 @@ void InputParser::ProcessInputs()
 	/***************** Drive assistance ****************/
 	if (m_driver_stick->IsButtonDown(KEYTRACK))
 	{
-		if (m_action_ptr->auton->state != ACTION::AUTONOMOUS::AUTOALIGN)
+		if (m_action_ptr->auton->state != ACTION::AUTONOMOUS::AUTOALIGN
+				&& m_action_ptr->auton->completion_status != ACTION::SUCCESS)
 		{
 			m_action_ptr->auton->state = ACTION::AUTONOMOUS::KEYTRACK;
 		}
 	}
-	else if (m_driver_stick->IsButtonDown(BRIDGEBALANCE))
-	{
-		m_action_ptr->auton->state = ACTION::AUTONOMOUS::BRIDGEBALANCE;
-	}
+	//	else if (m_driver_stick->IsButtonDown(BRIDGEBALANCE))
+	//	{
+	//		m_action_ptr->auton->state = ACTION::AUTONOMOUS::BRIDGEBALANCE;
+	//	}
 	else
 	{
 		m_action_ptr->auton->state = ACTION::AUTONOMOUS::TELEOP;
 	}
 
 	/***************** Drivetrain **********************/
-
 	if (m_action_ptr->auton->state == ACTION::AUTONOMOUS::TELEOP)
 	{
+		if (m_driver_stick->IsButtonDown(9))
+		{
+			m_action_ptr->drivetrain->rate.drive_control = true;
+			m_action_ptr->drivetrain->rate.turn_control = true;
+
+			m_action_ptr->drivetrain->position.drive_control = true;
+			m_action_ptr->drivetrain->position.turn_control = true;
+
+			static bool temp = true;
+			if (m_driver_stick->IsButtonDown(10) || temp)
+			{
+				temp = false;
+				m_action_ptr->drivetrain->position.reset_translate_zero = true;
+			}
+			m_action_ptr->drivetrain->position.desiredRelativeDrivePosition
+					= -m_driver_stick->GetAxis(Joystick::kYAxis) * 12 * 4; //inches
+		}
+		else
+		{
 #define CLOSED_LOOP 1
 #if CLOSED_LOOP
-		m_action_ptr->drivetrain->rate.drive_control = true; //If driver control use velocity control
-		m_action_ptr->drivetrain->rate.turn_control = true;
+			m_action_ptr->drivetrain->rate.drive_control = true; //If driver control use velocity control
+			m_action_ptr->drivetrain->rate.turn_control = true;
 #else
-		m_action_ptr->drivetrain->rate.drive_control = false; //If driver control use velocity control
-		m_action_ptr->drivetrain->rate.turn_control = false;
+			m_action_ptr->drivetrain->rate.drive_control = false; //If driver control use velocity control
+			m_action_ptr->drivetrain->rate.turn_control = false;
 #endif 
-		m_action_ptr->drivetrain->position.drive_control = false;
-		m_action_ptr->drivetrain->position.turn_control = false;
+			//		m_action_ptr->drivetrain->position.drive_control = false;
+			//		m_action_ptr->drivetrain->position.turn_control = false;
+			m_action_ptr->drivetrain->position.drive_control = false;
+			m_action_ptr->drivetrain->position.turn_control = false;
 
-		m_action_ptr->drivetrain->rate.desiredDriveRate = pow(
-				-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
-		m_action_ptr->drivetrain->rate.desiredTurnRate = pow(
-				-m_driver_stick->GetAxis(Joystick::kZAxis), 3);
+			m_action_ptr->drivetrain->rate.desiredDriveRate = pow(
+					-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
+			m_action_ptr->drivetrain->rate.desiredTurnRate = pow(
+					-m_driver_stick->GetAxis(Joystick::kZAxis), 3);
+		}
+
 	}
 
 	/***************** Launcher **********************/
@@ -162,4 +185,5 @@ void InputParser::ProcessInputs()
 		m_action_ptr->config->load = true;
 	if (m_driver_stick->IsButtonJustPressed(APPLY_CONFIG))
 		m_action_ptr->config->apply = true;
+
 }

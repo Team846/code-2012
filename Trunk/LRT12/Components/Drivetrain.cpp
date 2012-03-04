@@ -61,6 +61,11 @@ void Drivetrain::Output()
 	{
 		if (m_action->drivetrain->position.drive_control)
 		{
+			if (m_action->drivetrain->position.reset_translate_zero)
+			{
+				m_action->drivetrain->position.reset_translate_zero = false;
+				m_drive_control.SetCurrentTranslatePositionAsZero();
+			}
 			m_drive_control.setTranslateControl(
 					ClosedLoopDrivetrain::CL_POSITION);
 			m_drive_control.setRelativeTranslatePosition(

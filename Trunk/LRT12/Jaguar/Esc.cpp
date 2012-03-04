@@ -103,7 +103,7 @@ void ESC::SetDutyCycle(float dutyCycle)
 //	static int e = 0; 
 //	if ( ++e % 5 == 0)
 //		AsyncPrinter::Printf("\nDuty %.3f Speed %.3f\n", dutyCycle, speed);
-	float origDutyCycle = dutyCycle;
+//	float origDutyCycle = dutyCycle;
 
 	if (fabs(command.dutyCycle) < 1E-4) //brake only when duty cycle = 0
 	{

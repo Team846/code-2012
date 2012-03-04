@@ -5,6 +5,7 @@
 #define INCREASE_MIN_POWER 0
 
 ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
+	Loggable(),
 	m_encoders(DriveEncoders::GetInstance())
 {
 	m_config = Config::GetInstance();
@@ -23,7 +24,7 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	setTurnControl(m_turn_control_type);
 	printf("Constructed CLRateTrain\n");
 
-	disableLog();
+	//	disableLog();
 }
 
 void ClosedLoopDrivetrain::Configure()
@@ -267,6 +268,21 @@ void ClosedLoopDrivetrain::setRelativeTranslatePosition(double pos)
 			(pos + m_encoders.getRobotDist()),
 			(m_pos_control[TRANSLATE]->getSetpoint()));
 	m_fwd_op_complete = false;
+}
+
+void ClosedLoopDrivetrain::setAbsoluteTranslatePosition(double pos)
+{
+	setTranslateControl(CL_POSITION);
+	m_pos_control[TRANSLATE]->setSetpoint(m_translate_zero + pos);
+	AsyncPrinter::Printf("pos %.2f,pre %.2f set %.2f\n", pos,
+			(pos + m_encoders.getRobotDist()),
+			(m_pos_control[TRANSLATE]->getSetpoint()));
+	m_fwd_op_complete = false;
+}
+
+void ClosedLoopDrivetrain::SetCurrentTranslatePositionAsZero()
+{
+	m_translate_zero = m_encoders.getRobotDist();
 }
 
 void ClosedLoopDrivetrain::setTranslateRate(double rate)

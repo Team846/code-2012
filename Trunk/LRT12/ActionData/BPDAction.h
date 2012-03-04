@@ -8,7 +8,7 @@ namespace ACTION
 	{ UNSET = 0, IN_PROGRESS = 1, SUCCESS = 2, FAILURE = 3, ABORTED = 4};
 	
 	char* const status_string[4 + 1] = 
-	{ "ERROR", "In Progress", "Success", "Failure", "Aborted" };
+	{ "Unset", "In Progress", "Success", "Failure", "Aborted" };
 
 	namespace WEDGE
 	{

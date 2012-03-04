@@ -106,6 +106,17 @@ public:
 	 * Starts the task
 	 */
 	void releaseSemaphore();
+	
+	/*!
+	 * 
+	 */
+	void startTask();
+	
+	/*!
+	 * 
+	 */
+	void stopTask();
+	
 private:
 	/*!
 	 * Helper method to get kNumPackets of data and fill m_i2c_buf
@@ -158,6 +169,7 @@ private:
 
 	SEM_ID m_sem;
 	Task *m_task;
+	bool m_is_running;
 };
 
 #endif

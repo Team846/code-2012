@@ -38,6 +38,8 @@ typedef enum GameState
 	DISABLED, AUTONOMOUS, TELEOPERATED
 };
 
+class IMU;
+
 class LRTRobotBase: public RobotBase
 {
 public:
@@ -59,6 +61,8 @@ private:
 	SEM_ID loopSemaphore;
 	Notifier * loopSynchronizer;
 	static void releaseLoop(void* param);
+
+	IMU *m_imu;
 };
 
 #endif

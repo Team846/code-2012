@@ -5,6 +5,7 @@
 #include "Config/RobotConfig.h"
 #include "Utility.h"
 #include "sysLib.h"
+#include "Sensors/IMU.h"
 
 /**
  * Constructor for RobotIterativeBase. Initializes member variables.
@@ -14,9 +15,11 @@ LRTRobotBase::LRTRobotBase()
 	loopSynchronizer = new Notifier(&releaseLoop, this);
 	quitting_ = false;
 	cycleCount = 0;
-
+	
 	printf("Creating LRTRobotbase\n");
 	loopSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+
+	m_imu = new IMU();
 }
 
 /**
@@ -35,6 +38,9 @@ LRTRobotBase::~LRTRobotBase()
 	AutonomousFunctions::getInstance()->stopBackgroundTask();
 	Pneumatics::getInstance()->stopBackgroundTask();
 	Log::getInstance()->stopTask();
+
+	m_imu->stopTask();
+	delete m_imu;
 
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
 	AsyncPrinter::Quit();
@@ -64,6 +70,8 @@ void LRTRobotBase::StartCompetition()
 	Pneumatics::getInstance()->startBackgroundTask();
 	Log::getInstance()->startTask();
 	AutonomousFunctions::getInstance()->startBackgroundTask();
+	
+	m_imu->startTask();
 
 	AsyncPrinter::Printf("Starting Profiler\r\n");
 	Profiler& profiler = Profiler::GetInstance();
@@ -80,6 +88,7 @@ void LRTRobotBase::StartCompetition()
 			break;
 		}
 
+		m_imu->releaseSemaphore();
 		AutonomousFunctions::getInstance()->releaseSemaphore();
 
 		profiler.StartNewCycle();
@@ -98,13 +107,14 @@ void LRTRobotBase::StartCompetition()
 		}
 
 		Pneumatics::getInstance()->releaseSemaphore();
+		
 
 		if (cycleCount % 100 == 0)
 		{
 			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-3);
 		}
 
-		if (cycleCount % 10 == 0)
+		if (cycleCount % 5 == 0)
 		{
 			Log::getInstance()->releaseSemaphore();
 		}
