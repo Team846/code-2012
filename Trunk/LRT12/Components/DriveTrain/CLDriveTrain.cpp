@@ -26,7 +26,7 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	printf("Constructed CLRateTrain\n");
 
 	m_translate_zero = 0.0;
-
+	m_turn_zero 	 = 0.0;
 	//	disableLog();
 }
 
