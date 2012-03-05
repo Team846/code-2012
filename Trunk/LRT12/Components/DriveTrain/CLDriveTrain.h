@@ -9,12 +9,12 @@
 
 /*!
  * @brief implements a closed-loop drivetrain
- * @brief DOES NOT implement absolute position control
+ * @brief DOES implement absolute position control
  * @brief DOES implement closed-loop rate control
  * @brief DOES implement closed-loop relative position control
- * @author Robert Ying
+ * @author Robert Ying with edits to break it by Brian Axelrod
  */
-class ClosedLoopDrivetrain: public Loggable
+class ClosedLoopDrivetrain: public Loggable, public Configurable
 {
 public:
 	/*!
@@ -90,6 +90,11 @@ public:
 	 */
 	void SetCurrentTranslatePositionAsZero();
 	
+	/*!
+	 * @brief Set current turn position as zero
+	 */
+	void SetCurrentTurnPositionAsZero();
+	
 
 	/*!
 	 * Gets current drive setpoint
@@ -114,6 +119,12 @@ public:
 	 * @param pos
 	 */
 	void setRelativeTurnPosition(double pos);
+
+	/*!
+	 * @brief Set turn position relative to current
+	 * @param pos
+	 */
+	void setAbsoluteTurnPosition(double pos);
 
 	/*!
 	 * @brief Set turn rate
@@ -203,6 +214,7 @@ private:
 	bool m_fwd_op_complete;
 	bool m_turn_op_complete;
 	double m_translate_zero;
+	double m_turn_zero;
 
 	bool m_in_high_gear;
 

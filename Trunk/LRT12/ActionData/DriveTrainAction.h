@@ -20,8 +20,13 @@ struct DriveTrainAction
 
 		double desiredRelativeDrivePosition;
 		double desiredRelativeTurnPosition;
+
+		double desiredAbsoluteDrivePosition;
+		double desiredAbsoluteTurnPosition;
 		
 		bool reset_translate_zero;
+		bool reset_turn_zero;
+		bool absolute;
 	} position;
 
 	struct

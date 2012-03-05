@@ -1,12 +1,13 @@
 #include "CLDriveTrain.h"
 #include "../../Util/AsyncPrinter.h"
+#include "../../ActionData/ActionData.h"
+#include "../../ActionData/IMUData.h"
 #include <math.h>
 
 #define INCREASE_MIN_POWER 0
 
 ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
-	Loggable(),
-	m_encoders(DriveEncoders::GetInstance())
+	Loggable(), Configurable(), m_encoders(DriveEncoders::GetInstance())
 {
 	m_config = Config::GetInstance();
 	m_brake_left = false;
@@ -24,11 +25,14 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 	setTurnControl(m_turn_control_type);
 	printf("Constructed CLRateTrain\n");
 
+	m_translate_zero = 0.0;
+
 	//	disableLog();
 }
 
 void ClosedLoopDrivetrain::Configure()
 {
+	AsyncPrinter::Printf("Configuring CLDrive\n");
 	const static string configSection = "CLDriveTrain";
 
 	double drive_rate_p_high = m_config->Get<double> (configSection,
@@ -141,6 +145,10 @@ ClosedLoopDrivetrain::DriveCommand ClosedLoopDrivetrain::getOutput()
 
 void ClosedLoopDrivetrain::update()
 {
+	static int e = 0;
+	++e;
+//	if (m_translate_ctrl_type == CL_RATE)
+//		AsyncPrinter::Printf("Something is wrong\n");
 	switch (m_translate_ctrl_type)
 	{
 	case CL_POSITION:
@@ -148,14 +156,30 @@ void ClosedLoopDrivetrain::update()
 		m_pos_control[TRANSLATE]->setInput(m_encoders.getRobotDist());
 		m_pos_control[TRANSLATE]->update(1.0 / RobotConfig::LOOP_RATE);
 		m_rate_control[TRANSLATE]->setSetpoint(
-				m_pos_control[TRANSLATE]->getOutput());
+				Util::Clamp<double>(m_pos_control[TRANSLATE]->getOutput(),
+						-0.35, 0.35));
+		
+//		double out = m_pos_control[TRANSLATE]->getOutput();
+//		if (e % 3 == 0)
+//		{
+//			AsyncPrinter::Printf("pos Setpoint %.2f, input %.2f, output %.2f\n",
+//					m_pos_control[TRANSLATE]->getSetpoint(),
+//					m_encoders.getRobotDist(), out);
+//		}
 
 		if (m_pos_control[TRANSLATE]->getError() < 0.5
 				&& m_pos_control[TRANSLATE]->getAccumulatedError() < 5.02 - 2)
 		{
 			m_fwd_op_complete = true;
 		}
+//		m_rate_control[TRANSLATE]->disablePID();
 	case CL_RATE: //Fall through switch
+//		if (e % 3 == 0)
+//		{
+//			AsyncPrinter::Printf("vel Setpoint %.2f, input %.2f\n",
+//					m_rate_control[TRANSLATE]->getSetpoint(),
+//					m_encoders.getNormalizedForwardMotorSpeed());
+//		}
 		m_rate_control[TRANSLATE]->setInput(
 				Util::Clamp<double>(
 						m_encoders.getNormalizedForwardMotorSpeed(), -1.0, 1.0));
@@ -177,14 +201,23 @@ void ClosedLoopDrivetrain::update()
 	switch (m_turn_control_type)
 	{
 	case CL_POSITION:
-		m_pos_control[TURN]->setInput(fmod(m_encoders.getTurnAngle(), 360.0));
+		m_pos_control[TURN]->setInput(ActionData::GetInstance()->imu->yaw);
 		m_pos_control[TURN]->update(1.0 / RobotConfig::LOOP_RATE);
-		m_rate_control[TURN]->setSetpoint(m_pos_control[TURN]->getOutput());
+		m_rate_control[TURN]->setSetpoint(Util::Clamp<double>(m_pos_control[TURN]->getOutput(), -0.35, 0.35));
 		if (m_pos_control[TURN]->getError() < 0.5
 				&& m_pos_control[TURN]->getAccumulatedError() < 5.02 - 2)
 		{
 			m_turn_op_complete = true;
 		}
+		if (e % 6 == 0)
+		{
+			AsyncPrinter::Printf("Pos setpoint %.2f in %.2f\n", m_pos_control[TURN]->getSetpoint(),
+					m_pos_control[TURN]->getInput()/*, m_pos_control[TURN]->getOutput()*/);
+//			AsyncPrinter::Printf("pos Setpoint %.2f, encin %.2f, imuin %.2f, output %.2f\n",
+//					m_pos_control[TURN]->getSetpoint(),
+//					m_encoders.getTurnAngle(), m_pos_control[TURN]->getOutput(), m_pos_control[TURN]->getOutput());
+		}
+//		m_rate_control[TURN]->disablePID();
 	case CL_RATE:
 		m_rate_control[TURN]->setInput(
 				Util::Clamp<double>(
@@ -264,9 +297,9 @@ void ClosedLoopDrivetrain::setRelativeTranslatePosition(double pos)
 {
 	setTranslateControl(CL_POSITION);
 	m_pos_control[TRANSLATE]->setSetpoint(pos + m_encoders.getRobotDist());
-	AsyncPrinter::Printf("pos %.2f,pre %.2f set %.2f\n", pos,
-			(pos + m_encoders.getRobotDist()),
-			(m_pos_control[TRANSLATE]->getSetpoint()));
+	//	AsyncPrinter::Printf("(rel) pos %.2f,pre %.2f set %.2f\n", pos,
+	//			(pos + m_encoders.getRobotDist()),
+	//			(m_pos_control[TRANSLATE]->getSetpoint()));
 	m_fwd_op_complete = false;
 }
 
@@ -274,15 +307,20 @@ void ClosedLoopDrivetrain::setAbsoluteTranslatePosition(double pos)
 {
 	setTranslateControl(CL_POSITION);
 	m_pos_control[TRANSLATE]->setSetpoint(m_translate_zero + pos);
-	AsyncPrinter::Printf("pos %.2f,pre %.2f set %.2f\n", pos,
-			(pos + m_encoders.getRobotDist()),
-			(m_pos_control[TRANSLATE]->getSetpoint()));
+	//	AsyncPrinter::Printf("(abs) pos %.2f,pre %.2f set %.2f\n", pos,
+	//			(pos + m_encoders.getRobotDist()),
+	//			(m_pos_control[TRANSLATE]->getSetpoint()));
 	m_fwd_op_complete = false;
 }
 
 void ClosedLoopDrivetrain::SetCurrentTranslatePositionAsZero()
 {
 	m_translate_zero = m_encoders.getRobotDist();
+}
+
+void ClosedLoopDrivetrain::SetCurrentTurnPositionAsZero()
+{
+	m_translate_zero = ActionData::GetInstance()->imu->yaw;
 }
 
 void ClosedLoopDrivetrain::setTranslateRate(double rate)
@@ -307,6 +345,14 @@ void ClosedLoopDrivetrain::setRelativeTurnPosition(double pos)
 {
 	setTurnControl(CL_POSITION);
 	m_pos_control[TURN]->setSetpoint(pos + m_encoders.getTurnAngle());
+	m_turn_op_complete = false;
+}
+
+void ClosedLoopDrivetrain::setAbsoluteTurnPosition(double pos)
+{
+	setTurnControl(CL_POSITION);
+	AsyncPrinter::Printf("Set %.2f\n", pos + m_turn_zero);
+	m_pos_control[TURN]->setSetpoint(pos + m_turn_zero);
 	m_turn_op_complete = false;
 }
 

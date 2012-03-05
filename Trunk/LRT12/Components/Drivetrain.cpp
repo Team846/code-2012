@@ -5,7 +5,7 @@
 #include "../ActionData/IMUData.h"
 
 Drivetrain::Drivetrain() :
-	Component(), m_name("Drivetrain"), m_encoders(DriveEncoders::GetInstance())
+	Component(), Configurable(), m_name("Drivetrain"), m_encoders(DriveEncoders::GetInstance())
 {
 	m_esc_left
 			= new ESC(RobotConfig::CAN::DRIVE_LEFT_A,
@@ -56,7 +56,7 @@ void Drivetrain::Output()
 	m_drive_control.setHighGear(isHighGear);
 
 	// only try new operation if previous one is complete, else discard
-	if (m_drive_control.driveOperationComplete()
+	if (true || m_drive_control.driveOperationComplete()
 			|| m_action->drivetrain->overrideOperationChecks)
 	{
 		if (m_action->drivetrain->position.drive_control)
@@ -66,18 +66,21 @@ void Drivetrain::Output()
 				m_action->drivetrain->position.reset_translate_zero = false;
 				m_drive_control.SetCurrentTranslatePositionAsZero();
 			}
-			m_drive_control.setTranslateControl(
-					ClosedLoopDrivetrain::CL_POSITION);
-			m_drive_control.setRelativeTranslatePosition(
-					m_action->drivetrain->position.desiredRelativeDrivePosition);
-			if (m_action->drivetrain->position.desiredRelativeDrivePosition
-					> 0.01)
-				AsyncPrinter::Printf(
-						"setpoint %.2f\n",
+			if (m_action->drivetrain->position.absolute)
+			{
+				m_drive_control.setAbsoluteTranslatePosition(m_action->drivetrain->position.desiredAbsoluteDrivePosition);
+			}
+			else
+			{
+				m_drive_control.setTranslateControl(
+						ClosedLoopDrivetrain::CL_POSITION);
+				m_drive_control.setRelativeTranslatePosition(
 						m_action->drivetrain->position.desiredRelativeDrivePosition);
+
 			// command has been set, so now zero the relative pos
 			// this serves as a crude one-command queue
-			m_action->drivetrain->position.desiredRelativeDrivePosition = 0;
+				m_action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
+			}
 		}
 		else if (m_action->drivetrain->rate.drive_control)
 		{
@@ -97,16 +100,29 @@ void Drivetrain::Output()
 	else
 	{
 		m_action->drivetrain->setDriveOperation = false;
-		AsyncPrinter::Printf(
+		static int e = 0; 
+		if (++e % 10 == 0)
+		{
+			AsyncPrinter::Printf(
 				"Previous drive operation not complete, discarding\n");
+		}
 	}
 	m_action->drivetrain->previousDriveOperationComplete
 			= m_drive_control.driveOperationComplete();
 
-	if (m_drive_control.turnOperationComplete()
+	if (true || m_drive_control.turnOperationComplete()
 			|| m_action->drivetrain->overrideOperationChecks)
 	{
-		if (m_action->drivetrain->rate.turn_control)
+		if (m_action->drivetrain->position.reset_turn_zero)
+		{
+			m_action->drivetrain->position.reset_turn_zero = false;
+			m_drive_control.SetCurrentTurnPositionAsZero();
+		}
+		if (m_action->drivetrain->position.absolute)
+		{
+			m_drive_control.setAbsoluteTurnPosition(m_action->drivetrain->position.desiredAbsoluteTurnPosition);
+		}
+		else if (m_action->drivetrain->rate.turn_control)
 		{
 			m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_RATE);
 			m_drive_control.setTurnRate(

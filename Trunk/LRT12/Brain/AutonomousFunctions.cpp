@@ -116,10 +116,10 @@ void AutonomousFunctions::task()
 		{
 		case ACTION::AUTONOMOUS::TELEOP:
 			// both on rate control
-			m_action->drivetrain->rate.drive_control = true;
-			m_action->drivetrain->rate.turn_control = true;
-			m_action->drivetrain->position.drive_control = false;
-			m_action->drivetrain->position.turn_control = false;
+//			m_action->drivetrain->rate.drive_control = true;
+//			m_action->drivetrain->rate.turn_control = true;
+//			m_action->drivetrain->position.drive_control = false;
+//			m_action->drivetrain->position.turn_control = false;
 			break;
 		case ACTION::AUTONOMOUS::BRIDGEBALANCE:
 			bridgeBalance();

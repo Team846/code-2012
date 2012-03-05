@@ -13,7 +13,7 @@
  * @brief Component that handles the drivetrain
  * @author Robert Ying
  */
-class Drivetrain: public Component, Configurable, public Loggable
+class Drivetrain: public Component, public Configurable, public Loggable
 {
 public:
 	/*!
