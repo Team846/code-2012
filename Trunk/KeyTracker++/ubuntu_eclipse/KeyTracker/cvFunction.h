@@ -5,6 +5,18 @@
 
 #define USE_DIFFERENCE_METHOD 1
 
+/*!
+ * @author Tony Peng, Raphael Chang, Robert Ying
+ *
+ * @brief Process an image and returns the amount of red and blue pixels in the image.
+ *
+ * @param cap_img The input image to process.
+ * @param redThreshold The threshold value for the red component.
+ * @param blueThreshold The threshold value for the blue component.
+ * @param redcount The amount of red pixels in the image (OUT)
+ * @param bluecount The amount of blue pixels in the image (OUT)
+ */
+
 void processImage(cv::Mat& cap_img, int redThreshold, int blueThreshold, int *redcount, int *bluecount) {
     cv::Mat img = cv::Mat(cap_img.cols / 2, cap_img.rows / 2, cap_img.type());
     
