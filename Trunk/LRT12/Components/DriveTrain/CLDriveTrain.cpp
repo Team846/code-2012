@@ -172,7 +172,6 @@ void ClosedLoopDrivetrain::update()
 		{
 			m_fwd_op_complete = true;
 		}
-//		m_rate_control[TRANSLATE]->disablePID();
 	case CL_RATE: //Fall through switch
 //		if (e % 3 == 0)
 //		{
@@ -201,9 +200,55 @@ void ClosedLoopDrivetrain::update()
 	switch (m_turn_control_type)
 	{
 	case CL_POSITION:
-		m_pos_control[TURN]->setInput(ActionData::GetInstance()->imu->yaw);
+		m_pos_control[TURN]->setInput(ActionData::GetInstance()->imu->yaw); //from -180 to + 180
+		
+		//below code ensures fastest path is chosen. 
+		static int lastState = 0, count = 0;
+		//todo Change lastState to enum
+		const static int hysteresisCount = 3;
+		if (m_pos_control[TURN]->getSetpoint() - m_pos_control[TURN]->getInput() > 180.0) //we don't want to take the long way around
+		{
+			if (lastState != 1)
+				count = 0;
+			else if (count < hysteresisCount)
+				count++;
+			else
+				lastState = 1;
+		}
+		if (m_pos_control[TURN]->getSetpoint() - m_pos_control[TURN]->getInput() < -180.0) //we don't want to take the long way around
+		{
+			if (lastState != 2)
+				count = 0;
+			else if (count < hysteresisCount)
+				count++;
+			else
+				lastState = 2;
+		}
+		else
+		{
+			if (lastState != 3)
+				count = 0;
+			else if (count < hysteresisCount)
+				count++;
+			else
+				lastState = 3;
+		}
+		
+		switch (lastState)
+		{
+		case 1:
+			m_pos_control[TURN]->setInput(m_pos_control[TURN]->getInput() + 360.0);
+			break;
+		case 2:
+			m_pos_control[TURN]->setInput(m_pos_control[TURN]->getInput() - 360.0);
+			break;
+		case 3:
+			//don't do anything
+			break;
+		}
+		
 		m_pos_control[TURN]->update(1.0 / RobotConfig::LOOP_RATE);
-		m_rate_control[TURN]->setSetpoint(Util::Clamp<double>(m_pos_control[TURN]->getOutput(), -0.35, 0.35));
+		m_rate_control[TURN]->setSetpoint(-Util::Clamp<double>(m_pos_control[TURN]->getOutput(), -0.35, 0.35));
 		if (m_pos_control[TURN]->getError() < 0.5
 				&& m_pos_control[TURN]->getAccumulatedError() < 5.02 - 2)
 		{
@@ -211,8 +256,8 @@ void ClosedLoopDrivetrain::update()
 		}
 		if (e % 6 == 0)
 		{
-			AsyncPrinter::Printf("Pos setpoint %.2f in %.2f\n", m_pos_control[TURN]->getSetpoint(),
-					m_pos_control[TURN]->getInput()/*, m_pos_control[TURN]->getOutput()*/);
+			AsyncPrinter::Printf("(Pos) set %.2f, in %.2f, out %.2f\n", m_pos_control[TURN]->getSetpoint(),
+					m_pos_control[TURN]->getInput(), m_pos_control[TURN]->getOutput());
 //			AsyncPrinter::Printf("pos Setpoint %.2f, encin %.2f, imuin %.2f, output %.2f\n",
 //					m_pos_control[TURN]->getSetpoint(),
 //					m_encoders.getTurnAngle(), m_pos_control[TURN]->getOutput(), m_pos_control[TURN]->getOutput());
@@ -320,7 +365,7 @@ void ClosedLoopDrivetrain::SetCurrentTranslatePositionAsZero()
 
 void ClosedLoopDrivetrain::SetCurrentTurnPositionAsZero()
 {
-	m_translate_zero = ActionData::GetInstance()->imu->yaw;
+	m_turn_zero = ActionData::GetInstance()->imu->yaw;
 }
 
 void ClosedLoopDrivetrain::setTranslateRate(double rate)
@@ -344,15 +389,20 @@ void ClosedLoopDrivetrain::setTranslateDriveDutyCycle(double duty)
 void ClosedLoopDrivetrain::setRelativeTurnPosition(double pos)
 {
 	setTurnControl(CL_POSITION);
-	m_pos_control[TURN]->setSetpoint(pos + m_encoders.getTurnAngle());
+	double setpoint = fmod(pos + m_encoders.getTurnAngle(), 360);
+	if (setpoint > 180.0) //want setpoint to be from -180 to +180 
+		setpoint -= 360.0;
+	m_pos_control[TURN]->setSetpoint(setpoint);
 	m_turn_op_complete = false;
 }
 
 void ClosedLoopDrivetrain::setAbsoluteTurnPosition(double pos)
 {
 	setTurnControl(CL_POSITION);
-	AsyncPrinter::Printf("Set %.2f\n", pos + m_turn_zero);
-	m_pos_control[TURN]->setSetpoint(pos + m_turn_zero);
+	double setpoint = fmod(pos + m_turn_zero, 360.0); //0-360
+	if (setpoint > 180.0) //want setpoint to be from -180 to +180 
+		setpoint -= 360.0;
+	m_pos_control[TURN]->setSetpoint(setpoint);
 	m_turn_op_complete = false;
 }
 
