@@ -106,17 +106,17 @@ public:
 	 * Starts the task
 	 */
 	void releaseSemaphore();
-	
+
 	/*!
 	 * 
 	 */
 	void startTask();
-	
+
 	/*!
 	 * 
 	 */
 	void stopTask();
-	
+
 private:
 	/*!
 	 * Helper method to get kNumPackets of data and fill m_i2c_buf
@@ -137,8 +137,8 @@ private:
 
 	const static uint8_t kAddress = (0x29); // 7-bit default address
 	const static uint8_t kNumPackets = 4; // number of 7-byte packets to concatenate
-	const static double kAccelConversion = 0.001/*9.81 / 8192*/; // 4G, 4096 = 1G
-	const static double kGyroConversion = 0.001/*0.94*/; // 3.33mV/deg
+	const static double kAccelConversion = 0.001;
+	const static double kGyroConversion = 0.001;
 
 	/*!
 	 * indices in the data packet of various variables

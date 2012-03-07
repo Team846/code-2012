@@ -115,19 +115,11 @@ void AutonomousFunctions::task()
 		switch (m_action->auton->state)
 		{
 		case ACTION::AUTONOMOUS::TELEOP:
-			// both on rate control
-//			m_action->drivetrain->rate.drive_control = true;
-//			m_action->drivetrain->rate.turn_control = true;
-//			m_action->drivetrain->position.drive_control = false;
-//			m_action->drivetrain->position.turn_control = false;
 			break;
 		case ACTION::AUTONOMOUS::BRIDGEBALANCE:
 			bridgeBalance();
 			break;
 		case ACTION::AUTONOMOUS::KEYTRACK:
-			static int e = 0;
-//			if (++e %10 == 0)
-//				AsyncPrinter::Printf("Key\n");
 			keyTrack();
 			break;
 		case ACTION::AUTONOMOUS::AUTOALIGN:
@@ -187,9 +179,9 @@ void AutonomousFunctions::bridgeBalance()
 	m_action->drivetrain->rate.desiredDriveRate = Util::Clamp<double>(
 			-m_bridgebalance_pid->getOutput(), -0.1, 0.1);
 
-//	if (++e % 25 == 0)
-//		AsyncPrinter::Printf("Bridge Out %.4f\n",
-//				m_bridgebalance_pid->getOutput());
+	//	if (++e % 25 == 0)
+	//		AsyncPrinter::Printf("Bridge Out %.4f\n",
+	//				m_bridgebalance_pid->getOutput());
 	//	m_action->drivetrain->rate.desiredDriveRate
 	//			= m_bridgebalance_pid->getOutput();
 	m_action->drivetrain->rate.desiredTurnRate = 0.0;
@@ -219,16 +211,13 @@ void AutonomousFunctions::keyTrack()
 	bool state = m_action->cam->key.higher >= m_keytrack_threshold;
 	m_hit_key_flag |= state;
 
-//	AsyncPrinter::Printf("%d %d %d %f\n", m_hit_key_flag, state,
-//			m_action->cam->key.higher, m_keytrack_threshold);
+	//	AsyncPrinter::Printf("%d %d %d %f\n", m_hit_key_flag, state,
+	//			m_action->cam->key.higher, m_keytrack_threshold);
 	if (m_hit_key_flag)
 	{
 		if (!state)
 		{
-			AsyncPrinter::Printf("Key Align done\n");
-#warning This should change state to ACTION::AUTONOMOUS::AUTOALIGN
 			m_hit_key_flag = false;
-//			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
 			m_action->auton->state = ACTION::AUTONOMOUS::AUTOALIGN;
 			m_action->auton->completion_status = ACTION::SUCCESS;
 			m_action->drivetrain->rate.desiredDriveRate = 0.0;
@@ -249,12 +238,12 @@ void AutonomousFunctions::autoAlign()
 		m_action->drivetrain->rate.turn_control = true;
 		m_action->drivetrain->position.drive_control = false;
 		m_action->drivetrain->position.turn_control = false;
-	
+
 		// switch directions depending on error
 		m_action->drivetrain->rate.desiredTurnRate = Util::Sign<double>(error)
 				* m_align_turn_rate;
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
-	
+
 		static int debouncer = 0;
 		if (fabs(error) < m_align_threshold /*&& ++debouncer > 1*/)
 		{
@@ -264,7 +253,7 @@ void AutonomousFunctions::autoAlign()
 			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 			m_action->drivetrain->rate.desiredTurnRate = 0.0;
 		}
-		else 
+		else
 		{
 			debouncer = 0;
 		}

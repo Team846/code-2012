@@ -10,8 +10,6 @@
 class LRTEncoder: public Encoder, public Loggable
 {
 private:
-	//  static int count = 0;
-	//    Encoder useless;
 	double trim;
 	std::string m_name;
 

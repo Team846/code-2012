@@ -116,10 +116,6 @@ void Launcher::Output()
 		Pneumatics::getInstance()->setTrajectory(false);
 	}
 
-	static int e = 0;
-	if (++e % 10 == 0)
-		AsyncPrinter::Printf("Speed %.3f Output %.3f\n", m_speed, m_output);
-
 	double max_output = m_speed / m_max_speed + m_duty_cycle_delta;
 	m_output = min(max_output, m_output);
 	m_output = Util::Clamp<double>(m_output, 0, 1.0);

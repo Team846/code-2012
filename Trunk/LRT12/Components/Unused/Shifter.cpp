@@ -1,11 +1,11 @@
 #include "Shifter.h"
-#include "../Util/AsyncPrinter.h"
+#include "../../Util/AsyncPrinter.h"
 #include "LRTServo.h"
-#include "..\Sensors\DriveEncoders.h"
-#include "..\Config\RobotConfig.h"
-#include "..\Config\Config.h"
-#include "../ActionData/DriveTrainAction.h"
-#include "../ActionData/ShifterAction.h"
+#include "../..\Sensors\DriveEncoders.h"
+#include "../..\Config\RobotConfig.h"
+#include "../..\Config\Config.h"
+#include "../../ActionData/DriveTrainAction.h"
+#include "../../ActionData/ShifterAction.h"
 
 Shifter::Shifter() :
 	Component(), encoders(DriveEncoders::GetInstance()),

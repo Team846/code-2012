@@ -18,7 +18,6 @@ LRTRobot12::LRTRobot12() :
 	components = Component::CreateComponents();
 	m_action = ActionData::GetInstance();
 
-
 	m_compressor = new Compressor(
 			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
 			RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
@@ -39,7 +38,7 @@ LRTRobot12::~LRTRobot12()
 
 	m_compressor->Stop();
 	delete m_compressor;
-	
+
 	delete m_trackers;
 
 	printf("\n\nBegin Deleting LRTRobot12\n");
@@ -83,7 +82,6 @@ void LRTRobot12::MainLoop()
 	m_action->motorsEnabled = ds->GetDigitalIn(
 			RobotConfig::DRIVER_STATION::MOTORS);
 
-
 	//iterate though and output components
 	for (list<Component::ComponentWithData>::iterator iter =
 			components->begin(); iter != components->end(); iter++)
@@ -117,14 +115,6 @@ void LRTRobot12::MainLoop()
 
 	prevState = gameState;
 
-	// limit rate of logging 
-	//	static uint8_t counter = 0;
-	//	if (++counter >= 10)
-	//	{
-	//		counter = 0;
-	//		Log::logAll();
-	//	}
-	//*/
 	// if we finish in time, cancel the watchdog's error message
 	wdCancel(mainLoopWatchDog);
 }

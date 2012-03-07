@@ -15,7 +15,7 @@ LRTRobotBase::LRTRobotBase()
 	loopSynchronizer = new Notifier(&releaseLoop, this);
 	quitting_ = false;
 	cycleCount = 0;
-	
+
 	printf("Creating LRTRobotbase\n");
 	loopSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 
@@ -60,9 +60,6 @@ void LRTRobotBase::StartCompetition()
 	// first and one-time initialization
 	RobotInit();
 
-	// must allow a negative value in case loop runs over 20ms
-	//	INT32 sleepTime_us = 0;
-
 	AsyncPrinter::Printf("starting synchronizer\r\n");
 	loopSynchronizer->StartPeriodic(1.0 / RobotConfig::LOOP_RATE); //arg is period in seconds
 
@@ -70,7 +67,7 @@ void LRTRobotBase::StartCompetition()
 	Pneumatics::getInstance()->startBackgroundTask();
 	Log::getInstance()->startTask();
 	AutonomousFunctions::getInstance()->startBackgroundTask();
-	
+
 	m_imu->startTask();
 
 	AsyncPrinter::Printf("Starting Profiler\r\n");
@@ -107,7 +104,6 @@ void LRTRobotBase::StartCompetition()
 		}
 
 		Pneumatics::getInstance()->releaseSemaphore();
-		
 
 		if (cycleCount % 100 == 0)
 		{

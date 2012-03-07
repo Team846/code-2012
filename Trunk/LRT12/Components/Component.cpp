@@ -3,7 +3,6 @@
 #include "ConfigLoader.h"
 #include "Drivetrain.h"
 #include "Launcher.h"
-#include "Shifter.h"
 #include "BallCollector.h"
 #include "BallFeeder.h"
 #include "Wedge.h"

@@ -46,19 +46,19 @@ void BallFeeder::Output()
 	switch (m_action->ballfeed->feeder_state)
 	{
 	case ACTION::BALLFEED::FEEDING:
-//			AsyncPrinter::Printf("Feeding\n");
+		//			AsyncPrinter::Printf("Feeding\n");
 		front = (m_fwd_duty[FRONT]);
 		back = (m_fwd_duty[BACK]);
 		intake = (m_fwd_duty[INTAKE]);
 		break;
 	case ACTION::BALLFEED::HOLDING:
-//			AsyncPrinter::Printf("Holding\n");
+		//			AsyncPrinter::Printf("Holding\n");
 		front = (m_holding_duty[FRONT]);
 		back = (m_holding_duty[BACK]);
 		intake = (0.0);
 		break;
 	case ACTION::BALLFEED::PURGING:
-//			AsyncPrinter::Printf("Purging\n");
+		//			AsyncPrinter::Printf("Purging\n");
 		front = (m_rev_duty[FRONT]);
 		back = (m_rev_duty[BACK]);
 		intake = (m_rev_duty[INTAKE]);
@@ -76,8 +76,6 @@ void BallFeeder::Output()
 		else
 		{
 			Pneumatics::getInstance()->setPressurePlate(false);
-			//			front=(m_holding_duty[FRONT]);
-			//			back=(m_holding_duty[BACK]);
 			front = (0.0);
 			back = (0.0);
 
@@ -86,25 +84,7 @@ void BallFeeder::Output()
 	else
 	{
 		Pneumatics::getInstance()->setPressurePlate(false);
-		//		SharedSolenoid::GetInstance()->DisablePressurePlate();
 	}
-	//	if (loading)
-	//	{
-	//		static int e = 0;
-	//		if (++e > 70)
-	//			loading = false;
-	////		if (!m_action->launcher->atSpeed)
-	////			loading = false;
-	//	}
-	//	else
-	//	{
-	//	}
-	//	
-	//	if (m_action->ballfeed->attemptToLoadRound)
-	//	{
-	//		loading = true;
-	//		m_action->ballfeed->attemptToLoadRound = false;
-	//	}
 	if (!m_action->motorsEnabled)
 	{
 		front = (0.0);
@@ -114,7 +94,7 @@ void BallFeeder::Output()
 	m_roller[FRONT]->SetDutyCycle(front);
 	m_roller[BACK]->SetDutyCycle(back);
 	m_roller[INTAKE]->SetDutyCycle(intake);
-	
+
 }
 
 void BallFeeder::Configure()

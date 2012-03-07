@@ -1,9 +1,9 @@
 #ifndef SHIFTER_H_
 #define SHIFTER_H_
 
-#include "Component.h"
-#include "..\Config\Configurable.h"
-#include "../Log/Loggable.h"
+#include "../Component.h"
+#include "../..\Config\Configurable.h"
+#include "../../Log/Loggable.h"
 
 class Config;
 class DriveEncoders;

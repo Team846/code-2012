@@ -5,7 +5,8 @@
 #include "../ActionData/IMUData.h"
 
 Drivetrain::Drivetrain() :
-	Component(), Configurable(), m_name("Drivetrain"), m_encoders(DriveEncoders::GetInstance())
+	Component(), Configurable(), m_name("Drivetrain"),
+			m_encoders(DriveEncoders::GetInstance())
 {
 	m_esc_left
 			= new ESC(RobotConfig::CAN::DRIVE_LEFT_A,
@@ -52,105 +53,85 @@ void Drivetrain::Output()
 	}
 	wasHighGear = isHighGear;
 
-	//	m_encoders.setHighGear(isHighGear); // set by shifter
 	m_drive_control.setHighGear(isHighGear);
 
-	// only try new operation if previous one is complete, else discard
-	if (true || m_drive_control.driveOperationComplete()
-			|| m_action->drivetrain->overrideOperationChecks)
+	// set position zeros if necessary
+	if (m_action->drivetrain->position.reset_translate_zero)
 	{
-		if (m_action->drivetrain->position.drive_control)
-		{
-			if (m_action->drivetrain->position.reset_translate_zero)
-			{
-				m_action->drivetrain->position.reset_translate_zero = false;
-				m_drive_control.SetCurrentTranslatePositionAsZero();
-			}
-			if (m_action->drivetrain->position.absolute)
-			{
-				m_drive_control.setAbsoluteTranslatePosition(m_action->drivetrain->position.desiredAbsoluteDrivePosition);
-			}
-			else
-			{
-				m_drive_control.setTranslateControl(
-						ClosedLoopDrivetrain::CL_POSITION);
-				m_drive_control.setRelativeTranslatePosition(
-						m_action->drivetrain->position.desiredRelativeDrivePosition);
+		m_action->drivetrain->position.reset_translate_zero = false;
+		m_drive_control.SetCurrentTranslatePositionAsZero();
+	}
 
-			// command has been set, so now zero the relative pos
-			// this serves as a crude one-command queue
-				m_action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
-			}
-		}
-		else if (m_action->drivetrain->rate.drive_control)
+	if (m_action->drivetrain->position.reset_turn_zero)
+	{
+		m_action->drivetrain->position.reset_turn_zero = false;
+		m_drive_control.SetCurrentTurnPositionAsZero();
+	}
+
+	// check actual drive commands
+	if (m_action->drivetrain->position.drive_control)
+	{
+		if (m_action->drivetrain->position.absolute)
 		{
-			m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_RATE);
-			m_drive_control.setTranslateRate(
-					m_action->drivetrain->rate.desiredDriveRate);
+			m_drive_control.setAbsoluteTranslatePosition(
+					m_action->drivetrain->position.desiredAbsoluteDrivePosition);
 		}
 		else
 		{
-			m_drive_control.setTranslateControl(
-					ClosedLoopDrivetrain::CL_DISABLED);
-			m_drive_control.setTranslateDriveDutyCycle(
-					m_action->drivetrain->rate.desiredDriveRate);
+			m_drive_control.setRelativeTranslatePosition(
+					m_action->drivetrain->position.desiredRelativeDrivePosition);
+
+			// command has been set, so now zero the relative pos
+			// this serves as a crude one-command queue
+			m_action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
 		}
-		m_action->drivetrain->setDriveOperation = true;
+		m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_POSITION);
+	}
+	else if (m_action->drivetrain->rate.drive_control)
+	{
+		m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_RATE);
+		m_drive_control.setTranslateRate(
+				m_action->drivetrain->rate.desiredDriveRate);
 	}
 	else
 	{
-		m_action->drivetrain->setDriveOperation = false;
-		static int e = 0; 
-		if (++e % 10 == 0)
-		{
-			AsyncPrinter::Printf(
-				"Previous drive operation not complete, discarding\n");
-		}
+		m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_DISABLED);
+		m_drive_control.setTranslateDriveDutyCycle(
+				m_action->drivetrain->rate.desiredDriveRate);
 	}
+	m_action->drivetrain->setDriveOperation = true;
 	m_action->drivetrain->previousDriveOperationComplete
 			= m_drive_control.driveOperationComplete();
 
-	if (true || m_drive_control.turnOperationComplete()
-			|| m_action->drivetrain->overrideOperationChecks)
+	if (m_action->drivetrain->rate.turn_control)
 	{
-		if (m_action->drivetrain->position.reset_turn_zero)
-		{
-			m_action->drivetrain->position.reset_turn_zero = false;
-			m_drive_control.SetCurrentTurnPositionAsZero();
-		}
+		m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_RATE);
+		m_drive_control.setTurnRate(m_action->drivetrain->rate.desiredTurnRate);
+	}
+	else if (m_action->drivetrain->position.turn_control)
+	{
 		if (m_action->drivetrain->position.absolute)
 		{
-			m_drive_control.setAbsoluteTurnPosition(m_action->drivetrain->position.desiredAbsoluteTurnPosition);
+			m_drive_control.setAbsoluteTurnPosition(
+					m_action->drivetrain->position.desiredAbsoluteTurnPosition);
 		}
-		else if (m_action->drivetrain->rate.turn_control)
+		else
 		{
-			m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_RATE);
-			m_drive_control.setTurnRate(
-					m_action->drivetrain->rate.desiredTurnRate);
-		}
-		else if (m_action->drivetrain->position.turn_control)
-		{
-			m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_POSITION);
 			m_drive_control.setRelativeTurnPosition(
 					m_action->drivetrain->position.desiredRelativeTurnPosition);
 			// command has been set, so now zero the relative pos
 			// this serves as a crude one-command queue
 			m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
 		}
-		else
-		{
-			m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_DISABLED);
-			m_drive_control.setRawTurnDutyCycle(
-					m_action->drivetrain->rate.desiredTurnRate);
-		}
-		m_action->drivetrain->setTurnOperation = true;
+		m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_POSITION);
 	}
 	else
 	{
-		m_action->drivetrain->setTurnOperation = false;
-		AsyncPrinter::Printf(
-				"Previous turn operation not complete, discarding\n");
+		m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_DISABLED);
+		m_drive_control.setRawTurnDutyCycle(
+				m_action->drivetrain->rate.desiredTurnRate);
 	}
+	m_action->drivetrain->setTurnOperation = true;
 	m_action->drivetrain->previousTurnOperationComplete
 			= m_drive_control.turnOperationComplete();
 
@@ -179,7 +160,6 @@ void Drivetrain::Output()
 	}
 
 	// decrease one cycle until zero
-	// DIS DOESN"T WORK -RY, BA
 	if (m_action->drivetrain->synchronizedCyclesRemaining > 0)
 	{
 		m_action->drivetrain->synchronizedCyclesRemaining--;

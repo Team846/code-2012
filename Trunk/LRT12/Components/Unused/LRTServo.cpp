@@ -1,6 +1,6 @@
 #include "LRTServo.h"
-#include "../Util/AsyncPrinter.h"
-#include "../Util/Util.h"
+#include "../../Util/AsyncPrinter.h"
+#include "../../Util/Util.h"
 
 LRTServo::LRTServo(UINT32 channel, char* name) :
 	Servo(channel), name_(name)

@@ -32,11 +32,6 @@ public:
 	void startTeleop();
 
 	/*!
-	 * @brief starts the auton task
-	 */
-	void startAuton();
-
-	/*!
 	 * @brief gets the m_action_ptr semaphore
 	 */
 	void takeActionSem();
@@ -58,11 +53,6 @@ private:
 	void process();
 
 	/*!
-	 * @brief the autonomous task
-	 */
-	void autonTask();
-
-	/*!
 	 * @brief the teleop task
 	 */
 	void teleopTask();
@@ -72,17 +62,9 @@ private:
 	 * @param BrainPtr
 	 * @return 0
 	 */
-	static int autonTaskEntryPoint(uint32_t autonTaskPtr);
-
-	/*!
-	 * 
-	 * @param BrainPtr
-	 * @return 0
-	 */
-	static int teleopTaskEntryPoint(uint32_t autonTaskPtr);
+	static int taskEntryPoint(uint32_t autonTaskPtr);
 
 	Task* m_teleop_task;
-	Task* m_auton_task;
 	SEM_ID actionSemaphore;
 
 	ActionData *action;

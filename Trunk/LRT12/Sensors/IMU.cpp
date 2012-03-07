@@ -85,7 +85,7 @@ void IMU::update()
 		return;
 	}
 	uint8_t status = getUint8(STATUS);
-	if (/*status == 0x00 ||*/status == 0xff)
+	if (status == 0xff)
 	{
 		AsyncPrinter::Printf("Status: Bad IMU packet\r\n");
 		return;
@@ -104,9 +104,6 @@ void IMU::update()
 
 	m_time = GetFPGATime() - m_time;
 
-	//	static int e = 0;
-	//	if (++e % 10 == 0)
-	//		printAll();
 }
 
 void IMU::releaseSemaphore()
@@ -239,7 +236,7 @@ void IMU::printAll()
 	AsyncPrinter::Printf("IMU Data: \r\n");
 	AsyncPrinter::Printf("Roll: %.02f Pitch: %.02f Yaw: %.02f\r\n", getRoll(),
 			getPitch(), getYaw());
-	AsyncPrinter::Printf("Scaled Gyro: [%d, %d, %d]\r\n", getGyroX(),
+	AsyncPrinter::Printf("Scaled Gyro: [%.02f, %.02f, %.02f]\r\n", getGyroX(),
 			getGyroY(), getGyroZ());
 	AsyncPrinter::Printf("Scaled Accel: [%.02f, %.02f, %.02f]\r\n",
 			getAccelX(), getAccelY(), getAccelZ());

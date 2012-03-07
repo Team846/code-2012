@@ -59,10 +59,6 @@ void InputParser::ProcessInputs()
 		}
 		hasBeenReleased = false;
 	}
-	//	else if (m_driver_stick->IsButtonDown(BRIDGEBALANCE))
-	//	{
-	//		m_action_ptr->auton->state = ACTION::AUTONOMOUS::BRIDGEBALANCE;
-	//	}
 	else
 	{
 		hasBeenReleased = true;
@@ -73,25 +69,24 @@ void InputParser::ProcessInputs()
 	if (m_action_ptr->auton->state == ACTION::AUTONOMOUS::TELEOP)
 	{
 		m_action_ptr->drivetrain->position.absolute = true;
-		static bool temp = true;
-		if (m_driver_stick->IsButtonDown(10) || temp)
+		if (m_driver_stick->IsButtonDown(RESET_ZERO))
 		{
-			temp = false;
 			m_action_ptr->drivetrain->position.reset_translate_zero = true;
 			m_action_ptr->drivetrain->position.reset_turn_zero = true;
 		}
-		m_action_ptr->drivetrain->position.desiredAbsoluteDrivePosition
-				= -m_driver_stick->GetAxis(Joystick::kYAxis) * 12 * 3; //inches
-		m_action_ptr->drivetrain->position.desiredAbsoluteTurnPosition
-				= -m_driver_stick->GetAxis(Joystick::kZAxis) * 90.0; //inches
-		if (m_driver_stick->IsButtonDown(9))
+
+		if (m_driver_stick->IsButtonDown(POS_CONTROL))
 		{
-			m_action_ptr->drivetrain->rate.drive_control = true;
-			m_action_ptr->drivetrain->rate.turn_control = true;
+			m_action_ptr->drivetrain->position.desiredAbsoluteDrivePosition
+					= -m_driver_stick->GetAxis(Joystick::kYAxis) * 12 * 3; //inches
+			m_action_ptr->drivetrain->position.desiredAbsoluteTurnPosition
+					= -m_driver_stick->GetAxis(Joystick::kZAxis) * 90.0; //inches
+
+			m_action_ptr->drivetrain->rate.drive_control = false;
+			m_action_ptr->drivetrain->rate.turn_control = false;
 
 			m_action_ptr->drivetrain->position.drive_control = true;
-			m_action_ptr->drivetrain->position.turn_control = false;
-
+			m_action_ptr->drivetrain->position.turn_control = true;
 		}
 		else
 		{
@@ -103,8 +98,6 @@ void InputParser::ProcessInputs()
 			m_action_ptr->drivetrain->rate.drive_control = false; //If driver control use velocity control
 			m_action_ptr->drivetrain->rate.turn_control = false;
 #endif 
-			//		m_action_ptr->drivetrain->position.drive_control = false;
-			//		m_action_ptr->drivetrain->position.turn_control = false;
 			m_action_ptr->drivetrain->position.drive_control = false;
 			m_action_ptr->drivetrain->position.turn_control = false;
 
