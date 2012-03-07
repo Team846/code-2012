@@ -241,17 +241,17 @@ void AutonomousFunctions::autoAlign()
 
 		// switch directions depending on error
 		m_action->drivetrain->rate.desiredTurnRate = Util::Sign<double>(error)
-				* m_align_turn_rate;
+				* fabs(error * (1.0 / 127) * m_align_turn_rate);
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 
 		static int debouncer = 0;
 		if (fabs(error) < m_align_threshold /*&& ++debouncer > 1*/)
 		{
 			AsyncPrinter::Printf("Aiming done\n");
-			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+			//			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
 			m_action->auton->completion_status = ACTION::SUCCESS;
-			m_action->drivetrain->rate.desiredDriveRate = 0.0;
-			m_action->drivetrain->rate.desiredTurnRate = 0.0;
+			//			m_action->drivetrain->rate.desiredDriveRate = 0.0;
+			//			m_action->drivetrain->rate.desiredTurnRate = 0.0;
 		}
 		else
 		{

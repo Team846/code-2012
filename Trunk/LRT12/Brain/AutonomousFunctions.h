@@ -114,7 +114,7 @@ private:
 	double m_bridgebalance_setpoint, m_align_setpoint;
 	double m_bridgebalance_angular_rate_threshold;
 	double m_bridgebalance_threshold, m_keytrack_threshold, m_align_threshold;
-	
+
 	bool m_hit_key_flag;
 
 	DISALLOW_COPY_AND_ASSIGN( AutonomousFunctions);
