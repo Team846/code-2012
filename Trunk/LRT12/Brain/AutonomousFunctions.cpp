@@ -6,6 +6,9 @@
  */
 
 #include "AutonomousFunctions.h"
+#include "../ActionData/LauncherAction.h"
+#include "../ActionData/BallFeedAction.h"
+#include "../ActionData/BPDAction.h"
 #include "../Util/AsyncPrinter.h"
 #include "../Util/PID.h"
 
@@ -78,7 +81,7 @@ void AutonomousFunctions::task()
 			break;
 		}
 
-		if (m_action->auton->state != m_pstate)
+		if (m_action->auton->state != m_last_state)
 		{
 			if (m_action->auton->state != ACTION::AUTONOMOUS::TELEOP)
 			{
@@ -100,8 +103,11 @@ void AutonomousFunctions::task()
 			case ACTION::AUTONOMOUS::AUTOALIGN:
 				m_counter = m_timeout_autoalign;
 				break;
+			case ACTION::AUTONOMOUS::AUTON_MODE:
+				break;
 			}
 		}
+		m_last_state = m_action->auton->state;
 
 		// timeout
 #if TIMEOUT_ENABLED
@@ -115,21 +121,60 @@ void AutonomousFunctions::task()
 		switch (m_action->auton->state)
 		{
 		case ACTION::AUTONOMOUS::TELEOP:
+#define CLOSED_LOOP 1
+#if CLOSED_LOOP
+			m_action->drivetrain->rate.drive_control = true; //If driver control use velocity control
+			m_action->drivetrain->rate.turn_control = true;
+#else
+			m_action->drivetrain->rate.drive_control = false; //If driver control use velocity control
+			m_action->drivetrain->rate.turn_control = false;
+#endif 
+			m_action->drivetrain->position.drive_control = false;
+			m_action->drivetrain->position.turn_control = false;
 			break;
 		case ACTION::AUTONOMOUS::BRIDGEBALANCE:
-			bridgeBalance();
+			if (bridgeBalance())
+			{
+				m_action->auton->completion_status = ACTION::SUCCESS;
+				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+			}
+			else
+				m_action->auton->completion_status = ACTION::IN_PROGRESS;
 			break;
 		case ACTION::AUTONOMOUS::KEYTRACK:
-			keyTrack();
+			if (keyTrack())
+			{
+				m_action->auton->completion_status = ACTION::SUCCESS;
+				m_action->auton->state = ACTION::AUTONOMOUS::AUTOALIGN;
+			}
+			else
+				m_action->auton->completion_status = ACTION::IN_PROGRESS;
 			break;
 		case ACTION::AUTONOMOUS::AUTOALIGN:
-			autoAlign();
+			if (autoAlign())
+			{
+				m_action->auton->completion_status = ACTION::SUCCESS;
+				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+			}
+			else
+				m_action->auton->completion_status = ACTION::IN_PROGRESS;
+			break;
+		case ACTION::AUTONOMOUS::AUTON_MODE:
+			if (autonomousMode())
+			{
+				m_action->auton->completion_status = ACTION::SUCCESS;
+				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+			}
+			else
+			{
+				m_action->auton->completion_status = ACTION::IN_PROGRESS;
+			}
 			break;
 		}
 	}
 }
 
-void AutonomousFunctions::alternateBridgeBalance()
+bool AutonomousFunctions::alternateBridgeBalance()
 {
 	m_action->drivetrain->rate.drive_control = true;
 	m_action->drivetrain->rate.turn_control = true;
@@ -148,15 +193,15 @@ void AutonomousFunctions::alternateBridgeBalance()
 	if (fabs(m_action->imu->pitch - m_bridgebalance_setpoint)
 			< m_bridgebalance_threshold)
 	{
-		m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
-		m_action->auton->completion_status = ACTION::SUCCESS;
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 		m_action ->drivetrain->rate.desiredTurnRate = 0.0;
+		return true;//we're done
 	}
+	return false;
 
 }
 
-void AutonomousFunctions::bridgeBalance()
+bool AutonomousFunctions::bridgeBalance()
 {
 	static int e = 0;
 	if (++e % 50 == 0)
@@ -189,7 +234,7 @@ void AutonomousFunctions::bridgeBalance()
 	if (fabs(m_bridgebalance_pid->getError()) < m_bridgebalance_threshold)
 	{
 		//			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
-		m_action->auton->completion_status = ACTION::SUCCESS;
+		return true;//we're done
 		//		m_action->drivetrain->rate.drive_control = true;
 		//		m_action->drivetrain->rate.turn_control = true;
 		//		m_action->drivetrain->position.drive_control = false;
@@ -197,9 +242,10 @@ void AutonomousFunctions::bridgeBalance()
 		//		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 		//		m_action ->drivetrain->rate.desiredTurnRate = 0.0;
 	}
+	return false;
 }
 
-void AutonomousFunctions::keyTrack()
+bool AutonomousFunctions::keyTrack()
 {
 	m_action->drivetrain->rate.drive_control = true;
 	m_action->drivetrain->rate.turn_control = true;
@@ -218,17 +264,17 @@ void AutonomousFunctions::keyTrack()
 		if (!state)
 		{
 			m_hit_key_flag = false;
-			m_action->auton->state = ACTION::AUTONOMOUS::AUTOALIGN;
-			m_action->auton->completion_status = ACTION::SUCCESS;
 			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 			m_action ->drivetrain->rate.desiredTurnRate = 0.0;
+			return true;
 
 		}
 	}
+	return false;
 	//	AsyncPrinter::Printf("%d %d\n", state, m_hit_key_flag);
 }
 
-void AutonomousFunctions::autoAlign()
+bool AutonomousFunctions::autoAlign()
 {
 	if (m_action->cam->align.status != ACTION::CAMERA::NO_TARGET)
 	{
@@ -244,20 +290,86 @@ void AutonomousFunctions::autoAlign()
 				* fabs(error * (1.0 / 127) * m_align_turn_rate);
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 
-		static int debouncer = 0;
-		if (fabs(error) < m_align_threshold /*&& ++debouncer > 1*/)
+		if (fabs(error) < m_align_threshold )
 		{
 			AsyncPrinter::Printf("Aiming done\n");
 			//			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
-			m_action->auton->completion_status = ACTION::SUCCESS;
+			
+			return true;
 			//			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 			//			m_action->drivetrain->rate.desiredTurnRate = 0.0;
 		}
-		else
-		{
-			debouncer = 0;
-		}
 	}
+	return false;
+}
+
+#define BALLS_TO_SHOOT 2
+bool AutonomousFunctions::autonomousMode()
+{
+	switch (m_curr_auton_stage)
+	{
+	case INIT:
+#warning Set speed correctly and check trajectory 
+		m_action->launcher->desiredSpeed = ACTION::LAUNCHER::MEDIUM;
+		m_action->launcher->atSpeed = false;
+		m_action->launcher->topTrajectory = false;
+		m_curr_auton_stage = KEY_TRACK;
+		break;
+	case KEY_TRACK:
+		if (keyTrack())
+		{
+			m_curr_auton_stage = AIM;
+		}
+		break;
+	case AIM:
+		if (autoAlign())
+		{
+			m_curr_auton_stage = SHOOT;
+			m_shot_counter = 0;
+		}
+		break;
+	case SPIN_UP:
+		if (m_action->launcher->atSpeed)
+		{
+			m_launcher_was_at_speed = true;
+			m_curr_auton_stage = SHOOT;
+		}
+		break;
+	case SHOOT:
+		m_action->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
+		if (m_shot_counter >= BALLS_TO_SHOOT)
+		{
+			m_action->ballfeed->attemptToLoadRound = true;
+			if ((!m_action->launcher->atSpeed) && m_launcher_was_at_speed) //indicates ball launched
+				m_shot_counter++;
+			m_launcher_was_at_speed = m_action->launcher->atSpeed;
+		}
+		else 
+		{
+			m_curr_auton_stage = MOVE_BACK_INIT;
+		}
+		break;
+	case MOVE_BACK_INIT:
+		
+		m_action->drivetrain->position.absolute = false;
+		m_action->drivetrain->position.drive_control = true;
+		m_action->drivetrain->position.turn_control = true;
+#warning Verify amount to drive back
+		m_action->drivetrain->position.desiredRelativeDrivePosition = -12; //TODO Check me
+//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
+		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
+		m_curr_auton_stage = MOVE_BACK;
+		break;
+	case MOVE_BACK:
+		m_action->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
+		if (m_action->drivetrain->previousDriveOperationComplete)
+			m_curr_auton_stage = DONE;
+		break;
+	case DONE:
+		return true;
+		break;
+	}
+	return false;
 }
 
 AutonomousFunctions * AutonomousFunctions::getInstance()
@@ -312,6 +424,9 @@ void AutonomousFunctions::log()
 		break;
 	case ACTION::AUTONOMOUS::KEYTRACK:
 		s = "Key Track";
+		break;
+	case ACTION::AUTONOMOUS::AUTON_MODE:
+		s = "Auton";
 		break;
 	case ACTION::AUTONOMOUS::TELEOP:
 		s = "Teleop";

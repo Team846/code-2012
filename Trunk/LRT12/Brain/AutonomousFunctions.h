@@ -77,29 +77,52 @@ private:
 	/*!
 	 * Iterative method to balance the bridge
 	 */
-	void bridgeBalance();
+	bool bridgeBalance();
 
 	/*!
 	 * Alternate iterative method to balance the bridge
 	 */
-	void alternateBridgeBalance();
+	bool alternateBridgeBalance();
 
 	/*!
 	 * Iterative method to track the key
 	 */
-	void keyTrack();
+	bool keyTrack();
 
 	/*!
 	 * Iterative method to align the shooter
 	 */
-	void autoAlign();
-
+	bool autoAlign();
+	
+	/*!
+	 * Our basic autonomous mode
+	 */
+	bool autonomousMode();
+	
+	/*!
+	 * enum to keep track of stage
+	 */
+	enum autonomousStage 
+	{
+		INIT,//!< Initialize things
+		KEY_TRACK, //!< KEY_TRACK
+		AIM,       //!< AIM
+		SPIN_UP,   //!< Spin up
+		SHOOT,     //!< SHOOT
+		MOVE_BACK_INIT,  //!< MOVE_BACK
+		MOVE_BACK,  //!< MOVE_BACK
+		DONE
+	};
+	autonomousStage m_curr_auton_stage;
+	int m_shot_counter;
+	bool m_launcher_was_at_speed;
+	
 	static AutonomousFunctions * m_instance;
 
 	SEM_ID m_task_sem;
 	Task * m_task;
 
-	ACTION::AUTONOMOUS::state m_pstate;
+	ACTION::AUTONOMOUS::state m_last_state;
 
 	std::string m_name;
 	bool m_is_running;

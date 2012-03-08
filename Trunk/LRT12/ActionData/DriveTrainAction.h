@@ -26,6 +26,7 @@ struct DriveTrainAction
 		
 		bool reset_translate_zero;
 		bool reset_turn_zero;
+		
 		bool absolute;
 	} position;
 

@@ -90,17 +90,6 @@ void InputParser::ProcessInputs()
 		}
 		else
 		{
-#define CLOSED_LOOP 1
-#if CLOSED_LOOP
-			m_action_ptr->drivetrain->rate.drive_control = true; //If driver control use velocity control
-			m_action_ptr->drivetrain->rate.turn_control = true;
-#else
-			m_action_ptr->drivetrain->rate.drive_control = false; //If driver control use velocity control
-			m_action_ptr->drivetrain->rate.turn_control = false;
-#endif 
-			m_action_ptr->drivetrain->position.drive_control = false;
-			m_action_ptr->drivetrain->position.turn_control = false;
-
 			m_action_ptr->drivetrain->rate.desiredDriveRate = pow(
 					-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
 			m_action_ptr->drivetrain->rate.desiredTurnRate = pow(
