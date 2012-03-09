@@ -14,9 +14,19 @@ enum launcherState
 {
 	DISABLED, RUNNING
 };
-enum launcherSpeed{
-	SLOW, MEDIUM, FASTEST
+enum launcherConfiguration
+{
+	FENDER_SHOT_HIGH = 0,
+	FENDER_SHOT_LOW = 1,
+	KEY_SHOT_HIGH = 2,
+	KEY_SHOT_LOW = 3,
+	FAR_FENDER_SHOT_HIGH = 4,
+	FAR_FENDER_SHOT_LOW = 5
 };
+
+char* const launcherConfigStr[6 + 1] =
+{ "Fender High", "Fender Low", "Key High", "Key Low", "Far Fender High",
+		"Far Fender Low" };
 }
 }
 
@@ -25,9 +35,9 @@ struct LauncherAction
 	ACTION::LAUNCHER::launcherState state;
 	bool atSpeed;
 	double speed;
-	ACTION::LAUNCHER::launcherSpeed desiredSpeed;
-	double distance;
+	ACTION::LAUNCHER::launcherConfiguration desiredTarget;
 	bool topTrajectory;
+	int ballLaunchCounter;
 };
 
 #endif

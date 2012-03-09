@@ -3,7 +3,9 @@
 #include <I2C.h>
 #include "../ActionData/ActionData.h"
 #include "../ActionData/IMUData.h"
+#include "../ActionData/DriveTrainAction.h"
 #include "../Util/AsyncPrinter.h"
+#include "../Config/RobotConfig.h"
 #include "IMU.h"
 
 const UINT8 IMU::kAddress;
@@ -26,6 +28,7 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 	m_roll = m_pitch = m_yaw = 0.0;
 	m_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 	m_is_running = false;
+	m_dio = new DigitalOutput(RobotConfig::DIGITAL_IO::IMU_CALIBRATE);
 }
 
 IMU::~IMU()
@@ -38,6 +41,7 @@ IMU::~IMU()
 		printf("SemDelete Error=%d\n", error);
 	}
 	delete m_i2c;
+	delete m_dio;
 	m_i2c = NULL;
 }
 
@@ -103,7 +107,6 @@ void IMU::update()
 	m_gyro_z = getInt16(GYRO_Z);
 
 	m_time = GetFPGATime() - m_time;
-
 }
 
 void IMU::releaseSemaphore()
@@ -127,6 +130,18 @@ void IMU::update(ActionData * action)
 	imu->gyro_x = getGyroX();
 	imu->gyro_y = getGyroY();
 	imu->gyro_z = getGyroZ();
+
+	DriveTrainAction * dt = action->drivetrain;
+
+	if (dt->rate.desiredDriveRate == 0.0 && dt->rate.desiredTurnRate == 0.0
+			&& dt->robotRotateSpeed == 0 && dt->robotTranslateSpeed == 0)
+	{
+		m_dio->Set(1);
+	}
+	else
+	{
+		m_dio->Set(0);
+	}
 }
 
 void IMU::log()

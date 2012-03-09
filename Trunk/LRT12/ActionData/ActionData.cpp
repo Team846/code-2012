@@ -55,9 +55,10 @@ ActionData::ActionData()
 
 	launcher = (LauncherAction*) malloc(sizeof(LauncherAction));
 	launcher->state = ACTION::LAUNCHER::RUNNING;
-	launcher->speed = 0.0;
 	launcher->atSpeed = false;
 	launcher->speed = 2000;
+	launcher->ballLaunchCounter = 0;
+	launcher->topTrajectory = false;
 
 	wedge = (BPDAction*) malloc(sizeof(BPDAction));
 	wedge->state = ACTION::WEDGE::IDLE;

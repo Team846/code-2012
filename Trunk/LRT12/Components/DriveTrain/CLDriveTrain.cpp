@@ -165,8 +165,17 @@ void ClosedLoopDrivetrain::update()
 		m_rate_control[TRANSLATE]->setInput(
 				Util::Clamp<double>(
 						m_encoders.getNormalizedForwardMotorSpeed(), -1.0, 1.0));
+		if (fabs(m_rate_control[TRANSLATE]->getSetpoint()) < 1.0e-2)
+		{
+			m_rate_control[TRANSLATE]->setIIREnabled(true);
+		}
+		else
+		{
+			m_rate_control[TRANSLATE]->setIIREnabled(false);
+		}
 		m_rate_control[TRANSLATE]->update(1.0 / RobotConfig::LOOP_RATE);
 		output[TRANSLATE] = m_rate_control[TRANSLATE]->getOutput();
+
 		break;
 	case CL_DISABLED:
 		m_fwd_op_complete = true;
@@ -243,8 +252,21 @@ void ClosedLoopDrivetrain::update()
 		m_rate_control[TURN]->setInput(
 				Util::Clamp<double>(
 						m_encoders.getNormalizedTurningMotorSpeed(), -1.0, 1.0));
+		if (fabs(m_rate_control[TURN]->getSetpoint()) < 1.0e-2)
+		{
+			m_rate_control[TURN]->setIIREnabled(true);
+		}
+		else
+		{
+			m_rate_control[TURN]->setIIREnabled(false);
+		}
 		m_rate_control[TURN]->update(1.0 / RobotConfig::LOOP_RATE);
 		output[TURN] = m_rate_control[TURN]->getOutput();
+
+		if (fabs(m_rate_control[TURN]->getSetpoint()) < 1.0e-2)
+		{
+			output[TURN] = 0.0;
+		}
 		break;
 	case CL_DISABLED:
 		m_fwd_op_complete = true;
@@ -252,6 +274,7 @@ void ClosedLoopDrivetrain::update()
 	}
 	if (m_turn_control_type != CL_POSITION)
 		m_turn_op_complete = true; // this flag doesn't mean much here
+
 }
 
 void ClosedLoopDrivetrain::setTranslateControl(CONTROL_TYPE type)

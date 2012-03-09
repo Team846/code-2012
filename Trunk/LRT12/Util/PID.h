@@ -150,14 +150,14 @@ public:
 	void enablePID();
 	
 	/*!
-	 * @brief Enables an IFR filter on output
+	 * @brief Enables an IIR filter on output
 	 */
-	void setIFREnabled(bool enabled);
+	void setIIREnabled(bool enabled);
 	
 	/*!
 	 * @brief Sets the IFR Decay rate
 	 */
-	void setIFRDecay(double decay);
+	void setIIRDecay(double decay);
 	
 
 private:
@@ -175,7 +175,7 @@ private:
 	bool m_is_feed_forward;
 	bool m_enabled;
 	
-	bool m_IFREnabled;
+	bool m_IIREnabled;
 	RunningSum m_runningSum;
 };
 #endif

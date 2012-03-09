@@ -12,6 +12,7 @@
 #include "../ActionData/ShifterAction.h"
 #include "../ActionData/IMUData.h"
 #include "../ActionData/CameraData.h"
+#include <queue>
 
 class PID;
 
@@ -22,6 +23,23 @@ class PID;
 class AutonomousFunctions: public Configurable, public Loggable
 {
 public:
+	/*!
+	 * enum to keep track of stage
+	 */
+	enum autonomousStage
+	{
+		INIT = 1,//!< Initialize things
+		KEY_TRACK = 2, //!< KEY_TRACK
+		AIM = 3, //!< AIM
+		SHOOT = 4, //!< SHOOT
+		MOVE_BACK_INIT = 5, //!< MOVE_BACK
+		DROP_WEDGE = 6, //!< Drop the Wedge
+		RAISE_WEDGE = 7, //!< Raise the Wedge
+		WAIT_FOR_POSITION = 8, //!< MOVE_BACK
+		DONE = 0
+	//!< Finished
+	};
+
 	/*!
 	 * Destroys an AutonomousFunctions object
 	 */
@@ -93,30 +111,39 @@ private:
 	 * Iterative method to align the shooter
 	 */
 	bool autoAlign();
-	
+
 	/*!
 	 * Our basic autonomous mode
 	 */
 	bool autonomousMode();
-	
+
 	/*!
-	 * enum to keep track of stage
+	 * Load autonomous queue
 	 */
-	enum autonomousStage 
-	{
-		INIT,//!< Initialize things
-		KEY_TRACK, //!< KEY_TRACK
-		AIM,       //!< AIM
-		SPIN_UP,   //!< Spin up
-		SHOOT,     //!< SHOOT
-		MOVE_BACK_INIT,  //!< MOVE_BACK
-		MOVE_BACK,  //!< MOVE_BACK
-		DONE
-	};
+	void loadQueue();
+
+	/*!
+	 * Advance autonomous queue
+	 */
+	void advanceQueue();
+
+	/*!
+	 * Gets name of autonomous stage
+	 * @param a the autonomous stage
+	 * @return pointer to string
+	 */
+	std::string getAutonomousStageName(autonomousStage a);
+
+	const static int SHOOT_THEN_BRIDGE_LENGTH = 9;
+	const static autonomousStage SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH];
+
+	const static int BRIDGE_THEN_SHOOT_LENGTH = 9;
+	const static autonomousStage BRIDGE_THEN_SHOOT[BRIDGE_THEN_SHOOT_LENGTH];
+
+	std::queue<autonomousStage> m_auton_sequence;
+
 	autonomousStage m_curr_auton_stage;
-	int m_shot_counter;
-	bool m_launcher_was_at_speed;
-	
+
 	static AutonomousFunctions * m_instance;
 
 	SEM_ID m_task_sem;

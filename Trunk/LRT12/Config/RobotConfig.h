@@ -39,6 +39,7 @@ const uint32_t ENCODER_RIGHT_A = 1;
 const uint32_t ENCODER_RIGHT_B = 2;
 const uint32_t COMPRESSOR_PRESSURE_SENSOR_PIN = 14;
 const uint32_t HALL_EFFECT = 13;
+const uint32_t IMU_CALIBRATE = CHANGEME;
 const uint32_t WEDGE_LIMIT_TOP = CHANGEME;
 const uint32_t WEDGE_LIMIT_BOTTOM = CHANGEME;
 }

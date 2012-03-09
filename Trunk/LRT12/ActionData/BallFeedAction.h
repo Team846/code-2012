@@ -13,7 +13,7 @@ namespace BALLFEED
  */
 enum feeder_state
 {
-	FEEDING, HOLDING, PURGING
+	FEEDING, HOLDING, PURGING, FREEZING
 };
 }
 }

@@ -44,11 +44,14 @@ void InputParser::ProcessInputs()
 	{
 		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
 	}
+	else if (m_action_ptr->wedge->state == ACTION::WEDGE::PRESET_BOTTOM)
+	{
+		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::FREEZING;
+	}
 	else
 	{
 		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::HOLDING;
 	}
-
 	static bool hasBeenReleased = true;
 	/***************** Drive assistance ****************/
 	if (m_driver_stick->IsButtonDown(KEYTRACK))
@@ -110,15 +113,42 @@ void InputParser::ProcessInputs()
 
 	if (m_operator_stick->IsButtonDown(LOW_SPEED))
 	{
-		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::SLOW;
+		if (m_action_ptr->launcher->topTrajectory)
+		{
+			m_action_ptr->launcher->desiredTarget
+					= ACTION::LAUNCHER::FENDER_SHOT_LOW;
+		}
+		else
+		{
+			m_action_ptr->launcher->desiredTarget
+					= ACTION::LAUNCHER::KEY_SHOT_LOW;
+		}
 	}
 	else if (m_operator_stick->IsButtonDown(HIGH_SPEED))
 	{
-		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::FASTEST;
+		if (m_action_ptr->launcher->topTrajectory)
+		{
+			m_action_ptr->launcher->desiredTarget
+					= ACTION::LAUNCHER::FENDER_SHOT_HIGH;
+		}
+		else
+		{
+			m_action_ptr->launcher->desiredTarget
+					= ACTION::LAUNCHER::KEY_SHOT_HIGH;
+		}
 	}
 	else
 	{
-		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::MEDIUM;
+		if (m_action_ptr->launcher->topTrajectory)
+		{
+			m_action_ptr->launcher->desiredTarget
+					= ACTION::LAUNCHER::FENDER_SHOT_HIGH;
+		}
+		else
+		{
+			m_action_ptr->launcher->desiredTarget
+					= ACTION::LAUNCHER::KEY_SHOT_HIGH;
+		}
 	}
 
 	m_action_ptr->launcher->state = ACTION::LAUNCHER::RUNNING;
@@ -163,7 +193,8 @@ void InputParser::ProcessInputs()
 	if (m_operator_stick->IsButtonDown(PURGE))
 	{
 		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::PURGING;
-		m_action_ptr->launcher->desiredSpeed = ACTION::LAUNCHER::SLOW;
+		m_action_ptr->launcher->desiredTarget
+				= ACTION::LAUNCHER::FENDER_SHOT_HIGH;
 	}
 
 	/***************** Config **********************/

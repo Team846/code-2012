@@ -159,6 +159,7 @@ private:
 	};
 
 	I2C* m_i2c;
+	DigitalOutput * m_dio;
 	uint8_t m_i2c_buf[kNumPackets * 6 + 1];
 	int16_t getInt16(uint8_t index);
 	uint8_t getUint8(uint8_t index);

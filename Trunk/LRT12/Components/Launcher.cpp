@@ -2,7 +2,7 @@
 #include "Pneumatic/Pneumatics.h"
 
 Launcher::Launcher() :
-	Component(), m_name("Launcher")
+	Component(), Configurable(), Loggable(), m_name("Launcher")
 {
 	m_roller = new AsyncCANJaguar(RobotConfig::CAN::LAUNCHER, "Roller");
 	m_enc = new Counter((UINT32) RobotConfig::DIGITAL_IO::HALL_EFFECT);
@@ -17,7 +17,11 @@ Launcher::Launcher() :
 	m_duty_cycle_delta = 0.55;
 	m_speed = 0;
 	m_speed_threshold = 10;
-	disableLog();
+
+	m_p_conf = ACTION::LAUNCHER::KEY_SHOT_HIGH;
+	m_is_changing_speed = true;
+
+	//	disableLog();
 }
 
 Launcher::~Launcher()
@@ -36,12 +40,29 @@ void Launcher::Configure()
 
 	m_speed_threshold = c->Get<double> (m_name, "speedThreshold", 10);
 	m_max_speed = c->Get<double> (m_name, "maxSpeed", 5180);
-	m_action->launcher->speed = c->Get<double> (m_name, "targetSpeed", 3000);
+	m_action->launcher->speed = c->Get<double> (m_name,
+			"m_action->launcher->speed", 3000);
 	m_atSpeedCycles = c->Get<int> (m_name, "cyclesAtSpeed", 1);
 
-	m_speeds[SLOW] = c->Get<double> (m_name, "lowSpeed", 2000);
-	m_speeds[MEDIUM] = c->Get<double> (m_name, "mediumSpeed", 3000);
-	m_speeds[FASTEST] = c->Get<double> (m_name, "fastestSpeed", 4000);
+	m_speeds[ACTION::LAUNCHER::FAR_FENDER_SHOT_HIGH] = c->Get<double> (m_name,
+			"farFenderHigh", 2000);
+	m_speeds[ACTION::LAUNCHER::FAR_FENDER_SHOT_LOW] = c->Get<double> (m_name,
+			"farFenderLow", 3000);
+	m_speeds[ACTION::LAUNCHER::FENDER_SHOT_HIGH] = c->Get<double> (m_name,
+			"fenderHigh", 3000);
+	m_speeds[ACTION::LAUNCHER::FENDER_SHOT_LOW] = c->Get<double> (m_name,
+			"fenderLow", 3000);
+	m_speeds[ACTION::LAUNCHER::KEY_SHOT_HIGH] = c->Get<double> (m_name,
+			"keyHigh", 4000);
+	m_speeds[ACTION::LAUNCHER::KEY_SHOT_LOW] = c->Get<double> (m_name,
+			"keyLow", 3000);
+
+	m_trajectories[ACTION::LAUNCHER::FAR_FENDER_SHOT_HIGH] = true;
+	m_trajectories[ACTION::LAUNCHER::FAR_FENDER_SHOT_LOW] = true;
+	m_trajectories[ACTION::LAUNCHER::FENDER_SHOT_HIGH] = true;
+	m_trajectories[ACTION::LAUNCHER::FENDER_SHOT_LOW] = true;
+	m_trajectories[ACTION::LAUNCHER::KEY_SHOT_HIGH] = false;
+	m_trajectories[ACTION::LAUNCHER::KEY_SHOT_LOW] = false;
 
 	m_pid.setParameters(p, i, d, ff);
 }
@@ -56,24 +77,21 @@ void Launcher::Output()
 {
 	m_speed = (m_enc->GetStopped()) ? 0.0 : (60.0 / 2.0 / m_enc->GetPeriod());
 	m_speed = Util::Clamp<double>(m_speed, 0, m_max_speed * 1.3);
-	double targetSpeed;
-	switch (m_action->launcher->desiredSpeed)
+
+	m_action->launcher->speed = m_speeds[m_action->launcher->desiredTarget];
+	m_action->launcher->topTrajectory
+			= m_trajectories[m_action->launcher->desiredTarget];
+
+	if (m_p_conf != m_action->launcher->desiredTarget)
 	{
-	case ACTION::LAUNCHER::SLOW:
-		targetSpeed = m_speeds[SLOW];
-		break;
-	case ACTION::LAUNCHER::MEDIUM:
-		targetSpeed = m_speeds[MEDIUM];
-		break;
-	case ACTION::LAUNCHER::FASTEST:
-		targetSpeed = m_speeds[FASTEST];
-		break;
+		m_is_changing_speed = true;
 	}
 
 	switch (m_action->launcher->state)
 	{
 	case ACTION::LAUNCHER::RUNNING:
-		m_pid.setSetpoint(Util::Clamp<double>(targetSpeed, 0, m_max_speed));
+		m_pid.setSetpoint(
+				Util::Clamp<double>(m_action->launcher->speed, 0, m_max_speed));
 
 		m_pid.setInput(m_speed);
 		m_pid.update(1.0 / RobotConfig::LOOP_RATE); // 50 Hz
@@ -92,6 +110,7 @@ void Launcher::Output()
 
 		if (atSpeedCounter > m_atSpeedCycles)
 		{
+			m_is_changing_speed = false;
 			m_action->launcher->atSpeed = true; // w/i 10 rpm
 		}
 		else
@@ -99,10 +118,22 @@ void Launcher::Output()
 			m_action->launcher->atSpeed = false; // w/i 10 rpm
 		}
 
+		static bool wasAtSpeed = false;
+		// catch falling edge
+		if (wasAtSpeed && !m_action->launcher->atSpeed)
+		{
+			if (!m_is_changing_speed)
+			{
+				m_action->launcher->ballLaunchCounter++;
+			}
+		}
+		wasAtSpeed = m_action->launcher->atSpeed;
+
 		break;
 	case ACTION::LAUNCHER::DISABLED:
 		m_action->launcher->atSpeed = false;
 		m_output = 0.0;
+		m_is_changing_speed = true;
 		m_pid.reset();
 		break;
 	}
@@ -129,7 +160,6 @@ void Launcher::Output()
 		m_roller->SetDutyCycle(0.0);
 	}
 	m_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
-
 }
 
 std::string Launcher::GetName()
@@ -139,28 +169,29 @@ std::string Launcher::GetName()
 
 void Launcher::log()
 {
-	SmartDashboard::GetInstance()->PutString(
+	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	sdb->PutString(
 			"Launcher State",
 			(m_action->launcher->state == ACTION::LAUNCHER::RUNNING) ? "Running"
 					: "Disabled");
-	SmartDashboard::GetInstance()->PutDouble("Launcher Speed", m_speed);
-	SmartDashboard::GetInstance()->PutDouble("Launcher Output", m_output);
-	SmartDashboard::GetInstance()->PutDouble("Launcher Max speed", m_max_speed);
 
-	SmartDashboard::GetInstance()->PutDouble("Launcher Setpoint",
-			m_pid.getSetpoint());
-	SmartDashboard::GetInstance()->PutDouble("Launcher Error", m_pid.getError());
-	SmartDashboard::GetInstance()->PutDouble("Launcher P",
-			m_pid.getProportionalGain());
-	SmartDashboard::GetInstance()->PutDouble("Launcher I",
-			m_pid.getIntegralGain());
-	SmartDashboard::GetInstance()->PutDouble("Launcher D",
-			m_pid.getDerivativeGain());
+	sdb->PutString(
+			"Launcher Target",
+			ACTION::LAUNCHER::launcherConfigStr[m_action->launcher->desiredTarget]);
 
-	SmartDashboard::GetInstance()->PutString("Launcher Trajectory",
+	sdb->PutDouble("Launcher Speed", m_speed);
+	sdb->PutDouble("Launcher Output", m_output);
+	sdb->PutDouble("Launcher Max speed", m_max_speed);
+
+	sdb->PutDouble("Launcher Setpoint", m_pid.getSetpoint());
+	sdb->PutDouble("Launcher Error", m_pid.getError());
+	sdb->PutDouble("Launcher P", m_pid.getProportionalGain());
+	sdb->PutDouble("Launcher I", m_pid.getIntegralGain());
+	sdb->PutDouble("Launcher D", m_pid.getDerivativeGain());
+
+	sdb->PutString("Launcher Trajectory",
 			(m_action->launcher->topTrajectory) ? "High" : "Low");
 
-	SmartDashboard::GetInstance()->PutBoolean("Launcher at speed",
-			(m_action->launcher->atSpeed));
+	sdb->PutBoolean("Launcher at speed", (m_action->launcher->atSpeed));
 
 }

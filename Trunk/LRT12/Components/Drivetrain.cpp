@@ -183,7 +183,7 @@ void Drivetrain::Output()
 	}
 
 	m_action->drivetrain->raw.leftDutyCycle = cmd.leftDutyCycle;
-	//	m_action_ptr->drivetrain->raw.leftBrakingDutyCycle
+	//	m_action_ptr->drivetrain->raw.leftBrakingDutwyCycle
 	//			= cmd.leftCommand.brakingDutyCycle;
 	m_action->drivetrain->raw.rightDutyCycle = cmd.rightDutyCycle;
 	//	m_action_ptr->drivetrain->raw.rightBrakingDutyCycle
@@ -193,6 +193,11 @@ void Drivetrain::Output()
 	{
 		m_drive_control.reset();
 	}
+
+	m_action->drivetrain->robotRotateSpeed
+			= m_encoders.getNormalizedTurningMotorSpeed();
+	m_action->drivetrain->robotTranslateSpeed
+			= m_encoders.getNormalizedForwardMotorSpeed();
 }
 
 void Drivetrain::log()

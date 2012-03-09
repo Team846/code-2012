@@ -2,16 +2,18 @@
 #include "AsyncPrinter.h"
 
 PID::PID(double p_gain, double i_gain, double d_gain, double ff_gain,
-		double i_decay, bool feedforward)
+		double i_decay, bool feedforward) :
+	m_runningSum(0.87)
 {
 	setParameters(p_gain, i_gain, d_gain, ff_gain, i_decay, feedforward);
-	m_IFREnabled = false;
+	m_IIREnabled = false;
 }
 
-PID::PID()
+PID::PID() :
+	m_runningSum(0.87)
 {
 	setParameters(0, 0, 0);
-	m_IFREnabled = false;
+	m_IIREnabled = false;
 }
 
 void PID::setParameters(double p_gain, double i_gain, double d_gain,
@@ -32,14 +34,21 @@ double PID::update(double dt)
 	m_error = m_setpoint - m_input;
 	//	AsyncPrinter::Printf("Error: %.02f\r\n", m_error);
 
+	if (m_IIREnabled)
+	{
+		m_error = m_runningSum.UpdateSum(m_error);
+	}
+	else
+	{
+		m_runningSum.Clear();
+	}
+
 	// calculate discrete derivative
 	double delta = (m_error - m_prev_error) / dt;
 
 	// approximate with riemann sum and decay
 	m_acc_error *= m_integral_decay;
 	m_acc_error += m_error * dt;
-	if (m_acc_error != m_acc_error)
-		m_acc_error = 0.0; //just a random high value
 	double integral = m_acc_error / (1 - m_integral_decay);
 
 	// magic PID line
@@ -58,11 +67,6 @@ double PID::update(double dt)
 	}
 
 	m_prev_error = m_error;
-
-	if (m_IFREnabled)
-	{
-		m_output = m_runningSum.UpdateSum(m_output);
-	}
 
 	return m_output;
 }
@@ -155,14 +159,14 @@ void PID::reset()
 	m_setpoint = 0.0;
 }
 
-void PID::setIFREnabled(bool enabled)
+void PID::setIIREnabled(bool enabled)
 {
-	m_IFREnabled = enabled;
+	m_IIREnabled = enabled;
 	if (!enabled)
 		m_runningSum.Clear();
 }
 
-void PID::setIFRDecay(double decay)
+void PID::setIIRDecay(double decay)
 {
 	m_runningSum.setDecayConstant(decay);
 }

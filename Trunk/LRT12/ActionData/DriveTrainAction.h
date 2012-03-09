@@ -47,6 +47,9 @@ struct DriveTrainAction
 	bool overrideOperationChecks;
 
 	int synchronizedCyclesRemaining;
+	
+	double robotTranslateSpeed;
+	double robotRotateSpeed;
 };
 
 #endif

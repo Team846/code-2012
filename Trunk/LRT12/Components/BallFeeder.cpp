@@ -57,6 +57,11 @@ void BallFeeder::Output()
 		back = (m_holding_duty[BACK]);
 		intake = (0.0);
 		break;
+	case ACTION::BALLFEED::FREEZING:
+		front = 0.0;
+		back = 0.0;
+		intake = 0.0;
+		break;
 	case ACTION::BALLFEED::PURGING:
 		//			AsyncPrinter::Printf("Purging\n");
 		front = (m_rev_duty[FRONT]);
@@ -78,7 +83,6 @@ void BallFeeder::Output()
 			Pneumatics::getInstance()->setPressurePlate(false);
 			front = (0.0);
 			back = (0.0);
-
 		}
 	}
 	else
@@ -131,6 +135,8 @@ void BallFeeder::log()
 		break;
 	case ACTION::BALLFEED::PURGING:
 		s = "Purging";
+	case ACTION::BALLFEED::FREEZING:
+		s = "Freezing";
 		break;
 	}
 	sdb->PutBoolean("Ball Feeder Status", s.c_str());

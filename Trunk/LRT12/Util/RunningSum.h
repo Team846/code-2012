@@ -12,7 +12,7 @@ public:
 	 * @brief Constructs a m_is_running sum
 	 * @param decayConstant rate of decay
 	 */
-	RunningSum(double decayConstant = 1.0) :
+	RunningSum(double decayConstant) :
 		decayConstant(decayConstant), runningSum(0)
 	{
 

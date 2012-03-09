@@ -11,6 +11,7 @@
 #include "../ActionData/BPDAction.h"
 #include "../Util/AsyncPrinter.h"
 #include "../Util/PID.h"
+#include <string>
 
 #define TIMEOUT_ENABLED 0
 
@@ -104,6 +105,7 @@ void AutonomousFunctions::task()
 				m_counter = m_timeout_autoalign;
 				break;
 			case ACTION::AUTONOMOUS::AUTON_MODE:
+				loadQueue();
 				break;
 			}
 		}
@@ -257,8 +259,6 @@ bool AutonomousFunctions::keyTrack()
 	bool state = m_action->cam->key.higher >= m_keytrack_threshold;
 	m_hit_key_flag |= state;
 
-	//	AsyncPrinter::Printf("%d %d %d %f\n", m_hit_key_flag, state,
-	//			m_action->cam->key.higher, m_keytrack_threshold);
 	if (m_hit_key_flag)
 	{
 		if (!state)
@@ -271,7 +271,6 @@ bool AutonomousFunctions::keyTrack()
 		}
 	}
 	return false;
-	//	AsyncPrinter::Printf("%d %d\n", state, m_hit_key_flag);
 }
 
 bool AutonomousFunctions::autoAlign()
@@ -290,82 +289,87 @@ bool AutonomousFunctions::autoAlign()
 				* fabs(error * (1.0 / 127) * m_align_turn_rate);
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 
-		if (fabs(error) < m_align_threshold )
+		if (fabs(error) < m_align_threshold)
 		{
 			AsyncPrinter::Printf("Aiming done\n");
-			//			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
-			
 			return true;
-			//			m_action->drivetrain->rate.desiredDriveRate = 0.0;
-			//			m_action->drivetrain->rate.desiredTurnRate = 0.0;
 		}
 	}
 	return false;
 }
 
 #define BALLS_TO_SHOOT 2
+#define DEBUG 1
 bool AutonomousFunctions::autonomousMode()
 {
+
+#if DEBUG
+	AsyncPrinter::Printf("Entering %s\r\n",
+			getAutonomousStageName(m_curr_auton_stage).c_str());
+#endif
 	switch (m_curr_auton_stage)
 	{
 	case INIT:
 #warning Set speed correctly and check trajectory 
-		m_action->launcher->desiredSpeed = ACTION::LAUNCHER::MEDIUM;
-		m_action->launcher->atSpeed = false;
-		m_action->launcher->topTrajectory = false;
-		m_curr_auton_stage = KEY_TRACK;
+		m_action->launcher->desiredTarget = ACTION::LAUNCHER::KEY_SHOT_HIGH;
+		advanceQueue();
 		break;
 	case KEY_TRACK:
 		if (keyTrack())
 		{
-			m_curr_auton_stage = AIM;
+			advanceQueue();
 		}
 		break;
 	case AIM:
 		if (autoAlign())
 		{
-			m_curr_auton_stage = SHOOT;
-			m_shot_counter = 0;
-		}
-		break;
-	case SPIN_UP:
-		if (m_action->launcher->atSpeed)
-		{
-			m_launcher_was_at_speed = true;
-			m_curr_auton_stage = SHOOT;
+			advanceQueue();
 		}
 		break;
 	case SHOOT:
-		m_action->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
-		if (m_shot_counter >= BALLS_TO_SHOOT)
+		if (autoAlign() && m_action->launcher->ballLaunchCounter
+				<= BALLS_TO_SHOOT)
 		{
 			m_action->ballfeed->attemptToLoadRound = true;
-			if ((!m_action->launcher->atSpeed) && m_launcher_was_at_speed) //indicates ball launched
-				m_shot_counter++;
-			m_launcher_was_at_speed = m_action->launcher->atSpeed;
 		}
-		else 
+		else
 		{
-			m_curr_auton_stage = MOVE_BACK_INIT;
+			advanceQueue();
 		}
 		break;
 	case MOVE_BACK_INIT:
-		
+#warning Verify amount to drive back
+		m_action->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
 		m_action->drivetrain->position.absolute = false;
 		m_action->drivetrain->position.drive_control = true;
 		m_action->drivetrain->position.turn_control = true;
-#warning Verify amount to drive back
 		m_action->drivetrain->position.desiredRelativeDrivePosition = -12; //TODO Check me
-//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
+		//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
 		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
-		m_curr_auton_stage = MOVE_BACK;
+		advanceQueue();
 		break;
-	case MOVE_BACK:
+	case DROP_WEDGE:
+		m_action->ballfeed->feeder_state = ACTION::BALLFEED::FREEZING;
 		m_action->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
+		advanceQueue();
+		break;
+	case RAISE_WEDGE:
+		m_action->wedge->state = ACTION::WEDGE::PRESET_TOP;
+		m_action->ballfeed->feeder_state = ACTION::BALLFEED::HOLDING;
+		advanceQueue();
+		break;
+	case WAIT_FOR_POSITION:
+
 		if (m_action->drivetrain->previousDriveOperationComplete)
-			m_curr_auton_stage = DONE;
+		{
+			advanceQueue();
+		}
+
 		break;
 	case DONE:
+#if DEBUG
+		AsyncPrinter::Printf("Finished\r\n");
+#endif
 		return true;
 		break;
 	}
@@ -404,6 +408,86 @@ void AutonomousFunctions::Configure()
 	m_align_turn_rate = c->Get<double> (m_name, "alignTurnRate", 0.15);
 	m_align_threshold = c->Get<double> (m_name, "alignThreshold", 20);
 	m_align_setpoint = c->Get<double> (m_name, "alignSetpoint", 0.0);
+}
+
+const AutonomousFunctions::autonomousStage
+		AutonomousFunctions::SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH] =
+		{ INIT, KEY_TRACK, AIM, SHOOT, MOVE_BACK_INIT, DROP_WEDGE,
+				WAIT_FOR_POSITION, DONE };
+
+const AutonomousFunctions::autonomousStage
+		AutonomousFunctions::BRIDGE_THEN_SHOOT[BRIDGE_THEN_SHOOT_LENGTH] =
+		{ INIT, MOVE_BACK_INIT, DROP_WEDGE, WAIT_FOR_POSITION, RAISE_WEDGE,
+				KEY_TRACK, AIM, SHOOT, DONE };
+
+void AutonomousFunctions::loadQueue()
+{
+	while (!m_auton_sequence.empty())
+		m_auton_sequence.pop();
+
+	for (uint8_t i = 0;; ++i)
+	{
+		autonomousStage s = SHOOT_THEN_BRIDGE[i];
+		if (s == DONE)
+		{
+			break;
+		}
+		else
+		{
+			m_auton_sequence.push(s);
+		}
+	}
+
+	m_curr_auton_stage = INIT;
+}
+
+std::string AutonomousFunctions::getAutonomousStageName(autonomousStage a)
+{
+	std::string str;
+	switch (a)
+	{
+	case INIT:
+		str = "Init";
+		break;
+	case KEY_TRACK:
+		str = "Key Track";
+		break;
+	case AIM:
+		str = "Aim";
+		break;
+	case SHOOT:
+		str = "Shoot";
+		break;
+	case MOVE_BACK_INIT:
+		str = "Move back init";
+		break;
+	case DROP_WEDGE:
+		str = "Drop wedge";
+		break;
+	case RAISE_WEDGE:
+		str = "Raise wedge";
+		break;
+	case WAIT_FOR_POSITION:
+		str = "Wait for position";
+		break;
+	case DONE:
+		str = "Done";
+		break;
+	}
+	return str;
+}
+
+void AutonomousFunctions::advanceQueue()
+{
+	if (!m_auton_sequence.empty())
+	{
+		m_curr_auton_stage = m_auton_sequence.front();
+		m_auton_sequence.pop();
+	}
+	else
+	{
+		m_curr_auton_stage = DONE;
+	}
 }
 
 void AutonomousFunctions::log()

@@ -1,5 +1,6 @@
 #include "Brain.h"
 #include "../Util/AsyncPrinter.h"
+#include "../ActionData/AutonomousAction.h"
 #include "Joystick.h"
 
 Brain::Brain()
@@ -76,6 +77,17 @@ void Brain::process()
 	//This heuristic may eventually have to change if brain is to do processing during disabled
 	if (m_ds->IsAutonomous())
 	{
+		static bool runonce = true;
+		AutonomousAction * a = ActionData::GetInstance()->auton;
+		if (runonce)
+		{
+			runonce = false;
+			a->state = ACTION::AUTONOMOUS::AUTON_MODE;
+		}
+		if (a->state != ACTION::AUTONOMOUS::TELEOP)
+		{
+			a->state = ACTION::AUTONOMOUS::AUTON_MODE;
+		}
 		AsyncPrinter::Printf("Auton Mode!\r\n");
 	}
 	else if (m_ds->IsOperatorControl())

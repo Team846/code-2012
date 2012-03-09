@@ -43,16 +43,17 @@ private:
 
 	bool started;
 
+	ACTION::LAUNCHER::launcherConfiguration m_p_conf;
+	bool m_is_changing_speed;
+
 	double m_output;
 	double m_max_speed;
 	double m_duty_cycle_delta;
 	double m_speed;
 	double m_speed_threshold;
 	int m_atSpeedCycles;
-	
-	const static int SLOW   = 0;
-	const static int MEDIUM = 1;
-	const static int FASTEST= 2;
-	double m_speeds[3];
+
+	double m_speeds[6];
+	bool m_trajectories[6];
 };
 #endif

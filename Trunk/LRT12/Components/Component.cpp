@@ -38,8 +38,11 @@ list<Component::ComponentWithData>* Component::CreateComponents()
 					new PneumaticShifter(),
 					createComponentData(true,
 							RobotConfig::DRIVER_STATION::SHIFTER)));
-	//	components->push_back(
-	//			ComponentWithData(new Launcher(), createComponentData(true, RobotConfig::DRIVER_STATION::LAUNCHER)));
+	components->push_back(
+			ComponentWithData(
+					new Launcher(),
+					createComponentData(true,
+							RobotConfig::DRIVER_STATION::LAUNCHER)));
 	//	components->push_back(
 	//			ComponentWithData(new BallCollector(), createComponentData(true, RobotConfig::DRIVER_STATION::BALLCOLLECTOR)));
 	//	components->push_back(
