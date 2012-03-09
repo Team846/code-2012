@@ -1,0 +1,5 @@
+c:\users\monkey\documents\visual studio 2010\Projects\KeyTrackerConsole\KeyTrackerConsole\bin\Debug\KeyTrackerConsole.exe
+c:\users\monkey\documents\visual studio 2010\Projects\KeyTrackerConsole\KeyTrackerConsole\bin\Debug\KeyTrackerConsole.pdb
+c:\users\monkey\documents\visual studio 2010\Projects\KeyTrackerConsole\KeyTrackerConsole\obj\x86\Debug\ResolveAssemblyReference.cache
+c:\users\monkey\documents\visual studio 2010\Projects\KeyTrackerConsole\KeyTrackerConsole\obj\x86\Debug\KeyTrackerConsole.exe
+c:\users\monkey\documents\visual studio 2010\Projects\KeyTrackerConsole\KeyTrackerConsole\obj\x86\Debug\KeyTrackerConsole.pdb
