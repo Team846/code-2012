@@ -20,12 +20,12 @@
 #include "opencv2/imgproc/imgproc.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
-/** \namespace  cv: openCV namespace
+/** @namespace  cv: openCV namespace
  */
 using namespace cv;
 
-/** \class ReportSlop
- *  \brief Sends packets with the slop in it.
+/** @class ReportSlop
+ *  @brief Sends packets with the slop in it.
  */
 class ReportSlop
 {
@@ -41,8 +41,8 @@ class ReportSlop
     struct sockaddr_in m_dst;
 };
 
-/** \class FindTarget
- *  \brief Finds the target closest to the center.
+/** @class FindTarget
+ *  @brief Finds the target closest to the center.
  * 
  *  The class returns the distance from the target to the center on the x-axis, and
  *  whether the target is the top or middle one.
