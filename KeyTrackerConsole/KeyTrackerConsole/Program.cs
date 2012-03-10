@@ -32,14 +32,7 @@ namespace KeyTrackerConsole
 
             socket.BeginReceiveFrom(buffer = new byte[7], 0, buffer.Length, SocketFlags.None, ref ep, new AsyncCallback(onReceive), 0);
 
-            while (true)
-            {
-                if (Console.KeyAvailable)
-                {
-                    Console.ReadKey();
-                    break;
-                }
-            }
+            Console.ReadKey();
 
             Console.WriteLine("Packet Data Analysis: {0} packets received, {1} total bytes received, {2} total packets lost", packets, packets*7, missedpackets);
 
