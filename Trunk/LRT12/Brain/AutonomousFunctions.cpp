@@ -266,6 +266,7 @@ bool AutonomousFunctions::keyTrack()
 			m_hit_key_flag = false;
 			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 			m_action ->drivetrain->rate.desiredTurnRate = 0.0;
+			AsyncPrinter::Printf("Done Keytrack Done\n");
 			return true;
 
 		}
@@ -304,7 +305,9 @@ bool AutonomousFunctions::autonomousMode()
 {
 
 #if DEBUG
-	AsyncPrinter::Printf("Entering %s\r\n",
+	static int e = 0;
+	if (++e % 40 == 0)
+		AsyncPrinter::Printf("Entering %s\r\n",
 			getAutonomousStageName(m_curr_auton_stage).c_str());
 #endif
 	switch (m_curr_auton_stage)
@@ -327,6 +330,9 @@ bool AutonomousFunctions::autonomousMode()
 		}
 		break;
 	case SHOOT:
+		AsyncPrinter::Printf("Pretend Shooting\n");
+		advanceQueue();
+		break;
 		if (autoAlign() && m_action->launcher->ballLaunchCounter
 				<= BALLS_TO_SHOOT)
 		{
@@ -340,7 +346,8 @@ bool AutonomousFunctions::autonomousMode()
 	case MOVE_BACK_INIT:
 #warning Verify amount to drive back
 		m_action->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
-		m_action->drivetrain->position.absolute = false;
+		m_action->drivetrain->position.absoluteTranslate = false;
+		m_action->drivetrain->position.absoluteTurn = true;
 		m_action->drivetrain->position.drive_control = true;
 		m_action->drivetrain->position.turn_control = true;
 		m_action->drivetrain->position.desiredRelativeDrivePosition = -12; //TODO Check me
@@ -412,7 +419,7 @@ void AutonomousFunctions::Configure()
 
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH] =
-		{ INIT, KEY_TRACK, AIM, SHOOT, MOVE_BACK_INIT, DROP_WEDGE,
+		{ INIT, KEY_TRACK, AIM, SHOOT,DROP_WEDGE, MOVE_BACK_INIT,
 				WAIT_FOR_POSITION, DONE };
 
 const AutonomousFunctions::autonomousStage
@@ -488,6 +495,8 @@ void AutonomousFunctions::advanceQueue()
 	{
 		m_curr_auton_stage = DONE;
 	}
+	AsyncPrinter::Printf("Entering %s\r\n",
+				getAutonomousStageName(m_curr_auton_stage).c_str());
 }
 
 void AutonomousFunctions::log()

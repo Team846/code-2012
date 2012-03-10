@@ -105,7 +105,10 @@ void IMU::update()
 	m_gyro_x = getInt16(GYRO_X);
 	m_gyro_y = getInt16(GYRO_Y);
 	m_gyro_z = getInt16(GYRO_Z);
-
+	
+	m_gyro_y_delta = getGyroY() - m_last_gyro_y;
+	m_last_gyro_y = getGyroY();
+	
 	m_time = GetFPGATime() - m_time;
 }
 
@@ -159,6 +162,8 @@ void IMU::log()
 	sdb->PutDouble("IMU Gyro X", getGyroX());
 	sdb->PutDouble("IMU Gyro Y", getGyroY());
 	sdb->PutDouble("IMU Gyro Z", getGyroZ());
+
+	sdb->PutDouble("IMU Gyro y delta", getGyroYDelta());
 }
 
 int IMU::getPacket()
@@ -239,6 +244,11 @@ double IMU::getGyroX()
 double IMU::getGyroY()
 {
 	return m_gyro_y * kGyroConversion;
+}
+
+double IMU::getGyroYDelta()
+{
+	return m_gyro_y_delta;
 }
 
 double IMU::getGyroZ()

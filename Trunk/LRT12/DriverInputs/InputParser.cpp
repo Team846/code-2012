@@ -71,25 +71,26 @@ void InputParser::ProcessInputs()
 	/***************** Drivetrain **********************/
 	if (m_action_ptr->auton->state == ACTION::AUTONOMOUS::TELEOP)
 	{
-		m_action_ptr->drivetrain->position.absolute = true;
 		if (m_driver_stick->IsButtonDown(RESET_ZERO))
 		{
 			m_action_ptr->drivetrain->position.reset_translate_zero = true;
 			m_action_ptr->drivetrain->position.reset_turn_zero = true;
 		}
 
-		if (m_driver_stick->IsButtonDown(POS_CONTROL))
+		if (m_driver_stick->IsButtonDown(BALANCE_BRIDGE))
 		{
-			m_action_ptr->drivetrain->position.desiredAbsoluteDrivePosition
-					= -m_driver_stick->GetAxis(Joystick::kYAxis) * 12 * 3; //inches
-			m_action_ptr->drivetrain->position.desiredAbsoluteTurnPosition
-					= -m_driver_stick->GetAxis(Joystick::kZAxis) * 90.0; //inches
-
-			m_action_ptr->drivetrain->rate.drive_control = false;
-			m_action_ptr->drivetrain->rate.turn_control = false;
-
-			m_action_ptr->drivetrain->position.drive_control = true;
-			m_action_ptr->drivetrain->position.turn_control = true;
+//			m_action_ptr->drivetrain->position.desiredAbsoluteDrivePosition
+//					= -m_driver_stick->GetAxis(Joystick::kYAxis) * 12 * 3; //inches
+//			m_action_ptr->drivetrain->position.desiredAbsoluteTurnPosition
+//					= -m_driver_stick->GetAxis(Joystick::kZAxis) * 90.0; //inches
+//
+//			m_action_ptr->drivetrain->rate.drive_control = false;
+//			m_action_ptr->drivetrain->rate.turn_control = false;
+//
+//			m_action_ptr->drivetrain->position.drive_control = true;
+//			m_action_ptr->drivetrain->position.turn_control = true;
+//			m_action_ptr->auton->state = ACTION::AUTONOMOUS::AUTON_MODE;
+			m_action_ptr->auton->state = ACTION::AUTONOMOUS::BRIDGEBALANCE;
 		}
 		else
 		{
@@ -98,7 +99,6 @@ void InputParser::ProcessInputs()
 			m_action_ptr->drivetrain->rate.desiredTurnRate = pow(
 					-m_driver_stick->GetAxis(Joystick::kZAxis), 3);
 		}
-
 	}
 
 	/***************** Launcher **********************/

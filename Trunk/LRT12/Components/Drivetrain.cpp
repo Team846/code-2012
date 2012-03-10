@@ -71,13 +71,14 @@ void Drivetrain::Output()
 	// check actual drive commands
 	if (m_action->drivetrain->position.drive_control)
 	{
-		if (m_action->drivetrain->position.absolute)
+		if (m_action->drivetrain->position.absoluteTranslate)
 		{
 			m_drive_control.setAbsoluteTranslatePosition(
 					m_action->drivetrain->position.desiredAbsoluteDrivePosition);
 		}
-		else
+		else if (m_drive_control.driveOperationComplete())
 		{
+			AsyncPrinter::Printf("Op done\n");
 			m_drive_control.setRelativeTranslatePosition(
 					m_action->drivetrain->position.desiredRelativeDrivePosition);
 
@@ -110,12 +111,12 @@ void Drivetrain::Output()
 	}
 	else if (m_action->drivetrain->position.turn_control)
 	{
-		if (m_action->drivetrain->position.absolute)
+		if (m_action->drivetrain->position.absoluteTurn)
 		{
 			m_drive_control.setAbsoluteTurnPosition(
 					m_action->drivetrain->position.desiredAbsoluteTurnPosition);
 		}
-		else
+		else if (m_drive_control.turnOperationComplete())
 		{
 			m_drive_control.setRelativeTurnPosition(
 					m_action->drivetrain->position.desiredRelativeTurnPosition);

@@ -87,6 +87,12 @@ public:
 	double getGyroY();
 
 	/*!
+	 * Returns raw angular rate about y in degrees per second
+	 * @return angular rate about y
+	 */
+	double getGyroYDelta();
+
+	/*!
 	 * Returns raw angular rate about z in degrees per second
 	 * @return angular rate about z
 	 */
@@ -165,6 +171,7 @@ private:
 	uint8_t getUint8(uint8_t index);
 	uint8_t m_expected_packet_num;
 	int16_t m_accel_x, m_accel_y, m_accel_z, m_gyro_x, m_gyro_y, m_gyro_z;
+	double m_last_gyro_y, m_gyro_y_delta;
 	double m_roll, m_pitch, m_yaw;
 	int m_time;
 

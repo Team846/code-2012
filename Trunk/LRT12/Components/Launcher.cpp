@@ -104,7 +104,7 @@ void Launcher::Output()
 		}
 		else
 		{
-			AsyncPrinter::Printf("not at speed\n");
+//			AsyncPrinter::Printf("not at speed\n");
 			atSpeedCounter = 0;
 		}
 

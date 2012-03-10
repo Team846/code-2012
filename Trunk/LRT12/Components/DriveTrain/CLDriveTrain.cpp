@@ -156,10 +156,15 @@ void ClosedLoopDrivetrain::update()
 				Util::Clamp<double>(m_pos_control[TRANSLATE]->getOutput(),
 						-0.35, 0.35));
 
-		if (m_pos_control[TRANSLATE]->getError() < 0.5
+		if (fabs(m_pos_control[TRANSLATE]->getError()) < 0.5
 				&& m_pos_control[TRANSLATE]->getAccumulatedError() < 5.02 - 2)
 		{
+			AsyncPrinter::Printf("setpoint %.2f, in %.2f, err %.2f, prev_error %.2f, Done for real\n", m_pos_control[TRANSLATE]->getSetpoint(), m_pos_control[TRANSLATE]->getInput(), m_pos_control[TRANSLATE]->getError(), m_pos_control[TRANSLATE]->getPreviousError());
 			m_fwd_op_complete = true;
+		}
+		else
+		{
+			m_fwd_op_complete = false;
 		}
 	case CL_RATE: //Fall through switch
 		m_rate_control[TRANSLATE]->setInput(
@@ -183,7 +188,9 @@ void ClosedLoopDrivetrain::update()
 	}
 
 	if (m_translate_ctrl_type != CL_POSITION)
+	{
 		m_fwd_op_complete = true; // this flag doesn't mean much here
+	}
 
 	switch (m_turn_control_type)
 	{
@@ -243,10 +250,14 @@ void ClosedLoopDrivetrain::update()
 		m_rate_control[TURN]->setSetpoint(
 				-Util::Clamp<double>(m_pos_control[TURN]->getOutput(),
 						-m_max_motor_power, m_max_motor_power));
-		if (m_pos_control[TURN]->getError() < 0.5
+		if (fabs(m_pos_control[TURN]->getError()) < 0.5
 				&& m_pos_control[TURN]->getAccumulatedError() < 5.02 - 2)
 		{
 			m_turn_op_complete = true;
+		}
+		else
+		{
+			m_turn_op_complete = false;
 		}
 	case CL_RATE:
 		m_rate_control[TURN]->setInput(
@@ -269,12 +280,12 @@ void ClosedLoopDrivetrain::update()
 		}
 		break;
 	case CL_DISABLED:
-		m_fwd_op_complete = true;
+		m_turn_op_complete = true;
 		break;
 	}
 	if (m_turn_control_type != CL_POSITION)
 		m_turn_op_complete = true; // this flag doesn't mean much here
-
+	
 }
 
 void ClosedLoopDrivetrain::setTranslateControl(CONTROL_TYPE type)
@@ -333,10 +344,8 @@ bool ClosedLoopDrivetrain::getHighGear()
 void ClosedLoopDrivetrain::setRelativeTranslatePosition(double pos)
 {
 	setTranslateControl(CL_POSITION);
+	AsyncPrinter::Printf("Setting %.2f\n", pos);
 	m_pos_control[TRANSLATE]->setSetpoint(pos + m_encoders.getRobotDist());
-	//	AsyncPrinter::Printf("(rel) pos %.2f,pre %.2f set %.2f\n", pos,
-	//			(pos + m_encoders.getRobotDist()),
-	//			(m_pos_control[TRANSLATE]->getSetpoint()));
 	m_fwd_op_complete = false;
 }
 
