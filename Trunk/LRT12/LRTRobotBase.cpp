@@ -105,7 +105,7 @@ void LRTRobotBase::StartCompetition()
 
 		Pneumatics::getInstance()->releaseSemaphore();
 
-		if (cycleCount % 100 == 0)
+		if (cycleCount % 1000 == 0)
 		{
 			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-3);
 		}

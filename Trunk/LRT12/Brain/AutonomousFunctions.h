@@ -166,6 +166,9 @@ private:
 	double m_bridgebalance_threshold, m_keytrack_threshold, m_align_threshold;
 
 	bool m_hit_key_flag;
+	
+	bool hasStartedTipping;
+	int m_direction;
 
 	DISALLOW_COPY_AND_ASSIGN( AutonomousFunctions);
 };

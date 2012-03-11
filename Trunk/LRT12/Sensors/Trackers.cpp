@@ -105,9 +105,9 @@ void Trackers::listen()
 
 			key_lastPacketID = pid;
 
-			static int e = 0;
-			if (++e % 20 == 0)
-				AsyncPrinter::Printf("%d: r: %d, b: %d\n", pid, m_key_value_r, m_key_value_b);
+//			static int e = 0;
+//			if (++e % 20 == 0)
+//				AsyncPrinter::Printf("%d: r: %d, b: %d\n", pid, m_key_value_r, m_key_value_b);
 			break;
 		}
 

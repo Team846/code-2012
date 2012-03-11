@@ -163,7 +163,7 @@ void Pneumatics::pulse(PulsedSolenoid * ptr)
 {
 #if PNEUMATICS_DISABLED
 	static uint32_t ctr = 0;
-	if (++ctr > 1000)
+	if (++ctr > 10000)
 	{
 		AsyncPrinter::Printf("Pneumatics Disabled\r\n");
 		ctr = 0;

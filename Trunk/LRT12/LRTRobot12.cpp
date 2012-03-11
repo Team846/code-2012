@@ -1,6 +1,7 @@
 #include "LRTRobot12.h"
 #include "Util/PrintInConstructor.h"
 #include "ActionData/IMUData.h"
+#include "Sensors/DriveEncoders.h"
 
 //#include <signal.h>
 //#include "Config/joystickdg.h"
@@ -111,7 +112,7 @@ void LRTRobot12::MainLoop()
 			}
 		}
 	}
-
+	
 	if (ds->GetDigitalIn(RobotConfig::DRIVER_STATION::COMPRESSOR))
 	{
 		m_compressor->Start();

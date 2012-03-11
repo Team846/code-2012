@@ -76,7 +76,7 @@ void Drivetrain::Output()
 			m_drive_control.setAbsoluteTranslatePosition(
 					m_action->drivetrain->position.desiredAbsoluteDrivePosition);
 		}
-		else if (m_drive_control.driveOperationComplete())
+		else if (m_drive_control.driveOperationComplete()  && m_action->drivetrain->position.desiredRelativeDrivePosition != ACTION::DRIVETRAIN::UNSET_POS)
 		{
 			AsyncPrinter::Printf("Op done\n");
 			m_drive_control.setRelativeTranslatePosition(
@@ -84,7 +84,7 @@ void Drivetrain::Output()
 
 			// command has been set, so now zero the relative pos
 			// this serves as a crude one-command queue
-			m_action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
+			m_action->drivetrain->position.desiredRelativeDrivePosition = ACTION::DRIVETRAIN::UNSET_POS;
 		}
 		m_drive_control.setTranslateControl(ClosedLoopDrivetrain::CL_POSITION);
 	}
@@ -116,13 +116,13 @@ void Drivetrain::Output()
 			m_drive_control.setAbsoluteTurnPosition(
 					m_action->drivetrain->position.desiredAbsoluteTurnPosition);
 		}
-		else if (m_drive_control.turnOperationComplete())
+		else if (m_drive_control.turnOperationComplete() && m_action->drivetrain->position.desiredRelativeTurnPosition != ACTION::DRIVETRAIN::UNSET_POS)
 		{
 			m_drive_control.setRelativeTurnPosition(
 					m_action->drivetrain->position.desiredRelativeTurnPosition);
 			// command has been set, so now zero the relative pos
 			// this serves as a crude one-command queue
-			m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
+			m_action->drivetrain->position.desiredRelativeTurnPosition = ACTION::DRIVETRAIN::UNSET_POS;
 		}
 		m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_POSITION);
 	}

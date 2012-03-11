@@ -43,7 +43,7 @@ public:
 private:
 	/*!
 	 * @brief Drives at a set forward and turn rate
-	 * @param rawFwd rate of movement colinear with direction of motion
+	 * @param rawFwd rate of movement colinear with m_direction of motion
 	 * @param rawTurn rate of rotation about center of mass
 	 * @return drive command for escs
 	 */

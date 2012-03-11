@@ -369,7 +369,12 @@ LRT12_partialImage/Debug/Objects/LRT12/LRTRobot12.o:  \
   C:/WindRiver/workspace/LRT12/Jaguar/../Log/Loggable.h \
   C:/WindRiver/workspace/LRT12/Jaguar/JaguarTester.h \
   C:/WindRiver/workspace/LRT12/Jaguar/../Config/Config.h \
-  C:/WindRiver/workspace/LRT12/ActionData/IMUData.h
+  C:/WindRiver/workspace/LRT12/ActionData/IMUData.h \
+  C:/WindRiver/workspace/LRT12/Sensors/DriveEncoders.h \
+  C:/WindRiver/workspace/LRT12/Sensors/LRTEncoder.h \
+  C:/WindRiver/workspace/LRT12/Sensors/..\Config\Configurable.h \
+  C:/WindRiver/workspace/LRT12/Sensors/..\Config\RobotConfig.h \
+  C:/WindRiver/workspace/LRT12/Sensors/..\Util\Util.h
 
 C:/WindRiver/workspace/LRT12/LRTRobot12.h:
 
@@ -1110,3 +1115,13 @@ C:/WindRiver/workspace/LRT12/Jaguar/JaguarTester.h:
 C:/WindRiver/workspace/LRT12/Jaguar/../Config/Config.h:
 
 C:/WindRiver/workspace/LRT12/ActionData/IMUData.h:
+
+C:/WindRiver/workspace/LRT12/Sensors/DriveEncoders.h:
+
+C:/WindRiver/workspace/LRT12/Sensors/LRTEncoder.h:
+
+C:/WindRiver/workspace/LRT12/Sensors/..\Config\Configurable.h:
+
+C:/WindRiver/workspace/LRT12/Sensors/..\Config\RobotConfig.h:
+
+C:/WindRiver/workspace/LRT12/Sensors/..\Util\Util.h:

@@ -53,4 +53,12 @@ struct DriveTrainAction
 	double robotRotateSpeed;
 };
 
+namespace ACTION
+{
+	namespace DRIVETRAIN
+	{
+		const static double UNSET_POS = 6564E16;
+	}
+}
+
 #endif
