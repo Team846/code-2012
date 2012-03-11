@@ -28,9 +28,8 @@ void PrintInConstructor::Initialize(const char* ctor_message,
 {
 	if (ctor_message)
 	{
-		printf("ctor:");
-		printf(ctor_message);
-		printf("\n");
+		//		printf("ctor:");
+		printf("%s\n", ctor_message);
 	}
 	if (dtor_message) //save a copy with "dtor:" prepended, otherwise we won't print anything.
 		destructorMessage_.assign("dtor:").append(dtor_message).append("\n");

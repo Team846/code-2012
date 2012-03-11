@@ -159,7 +159,6 @@ void ClosedLoopDrivetrain::update()
 		if (fabs(m_pos_control[TRANSLATE]->getError()) < 0.5
 				&& m_pos_control[TRANSLATE]->getAccumulatedError() < 5.02 - 2)
 		{
-			AsyncPrinter::Printf("setpoint %.2f, in %.2f, err %.2f, prev_error %.2f, Done for real\n", m_pos_control[TRANSLATE]->getSetpoint(), m_pos_control[TRANSLATE]->getInput(), m_pos_control[TRANSLATE]->getError(), m_pos_control[TRANSLATE]->getPreviousError());
 			m_fwd_op_complete = true;
 		}
 		else
@@ -285,7 +284,7 @@ void ClosedLoopDrivetrain::update()
 	}
 	if (m_turn_control_type != CL_POSITION)
 		m_turn_op_complete = true; // this flag doesn't mean much here
-	
+
 }
 
 void ClosedLoopDrivetrain::setTranslateControl(CONTROL_TYPE type)

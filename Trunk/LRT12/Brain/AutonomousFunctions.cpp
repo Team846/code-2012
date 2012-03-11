@@ -28,6 +28,8 @@ AutonomousFunctions::AutonomousFunctions() :
 	m_action = ActionData::GetInstance();
 	m_bridgebalance_pid = new PID();
 	hasStartedTipping = false;
+	m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
+	m_adj_cyc_delay = 0;
 	Configure();
 }
 
@@ -125,6 +127,8 @@ void AutonomousFunctions::task()
 		{
 		case ACTION::AUTONOMOUS::TELEOP:
 			hasStartedTipping = false;
+			m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
+			m_adj_cyc_delay = M_CYCLES_TO_DELAY;
 #define CLOSED_LOOP 1
 #if CLOSED_LOOP
 			m_action->drivetrain->rate.drive_control = true; //If driver control use velocity control
@@ -140,7 +144,7 @@ void AutonomousFunctions::task()
 			if (bridgeBalance())
 			{
 				m_action->auton->completion_status = ACTION::SUCCESS;
-//				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+				//				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
 			}
 			else
 				m_action->auton->completion_status = ACTION::IN_PROGRESS;
@@ -158,7 +162,7 @@ void AutonomousFunctions::task()
 			if (autoAlign())
 			{
 				m_action->auton->completion_status = ACTION::SUCCESS;
-				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+//				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
 			}
 			else
 				m_action->auton->completion_status = ACTION::IN_PROGRESS;
@@ -220,21 +224,21 @@ bool AutonomousFunctions::bridgeBalance()
 		m_action->drivetrain->position.turn_control = false;
 		m_action->drivetrain->rate.drive_control = true;
 		m_action->drivetrain->rate.turn_control = true;
-		
+
 		m_action->drivetrain->rate.desiredDriveRate = 0.18 * m_direction;
 		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-		
+
 		static int prev_side = 0; // -1 neg, 0 flat, 1 pos
 		int side = 0;
 		if (fabs(m_action->imu->pitch) > 12)
 		{
 			side = m_direction;
 		}
-		else 
+		else
 		{
 			side = 0;
 		}
-		
+
 		if (side == 0 && prev_side != side)
 		{
 			AsyncPrinter::Printf("We have tipped\n");
@@ -252,9 +256,10 @@ bool AutonomousFunctions::bridgeBalance()
 			m_action->drivetrain->position.absoluteTurn = false;
 			m_action->drivetrain->position.drive_control = true;
 			m_action->drivetrain->position.turn_control = true;
-			m_action->drivetrain->position.desiredRelativeDrivePosition = -3 * m_direction; //TODO Check me
+			m_action->drivetrain->position.desiredRelativeDrivePosition = -3
+					* m_direction; //TODO Check me
 			//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
-			m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
+			m_action->drivetrain->position.desiredAbsoluteTurnPosition = 0;
 		}
 		else
 		{
@@ -262,9 +267,8 @@ bool AutonomousFunctions::bridgeBalance()
 				return true;
 		}
 	}
-	
+
 	return false;
-	
 
 	//	m_bridgebalance_pid->setSetpoint(m_bridgebalance_setpoint);
 	m_bridgebalance_pid->setSetpoint(0);
@@ -289,7 +293,7 @@ bool AutonomousFunctions::bridgeBalance()
 	//	m_action->drivetrain->rate.desiredDriveRate
 	//			= m_bridgebalance_pid->getOutput();
 	m_action->drivetrain->rate.desiredTurnRate = 0.0;
-	
+
 	if (fabs(m_bridgebalance_pid->getError()) < m_bridgebalance_threshold)
 	{
 		//			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
@@ -342,12 +346,9 @@ bool AutonomousFunctions::autoAlign()
 		m_action->drivetrain->position.drive_control = false;
 		m_action->drivetrain->position.turn_control = false;
 
-		/* PROPOSED FIX begin */
-		m_align_turned = Util::Sign<double>(error) * fabs(error * (1.0 / 127) * m_align_turn_rate);
-		/* PROPOSED FIX end */
-		
 		// switch directions depending on error
-		m_action->drivetrain->rate.desiredTurnRate = m_align_turned; // PROPOSED FIX
+		m_action->drivetrain->rate.desiredTurnRate = Util::Sign<double>(error)
+				* fabs(error * (1.0 / 127) * m_align_turn_rate);
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 
 		if (fabs(error) < m_align_threshold)
@@ -368,13 +369,18 @@ bool AutonomousFunctions::autonomousMode()
 	static int e = 0;
 	if (++e % 40 == 0)
 		AsyncPrinter::Printf("Entering %s\r\n",
-			getAutonomousStageName(m_curr_auton_stage).c_str());
+				getAutonomousStageName(m_curr_auton_stage).c_str());
 #endif
 	switch (m_curr_auton_stage)
 	{
 	case INIT:
 #warning Set speed correctly and check trajectory 
 		m_action->launcher->desiredTarget = ACTION::LAUNCHER::KEY_SHOT_HIGH;
+		m_action->drivetrain->position.reset_turn_zero = true;
+		M_CYCLES_TO_DELAY
+				= static_cast<int> ((DriverStation::GetInstance()->GetAnalogIn(
+						1) / 5.0) * 10 * RobotConfig::LOOP_RATE);
+		m_adj_cyc_delay = M_CYCLES_TO_DELAY;
 		advanceQueue();
 		break;
 	case KEY_TRACK:
@@ -392,19 +398,6 @@ bool AutonomousFunctions::autonomousMode()
 	case SHOOT:
 		AsyncPrinter::Printf("Pretend Shooting\n");
 		advanceQueue();
-		
-		/* PROPOSED FIX begin */
-		
-		m_action->drivetrain->rate.drive_control = true;
-		m_action->drivetrain->rate.turn_control = true;
-		m_action->drivetrain->position.drive_control = false;
-		m_action->drivetrain->position.turn_control = false;
-
-		m_action->drivetrain->rate.desiredTurnRate = -1* m_align_turned;
-		m_action->drivetrain->rate.desiredDriveRate = 0;		
-		
-		/* PROPOSED FIX end */
-		
 		break;
 		if (autoAlign() && m_action->launcher->ballLaunchCounter
 				<= BALLS_TO_SHOOT)
@@ -437,6 +430,20 @@ bool AutonomousFunctions::autonomousMode()
 		m_action->wedge->state = ACTION::WEDGE::PRESET_TOP;
 		m_action->ballfeed->feeder_state = ACTION::BALLFEED::HOLDING;
 		advanceQueue();
+		break;
+	case DELAY_HALF_SEC:
+		if (--m_haf_cyc_delay <= 0)
+		{
+			m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
+			advanceQueue();
+		}
+		break;
+	case ADJUSTABLE_DELAY:
+		if (--m_adj_cyc_delay <= 0)
+		{
+			m_adj_cyc_delay = M_CYCLES_TO_DELAY;
+			advanceQueue();
+		}
 		break;
 	case WAIT_FOR_POSITION:
 
@@ -492,13 +499,13 @@ void AutonomousFunctions::Configure()
 
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH] =
-		{ INIT, KEY_TRACK, AIM, SHOOT,DROP_WEDGE, MOVE_BACK_INIT,
-				WAIT_FOR_POSITION, DONE };
+		{ INIT, ADJUSTABLE_DELAY, KEY_TRACK, AIM, SHOOT, DROP_WEDGE,
+				MOVE_BACK_INIT, WAIT_FOR_POSITION, DONE };
 
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::BRIDGE_THEN_SHOOT[BRIDGE_THEN_SHOOT_LENGTH] =
-		{ INIT, MOVE_BACK_INIT, DROP_WEDGE, WAIT_FOR_POSITION, RAISE_WEDGE,
-				KEY_TRACK, AIM, SHOOT, DONE };
+		{ INIT, ADJUSTABLE_DELAY, MOVE_BACK_INIT, DROP_WEDGE,
+				WAIT_FOR_POSITION, RAISE_WEDGE, KEY_TRACK, AIM, SHOOT, DONE };
 
 void AutonomousFunctions::loadQueue()
 {
@@ -550,6 +557,12 @@ std::string AutonomousFunctions::getAutonomousStageName(autonomousStage a)
 	case WAIT_FOR_POSITION:
 		str = "Wait for position";
 		break;
+	case DELAY_HALF_SEC:
+		str = "Delay Half Second";
+		break;
+	case ADJUSTABLE_DELAY:
+		str = "Adjustable Delay";
+		break;
 	case DONE:
 		str = "Done";
 		break;
@@ -569,7 +582,7 @@ void AutonomousFunctions::advanceQueue()
 		m_curr_auton_stage = DONE;
 	}
 	AsyncPrinter::Printf("Entering %s\r\n",
-				getAutonomousStageName(m_curr_auton_stage).c_str());
+			getAutonomousStageName(m_curr_auton_stage).c_str());
 }
 
 void AutonomousFunctions::log()

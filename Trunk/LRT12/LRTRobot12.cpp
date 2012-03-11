@@ -76,14 +76,7 @@ void LRTRobot12::MainLoop()
 	// sysClkRateGet returns the number of ticks per cycle at the current clock rate.
 	wdStart(mainLoopWatchDog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			ExecutionNotify, 0);
-	
-	static double lastGyro = 0.0;
-	double delta = m_action->imu->gyro_y - lastGyro;
-	static int e = 0;
-	if (fabs(delta) > 0.1)
-	if (++e % 5 == 0)
-		AsyncPrinter::Printf("Delta %.3f\n", delta);
-	lastGyro = m_action->imu->gyro_y;
+
 	// /*
 	GameState gameState = DetermineState();
 	m_action->wasDisabled = (prevState == DISABLED);
@@ -112,7 +105,7 @@ void LRTRobot12::MainLoop()
 			}
 		}
 	}
-	
+
 	if (ds->GetDigitalIn(RobotConfig::DRIVER_STATION::COMPRESSOR))
 	{
 		m_compressor->Start();

@@ -36,6 +36,8 @@ public:
 		DROP_WEDGE = 6, //!< Drop the Wedge
 		RAISE_WEDGE = 7, //!< Raise the Wedge
 		WAIT_FOR_POSITION = 8, //!< MOVE_BACK
+		DELAY_HALF_SEC = 9,
+		ADJUSTABLE_DELAY = 10,
 		DONE = 0
 	//!< Finished
 	};
@@ -134,10 +136,10 @@ private:
 	 */
 	std::string getAutonomousStageName(autonomousStage a);
 
-	const static int SHOOT_THEN_BRIDGE_LENGTH = 9;
+	const static int SHOOT_THEN_BRIDGE_LENGTH = 10;
 	const static autonomousStage SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH];
 
-	const static int BRIDGE_THEN_SHOOT_LENGTH = 9;
+	const static int BRIDGE_THEN_SHOOT_LENGTH = 10;
 	const static autonomousStage BRIDGE_THEN_SHOOT[BRIDGE_THEN_SHOOT_LENGTH];
 
 	std::queue<autonomousStage> m_auton_sequence;
@@ -165,14 +167,12 @@ private:
 	double m_bridgebalance_angular_rate_threshold;
 	double m_bridgebalance_threshold, m_keytrack_threshold, m_align_threshold;
 
-	/* PROPOSED FIX begin */
-	double m_align_turned;
-	/* PROPOSED FIX end */
-	
 	bool m_hit_key_flag;
-	
+
 	bool hasStartedTipping;
 	int m_direction;
+	int m_haf_cyc_delay;
+	int m_adj_cyc_delay, M_CYCLES_TO_DELAY;
 
 	DISALLOW_COPY_AND_ASSIGN( AutonomousFunctions);
 };

@@ -18,11 +18,4 @@
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>Documentation</name>
-			<type>2</type>
-			<location>C:/WindRiver/workspace/Documentation</location>
-		</link>
-	</linkedResources>
 </projectDescription>
