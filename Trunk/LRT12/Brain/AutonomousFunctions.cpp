@@ -342,9 +342,12 @@ bool AutonomousFunctions::autoAlign()
 		m_action->drivetrain->position.drive_control = false;
 		m_action->drivetrain->position.turn_control = false;
 
+		/* PROPOSED FIX begin */
+		m_align_turned = Util::Sign<double>(error) * fabs(error * (1.0 / 127) * m_align_turn_rate);
+		/* PROPOSED FIX end */
+		
 		// switch directions depending on error
-		m_action->drivetrain->rate.desiredTurnRate = Util::Sign<double>(error)
-				* fabs(error * (1.0 / 127) * m_align_turn_rate);
+		m_action->drivetrain->rate.desiredTurnRate = m_align_turned; // PROPOSED FIX
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 
 		if (fabs(error) < m_align_threshold)
@@ -389,6 +392,19 @@ bool AutonomousFunctions::autonomousMode()
 	case SHOOT:
 		AsyncPrinter::Printf("Pretend Shooting\n");
 		advanceQueue();
+		
+		/* PROPOSED FIX begin */
+		
+		m_action->drivetrain->rate.drive_control = true;
+		m_action->drivetrain->rate.turn_control = true;
+		m_action->drivetrain->position.drive_control = false;
+		m_action->drivetrain->position.turn_control = false;
+
+		m_action->drivetrain->rate.desiredTurnRate = -1* m_align_turned;
+		m_action->drivetrain->rate.desiredDriveRate = 0;		
+		
+		/* PROPOSED FIX end */
+		
 		break;
 		if (autoAlign() && m_action->launcher->ballLaunchCounter
 				<= BALLS_TO_SHOOT)

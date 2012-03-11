@@ -165,6 +165,10 @@ private:
 	double m_bridgebalance_angular_rate_threshold;
 	double m_bridgebalance_threshold, m_keytrack_threshold, m_align_threshold;
 
+	/* PROPOSED FIX begin */
+	double m_align_turned;
+	/* PROPOSED FIX end */
+	
 	bool m_hit_key_flag;
 	
 	bool hasStartedTipping;
