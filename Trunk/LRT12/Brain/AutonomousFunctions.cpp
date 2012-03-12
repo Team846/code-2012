@@ -243,6 +243,15 @@ bool AutonomousFunctions::bridgeBalance()
 		{
 			AsyncPrinter::Printf("We have tipped\n");
 			hasStartedTipping = true;
+		
+			/* changes begin */
+			
+			m_action->drivetrain->rate.desiredDriveRate = 0.0;
+			m_action->drivetrain->rate.desiredTurnRate = 0.0;
+					
+			return true;
+			
+			/* changes end */
 		}
 		prev_side = side;
 	}
