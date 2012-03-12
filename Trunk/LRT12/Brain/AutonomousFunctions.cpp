@@ -26,10 +26,11 @@ AutonomousFunctions::AutonomousFunctions() :
 	m_task_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 	m_is_running = false;
 	m_action = ActionData::GetInstance();
-	m_bridgebalance_pid = new PID();
+
 	hasStartedTipping = false;
 	m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
 	m_adj_cyc_delay = 0;
+	m_align_setpoint = 0;
 	Configure();
 }
 
@@ -44,8 +45,6 @@ AutonomousFunctions::~AutonomousFunctions()
 	{
 		printf("SemDelete Error=%d\n", error);
 	}
-
-	delete m_bridgebalance_pid;
 }
 
 void AutonomousFunctions::taskEntryPoint()
@@ -99,7 +98,7 @@ void AutonomousFunctions::task()
 				break;
 			case ACTION::AUTONOMOUS::BRIDGEBALANCE:
 				m_counter = m_timeout_bridgebalance;
-				m_bridgebalance_pid->reset();
+				m_bridgebalance_pid.reset();
 				break;
 			case ACTION::AUTONOMOUS::KEYTRACK:
 				m_counter = m_timeout_keytrack;
@@ -162,7 +161,7 @@ void AutonomousFunctions::task()
 			if (autoAlign())
 			{
 				m_action->auton->completion_status = ACTION::SUCCESS;
-//				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+				//				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
 			}
 			else
 				m_action->auton->completion_status = ACTION::IN_PROGRESS;
@@ -214,6 +213,7 @@ bool AutonomousFunctions::bridgeBalance()
 	static int e = 0;
 	if (++e % 25 == 0)
 		AsyncPrinter::Printf("Balancing\n");
+	
 	if (!hasStartedTipping)
 	{
 		if (++e % 5 == 0)
@@ -225,7 +225,7 @@ bool AutonomousFunctions::bridgeBalance()
 		m_action->drivetrain->rate.drive_control = true;
 		m_action->drivetrain->rate.turn_control = true;
 
-		m_action->drivetrain->rate.desiredDriveRate = 0.18 * m_direction;
+		m_action->drivetrain->rate.desiredDriveRate = 0.11 * m_direction;
 		m_action->drivetrain->rate.desiredTurnRate = 0.0;
 
 		static int prev_side = 0; // -1 neg, 0 flat, 1 pos
@@ -249,15 +249,23 @@ bool AutonomousFunctions::bridgeBalance()
 	else
 	{
 		if (++e % 5 == 0)
-			AsyncPrinter::Printf("Moving Back\n");
+			AsyncPrinter::Printf("Stopping \n");
+		m_action->drivetrain->position.drive_control = false;
+		m_action->drivetrain->position.turn_control = false;
+		m_action->drivetrain->rate.drive_control = false;
+		m_action->drivetrain->rate.turn_control = false;
+		m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+		
 		if (!m_action->drivetrain->position.drive_control)
 		{
+			AsyncPrinter::Printf("setting\n");
 			m_action->drivetrain->position.absoluteTranslate = false;
-			m_action->drivetrain->position.absoluteTurn = false;
-			m_action->drivetrain->position.drive_control = true;
-			m_action->drivetrain->position.turn_control = true;
-			m_action->drivetrain->position.desiredRelativeDrivePosition = -3
-					* m_direction; //TODO Check me
+			m_action->drivetrain->position.drive_control = false;
+			m_action->drivetrain->position.turn_control = false;
+			m_action->drivetrain->rate.drive_control = false;
+			m_action->drivetrain->rate.turn_control = false;
+			m_action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
 			//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
 			m_action->drivetrain->position.desiredAbsoluteTurnPosition = 0;
 		}
@@ -270,10 +278,10 @@ bool AutonomousFunctions::bridgeBalance()
 
 	return false;
 
-	//	m_bridgebalance_pid->setSetpoint(m_bridgebalance_setpoint);
-	m_bridgebalance_pid->setSetpoint(0);
-	m_bridgebalance_pid->setInput(m_action->imu->pitch);
-	m_bridgebalance_pid->update(1.0 / RobotConfig::LOOP_RATE);
+	//	m_bridgebalance_pid.setSetpoint(m_bridgebalance_setpoint);
+	m_bridgebalance_pid.setSetpoint(0);
+	m_bridgebalance_pid.setInput(m_action->imu->pitch);
+	m_bridgebalance_pid.update(1.0 / RobotConfig::LOOP_RATE);
 
 	// drive on rate control, turn on rate control
 	m_action->drivetrain->rate.drive_control = true;
@@ -283,18 +291,18 @@ bool AutonomousFunctions::bridgeBalance()
 
 	// set drivetrain and switch sign
 	//	m_action->drivetrain->position.desiredRelativeDrivePosition
-	//			= -m_bridgebalance_pid->getOutput();
+	//			= -m_bridgebalance_pid.getOutput();
 	m_action->drivetrain->rate.desiredDriveRate = Util::Clamp<double>(
-			-m_bridgebalance_pid->getOutput(), -0.1, 0.1);
+			-m_bridgebalance_pid.getOutput(), -0.1, 0.1);
 
 	//	if (++e % 25 == 0)
 	//		AsyncPrinter::Printf("Bridge Out %.4f\n",
-	//				m_bridgebalance_pid->getOutput());
+	//				m_bridgebalance_pid.getOutput());
 	//	m_action->drivetrain->rate.desiredDriveRate
-	//			= m_bridgebalance_pid->getOutput();
+	//			= m_bridgebalance_pid.getOutput();
 	m_action->drivetrain->rate.desiredTurnRate = 0.0;
 
-	if (fabs(m_bridgebalance_pid->getError()) < m_bridgebalance_threshold)
+	if (fabs(m_bridgebalance_pid.getError()) < m_bridgebalance_threshold)
 	{
 		//			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
 		return true;//we're done
@@ -337,24 +345,46 @@ bool AutonomousFunctions::keyTrack()
 
 bool AutonomousFunctions::autoAlign()
 {
+	m_auto_aim_pid.setSetpoint(m_align_setpoint);
 	if (m_action->cam->align.status != ACTION::CAMERA::NO_TARGET)
 	{
-		double error = m_align_setpoint
-				- m_action->cam->align.arbitraryOffsetFromUDP;
+		double input = m_action->cam->align.arbitraryOffsetFromUDP;
+		m_auto_aim_pid.setInput(input / 127.0);
+		m_auto_aim_pid.update(1.0 / RobotConfig::LOOP_RATE);
+		double out = m_auto_aim_pid.getOutput();
+		if (fabs(out) > m_max_align_turn_rate)
+		{
+			out = Util::Sign<double>(out) * m_max_align_turn_rate;
+		}
+
 		m_action->drivetrain->rate.drive_control = true;
 		m_action->drivetrain->rate.turn_control = true;
 		m_action->drivetrain->position.drive_control = false;
 		m_action->drivetrain->position.turn_control = false;
 
 		// switch directions depending on error
-		m_action->drivetrain->rate.desiredTurnRate = Util::Sign<double>(error)
-				* fabs(error * (1.0 / 127) * m_align_turn_rate);
-		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 
-		if (fabs(error) < m_align_threshold)
+		if (fabs(m_auto_aim_pid.getError()) <= m_align_threshold)
 		{
+//			m_align_turned = out;
+			
+			m_action->drivetrain->rate.desiredTurnRate = 0.0;
+			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 			AsyncPrinter::Printf("Aiming done\n");
 			return true;
+		}
+		else
+		{
+			if (fabs(out) <= m_min_align_turn_rate)
+			{
+				m_action->drivetrain->rate.desiredTurnRate
+						= Util::Sign<double>(out) * m_min_align_turn_rate;
+			}
+			else
+			{
+				m_action->drivetrain->rate.desiredTurnRate = out;
+			}
+			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 		}
 	}
 	return false;
@@ -397,6 +427,15 @@ bool AutonomousFunctions::autonomousMode()
 		break;
 	case SHOOT:
 		AsyncPrinter::Printf("Pretend Shooting\n");
+		
+		//m_action->drivetrain->rate.drive_control = true;
+		//m_action->drivetrain->rate.turn_control = true;
+		//m_action->drivetrain->position.drive_control = false;
+		//m_action->drivetrain->position.turn_control = false;
+		
+		//m_action->drivetrain->rate.desiredTurnRate = -1 * m_align_turned;
+		//m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		
 		advanceQueue();
 		break;
 		if (autoAlign() && m_action->launcher->ballLaunchCounter
@@ -483,7 +522,7 @@ void AutonomousFunctions::Configure()
 	p = c->Get<double> (m_name, "bridgeP", 0.05);
 	i = c->Get<double> (m_name, "bridgeI", 0.0);
 	d = c->Get<double> (m_name, "bridgeD", 0.0);
-	m_bridgebalance_pid->setParameters(p, i, d, 0, 0.87, false);
+	m_bridgebalance_pid.setParameters(p, i, d, 0, 0.87, false);
 	m_bridgebalance_setpoint = c->Get<double> (m_name, "bridgeSetpoint", 00);
 	m_bridgebalance_threshold = c->Get<double> (m_name, "bridgeThreshold", 1);
 	m_bridgebalance_angular_rate_threshold = c->Get<double> (m_name,
@@ -492,7 +531,12 @@ void AutonomousFunctions::Configure()
 	m_keytrack_forward_rate = c->Get<double> (m_name, "keyForwardRate", 0.1);
 	m_keytrack_threshold = c->Get<double> (m_name, "keyThreshold", 127);
 
-	m_align_turn_rate = c->Get<double> (m_name, "alignTurnRate", 0.15);
+	p = c->Get<double> (m_name, "autoAlignP", 32.0);
+	i = c->Get<double> (m_name, "autoAlignI", 12.7);
+	d = c->Get<double> (m_name, "autoAlignD", 0.0);
+	m_auto_aim_pid.setParameters(p, i, d, 0.1, false);
+	m_max_align_turn_rate = c->Get<double> (m_name, "alignMaxTurnRate", 0.15);
+	m_min_align_turn_rate = c->Get<double> (m_name, "alignMinTurnRate", 0.05);
 	m_align_threshold = c->Get<double> (m_name, "alignThreshold", 20);
 	m_align_setpoint = c->Get<double> (m_name, "alignSetpoint", 0.0);
 }
@@ -613,11 +657,17 @@ void AutonomousFunctions::log()
 	}
 	sdb->PutString("Autonomous Mode", s.c_str());
 
-	sdb->PutDouble("BridgePIDError", m_bridgebalance_pid->getError());
+	sdb->PutDouble("BridgePIDError", m_bridgebalance_pid.getError());
 	sdb->PutDouble("BridgePID_Acc_error",
-			m_bridgebalance_pid->getAccumulatedError());
-	sdb->PutDouble("BridgePIDOutput", m_bridgebalance_pid->getOutput());
-	sdb->PutDouble("BridgePID_P", m_bridgebalance_pid->getProportionalGain());
-	sdb->PutDouble("BridgePID_I", m_bridgebalance_pid->getDerivativeGain());
-	sdb->PutDouble("BridgePID_D", m_bridgebalance_pid->getIntegralGain());
+			m_bridgebalance_pid.getAccumulatedError());
+	sdb->PutDouble("BridgePIDOutput", m_bridgebalance_pid.getOutput());
+	sdb->PutDouble("BridgePID_P", m_bridgebalance_pid.getProportionalGain());
+	sdb->PutDouble("BridgePID_I", m_bridgebalance_pid.getIntegralGain());
+	sdb->PutDouble("BridgePID_D", m_bridgebalance_pid.getDerivativeGain());
+	sdb->PutDouble("AutoAimPID Error", m_auto_aim_pid.getError());
+	sdb->PutDouble("AutoAimPID_Acc_error", m_auto_aim_pid.getAccumulatedError());
+	sdb->PutDouble("AutoAimPID_Output", m_auto_aim_pid.getOutput());
+	sdb->PutDouble("AutoAimPID_P", m_auto_aim_pid.getProportionalGain());
+	sdb->PutDouble("AutoAimPID_I", m_auto_aim_pid.getIntegralGain());
+	sdb->PutDouble("AutoAimPID_D", m_auto_aim_pid.getDerivativeGain());
 }

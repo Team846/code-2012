@@ -49,6 +49,10 @@ double PID::update(double dt)
 	// approximate with riemann sum and decay
 	m_acc_error *= m_integral_decay;
 	m_acc_error += m_error * dt;
+	if (m_acc_error != m_acc_error) // catch NaN
+	{
+		m_acc_error = 0;
+	}
 	double integral = m_acc_error / (1 - m_integral_decay);
 
 	// magic PID line

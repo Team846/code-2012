@@ -4,6 +4,7 @@
 #include "WPILib.h"
 #include "../Config/Configurable.h"
 #include "../Config/Config.h"
+#include "../Util/PID.h"
 #include "../Log/Loggable.h"
 #include "../Config/RobotConfig.h"
 #include "../ActionData/ActionData.h"
@@ -13,8 +14,6 @@
 #include "../ActionData/IMUData.h"
 #include "../ActionData/CameraData.h"
 #include <queue>
-
-class PID;
 
 /*!
  * Contains assist functions for autonomous and teleoperated usage
@@ -160,13 +159,17 @@ private:
 	uint32_t m_timeout_bridgebalance, m_timeout_keytrack, m_timeout_autoalign;
 
 	ActionData * m_action;
-	PID *m_bridgebalance_pid;
+	PID m_bridgebalance_pid;
+	PID m_auto_aim_pid;
+
 	double m_keytrack_forward_rate;
-	double m_align_turn_rate;
+	double m_max_align_turn_rate, m_min_align_turn_rate;
 	double m_bridgebalance_setpoint, m_align_setpoint;
 	double m_bridgebalance_angular_rate_threshold;
 	double m_bridgebalance_threshold, m_keytrack_threshold, m_align_threshold;
 
+	//double m_align_turned;
+	
 	bool m_hit_key_flag;
 
 	bool hasStartedTipping;

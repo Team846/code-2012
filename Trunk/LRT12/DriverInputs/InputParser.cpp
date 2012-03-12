@@ -64,8 +64,8 @@ void InputParser::ProcessInputs()
 	}
 	else if (m_driver_stick->IsButtonDown(BALANCE_BRIDGE))
 	{
-			m_action_ptr->auton->state = ACTION::AUTONOMOUS::AUTON_MODE;
-//		m_action_ptr->auton->state = ACTION::AUTONOMOUS::BRIDGEBALANCE;
+//			m_action_ptr->auton->state = ACTION::AUTONOMOUS::AUTON_MODE;
+		m_action_ptr->auton->state = ACTION::AUTONOMOUS::BRIDGEBALANCE;
 	}
 	else
 	{
