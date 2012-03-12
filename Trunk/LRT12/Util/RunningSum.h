@@ -37,14 +37,14 @@ public:
 	{
 		runningSum = 0;
 	}
-	
+
 	/*!
 	 * @brief sets the decay constant
 	 * @param decayConstant
 	 */
 	void setDecayConstant(double decayConstant)
 	{
-		decayConstant = 0;
+		this->decayConstant = decayConstant;
 	}
 
 private:

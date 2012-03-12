@@ -44,7 +44,7 @@ public:
 	/*!
 	 * Starts the brain tasks
 	 */
-	void Brain::Start();
+	void Start();
 
 private:
 	/*!

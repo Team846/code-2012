@@ -20,10 +20,10 @@ public:
 	/*!
 	 * @brief Types of control
 	 */
-	typedef enum
+	enum CONTROL_TYPE
 	{
 		CL_DISABLED, CL_RATE, CL_POSITION
-	} CONTROL_TYPE;
+	};
 
 	typedef struct
 	{

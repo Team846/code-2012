@@ -30,9 +30,13 @@ LRTRobotBase::~LRTRobotBase()
 	loopSynchronizer->Stop();
 	delete loopSynchronizer;
 
-	for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j = j->next_jaguar_)
+	if (AsyncCANJaguar::jaguar_list_)
 	{
-		j->StopBackgroundTask();
+		for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
+				= j->next_jaguar_)
+		{
+			j->StopBackgroundTask();
+		}
 	}
 
 	AutonomousFunctions::getInstance()->stopBackgroundTask();
@@ -97,10 +101,13 @@ void LRTRobotBase::StartCompetition()
 
 		// release jaggie semaphores
 		// NB: This loop must be quit *before* the Jaguars are deleted!
-		for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
-				= j->next_jaguar_)
+		if (AsyncCANJaguar::jaguar_list_)
 		{
-			j->ReleaseCommSemaphore();
+			for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
+					= j->next_jaguar_)
+			{
+				j->ReleaseCommSemaphore();
+			}
 		}
 
 		Pneumatics::getInstance()->releaseSemaphore();

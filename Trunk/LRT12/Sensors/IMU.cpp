@@ -29,6 +29,8 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 	m_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 	m_is_running = false;
 	m_dio = new DigitalOutput(RobotConfig::DIGITAL_IO::IMU_CALIBRATE);
+	memset(m_i2c_buf, 0, kNumPackets * 6 + 1);
+	m_time = 0;
 }
 
 IMU::~IMU()
@@ -105,10 +107,10 @@ void IMU::update()
 	m_gyro_x = getInt16(GYRO_X);
 	m_gyro_y = getInt16(GYRO_Y);
 	m_gyro_z = getInt16(GYRO_Z);
-	
+
 	m_gyro_y_delta = getGyroY() - m_last_gyro_y;
 	m_last_gyro_y = getGyroY();
-	
+
 	m_time = GetFPGATime() - m_time;
 }
 
@@ -181,7 +183,7 @@ int IMU::getPacket()
 		}
 		else if (data[0] == m_expected_packet_num)
 		{
-			m_expected_packet_num = ++m_expected_packet_num % kNumPackets;
+			m_expected_packet_num = (m_expected_packet_num + 1) % kNumPackets;
 			for (uint8_t j = 0; j < 6; ++j)
 			{
 				m_i2c_buf[data[0] * 6 + j] = data[j + 1];

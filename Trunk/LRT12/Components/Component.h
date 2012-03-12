@@ -19,7 +19,7 @@ protected:
 	 */
 	ActionData* m_action;
 public:
-	typedef struct ComponentData
+	struct ComponentData
 	{
 		bool RequiresEnabledState;
 		const static int NO_DS_DISABLE_DIO = -1;
@@ -35,11 +35,11 @@ public:
 	 * @brief called every time the main loop iterates.
 	 */
 	virtual void Output() = 0;
-	
+
 	/*!
 	 * @brief called when the component is disabled
 	 */
-	
+
 	virtual void Disable() = 0;
 
 	/*!

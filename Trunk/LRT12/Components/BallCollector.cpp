@@ -7,6 +7,7 @@ BallCollector::BallCollector() :
 	m_name("Ball Collector"), m_configsection("bc")
 {
 	m_roller = new AsyncCANJaguar(RobotConfig::CAN::COLLECTOR, "Collector");
+	m_fwd_duty = m_rev_duty = 0;
 }
 
 BallCollector::~BallCollector()

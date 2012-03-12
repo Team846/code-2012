@@ -16,6 +16,10 @@ Shifter::Shifter() :
 	rightServo = new LRTServo(RobotConfig::PWM::RIGHT_GEARBOX_SERVO,
 			"Right Shift Servo");
 	puts("Constructed Shifter");
+	highGearServoValLeft = highGearServoValRight = lowGearServoValLeft
+			= lowGearServoValRight = 1500;
+	servoDisableDelay = servoDisableTimer = 0;
+	Configure();
 }
 
 Shifter::~Shifter()

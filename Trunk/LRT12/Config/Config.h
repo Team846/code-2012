@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <list>
 
-typedef struct ConfigVal
+struct ConfigVal
 {
 	string val;
 	list<string>::iterator positionInFile;

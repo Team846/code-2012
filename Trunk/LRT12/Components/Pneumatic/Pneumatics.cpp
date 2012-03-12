@@ -35,6 +35,8 @@ Pneumatics::Pneumatics() :
 					RobotConfig::SOLENOID_IO::BALL_COLLECTOR_B));
 #endif
 
+	m_mutex = false;
+
 	disableLog();
 
 	m_task = new Task("PneumaticsTask", (FUNCPTR) Pneumatics::taskEntryPoint,

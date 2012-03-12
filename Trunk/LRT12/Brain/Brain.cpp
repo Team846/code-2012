@@ -27,6 +27,7 @@ Brain::~Brain()
 {
 	m_teleop_task->Stop();
 	delete m_teleop_task;
+	delete m_inputs;
 }
 
 void Brain::startTeleop()

@@ -31,6 +31,11 @@ DriveEncoders::DriveEncoders() :
 	m_encoder_left->Start();
 	m_encoder_right->Start();
 	printf("Construct Drive Encoders\n");
+
+	ENCODER_RATE_HIGH_GEAR = HIGH_GEAR_MULTIPLIER = MAX_TURNING_RATE
+			= PULSES_PER_REVOLUTION = TICKS_PER_FULL_TURN = WHEEL_DIAMETER = 0;
+
+	Configure();
 }
 
 DriveEncoders::~DriveEncoders()

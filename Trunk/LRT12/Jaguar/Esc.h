@@ -51,7 +51,7 @@ public:
 	 * @brief Resets the caching.
 	 */
 	void ResetCache();
-	
+
 	void Disable();
 private:
 	AsyncCANJaguar *m_jag1, *m_jag2;
@@ -63,7 +63,7 @@ private:
 	string m_name;
 	int m_cycle_count;
 
-	typedef struct brakeAndDutyCycle
+	struct brakeAndDutyCycle
 	{
 		float dutyCycle;
 		float braking;

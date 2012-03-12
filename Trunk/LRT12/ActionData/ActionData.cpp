@@ -90,4 +90,7 @@ ActionData::~ActionData()
 	free(shifter);
 	free(wedge);
 	free(ballfeed);
+	free(auton);
+	free(imu);
+	free(cam);
 }

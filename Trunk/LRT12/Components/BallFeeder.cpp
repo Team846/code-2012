@@ -17,6 +17,12 @@ BallFeeder::BallFeeder() :
 			"INTAKE");
 
 	loadTimer = 0;
+	loading = 0;
+	for (uint8_t i = 0; i < 3; i++)
+	{
+		m_fwd_duty[i] = m_holding_duty[i] = m_rev_duty[i] = 0;
+	}
+	Configure();
 }
 
 BallFeeder::~BallFeeder()
@@ -135,6 +141,7 @@ void BallFeeder::log()
 		break;
 	case ACTION::BALLFEED::PURGING:
 		s = "Purging";
+		break;
 	case ACTION::BALLFEED::FREEZING:
 		s = "Freezing";
 		break;

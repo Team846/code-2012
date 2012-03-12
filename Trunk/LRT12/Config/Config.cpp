@@ -93,7 +93,7 @@ void Config::Load()
 				keyname + ".scaleMax", 1);
 	}
 	AsyncPrinter::Printf("Done loading file\n");
-	
+
 	ConfigureAll();
 }
 
@@ -179,6 +179,22 @@ void Config::ConfigureAll()
  */
 void Config::CheckForFileUpdates()
 {
+	if (configFile != NULL)
+		delete configFile;
+	configFile = new list<string> ();
+
+	//	printf("Config file\n");
+
+	if (newConfigData != NULL)
+		delete newConfigData;
+	newConfigData = new config();
+
+	//	printf("Config data\n");
+
+	if (sectionsMap != NULL)
+		delete sectionsMap;
+	sectionsMap = new map<string, list<string>::iterator> ();
+
 	struct stat statistics;
 	stat(CONFIG_FILE_PATH.c_str(), &statistics);
 
@@ -402,8 +418,8 @@ void Config::LoadFile(string path)
 		string key, val;
 		getline(sstream, key, '=');
 		getline(sstream, val);
-//		if (val.find("=") != string::npos)//we don't allow more than 1 equals sign per line leave a comment stating that
-//			(*iter) += " ; more than 1 equals sign per line is illegal";
+		//		if (val.find("=") != string::npos)//we don't allow more than 1 equals sign per line leave a comment stating that
+		//			(*iter) += " ; more than 1 equals sign per line is illegal";
 
 		ConfigVal newVal;
 		newVal.val = val;

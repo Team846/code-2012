@@ -12,6 +12,7 @@ Wedge::Wedge() :
 	m_ctr = 0;
 
 	AsyncPrinter::Printf("Constructed Wedge\n");
+	m_lastState = ACTION::WEDGE::IDLE;
 }
 
 Wedge::~Wedge()
