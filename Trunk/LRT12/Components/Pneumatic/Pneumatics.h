@@ -47,14 +47,14 @@ public:
 	void setTrajectory(bool on);
 
 	/*!
-	 * Sets the status of the latch
+	 * Sets the m_status of the latch
 	 * interlocked with setPressurePlate
 	 * @param on
 	 */
 	void setLatch(bool on);
 
 	/*!
-	 * Sets the status of the pressure plate
+	 * Sets the m_status of the pressure plate
 	 * interlocked with setLatch
 	 * @param on
 	 */

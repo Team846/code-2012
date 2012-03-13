@@ -370,8 +370,8 @@ public:
 	}
 
 	/*!
-	 * @brief Get forward limit status
-	 * @return forward limit status
+	 * @brief Get forward limit m_status
+	 * @return forward limit m_status
 	 */
 	bool GetForwardLimitOK()
 	{
@@ -379,8 +379,8 @@ public:
 	}
 
 	/*!
-	 * @brief Get reverse limit status
-	 * @return reverse limit status
+	 * @brief Get reverse limit m_status
+	 * @return reverse limit m_status
 	 */
 	bool GetReverseLimitOK()
 	{
@@ -388,8 +388,8 @@ public:
 	}
 
 	/*!
-	 * @brief Get power cycle status
-	 * @return power cycle status
+	 * @brief Get power cycle m_status
+	 * @return power cycle m_status
 	 */
 	bool GetPowerCycled()
 	{
@@ -413,7 +413,7 @@ public:
 	static int CommTaskWrapper(UINT32 proxiedCANJaguarPointer);
 
 	/*!
-	 * @brief Synchronizes the Jaguar with the cRIO status
+	 * @brief Synchronizes the Jaguar with the cRIO m_status
 	 */
 	void CommTask();
 

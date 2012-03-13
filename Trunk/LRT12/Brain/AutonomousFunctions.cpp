@@ -31,10 +31,6 @@ AutonomousFunctions::AutonomousFunctions() :
 	m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
 	m_adj_cyc_delay = 0;
 	m_align_setpoint = 0;
-	m_counter = 0;
-	m_curr_auton_stage = INIT;
-	m_hit_key_flag = false;
-	m_last_state = ACTION::AUTONOMOUS::TELEOP;
 	Configure();
 }
 
@@ -185,6 +181,11 @@ void AutonomousFunctions::task()
 	}
 }
 
+bool anotherBridgeBalance()
+{
+	return false;
+}
+
 bool AutonomousFunctions::alternateBridgeBalance()
 {
 	m_action->drivetrain->rate.drive_control = true;
@@ -217,7 +218,16 @@ bool AutonomousFunctions::bridgeBalance()
 	static int e = 0;
 	if (++e % 25 == 0)
 		AsyncPrinter::Printf("Balancing\n");
-
+	
+	static double lastAccelX = 0.0;
+	static double lastPitch = 0.0;
+	static double angularVelocity = 0.0;
+	if (lastAccelX != m_action->imu->accel_x )//noise means that we have new data
+	{
+		angularVelocity = (m_action->imu->pitch - lastPitch) * RobotConfig::LOOP_RATE;
+		lastPitch = m_action->imu->pitch;
+		lastAccelX = m_action->imu->accel_x;
+	}
 	if (!hasStartedTipping)
 	{
 		if (++e % 5 == 0)
@@ -247,86 +257,33 @@ bool AutonomousFunctions::bridgeBalance()
 		{
 			AsyncPrinter::Printf("We have tipped\n");
 			hasStartedTipping = true;
-
-			/* changes begin */
-
-			m_action->drivetrain->rate.desiredDriveRate = 0.0;
-			m_action->drivetrain->rate.desiredTurnRate = 0.0;
-
-			return true;
-
-			/* changes end */
 		}
 		prev_side = side;
 	}
-	else
+	else //has started tipping
 	{
-		if (++e % 5 == 0)
-			AsyncPrinter::Printf("Stopping \n");
+		m_bridgebalance_pid.setSetpoint(0.0);
+		m_bridgebalance_pid.setInput(m_action->imu->gyro_y);
+		m_bridgebalance_pid.update(1.0 / RobotConfig::LOOP_RATE);
+		
+
+		if (++e % 2 == 0)
+		{
+			AsyncPrinter::Printf("Pitch %2f, pitch rate %2f, gyro %2f, out %2f\n", lastPitch, angularVelocity, m_action->imu->gyro_y,  m_bridgebalance_pid.getOutput());
+		}
+		
 		m_action->drivetrain->position.drive_control = false;
 		m_action->drivetrain->position.turn_control = false;
-		m_action->drivetrain->rate.drive_control = false;
-		m_action->drivetrain->rate.turn_control = false;
-		m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		m_action->drivetrain->rate.drive_control = true;
+		m_action->drivetrain->rate.turn_control = true;
+		m_action->drivetrain->rate.desiredDriveRate = Util::Clamp<double>(m_bridgebalance_pid.getOutput(), -0.2, 0.2);
 		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-
-		if (!m_action->drivetrain->position.drive_control)
-		{
-			AsyncPrinter::Printf("setting\n");
-			m_action->drivetrain->position.absoluteTranslate = false;
-			m_action->drivetrain->position.drive_control = false;
-			m_action->drivetrain->position.turn_control = false;
-			m_action->drivetrain->rate.drive_control = false;
-			m_action->drivetrain->rate.turn_control = false;
-			m_action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
-			//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
-			m_action->drivetrain->position.desiredAbsoluteTurnPosition = 0;
-		}
-		else
-		{
-			if (m_action->drivetrain->previousDriveOperationComplete)
-				return true;
-		}
+		return false;
 	}
 
 	return false;
 
-	//	//	m_bridgebalance_pid.setSetpoint(m_bridgebalance_setpoint);
-	//	m_bridgebalance_pid.setSetpoint(0);
-	//	m_bridgebalance_pid.setInput(m_action->imu->pitch);
-	//	m_bridgebalance_pid.update(1.0 / RobotConfig::LOOP_RATE);
-	//
-	//	// drive on rate control, turn on rate control
-	//	m_action->drivetrain->rate.drive_control = true;
-	//	m_action->drivetrain->rate.turn_control = true;
-	//	m_action->drivetrain->position.drive_control = false;
-	//	m_action->drivetrain->position.turn_control = false;
-	//
-	//	// set drivetrain and switch sign
-	//	//	m_action->drivetrain->position.desiredRelativeDrivePosition
-	//	//			= -m_bridgebalance_pid.getOutput();
-	//	m_action->drivetrain->rate.desiredDriveRate = Util::Clamp<double>(
-	//			-m_bridgebalance_pid.getOutput(), -0.1, 0.1);
-	//
-	//	//	if (++e % 25 == 0)
-	//	//		AsyncPrinter::Printf("Bridge Out %.4f\n",
-	//	//				m_bridgebalance_pid.getOutput());
-	//	//	m_action->drivetrain->rate.desiredDriveRate
-	//	//			= m_bridgebalance_pid.getOutput();
-	//	m_action->drivetrain->rate.desiredTurnRate = 0.0;
-	//
-	//	if (fabs(m_bridgebalance_pid.getError()) < m_bridgebalance_threshold)
-	//	{
-	//		//			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
-	//		return true;//we're done
-	//		//		m_action->drivetrain->rate.drive_control = true;
-	//		//		m_action->drivetrain->rate.turn_control = true;
-	//		//		m_action->drivetrain->position.drive_control = false;
-	//		//		m_action->drivetrain->position.turn_control = false;
-	//		//		m_action->drivetrain->rate.desiredDriveRate = 0.0;
-	//		//		m_action ->drivetrain->rate.desiredTurnRate = 0.0;
-	//	}
-	//	return false;
+	//	m_bridgebalance_pid.setSetpoint(m_bridgebalance_setpoint);
 }
 
 bool AutonomousFunctions::keyTrack()
@@ -379,8 +336,8 @@ bool AutonomousFunctions::autoAlign()
 
 		if (fabs(m_auto_aim_pid.getError()) <= m_align_threshold)
 		{
-			//			m_align_turned = out;
-
+//			m_align_turned = out;
+			
 			m_action->drivetrain->rate.desiredTurnRate = 0.0;
 			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 			AsyncPrinter::Printf("Aiming done\n");
@@ -440,15 +397,7 @@ bool AutonomousFunctions::autonomousMode()
 		break;
 	case SHOOT:
 		AsyncPrinter::Printf("Pretend Shooting\n");
-
-		//m_action->drivetrain->rate.drive_control = true;
-		//m_action->drivetrain->rate.turn_control = true;
-		//m_action->drivetrain->position.drive_control = false;
-		//m_action->drivetrain->position.turn_control = false;
-
-		//m_action->drivetrain->rate.desiredTurnRate = -1 * m_align_turned;
-		//m_action->drivetrain->rate.desiredDriveRate = 0.0;
-
+		
 		advanceQueue();
 		break;
 		if (autoAlign() && m_action->launcher->ballLaunchCounter
@@ -465,10 +414,23 @@ bool AutonomousFunctions::autonomousMode()
 #warning Verify amount to drive back
 		m_action->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
 		m_action->drivetrain->position.absoluteTranslate = false;
-		m_action->drivetrain->position.absoluteTurn = true;
+		m_action->drivetrain->position.absoluteTurn = false;
 		m_action->drivetrain->position.drive_control = true;
-		m_action->drivetrain->position.turn_control = true;
+		m_action->drivetrain->position.turn_control = false;
+		
 		m_action->drivetrain->position.desiredRelativeDrivePosition = -12; //TODO Check me
+		//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
+		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
+		advanceQueue();
+		break;
+	case MOVE_TO_FENDER_INIT:
+#warning Verify amount to drive forward
+		m_action->drivetrain->position.absoluteTranslate = false;
+		m_action->drivetrain->position.absoluteTurn = false;
+		m_action->drivetrain->position.drive_control = true;
+		m_action->drivetrain->position.turn_control = false;
+		
+		m_action->drivetrain->position.desiredRelativeDrivePosition = 24; //TODO Check me
 		//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
 		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
 		advanceQueue();
@@ -555,6 +517,10 @@ void AutonomousFunctions::Configure()
 }
 
 const AutonomousFunctions::autonomousStage
+		AutonomousFunctions::DRIVE_THEN_SHOOT[DRIVE_THEN_SHOOT_LENGTH] =
+		{ INIT, ADJUSTABLE_DELAY, MOVE_TO_FENDER_INIT, WAIT_FOR_POSITION, SHOOT, DONE };
+
+const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH] =
 		{ INIT, ADJUSTABLE_DELAY, KEY_TRACK, AIM, SHOOT, DROP_WEDGE,
 				MOVE_BACK_INIT, WAIT_FOR_POSITION, DONE };
@@ -571,7 +537,9 @@ void AutonomousFunctions::loadQueue()
 
 	for (uint8_t i = 0;; ++i)
 	{
-		autonomousStage s = SHOOT_THEN_BRIDGE[i];
+		autonomousStage s = DRIVE_THEN_SHOOT[i];
+//		autonomousStage s = SHOOT_THEN_BRIDGE[i];
+//		autonomousStage s = BRIDGE_THEN_SHOOT[i];
 		if (s == DONE)
 		{
 			break;
@@ -604,6 +572,9 @@ std::string AutonomousFunctions::getAutonomousStageName(autonomousStage a)
 		break;
 	case MOVE_BACK_INIT:
 		str = "Move back init";
+		break;
+	case MOVE_TO_FENDER_INIT:
+		str = "Move to fender init";
 		break;
 	case DROP_WEDGE:
 		str = "Drop wedge";

@@ -129,7 +129,7 @@ public:
 	double getPreviousError();
 
 	/*!
-	 * @brief status flag for feed-forward PID
+	 * @brief m_status flag for feed-forward PID
 	 * @return whether this controller uses feedforward PID
 	 */
 	bool isFeedForward();

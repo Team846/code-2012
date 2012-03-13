@@ -348,6 +348,8 @@ LRT12_partialImage/Debug/Objects/LRT12/LRTRobotBase.o:  \
   C:/WindRiver/workspace/LRT12/Brain/AutonomousFunctions.h \
   C:/WindRiver/workspace/LRT12/Brain/../Config/Configurable.h \
   C:/WindRiver/workspace/LRT12/Brain/../Config/Config.h \
+  C:/WindRiver/workspace/LRT12/Brain/../Util/PID.h \
+  C:/WindRiver/workspace/LRT12/Brain/../Util/RunningSum.h \
   C:/WindRiver/workspace/LRT12/Brain/../Log/Loggable.h \
   C:/WindRiver/workspace/LRT12/Brain/../Config/RobotConfig.h \
   C:/WindRiver/workspace/LRT12/Brain/../ActionData/ActionData.h \
@@ -1066,6 +1068,10 @@ C:/WindRiver/workspace/LRT12/Brain/AutonomousFunctions.h:
 C:/WindRiver/workspace/LRT12/Brain/../Config/Configurable.h:
 
 C:/WindRiver/workspace/LRT12/Brain/../Config/Config.h:
+
+C:/WindRiver/workspace/LRT12/Brain/../Util/PID.h:
+
+C:/WindRiver/workspace/LRT12/Brain/../Util/RunningSum.h:
 
 C:/WindRiver/workspace/LRT12/Brain/../Log/Loggable.h:
 

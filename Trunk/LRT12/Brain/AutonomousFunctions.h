@@ -32,11 +32,12 @@ public:
 		AIM = 3, //!< AIM
 		SHOOT = 4, //!< SHOOT
 		MOVE_BACK_INIT = 5, //!< MOVE_BACK
-		DROP_WEDGE = 6, //!< Drop the Wedge
-		RAISE_WEDGE = 7, //!< Raise the Wedge
-		WAIT_FOR_POSITION = 8, //!< MOVE_BACK
-		DELAY_HALF_SEC = 9,
-		ADJUSTABLE_DELAY = 10,
+		MOVE_TO_FENDER_INIT = 6, //!< MOVE_BACK
+		DROP_WEDGE = 7, //!< Drop the Wedge
+		RAISE_WEDGE = 8, //!< Raise the Wedge
+		WAIT_FOR_POSITION = 9, //!< MOVE_BACK
+		DELAY_HALF_SEC = 10,
+		ADJUSTABLE_DELAY = 11,
 		DONE = 0
 	//!< Finished
 	};
@@ -104,6 +105,11 @@ private:
 	bool alternateBridgeBalance();
 
 	/*!
+	 * Another attempt to balance the bridge
+	 */
+	bool anotherBridgeBalance();
+	
+	/*!
 	 * Iterative method to track the key
 	 */
 	bool keyTrack();
@@ -134,6 +140,9 @@ private:
 	 * @return pointer to string
 	 */
 	std::string getAutonomousStageName(autonomousStage a);
+
+	const static int DRIVE_THEN_SHOOT_LENGTH = 10;
+	const static autonomousStage DRIVE_THEN_SHOOT[DRIVE_THEN_SHOOT_LENGTH];
 
 	const static int SHOOT_THEN_BRIDGE_LENGTH = 10;
 	const static autonomousStage SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH];

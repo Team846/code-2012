@@ -110,12 +110,7 @@ void Drivetrain::Output()
 	m_action->drivetrain->previousDriveOperationComplete
 			= m_drive_control.driveOperationComplete();
 
-	if (m_action->drivetrain->rate.turn_control)
-	{
-		m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_RATE);
-		m_drive_control.setTurnRate(m_action->drivetrain->rate.desiredTurnRate);
-	}
-	else if (m_action->drivetrain->position.turn_control)
+	if (m_action->drivetrain->position.turn_control)
 	{
 		if (m_action->drivetrain->position.absoluteTurn)
 		{
@@ -134,6 +129,11 @@ void Drivetrain::Output()
 					= ACTION::DRIVETRAIN::UNSET_POS;
 		}
 		m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_POSITION);
+	}
+	else if (m_action->drivetrain->rate.turn_control)
+	{
+		m_drive_control.setTurnControl(ClosedLoopDrivetrain::CL_RATE);
+		m_drive_control.setTurnRate(m_action->drivetrain->rate.desiredTurnRate);
 	}
 	else
 	{

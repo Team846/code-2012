@@ -145,13 +145,13 @@ public:
 
 	/*!
 	 * @brief Returns true when drive operation is complete
-	 * @return operation status
+	 * @return operation m_status
 	 */
 	bool driveOperationComplete();
 
 	/*!
 	 * @brief Returns true when turn operation is complete
-	 * @return operation status
+	 * @return operation m_status
 	 */
 	bool turnOperationComplete();
 

@@ -78,8 +78,17 @@ void IMU::task()
 		{
 			break;
 		}
-
 		update(ActionData::GetInstance());
+		printAll();
+		static int lastUpdate = 0;
+		static int counter = 0;
+		counter++;
+		if (GetFPGATime() - lastUpdate > 1000000)
+		{
+			AsyncPrinter::Printf("%d packets in 1s\n", counter);
+			counter = 0;
+			lastUpdate = GetFPGATime();
+		}
 	}
 }
 
@@ -90,8 +99,8 @@ void IMU::update()
 	{
 		return;
 	}
-	uint8_t status = getUint8(STATUS);
-	if (status == 0xff)
+	m_status = getUint8(STATUS);
+	if (m_status == 0xff)
 	{
 		AsyncPrinter::Printf("Status: Bad IMU packet\r\n");
 		return;
@@ -261,11 +270,12 @@ double IMU::getGyroZ()
 void IMU::printAll()
 {
 	AsyncPrinter::Printf("IMU Data: \r\n");
-	AsyncPrinter::Printf("Roll: %.02f Pitch: %.02f Yaw: %.02f\r\n", getRoll(),
+	AsyncPrinter::Printf("Update count %d\n", m_status);
+	AsyncPrinter::Printf("Roll: %2f Pitch: %2f Yaw: %2f\r\n", getRoll(),
 			getPitch(), getYaw());
-	AsyncPrinter::Printf("Scaled Gyro: [%.02f, %.02f, %.02f]\r\n", getGyroX(),
+	AsyncPrinter::Printf("Scaled Gyro: [%2f, %2f, %2f]\r\n", getGyroX(),
 			getGyroY(), getGyroZ());
-	AsyncPrinter::Printf("Scaled Accel: [%.02f, %.02f, %.02f]\r\n",
+	AsyncPrinter::Printf("Scaled Accel: [%2f, %2f, %2f]\r\n",
 			getAccelX(), getAccelY(), getAccelZ());
 	AsyncPrinter::Printf("\r\n");
 }
