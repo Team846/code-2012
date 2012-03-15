@@ -89,7 +89,11 @@ void LRTRobotBase::StartCompetition()
 			break;
 		}
 
-		m_imu->releaseSemaphore();
+		if (cycleCount % 2 == 0)
+		{
+			m_imu->releaseSemaphore();
+		}
+		
 		AutonomousFunctions::getInstance()->releaseSemaphore();
 
 		profiler.StartNewCycle();

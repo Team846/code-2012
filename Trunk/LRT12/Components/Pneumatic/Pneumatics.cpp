@@ -171,7 +171,7 @@ void Pneumatics::pulse(PulsedSolenoid * ptr)
 		ctr = 0;
 	}
 	return;
-#endif
+#else
 	if (ptr->pulsed)
 	{
 		if (ptr->counter > 0)
@@ -203,6 +203,7 @@ void Pneumatics::pulse(PulsedSolenoid * ptr)
 			ptr->solenoid->Set(DoubleSolenoid::kReverse);
 		}
 	}
+#endif
 }
 
 Pneumatics::~Pneumatics()

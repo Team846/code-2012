@@ -10,6 +10,7 @@
 #include "../ActionData/BallFeedAction.h"
 #include "../ActionData/BPDAction.h"
 #include "../Util/AsyncPrinter.h"
+#include "../Sensors/DriveEncoders.h"
 #include "../Util/PID.h"
 #include <string>
 
@@ -27,11 +28,12 @@ AutonomousFunctions::AutonomousFunctions() :
 	m_is_running = false;
 	m_action = ActionData::GetInstance();
 
-	hasStartedTipping = false;
+	bridgeTipState = 0;
 	m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
 	m_adj_cyc_delay = 0;
 	m_align_setpoint = 0;
 	Configure();
+	m_action->imu->pitch = 0.0;
 }
 
 AutonomousFunctions::~AutonomousFunctions()
@@ -125,7 +127,7 @@ void AutonomousFunctions::task()
 		switch (m_action->auton->state)
 		{
 		case ACTION::AUTONOMOUS::TELEOP:
-			hasStartedTipping = false;
+			bridgeTipState = 0;
 			m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
 			m_adj_cyc_delay = M_CYCLES_TO_DELAY;
 #define CLOSED_LOOP 1
@@ -181,8 +183,141 @@ void AutonomousFunctions::task()
 	}
 }
 
-bool anotherBridgeBalance()
+bool AutonomousFunctions::otherBridgeBalance(){
+	
+}
+bool AutonomousFunctions::anotherBridgeBalance()
 {
+	static int e = 0;
+	static bool hasStartedTipping = false;
+	
+	static bool after_process = false;
+	static int aftercounter = 0;
+	
+	if (++e % 25 == 0)
+		AsyncPrinter::Printf("Balancing\n");
+	
+	if (!hasStartedTipping)
+	{
+		if (++e % 5 == 0)
+			AsyncPrinter::Printf("Waiting for tip\n");
+		m_direction = Util::Sign<double>(m_action->imu->pitch);
+
+		m_action->drivetrain->position.drive_control = false;
+		m_action->drivetrain->position.turn_control = false;
+		m_action->drivetrain->rate.drive_control = true;
+		m_action->drivetrain->rate.turn_control = true;
+
+		m_action->drivetrain->rate.desiredDriveRate = 0.11 * m_direction;
+		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+
+		static int prev_side = 0; // -1 neg, 0 flat, 1 pos
+		int side = 0;
+		if (fabs(m_action->imu->pitch) > 12)
+		{
+			side = m_direction;
+		}
+		else
+		{
+			side = 0;
+		}
+
+		if (side == 0 && prev_side != side)
+		{
+			AsyncPrinter::Printf("We have tipped\n");
+			//hasStartedTipping = true;
+		
+			after_process = true;
+			
+			/* changes begin */
+			
+			m_action->drivetrain->rate.desiredDriveRate = -0.1 * m_direction;
+			m_action->drivetrain->rate.desiredTurnRate = 0.0;
+			
+			/* changes end */
+		}
+		prev_side = side;
+	}
+	else if(after_process)
+	{
+		AsyncPrinter::Printf("Going back...");
+		
+		m_action->drivetrain->rate.desiredDriveRate = 0.1 * m_direction;
+		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+					
+		if(++aftercounter == 25)
+		{
+			m_action->drivetrain->rate.desiredDriveRate = 0.0;
+			m_action->drivetrain->rate.desiredTurnRate = 0.0;
+		}
+	}
+	else
+	{
+		if (++e % 5 == 0)
+			AsyncPrinter::Printf("Stopping \n");
+		m_action->drivetrain->position.drive_control = false;
+		m_action->drivetrain->position.turn_control = false;
+		m_action->drivetrain->rate.drive_control = false;
+		m_action->drivetrain->rate.turn_control = false;
+		m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+		
+		if (!m_action->drivetrain->position.drive_control)
+		{
+			AsyncPrinter::Printf("setting\n");
+			m_action->drivetrain->position.absoluteTranslate = false;
+			m_action->drivetrain->position.drive_control = false;
+			m_action->drivetrain->position.turn_control = false;
+			m_action->drivetrain->rate.drive_control = false;
+			m_action->drivetrain->rate.turn_control = false;
+			m_action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
+			//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
+			m_action->drivetrain->position.desiredAbsoluteTurnPosition = 0;
+		}
+		else
+		{
+			if (m_action->drivetrain->previousDriveOperationComplete)
+				return true;
+		}
+	}
+
+	return false;
+
+	//	m_bridgebalance_pid.setSetpoint(m_bridgebalance_setpoint);
+	m_bridgebalance_pid.setSetpoint(0);
+	m_bridgebalance_pid.setInput(m_action->imu->pitch);
+	m_bridgebalance_pid.update(1.0 / RobotConfig::LOOP_RATE);
+
+	// drive on rate control, turn on rate control
+	m_action->drivetrain->rate.drive_control = true;
+	m_action->drivetrain->rate.turn_control = true;
+	m_action->drivetrain->position.drive_control = false;
+	m_action->drivetrain->position.turn_control = false;
+
+	// set drivetrain and switch sign
+	//	m_action->drivetrain->position.desiredRelativeDrivePosition
+	//			= -m_bridgebalance_pid.getOutput();
+	m_action->drivetrain->rate.desiredDriveRate = Util::Clamp<double>(
+			-m_bridgebalance_pid.getOutput(), -0.1, 0.1);
+
+	//	if (++e % 25 == 0)
+	//		AsyncPrinter::Printf("Bridge Out %.4f\n",
+	//				m_bridgebalance_pid.getOutput());
+	//	m_action->drivetrain->rate.desiredDriveRate
+	//			= m_bridgebalance_pid.getOutput();
+	m_action->drivetrain->rate.desiredTurnRate = 0.0;
+
+	if (fabs(m_bridgebalance_pid.getError()) < m_bridgebalance_threshold)
+	{
+		//			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+		return true;//we're done
+		//		m_action->drivetrain->rate.drive_control = true;
+		//		m_action->drivetrain->rate.turn_control = true;
+		//		m_action->drivetrain->position.drive_control = false;
+		//		m_action->drivetrain->position.turn_control = false;
+		//		m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		//		m_action ->drivetrain->rate.desiredTurnRate = 0.0;
+	}
 	return false;
 }
 
@@ -213,23 +348,19 @@ bool AutonomousFunctions::alternateBridgeBalance()
 
 }
 
+
 bool AutonomousFunctions::bridgeBalance()
 {
 	static int e = 0;
 	if (++e % 25 == 0)
 		AsyncPrinter::Printf("Balancing\n");
 	
-	static double lastAccelX = 0.0;
-	static double lastPitch = 0.0;
-	static double angularVelocity = 0.0;
-	if (lastAccelX != m_action->imu->accel_x )//noise means that we have new data
+	static int cyclecount = 0;
+	cyclecount++;
+	int side = 0;
+	switch (bridgeTipState)
 	{
-		angularVelocity = (m_action->imu->pitch - lastPitch) * RobotConfig::LOOP_RATE;
-		lastPitch = m_action->imu->pitch;
-		lastAccelX = m_action->imu->accel_x;
-	}
-	if (!hasStartedTipping)
-	{
+	case 0:
 		if (++e % 5 == 0)
 			AsyncPrinter::Printf("Waiting for tip\n");
 		m_direction = Util::Sign<double>(m_action->imu->pitch);
@@ -243,7 +374,6 @@ bool AutonomousFunctions::bridgeBalance()
 		m_action->drivetrain->rate.desiredTurnRate = 0.0;
 
 		static int prev_side = 0; // -1 neg, 0 flat, 1 pos
-		int side = 0;
 		if (fabs(m_action->imu->pitch) > 12)
 		{
 			side = m_direction;
@@ -256,34 +386,71 @@ bool AutonomousFunctions::bridgeBalance()
 		if (side == 0 && prev_side != side)
 		{
 			AsyncPrinter::Printf("We have tipped\n");
-			hasStartedTipping = true;
+			cyclecount = 0;
+			bridgeTipState++;
+			firstPlace = DriveEncoders::GetInstance().getRobotDist();
 		}
 		prev_side = side;
-	}
-	else //has started tipping
-	{
+		break;
+	case 1:
+		m_bridgebalance_pid.setInput(m_action->imu->pitch);
 		m_bridgebalance_pid.setSetpoint(0.0);
-		m_bridgebalance_pid.setInput(m_action->imu->gyro_y);
-		m_bridgebalance_pid.update(1.0 / RobotConfig::LOOP_RATE);
-		
-
-		if (++e % 2 == 0)
+		if (e % 2 == 0)
 		{
-			AsyncPrinter::Printf("Pitch %2f, pitch rate %2f, gyro %2f, out %2f\n", lastPitch, angularVelocity, m_action->imu->gyro_y,  m_bridgebalance_pid.getOutput());
+			m_bridgebalance_pid.update(2.0 / RobotConfig::LOOP_RATE);
 		}
 		
 		m_action->drivetrain->position.drive_control = false;
 		m_action->drivetrain->position.turn_control = false;
 		m_action->drivetrain->rate.drive_control = true;
 		m_action->drivetrain->rate.turn_control = true;
-		m_action->drivetrain->rate.desiredDriveRate = Util::Clamp<double>(m_bridgebalance_pid.getOutput(), -0.2, 0.2);
+
+		m_action->drivetrain->rate.desiredDriveRate = Util::Clamp<double>(m_bridgebalance_pid.getOutput(), -0.25, 0.25);
+		if (e % 4 == 0)
+		{
+			AsyncPrinter::Printf("Error %.2f, diff %.2f\n", m_bridgebalance_pid.getError(), (m_action->imu->pitch - lastPitch)* 25.0);
+		}
 		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-		return false;
+		break;
+//	case 1:
+//		m_action->drivetrain->position.drive_control = false;
+//		m_action->drivetrain->position.turn_control = false;
+//		m_action->drivetrain->rate.drive_control = true;
+//		m_action->drivetrain->rate.turn_control = true;
+//
+//		m_action->drivetrain->rate.desiredDriveRate = -0.11 * m_direction;
+//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+//		if (fabs(m_action->imu->pitch) < 0.5 || fabs(m_action->imu->pitch) > fabs(lastPitch))
+//		{
+//			AsyncPrinter::Printf("Detected\n");
+//			bridgeTipState++;
+//			secondPlace = DriveEncoders::GetInstance().getRobotDist();
+//		}
+//		break;
+//	case 2:
+//		m_action->drivetrain->position.absoluteTranslate = false;
+//		m_action->drivetrain->position.absoluteTurn = false;
+//
+//		m_action->drivetrain->position.drive_control = true;
+//		m_action->drivetrain->position.turn_control = false;
+//		m_action->drivetrain->rate.drive_control = true;
+//		m_action->drivetrain->rate.turn_control = true;
+//		
+//		double diff = fabs(firstPlace - secondPlace);
+//		AsyncPrinter::Printf("Diff %.2f\n", diff);
+//		m_action->drivetrain->position.desiredRelativeDrivePosition = (diff + 2.0) * m_direction;
+//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+//		bridgeTipState++;
+//		break;
+//	case 3:
+//		break;
+	default:
+		bridgeTipState = 0;
+		break;
 	}
 
+	lastPitch = m_action->imu->pitch;
 	return false;
-
-	//	m_bridgebalance_pid.setSetpoint(m_bridgebalance_setpoint);
 }
 
 bool AutonomousFunctions::keyTrack()

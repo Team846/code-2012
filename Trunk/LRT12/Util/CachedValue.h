@@ -106,8 +106,8 @@ CachedValue<T>::CachedValue()
 	m_has_new_value = false;
 	m_has_been_set = false;
 	m_counter = 0;
-	m_previous_value = 0;
-	m_value = 0;
+	m_previous_value = T();
+	m_value = T();
 }
 
 template<class T>

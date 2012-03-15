@@ -80,6 +80,8 @@ ActionData::ActionData()
 	cam->key.blue = cam->key.red = cam->key.higher = 0;
 	cam->align.arbitraryOffsetFromUDP = 0;
 	cam->align.status = ACTION::CAMERA::NO_TARGET;
+	
+	motorsEnabled = true;
 }
 
 ActionData::~ActionData()

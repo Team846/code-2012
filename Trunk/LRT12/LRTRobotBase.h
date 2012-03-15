@@ -33,7 +33,7 @@
  *
  */
 
-typedef enum GameState
+enum GameState
 {
 	DISABLED, AUTONOMOUS, TELEOPERATED
 };

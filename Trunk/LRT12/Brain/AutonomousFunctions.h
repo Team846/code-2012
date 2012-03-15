@@ -110,6 +110,11 @@ private:
 	bool anotherBridgeBalance();
 	
 	/*!
+	 * Raphael's PID attempt to balance the bridge
+	 */
+	bool otherBridgeBalance();
+	
+	/*!
 	 * Iterative method to track the key
 	 */
 	bool keyTrack();
@@ -181,7 +186,10 @@ private:
 	
 	bool m_hit_key_flag;
 
-	bool hasStartedTipping;
+	
+	int bridgeTipState;
+	double firstPlace, secondPlace;
+	double lastPitch;
 	int m_direction;
 	int m_haf_cyc_delay;
 	int m_adj_cyc_delay, M_CYCLES_TO_DELAY;

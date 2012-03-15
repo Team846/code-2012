@@ -79,7 +79,6 @@ void IMU::task()
 			break;
 		}
 		update(ActionData::GetInstance());
-		printAll();
 		static int lastUpdate = 0;
 		static int counter = 0;
 		counter++;
