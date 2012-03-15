@@ -17,6 +17,7 @@ Drivetrain::Drivetrain() :
 			"right");
 	m_delta_power_limit = m_forward_accel_limit = m_reverse_accel_limit
 			= NUM_CYCLES_TO_SYNC = 0;
+	m_action->drivetrain->synchronizedCyclesRemaining = 0;
 	Configure();
 }
 
@@ -212,6 +213,7 @@ void Drivetrain::Output()
 
 void Drivetrain::log()
 {
+#if LOGGING_ENABLED
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	std::string prefix = m_name + ": ";
 
@@ -219,4 +221,5 @@ void Drivetrain::log()
 			m_action->drivetrain->raw.leftDutyCycle);
 	sdb->PutDouble((prefix + "Right Duty Cycle").c_str(),
 			m_action->drivetrain->raw.rightDutyCycle);
+#endif
 }

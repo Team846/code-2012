@@ -47,7 +47,7 @@ DriveEncoders::~DriveEncoders()
 void DriveEncoders::Configure()
 {
 	PULSES_PER_REVOLUTION = m_config->Get<double> (m_configsection,
-			"pulses_per_revolution", 1000.0);
+			"pulses_per_revolution", 360.0);
 	ENCODER_RATE_HIGH_GEAR = m_config->Get<double> (m_configsection,
 			"high_gear_encoder_rate", 6100);
 	MAX_TURNING_RATE = m_config->Get<double> (m_configsection,
@@ -187,11 +187,13 @@ LRTEncoder * DriveEncoders::getRightEncoder()
 
 void DriveEncoders::log()
 {
+#if LOGGING_ENABLED
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	sdb->PutDouble("Robot Drive Speed", getNormalizedForwardMotorSpeed());
 	sdb->PutDouble("Robot Turning Speed", getNormalizedTurningMotorSpeed());
 	sdb->PutDouble("Robot Drive Distance", getRobotDist());
 	sdb->PutDouble("Robot Turn Angle", getTurnAngle());
+#endif
 }
 
 double DriveEncoders::getMaxEncoderRate()

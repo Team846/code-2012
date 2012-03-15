@@ -75,9 +75,8 @@ void Config::Load()
 
 		Save();
 		hasRun = true;
+		printf("done with first run\n");
 	}
-
-	printf("done with first run\n");
 
 	//deal with assignable dials
 	for (int i = 0; i < kNumAnalogAssignable; ++i)
@@ -179,22 +178,6 @@ void Config::ConfigureAll()
  */
 void Config::CheckForFileUpdates()
 {
-	if (configFile != NULL)
-		delete configFile;
-	configFile = new list<string> ();
-
-	//	printf("Config file\n");
-
-	if (newConfigData != NULL)
-		delete newConfigData;
-	newConfigData = new config();
-
-	//	printf("Config data\n");
-
-	if (sectionsMap != NULL)
-		delete sectionsMap;
-	sectionsMap = new map<string, list<string>::iterator> ();
-
 	struct stat statistics;
 	stat(CONFIG_FILE_PATH.c_str(), &statistics);
 
@@ -434,8 +417,8 @@ void Config::SaveToFile(string path)
 	ofstream fout(path.c_str());
 	if (!fout.is_open())
 	{
-		//		AsyncPrinter::Printf("Config could not open %s for writing\n",
-		//				path.c_str());
+		AsyncPrinter::Printf("Config could not open %s for writing\n",
+				path.c_str());
 		return;
 	}
 
@@ -443,7 +426,6 @@ void Config::SaveToFile(string path)
 			!= configFile->end(); iter++)
 	{
 		fout << *iter << '\n';
-		//		cout << *iter << '\n';
 	}
 
 	fout.close();

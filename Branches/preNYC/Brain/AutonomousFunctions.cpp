@@ -23,7 +23,7 @@ AutonomousFunctions::AutonomousFunctions() :
 {
 	m_task = new Task("AutonFuncTask",
 			(FUNCPTR) AutonomousFunctions::taskEntryPoint,
-			Task::kDefaultPriority - 1);
+			Task::kDefaultPriority);
 	m_task_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 	m_is_running = false;
 	m_action = ActionData::GetInstance();
@@ -34,6 +34,7 @@ AutonomousFunctions::AutonomousFunctions() :
 	m_align_setpoint = 0;
 	Configure();
 	m_action->imu->pitch = 0.0;
+	m_hasStartedHoldingPosition = false;
 }
 
 AutonomousFunctions::~AutonomousFunctions()
@@ -111,6 +112,9 @@ void AutonomousFunctions::task()
 			case ACTION::AUTONOMOUS::AUTON_MODE:
 				loadQueue();
 				break;
+			case ACTION::AUTONOMOUS::POSITION_HOLD:
+				break;
+
 			}
 		}
 		m_last_state = m_action->auton->state;
@@ -127,6 +131,7 @@ void AutonomousFunctions::task()
 		switch (m_action->auton->state)
 		{
 		case ACTION::AUTONOMOUS::TELEOP:
+			m_hasStartedHoldingPosition = false;
 			bridgeTipState = 0;
 			m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
 			m_adj_cyc_delay = M_CYCLES_TO_DELAY;
@@ -179,24 +184,39 @@ void AutonomousFunctions::task()
 				m_action->auton->completion_status = ACTION::IN_PROGRESS;
 			}
 			break;
+		case ACTION::AUTONOMOUS::POSITION_HOLD:
+			if (!m_hasStartedHoldingPosition)
+			{
+				m_hasStartedHoldingPosition = true;
+				m_action->drivetrain->position.drive_control = true;
+				m_action->drivetrain->position.absoluteTranslate = false;
+				m_action->drivetrain->position.desiredRelativeDrivePosition
+						= 0.0;
+				m_action->drivetrain->position.turn_control = false;
+				m_action->drivetrain->rate.turn_control = true;
+				m_action->drivetrain->rate.desiredTurnRate = 0.0;
+			}
+			break;
 		}
 	}
 }
 
-bool AutonomousFunctions::otherBridgeBalance(){
-	
+bool AutonomousFunctions::otherBridgeBalance()
+{
+	return true;
 }
+
 bool AutonomousFunctions::anotherBridgeBalance()
 {
 	static int e = 0;
 	static bool hasStartedTipping = false;
-	
+
 	static bool after_process = false;
 	static int aftercounter = 0;
-	
+
 	if (++e % 25 == 0)
 		AsyncPrinter::Printf("Balancing\n");
-	
+
 	if (!hasStartedTipping)
 	{
 		if (++e % 5 == 0)
@@ -226,26 +246,26 @@ bool AutonomousFunctions::anotherBridgeBalance()
 		{
 			AsyncPrinter::Printf("We have tipped\n");
 			//hasStartedTipping = true;
-		
+
 			after_process = true;
-			
+
 			/* changes begin */
-			
+
 			m_action->drivetrain->rate.desiredDriveRate = -0.1 * m_direction;
 			m_action->drivetrain->rate.desiredTurnRate = 0.0;
-			
+
 			/* changes end */
 		}
 		prev_side = side;
 	}
-	else if(after_process)
+	else if (after_process)
 	{
 		AsyncPrinter::Printf("Going back...");
-		
+
 		m_action->drivetrain->rate.desiredDriveRate = 0.1 * m_direction;
 		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-					
-		if(++aftercounter == 25)
+
+		if (++aftercounter == 25)
 		{
 			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 			m_action->drivetrain->rate.desiredTurnRate = 0.0;
@@ -261,7 +281,7 @@ bool AutonomousFunctions::anotherBridgeBalance()
 		m_action->drivetrain->rate.turn_control = false;
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-		
+
 		if (!m_action->drivetrain->position.drive_control)
 		{
 			AsyncPrinter::Printf("setting\n");
@@ -348,13 +368,12 @@ bool AutonomousFunctions::alternateBridgeBalance()
 
 }
 
-
 bool AutonomousFunctions::bridgeBalance()
 {
 	static int e = 0;
 	if (++e % 25 == 0)
 		AsyncPrinter::Printf("Balancing\n");
-	
+
 	static int cyclecount = 0;
 	cyclecount++;
 	int side = 0;
@@ -399,51 +418,54 @@ bool AutonomousFunctions::bridgeBalance()
 		{
 			m_bridgebalance_pid.update(2.0 / RobotConfig::LOOP_RATE);
 		}
-		
+
 		m_action->drivetrain->position.drive_control = false;
 		m_action->drivetrain->position.turn_control = false;
 		m_action->drivetrain->rate.drive_control = true;
 		m_action->drivetrain->rate.turn_control = true;
 
-		m_action->drivetrain->rate.desiredDriveRate = Util::Clamp<double>(m_bridgebalance_pid.getOutput(), -0.25, 0.25);
+		m_action->drivetrain->rate.desiredDriveRate = Util::Clamp<double>(
+				m_bridgebalance_pid.getOutput(), -0.25, 0.25);
 		if (e % 4 == 0)
 		{
-			AsyncPrinter::Printf("Error %.2f, diff %.2f\n", m_bridgebalance_pid.getError(), (m_action->imu->pitch - lastPitch)* 25.0);
+			AsyncPrinter::Printf("Error %.2f, diff %.2f\n",
+					m_bridgebalance_pid.getError(),
+					(m_action->imu->pitch - lastPitch) * 25.0);
 		}
 		m_action->drivetrain->rate.desiredTurnRate = 0.0;
 		break;
-//	case 1:
-//		m_action->drivetrain->position.drive_control = false;
-//		m_action->drivetrain->position.turn_control = false;
-//		m_action->drivetrain->rate.drive_control = true;
-//		m_action->drivetrain->rate.turn_control = true;
-//
-//		m_action->drivetrain->rate.desiredDriveRate = -0.11 * m_direction;
-//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-//		if (fabs(m_action->imu->pitch) < 0.5 || fabs(m_action->imu->pitch) > fabs(lastPitch))
-//		{
-//			AsyncPrinter::Printf("Detected\n");
-//			bridgeTipState++;
-//			secondPlace = DriveEncoders::GetInstance().getRobotDist();
-//		}
-//		break;
-//	case 2:
-//		m_action->drivetrain->position.absoluteTranslate = false;
-//		m_action->drivetrain->position.absoluteTurn = false;
-//
-//		m_action->drivetrain->position.drive_control = true;
-//		m_action->drivetrain->position.turn_control = false;
-//		m_action->drivetrain->rate.drive_control = true;
-//		m_action->drivetrain->rate.turn_control = true;
-//		
-//		double diff = fabs(firstPlace - secondPlace);
-//		AsyncPrinter::Printf("Diff %.2f\n", diff);
-//		m_action->drivetrain->position.desiredRelativeDrivePosition = (diff + 2.0) * m_direction;
-//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-//		bridgeTipState++;
-//		break;
-//	case 3:
-//		break;
+		//	case 1:
+		//		m_action->drivetrain->position.drive_control = false;
+		//		m_action->drivetrain->position.turn_control = false;
+		//		m_action->drivetrain->rate.drive_control = true;
+		//		m_action->drivetrain->rate.turn_control = true;
+		//
+		//		m_action->drivetrain->rate.desiredDriveRate = -0.11 * m_direction;
+		//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+		//		if (fabs(m_action->imu->pitch) < 0.5 || fabs(m_action->imu->pitch) > fabs(lastPitch))
+		//		{
+		//			AsyncPrinter::Printf("Detected\n");
+		//			bridgeTipState++;
+		//			secondPlace = DriveEncoders::GetInstance().getRobotDist();
+		//		}
+		//		break;
+		//	case 2:
+		//		m_action->drivetrain->position.absoluteTranslate = false;
+		//		m_action->drivetrain->position.absoluteTurn = false;
+		//
+		//		m_action->drivetrain->position.drive_control = true;
+		//		m_action->drivetrain->position.turn_control = false;
+		//		m_action->drivetrain->rate.drive_control = true;
+		//		m_action->drivetrain->rate.turn_control = true;
+		//		
+		//		double diff = fabs(firstPlace - secondPlace);
+		//		AsyncPrinter::Printf("Diff %.2f\n", diff);
+		//		m_action->drivetrain->position.desiredRelativeDrivePosition = (diff + 2.0) * m_direction;
+		//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+		//		bridgeTipState++;
+		//		break;
+		//	case 3:
+		//		break;
 	default:
 		bridgeTipState = 0;
 		break;
@@ -452,6 +474,8 @@ bool AutonomousFunctions::bridgeBalance()
 	lastPitch = m_action->imu->pitch;
 	return false;
 }
+
+#define ALT_METHOD 0
 
 bool AutonomousFunctions::keyTrack()
 {
@@ -465,6 +489,17 @@ bool AutonomousFunctions::keyTrack()
 	bool state = m_action->cam->key.higher >= m_keytrack_threshold;
 	m_hit_key_flag |= state;
 
+#if ALT_METHOD
+	if (state)
+	{
+		m_hit_key_flag = false;
+		m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		m_action ->drivetrain->rate.desiredTurnRate = 0.0;
+		AsyncPrinter::Printf("Keytrack Done\n");
+
+		return true;
+	}
+#else
 	if (m_hit_key_flag)
 	{
 		if (!state)
@@ -473,10 +508,11 @@ bool AutonomousFunctions::keyTrack()
 			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 			m_action ->drivetrain->rate.desiredTurnRate = 0.0;
 			AsyncPrinter::Printf("Done Keytrack Done\n");
-			return true;
 
+			return true;
 		}
 	}
+#endif
 	return false;
 }
 
@@ -503,8 +539,8 @@ bool AutonomousFunctions::autoAlign()
 
 		if (fabs(m_auto_aim_pid.getError()) <= m_align_threshold)
 		{
-//			m_align_turned = out;
-			
+			//			m_align_turned = out;
+
 			m_action->drivetrain->rate.desiredTurnRate = 0.0;
 			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 			AsyncPrinter::Printf("Aiming done\n");
@@ -531,18 +567,14 @@ bool AutonomousFunctions::autoAlign()
 #define DEBUG 1
 bool AutonomousFunctions::autonomousMode()
 {
-
-#if DEBUG
-	static int e = 0;
-	if (++e % 40 == 0)
-		AsyncPrinter::Printf("Entering %s\r\n",
-				getAutonomousStageName(m_curr_auton_stage).c_str());
-#endif
+	//	AsyncPrinter::Printf("Entering %s\r\n",
+	//			getAutonomousStageName(m_curr_auton_stage).c_str());
 	switch (m_curr_auton_stage)
 	{
 	case INIT:
-#warning Set speed correctly and check trajectory 
 		m_action->launcher->desiredTarget = ACTION::LAUNCHER::KEY_SHOT_HIGH;
+		m_action->launcher->isFenderShot = false;
+		m_action->launcher->ballLaunchCounter = 0;
 		m_action->drivetrain->position.reset_turn_zero = true;
 		M_CYCLES_TO_DELAY
 				= static_cast<int> ((DriverStation::GetInstance()->GetAnalogIn(
@@ -563,18 +595,15 @@ bool AutonomousFunctions::autonomousMode()
 		}
 		break;
 	case SHOOT:
-		AsyncPrinter::Printf("Pretend Shooting\n");
-		
-		advanceQueue();
-		break;
-		if (autoAlign() && m_action->launcher->ballLaunchCounter
-				<= BALLS_TO_SHOOT)
+		if (/*autoAlign() && */m_action->launcher->ballLaunchCounter
+				< BALLS_TO_SHOOT)
 		{
 			m_action->ballfeed->attemptToLoadRound = true;
 		}
 		else
 		{
 			advanceQueue();
+			m_action->ballfeed->attemptToLoadRound = false;
 		}
 		break;
 	case MOVE_BACK_INIT:
@@ -584,8 +613,10 @@ bool AutonomousFunctions::autonomousMode()
 		m_action->drivetrain->position.absoluteTurn = false;
 		m_action->drivetrain->position.drive_control = true;
 		m_action->drivetrain->position.turn_control = false;
-		
-		m_action->drivetrain->position.desiredRelativeDrivePosition = -12; //TODO Check me
+
+		//need to drive back 140 to have bumper on top of brdige
+		m_action->drivetrain->position.desiredRelativeDrivePosition
+				= m_drive_back_distance; //136 distance  - 3 in
 		//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
 		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
 		advanceQueue();
@@ -596,7 +627,7 @@ bool AutonomousFunctions::autonomousMode()
 		m_action->drivetrain->position.absoluteTurn = false;
 		m_action->drivetrain->position.drive_control = true;
 		m_action->drivetrain->position.turn_control = false;
-		
+
 		m_action->drivetrain->position.desiredRelativeDrivePosition = 24; //TODO Check me
 		//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
 		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
@@ -681,16 +712,21 @@ void AutonomousFunctions::Configure()
 	m_min_align_turn_rate = c->Get<double> (m_name, "alignMinTurnRate", 0.05);
 	m_align_threshold = c->Get<double> (m_name, "alignThreshold", 20);
 	m_align_setpoint = c->Get<double> (m_name, "alignSetpoint", 0.0);
+
+	m_drive_back_distance
+			= c->Get<double> (m_name, "driveBackDistance", -136.0);
 }
 
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::DRIVE_THEN_SHOOT[DRIVE_THEN_SHOOT_LENGTH] =
-		{ INIT, ADJUSTABLE_DELAY, MOVE_TO_FENDER_INIT, WAIT_FOR_POSITION, SHOOT, DONE };
+		{ INIT, ADJUSTABLE_DELAY, MOVE_TO_FENDER_INIT, WAIT_FOR_POSITION,
+				SHOOT, DONE };
 
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH] =
-		{ INIT, ADJUSTABLE_DELAY, KEY_TRACK, AIM, SHOOT, DROP_WEDGE,
-				MOVE_BACK_INIT, WAIT_FOR_POSITION, DONE };
+		{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, DELAY_HALF_SEC,
+				DELAY_HALF_SEC, DELAY_HALF_SEC, DROP_WEDGE, MOVE_BACK_INIT,
+				WAIT_FOR_POSITION, DELAY_HALF_SEC, RAISE_WEDGE, DONE };
 
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::BRIDGE_THEN_SHOOT[BRIDGE_THEN_SHOOT_LENGTH] =
@@ -704,9 +740,9 @@ void AutonomousFunctions::loadQueue()
 
 	for (uint8_t i = 0;; ++i)
 	{
-		autonomousStage s = DRIVE_THEN_SHOOT[i];
-//		autonomousStage s = SHOOT_THEN_BRIDGE[i];
-//		autonomousStage s = BRIDGE_THEN_SHOOT[i];
+		//		autonomousStage s = DRIVE_THEN_SHOOT[i];
+		autonomousStage s = SHOOT_THEN_BRIDGE[i];
+		//		autonomousStage s = BRIDGE_THEN_SHOOT[i];
 		if (s == DONE)
 		{
 			break;
@@ -765,6 +801,8 @@ std::string AutonomousFunctions::getAutonomousStageName(autonomousStage a)
 	return str;
 }
 
+#define PID_LOGGING_ENABLED 0
+
 void AutonomousFunctions::advanceQueue()
 {
 	if (!m_auton_sequence.empty())
@@ -782,6 +820,7 @@ void AutonomousFunctions::advanceQueue()
 
 void AutonomousFunctions::log()
 {
+#if LOGGING_ENABLED
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	sdb->PutInt("Autonomous Counter", m_counter);
 	sdb->PutString("Autonomous Completion State",
@@ -790,24 +829,28 @@ void AutonomousFunctions::log()
 	std::string s;
 	switch (m_action->auton->state)
 	{
-	case ACTION::AUTONOMOUS::AUTOALIGN:
+		case ACTION::AUTONOMOUS::AUTOALIGN:
 		s = "Auto Align";
 		break;
-	case ACTION::AUTONOMOUS::BRIDGEBALANCE:
+		case ACTION::AUTONOMOUS::BRIDGEBALANCE:
 		s = "Bridge Balance";
 		break;
-	case ACTION::AUTONOMOUS::KEYTRACK:
+		case ACTION::AUTONOMOUS::KEYTRACK:
 		s = "Key Track";
 		break;
-	case ACTION::AUTONOMOUS::AUTON_MODE:
+		case ACTION::AUTONOMOUS::AUTON_MODE:
 		s = "Auton";
 		break;
-	case ACTION::AUTONOMOUS::TELEOP:
+		case ACTION::AUTONOMOUS::TELEOP:
 		s = "Teleop";
+		break;
+		case ACTION::AUTONOMOUS::POSITION_HOLD:
+		s = "Position Hold";
 		break;
 	}
 	sdb->PutString("Autonomous Mode", s.c_str());
 
+#if PID_LOGGING_ENABLED
 	sdb->PutDouble("BridgePIDError", m_bridgebalance_pid.getError());
 	sdb->PutDouble("BridgePID_Acc_error",
 			m_bridgebalance_pid.getAccumulatedError());
@@ -821,4 +864,6 @@ void AutonomousFunctions::log()
 	sdb->PutDouble("AutoAimPID_P", m_auto_aim_pid.getProportionalGain());
 	sdb->PutDouble("AutoAimPID_I", m_auto_aim_pid.getIntegralGain());
 	sdb->PutDouble("AutoAimPID_D", m_auto_aim_pid.getDerivativeGain());
+#endif // PID_LOGGING_ENABLED*/
+#endif // LOGGING_ENABLED
 }

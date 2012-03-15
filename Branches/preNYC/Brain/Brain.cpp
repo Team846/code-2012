@@ -37,22 +37,26 @@ void Brain::startTeleop()
 
 void Brain::teleopTask()
 {
-	uint32_t lastPacketNum = 0;
+	//	uint32_t lastPacketNum = 0;
 	while (true)
 	{
-		if (lastPacketNum != 0) //don't run this the first time
+		//		if (lastPacketNum != 0) //don't run this the first time
+		//		{
+		//			if (m_ds->GetPacketNumber() != lastPacketNum + 1)
+		//			{
+		//				//we missed a packet
+		//				missedPackets += m_ds->GetPacketNumber() - lastPacketNum - 1;
+		//			}
+		//		}
+
+		if (m_ds->IsNewControlData())
 		{
-			if (m_ds->GetPacketNumber() != lastPacketNum + 1)
-			{
-				//we missed a packet
-				missedPackets += m_ds->GetPacketNumber() - lastPacketNum - 1;
-			}
+			process();
 		}
+		Wait(0.02);
 
-		process();
-
-		lastPacketNum = m_ds->GetPacketNumber();
-		m_ds->WaitForData();
+		//		lastPacketNum = m_ds->GetPacketNumber();
+		//		m_ds->WaitForData();
 	}
 }
 
@@ -75,24 +79,32 @@ int Brain::taskEntryPoint(uint32_t brain)
 
 void Brain::process()
 {
+	static bool runonce = true;
 	//This heuristic may eventually have to change if brain is to do processing during disabled
 	if (m_ds->IsAutonomous())
 	{
-		static bool runonce = true;
 		AutonomousAction * a = ActionData::GetInstance()->auton;
-		if (runonce)
+		if (m_ds->IsEnabled())
 		{
-			runonce = false;
-			a->state = ACTION::AUTONOMOUS::AUTON_MODE;
+			if (runonce)
+			{
+				runonce = false;
+				a->state = ACTION::AUTONOMOUS::AUTON_MODE;
+			}
+			if (a->state != ACTION::AUTONOMOUS::TELEOP)
+			{
+				a->state = ACTION::AUTONOMOUS::AUTON_MODE;
+			}
 		}
-		if (a->state != ACTION::AUTONOMOUS::TELEOP)
+		else
 		{
-			a->state = ACTION::AUTONOMOUS::AUTON_MODE;
+			a->state = ACTION::AUTONOMOUS::TELEOP;
+			runonce = true;
 		}
-		AsyncPrinter::Printf("Auton Mode!\r\n");
 	}
 	else if (m_ds->IsOperatorControl())
 	{
+		runonce = true;
 		m_inputs->ProcessInputs();
 	}
 }

@@ -7,7 +7,7 @@ std::vector<Loggable*> Log::m_loggables;
 Log::Log()
 {
 	m_task = new Task("LogTask", (FUNCPTR) Log::taskEntryPoint,
-			Task::kDefaultPriority - 1);
+			Task::kDefaultPriority);
 	m_is_running = false;
 	m_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 }
@@ -83,7 +83,9 @@ void Log::logAll()
 
 		if (ptr->shouldLog())
 		{
+#if LOGGING_ENABLED
 			ptr->log();
+#endif
 		}
 	}
 }

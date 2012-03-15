@@ -1,4 +1,5 @@
 #include "LRTRobotBase.h"
+#include "LRTRobot12.h"
 #include "Jaguar/AsyncCANJaguar.h"
 #include "Components/Pneumatic/Pneumatics.h"
 #include "Brain/AutonomousFunctions.h"
@@ -12,14 +13,18 @@
  */
 LRTRobotBase::LRTRobotBase()
 {
+#if USE_NOTIFIER
 	loopSynchronizer = new Notifier(&releaseLoop, this);
+#endif
 	quitting_ = false;
 	cycleCount = 0;
 
 	printf("Creating LRTRobotbase\n");
 	loopSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 
+#if FANCY_SHIT_ENABLED
 	m_imu = new IMU();
+#endif
 }
 
 /**
@@ -27,12 +32,14 @@ LRTRobotBase::LRTRobotBase()
  */
 LRTRobotBase::~LRTRobotBase()
 {
+#if USE_NOTIFIER
 	loopSynchronizer->Stop();
 	delete loopSynchronizer;
+#endif
 
 	if (AsyncCANJaguar::jaguar_list_)
 	{
-		for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
+		for (AsyncCANJaguar* j = AsyncCANJaguar::jaguar_list_; j != NULL; j
 				= j->next_jaguar_)
 		{
 			j->StopBackgroundTask();
@@ -43,8 +50,10 @@ LRTRobotBase::~LRTRobotBase()
 	Pneumatics::getInstance()->stopBackgroundTask();
 	Log::getInstance()->stopTask();
 
+#if FANCY_SHIT_ENABLED
 	m_imu->stopTask();
 	delete m_imu;
+#endif
 
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
 	AsyncPrinter::Quit();
@@ -59,47 +68,63 @@ void LRTRobotBase::StartCompetition()
 	//m_teleop_task is available only after robot is initialized -dg
 	printf("vxWorks task: %s\n", m_task->GetName());
 
-	GetWatchdog().SetEnabled(false);
+	GetWatchdog().SetEnabled(true);
 
 	// first and one-time initialization
 	RobotInit();
 
 	AsyncPrinter::Printf("starting synchronizer\r\n");
+
+#if USE_NOTIFIER
 	loopSynchronizer->StartPeriodic(1.0 / RobotConfig::LOOP_RATE); //arg is period in seconds
+#endif
 
 	AsyncPrinter::Printf("Starting Pneumatics\r\n");
 	Pneumatics::getInstance()->startBackgroundTask();
 	Log::getInstance()->startTask();
 	AutonomousFunctions::getInstance()->startBackgroundTask();
 
+#if FANCY_SHIT_ENABLED
 	m_imu->startTask();
+#endif
 
 	AsyncPrinter::Printf("Starting Profiler\r\n");
 	Profiler& profiler = Profiler::GetInstance();
 	// loop until we are quitting -- must be set by the destructor of the derived class.
 
+#if not USE_NOTIFIER
+	double last = GetFPGATime() * 1.0e-6; //ms
+#endif
+
 	while (!quitting_)
 	{
 		// block the loop and allow other tasks to run until the notifier
 		// releases our semaphore
+#if USE_NOTIFIER
 		semTake(loopSemaphore, WAIT_FOREVER);
+#else
+		last = GetFPGATime() * 1.0e-6;
+#endif
 		cycleCount++;
 		if (quitting_)
 		{
 			break;
 		}
 
+#if FANCY_SHIT_ENABLED
 		if (cycleCount % 2 == 0)
 		{
 			m_imu->releaseSemaphore();
 		}
-		
+#endif
+
 		AutonomousFunctions::getInstance()->releaseSemaphore();
 
 		profiler.StartNewCycle();
 
 		{
 			ProfiledSection ps("Main Loop");
+			GetWatchdog().Feed();
 			MainLoop();
 		}
 
@@ -107,7 +132,7 @@ void LRTRobotBase::StartCompetition()
 		// NB: This loop must be quit *before* the Jaguars are deleted!
 		if (AsyncCANJaguar::jaguar_list_)
 		{
-			for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
+			for (AsyncCANJaguar* j = AsyncCANJaguar::jaguar_list_; j != NULL; j
 					= j->next_jaguar_)
 			{
 				j->ReleaseCommSemaphore();
@@ -118,13 +143,24 @@ void LRTRobotBase::StartCompetition()
 
 		if (cycleCount % 500 == 0)
 		{
-			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-3);
+			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-6);
 		}
 
+#if LOGGING_ENABLED
 		if (cycleCount % 10 == 0)
 		{
 			Log::getInstance()->releaseSemaphore();
 		}
+#endif
+
+#if not NOTIFIER_ENABLED
+		double time_left_s =
+				(20.0 * 1.0e-3 - ((GetFPGATime() * 1.0e-6) - last));
+		if (time_left_s > 0.0)
+			Wait(time_left_s);
+		else
+			AsyncPrinter::Printf("%.02f overflow\r\n", time_left_s);
+#endif
 	}
 }
 

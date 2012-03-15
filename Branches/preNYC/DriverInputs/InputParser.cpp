@@ -30,13 +30,14 @@ void InputParser::ProcessInputs()
 	m_operator_stick->Update();
 
 	/***************** Shifter **********************/
-	if (m_driver_stick->IsButtonJustPressed(SHIFT)) //Shift gear
+	if (m_driver_stick->IsButtonDown(SHIFT)) //Shift gear
 	{
 		AsyncPrinter::Printf("Shift button\n");
-		if (m_action_ptr->shifter->gear == ACTION::GEARBOX::HIGH_GEAR)
-			m_action_ptr->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
-		else
-			m_action_ptr->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
+		m_action_ptr->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
+	}
+	else
+	{
+		m_action_ptr->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
 	}
 
 	/***************** Ball Feeder **********************/
@@ -62,10 +63,9 @@ void InputParser::ProcessInputs()
 		}
 		hasBeenReleased = false;
 	}
-	else if (m_driver_stick->IsButtonDown(BALANCE_BRIDGE))
+	else if (m_driver_stick->IsButtonDown(POSITION_HOLD))
 	{
-//			m_action_ptr->auton->state = ACTION::AUTONOMOUS::AUTON_MODE;
-		m_action_ptr->auton->state = ACTION::AUTONOMOUS::BRIDGEBALANCE;
+		m_action_ptr->auton->state = ACTION::AUTONOMOUS::POSITION_HOLD;
 	}
 	else
 	{
@@ -91,18 +91,18 @@ void InputParser::ProcessInputs()
 	}
 
 	/***************** Launcher **********************/
-	if (m_operator_stick->IsButtonJustPressed(TRAJECTORY_UP))
+	if (m_operator_stick->IsButtonJustPressed(FENDER_SHOT_SELECT))
 	{
-		m_action_ptr->launcher->topTrajectory = true;
+		m_action_ptr->launcher->isFenderShot = true;
 	}
-	else if (m_operator_stick->IsButtonJustPressed(TRAJECTORY_DOWN))
+	else if (m_operator_stick->IsButtonJustPressed(KEY_SHOT_SELECT))
 	{
-		m_action_ptr->launcher->topTrajectory = false;
+		m_action_ptr->launcher->isFenderShot = false;
 	}
 
-	if (m_operator_stick->IsButtonDown(LOW_SPEED))
+	if (m_operator_stick->IsButtonDown(LOWER_SHOT))
 	{
-		if (m_action_ptr->launcher->topTrajectory)
+		if (m_action_ptr->launcher->isFenderShot)
 		{
 			m_action_ptr->launcher->desiredTarget
 					= ACTION::LAUNCHER::FENDER_SHOT_LOW;
@@ -115,7 +115,7 @@ void InputParser::ProcessInputs()
 	}
 	else if (m_operator_stick->IsButtonDown(HIGH_SPEED))
 	{
-		if (m_action_ptr->launcher->topTrajectory)
+		if (m_action_ptr->launcher->isFenderShot)
 		{
 			m_action_ptr->launcher->desiredTarget
 					= ACTION::LAUNCHER::FENDER_SHOT_HIGH;
@@ -128,7 +128,7 @@ void InputParser::ProcessInputs()
 	}
 	else
 	{
-		if (m_action_ptr->launcher->topTrajectory)
+		if (m_action_ptr->launcher->isFenderShot)
 		{
 			m_action_ptr->launcher->desiredTarget
 					= ACTION::LAUNCHER::FENDER_SHOT_HIGH;
@@ -158,10 +158,12 @@ void InputParser::ProcessInputs()
 			|| m_action_ptr->ballfeed->sweepArmOut)
 	{
 		m_action_ptr->wedge->state = ACTION::WEDGE::PRESET_TOP;
+		m_action_ptr->wedge->try_again = true;
 	}
 	else if (m_operator_stick->IsButtonJustPressed(WEDGE_DOWN))
 	{
 		m_action_ptr->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
+		m_action_ptr->wedge->try_again = true;
 	}
 
 	/***************** Ball Collector **********************/
@@ -182,8 +184,8 @@ void InputParser::ProcessInputs()
 	if (m_operator_stick->IsButtonDown(PURGE))
 	{
 		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::PURGING;
-		m_action_ptr->launcher->desiredTarget
-				= ACTION::LAUNCHER::FENDER_SHOT_HIGH;
+		//		m_action_ptr->launcher->desiredTarget
+		//				= ACTION::LAUNCHER::FENDER_SHOT_HIGH;
 	}
 
 	/***************** Config **********************/

@@ -37,14 +37,13 @@ void Trackers::listen()
 
 	int iResult = -1;
 
-	/* TODO: Change loop to only bind, not setup. */
 	while (iResult != 0)
 	{
 		iResult = setup();
 
 		if (iResult != 0)
 		{
-			AsyncPrinter::Printf("!!! KeyTracker: Retrying bind...\n");
+			AsyncPrinter::Printf("!!! KeyTracker: Retrying setup...\n");
 			Wait(0.5);
 		}
 	}
@@ -105,9 +104,9 @@ void Trackers::listen()
 
 			key_lastPacketID = pid;
 
-//			static int e = 0;
-//			if (++e % 20 == 0)
-//				AsyncPrinter::Printf("%d: r: %d, b: %d\n", pid, m_key_value_r, m_key_value_b);
+			//			static int e = 0;
+			//			if (++e % 20 == 0)
+			//				AsyncPrinter::Printf("%d: r: %d, b: %d\n", pid, m_key_value_r, m_key_value_b);
 			break;
 		}
 
@@ -236,7 +235,7 @@ int Trackers::setup()
 		return retcode;
 	}
 
-	AsyncPrinter::Printf("KeyTracker: Socket successfully binded.\n");
+	AsyncPrinter::Printf("KeyTracker: Socket successfully bound.\n");
 
 	AsyncPrinter::Printf("Socket successfully initialized.\n");
 
@@ -250,6 +249,7 @@ void Trackers::disconnect()
 
 void Trackers::log()
 {
+#if LOGGING_ENABLED
 	SmartDashboard *sdb = SmartDashboard::GetInstance();
 	camera * c = ActionData::GetInstance()->cam;
 	sdb->PutInt("Key Blue", c->key.blue);
@@ -259,15 +259,16 @@ void Trackers::log()
 	string s;
 	switch (c->align.status)
 	{
-	case ACTION::CAMERA::NO_TARGET:
+		case ACTION::CAMERA::NO_TARGET:
 		s = "None";
 		break;
-	case ACTION::CAMERA::TOP:
+		case ACTION::CAMERA::TOP:
 		s = "Top";
 		break;
-	case ACTION::CAMERA::BOTTOM:
+		case ACTION::CAMERA::BOTTOM:
 		s = "Bottom";
 		break;
 	}
 	sdb->PutString("Target Selected", s.c_str());
+#endif
 }

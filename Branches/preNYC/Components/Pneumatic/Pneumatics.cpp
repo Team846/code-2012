@@ -2,7 +2,7 @@
 
 Pneumatics* Pneumatics::m_instance = NULL;
 
-#define PNEUMATICS_DISABLED 1
+#define PNEUMATICS_DISABLED 0
 
 #define INIT_PULSED_SOLENOID(x, y) (x).solenoid = (y);\
 	(x).counter = (m_pulse_length); \
@@ -14,7 +14,7 @@ Pneumatics::Pneumatics() :
 {
 	Configure();
 
-#if PNEUMATICS_DISABLED
+#if PNEUMATICS_DISABLED		
 #warning pneumatics disabled
 #else
 	INIT_PULSED_SOLENOID(m_shared, new DoubleSolenoid(
@@ -40,7 +40,7 @@ Pneumatics::Pneumatics() :
 	disableLog();
 
 	m_task = new Task("PneumaticsTask", (FUNCPTR) Pneumatics::taskEntryPoint,
-			Task::kDefaultPriority - 2);
+			Task::kDefaultPriority);
 	m_task_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 
 	m_is_running = false;
@@ -74,50 +74,50 @@ void Pneumatics::stopBackgroundTask()
 	}
 }
 
-void Pneumatics::setShifter(bool on)
+void Pneumatics::setShifter(bool on, bool force)
 {
-	if (on != m_shifter.state)
+	if (on != m_shifter.state || force)
 	{
 		m_shifter.state = on;
 		m_shifter.counter = m_pulse_length;
 	}
 }
 
-void Pneumatics::setBallCollector(bool on)
+void Pneumatics::setBallCollector(bool on, bool force)
 {
-	if (on != m_ballcollector.state)
+	if (on != m_ballcollector.state || force)
 	{
 		m_ballcollector.state = on;
 		m_ballcollector.counter = m_pulse_length;
 	}
 }
 
-void Pneumatics::setTrajectory(bool on)
+void Pneumatics::setTrajectory(bool on, bool force)
 {
-	if (on != m_trajectory.state)
+	if (on != m_trajectory.state || force)
 	{
 		m_trajectory.state = on;
 		m_trajectory.counter = m_pulse_length;
 	}
 }
 
-void Pneumatics::setLatch(bool on)
+void Pneumatics::setLatch(bool on, bool force)
 {
 	m_mutex = on;
 	on = !on;
-	if (on != m_shared.state)
+	if (on != m_shared.state || force)
 	{
 		m_shared.state = on;
 		m_shared.counter = m_pulse_length;
 	}
 }
 
-void Pneumatics::setPressurePlate(bool on)
+void Pneumatics::setPressurePlate(bool on, bool force)
 {
 	on = !on;
 	if (!m_mutex)
 	{
-		if (on != m_shared.state)
+		if (on != m_shared.state || force)
 		{
 			m_shared.state = on;
 			m_shared.counter = m_pulse_length;
@@ -133,27 +133,27 @@ void Pneumatics::Configure()
 
 void Pneumatics::log()
 {
-	SmartDashboard * sdb = SmartDashboard::GetInstance();
-	sdb->PutString("Shared Solenoid State",
-			(m_shared.state) ? "Forward" : "Reverse");
-	sdb->PutInt("Shared Solenoid Counter", m_shared.counter);
-	sdb->PutBoolean("Shared Solenoid Pulsing Enabled", m_shared.pulsed);
+	/*	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	 sdb->PutString("Shared Solenoid State",
+	 (m_shared.state) ? "Forward" : "Reverse");
+	 sdb->PutInt("Shared Solenoid Counter", m_shared.counter);
+	 sdb->PutBoolean("Shared Solenoid Pulsing Enabled", m_shared.pulsed);
 
-	sdb->PutString("BC Solenoid State",
-			(m_ballcollector.state) ? "Forward" : "Reverse");
-	sdb->PutInt("BC Solenoid Counter", m_ballcollector.counter);
-	sdb->PutBoolean("BC Solenoid Pulsing Enabled", m_ballcollector.pulsed);
+	 sdb->PutString("BC Solenoid State",
+	 (m_ballcollector.state) ? "Forward" : "Reverse");
+	 sdb->PutInt("BC Solenoid Counter", m_ballcollector.counter);
+	 sdb->PutBoolean("BC Solenoid Pulsing Enabled", m_ballcollector.pulsed);
 
-	sdb->PutString("Trajectory Solenoid State",
-			(m_trajectory.state) ? "Forward" : "Reverse");
-	sdb->PutInt("Trajectory Solenoid Counter", m_trajectory.counter);
-	sdb->PutBoolean("Trajectory Solenoid Pulsing Enabled", m_trajectory.pulsed);
+	 sdb->PutString("Trajectory Solenoid State",
+	 (m_trajectory.state) ? "Forward" : "Reverse");
+	 sdb->PutInt("Trajectory Solenoid Counter", m_trajectory.counter);
+	 sdb->PutBoolean("Trajectory Solenoid Pulsing Enabled", m_trajectory.pulsed);
 
-	sdb->PutString("Shifter Solenoid State",
-			(m_shifter.state) ? "Forward" : "Reverse");
-	sdb->PutInt("Shifter Solenoid Counter", m_shifter.counter);
-	sdb->PutBoolean("Shifter Solenoid Pulsing Enabled", m_shifter.pulsed);
-}
+	 sdb->PutString("Shifter Solenoid State",
+	 (m_shifter.state) ? "Forward" : "Reverse");
+	 sdb->PutInt("Shifter Solenoid Counter", m_shifter.counter);
+	 sdb->PutBoolean("Shifter Solenoid Pulsing Enabled", m_shifter.pulsed);
+	 */}
 
 void Pneumatics::releaseSemaphore()
 {

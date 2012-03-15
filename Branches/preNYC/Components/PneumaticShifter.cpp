@@ -32,12 +32,12 @@ void PneumaticShifter::Output()
 	switch (m_action->shifter->gear)
 	{
 	case ACTION::GEARBOX::LOW_GEAR:
-		Pneumatics::getInstance()->setShifter(false);
+		Pneumatics::getInstance()->setShifter(false, true);
 		encoders.setHighGear(false);
 		break;
 
 	case ACTION::GEARBOX::HIGH_GEAR:
-		Pneumatics::getInstance()->setShifter(true);
+		Pneumatics::getInstance()->setShifter(true, true);
 		encoders.setHighGear(true);
 		break;
 
@@ -54,8 +54,10 @@ string PneumaticShifter::GetName()
 
 void PneumaticShifter::log()
 {
+#if LOGGING_ENABLED
 	SmartDashboard::GetInstance()->PutString(
 			"Robot Gear",
 			(m_action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR) ? "High Gear"
-					: "Low Gear");
+			: "Low Gear");
+#endif
 }

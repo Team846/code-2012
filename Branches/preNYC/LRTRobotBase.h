@@ -8,6 +8,8 @@
 #include <WPILib.h>
 #include <vxWorks.h>
 
+#define USE_NOTIFIER 0
+
 /**
  * IterativeRobot implements a specific type of Robot Program framework, extending the RobotBase class.
  *
@@ -59,10 +61,14 @@ protected:
 
 private:
 	SEM_ID loopSemaphore;
+#if USE_NOTIFIER
 	Notifier * loopSynchronizer;
+#endif
 	static void releaseLoop(void* param);
 
+#if FANCY_SHIT_ENABLED
 	IMU *m_imu;
+#endif
 };
 
 #endif

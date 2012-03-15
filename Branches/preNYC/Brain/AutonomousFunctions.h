@@ -108,12 +108,12 @@ private:
 	 * Another attempt to balance the bridge
 	 */
 	bool anotherBridgeBalance();
-	
+
 	/*!
 	 * Raphael's PID attempt to balance the bridge
 	 */
 	bool otherBridgeBalance();
-	
+
 	/*!
 	 * Iterative method to track the key
 	 */
@@ -149,7 +149,7 @@ private:
 	const static int DRIVE_THEN_SHOOT_LENGTH = 10;
 	const static autonomousStage DRIVE_THEN_SHOOT[DRIVE_THEN_SHOOT_LENGTH];
 
-	const static int SHOOT_THEN_BRIDGE_LENGTH = 10;
+	const static int SHOOT_THEN_BRIDGE_LENGTH = 12;
 	const static autonomousStage SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH];
 
 	const static int BRIDGE_THEN_SHOOT_LENGTH = 10;
@@ -182,17 +182,20 @@ private:
 	double m_bridgebalance_angular_rate_threshold;
 	double m_bridgebalance_threshold, m_keytrack_threshold, m_align_threshold;
 
+	double m_drive_back_distance;
+
 	//double m_align_turned;
-	
+
 	bool m_hit_key_flag;
 
-	
 	int bridgeTipState;
 	double firstPlace, secondPlace;
 	double lastPitch;
 	int m_direction;
 	int m_haf_cyc_delay;
 	int m_adj_cyc_delay, M_CYCLES_TO_DELAY;
+
+	bool m_hasStartedHoldingPosition;
 
 	DISALLOW_COPY_AND_ASSIGN( AutonomousFunctions);
 };

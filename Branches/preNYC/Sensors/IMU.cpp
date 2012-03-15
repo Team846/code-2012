@@ -14,7 +14,7 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 	Loggable()
 {
 	m_task = new Task("IMU_TASK", (FUNCPTR) taskEntryPoint,
-			Task::kDefaultPriority - 1);
+			Task::kDefaultPriority);
 	DigitalModule *module = DigitalModule::GetInstance(module_num);
 	if (module)
 	{
@@ -28,7 +28,7 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 	m_roll = m_pitch = m_yaw = 0.0;
 	m_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 	m_is_running = false;
-	m_dio = new DigitalOutput(RobotConfig::DIGITAL_IO::IMU_CALIBRATE);
+	//m_dio = new DigitalOutput(RobotConfig::DIGITAL_IO::IMU_CALIBRATE);
 	memset(m_i2c_buf, 0, kNumPackets * 6 + 1);
 	m_time = 0;
 }
@@ -43,7 +43,7 @@ IMU::~IMU()
 		printf("SemDelete Error=%d\n", error);
 	}
 	delete m_i2c;
-	delete m_dio;
+	//delete m_dio;
 	m_i2c = NULL;
 }
 
@@ -149,16 +149,17 @@ void IMU::update(ActionData * action)
 	if (dt->rate.desiredDriveRate == 0.0 && dt->rate.desiredTurnRate == 0.0
 			&& dt->robotRotateSpeed == 0 && dt->robotTranslateSpeed == 0)
 	{
-		m_dio->Set(1);
+		//m_dio->Set(1);
 	}
 	else
 	{
-		m_dio->Set(0);
+		//m_dio->Set(0);
 	}
 }
 
 void IMU::log()
 {
+#if LOGGING_ENABLED
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 
 	sdb->PutDouble("IMU Roll", getRoll());
@@ -174,6 +175,7 @@ void IMU::log()
 	sdb->PutDouble("IMU Gyro Z", getGyroZ());
 
 	sdb->PutDouble("IMU Gyro y delta", getGyroYDelta());
+#endif
 }
 
 int IMU::getPacket()
@@ -274,8 +276,8 @@ void IMU::printAll()
 			getPitch(), getYaw());
 	AsyncPrinter::Printf("Scaled Gyro: [%2f, %2f, %2f]\r\n", getGyroX(),
 			getGyroY(), getGyroZ());
-	AsyncPrinter::Printf("Scaled Accel: [%2f, %2f, %2f]\r\n",
-			getAccelX(), getAccelY(), getAccelZ());
+	AsyncPrinter::Printf("Scaled Accel: [%2f, %2f, %2f]\r\n", getAccelX(),
+			getAccelY(), getAccelZ());
 	AsyncPrinter::Printf("\r\n");
 }
 

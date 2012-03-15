@@ -7,6 +7,7 @@ Wedge::Wedge() :
 	m_spike = new Relay(RobotConfig::RELAY_IO::WEDGE_SPIKE,
 			Relay::kBothDirections);
 
+	m_dither_down = m_dither_up = 0;
 	Configure();
 
 	m_ctr = 0;
@@ -25,7 +26,8 @@ void Wedge::Configure()
 	Config * config = Config::GetInstance();
 	m_pulse_down = config->Get<int> (m_name, "pulseDown", 70);
 	m_pulse_up = config->Get<int> (m_name, "pulseUp", 45);
-	m_dither = config->Get<int> (m_name, "dither", 5);
+	m_dither_down = config->Get<int> (m_name, "ditherDown", 4);
+	m_dither_up = config->Get<int> (m_name, "ditherUp", 5);
 }
 
 void Wedge::Disable()
@@ -36,11 +38,12 @@ void Wedge::Disable()
 
 void Wedge::Output()
 {
-	if (m_lastState != m_action->wedge->state)
+	if (m_lastState != m_action->wedge->state || m_action->wedge->try_again)
 	{
 		if (m_action->wedge->state == ACTION::WEDGE::PRESET_TOP
 				|| m_action->wedge->state == ACTION::WEDGE::PRESET_BOTTOM)
 		{
+			m_action ->wedge->try_again = false;
 			m_ctr = 0;
 		}
 	}
@@ -58,7 +61,7 @@ void Wedge::Output()
 		}
 		else
 		{
-			if (m_ctr % m_dither <= 1)
+			if (m_ctr % m_dither_up <= 1)
 			{
 				m_spike->Set(Relay::kReverse);
 			}
@@ -83,7 +86,7 @@ void Wedge::Output()
 		{
 			m_action->wedge->completion_status = ACTION::IN_PROGRESS;
 
-			if (m_ctr % m_dither <= 1)
+			if (m_ctr % m_dither_down <= 1)
 			{
 				m_spike->Set(Relay::kForward);
 			}
@@ -113,18 +116,19 @@ string Wedge::GetName()
 
 void Wedge::log()
 {
+#if LOGGING_ENABLED
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 
 	std::string pos;
 	switch (m_action->wedge->state)
 	{
-	case ACTION::WEDGE::IDLE:
+		case ACTION::WEDGE::IDLE:
 		pos = "Idle";
 		break;
-	case ACTION::WEDGE::PRESET_BOTTOM:
+		case ACTION::WEDGE::PRESET_BOTTOM:
 		pos = "Down";
 		break;
-	case ACTION::WEDGE::PRESET_TOP:
+		case ACTION::WEDGE::PRESET_TOP:
 		pos = "Up";
 		break;
 	}
@@ -133,21 +137,22 @@ void Wedge::log()
 	std::string stat;
 	switch (m_action->wedge->completion_status)
 	{
-	case ACTION::IN_PROGRESS:
+		case ACTION::IN_PROGRESS:
 		stat = "In Progress";
 		break;
-	case ACTION::ABORTED:
+		case ACTION::ABORTED:
 		stat = "Aborted";
 		break;
-	case ACTION::FAILURE:
+		case ACTION::FAILURE:
 		stat = "Failed";
 		break;
-	case ACTION::SUCCESS:
+		case ACTION::SUCCESS:
 		stat = "Success";
 		break;
-	case ACTION::UNSET:
+		case ACTION::UNSET:
 		stat = "Unset";
 		break;
 	}
 	sdb->PutString("Wedge Completion Status", stat);
+#endif
 }

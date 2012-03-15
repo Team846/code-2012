@@ -36,7 +36,7 @@ struct LauncherAction
 	bool atSpeed;
 	double speed;
 	ACTION::LAUNCHER::launcherConfiguration desiredTarget;
-	bool topTrajectory;
+	bool isFenderShot;
 	int ballLaunchCounter;
 };
 

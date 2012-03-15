@@ -21,7 +21,7 @@ Launcher::Launcher() :
 	m_p_conf = ACTION::LAUNCHER::KEY_SHOT_HIGH;
 	m_is_changing_speed = true;
 
-	//	disableLog();
+	disableLog();
 }
 
 Launcher::~Launcher()
@@ -60,7 +60,7 @@ void Launcher::Configure()
 	m_trajectories[ACTION::LAUNCHER::FAR_FENDER_SHOT_HIGH] = true;
 	m_trajectories[ACTION::LAUNCHER::FAR_FENDER_SHOT_LOW] = true;
 	m_trajectories[ACTION::LAUNCHER::FENDER_SHOT_HIGH] = true;
-	m_trajectories[ACTION::LAUNCHER::FENDER_SHOT_LOW] = true;
+	m_trajectories[ACTION::LAUNCHER::FENDER_SHOT_LOW] = false;
 	m_trajectories[ACTION::LAUNCHER::KEY_SHOT_HIGH] = false;
 	m_trajectories[ACTION::LAUNCHER::KEY_SHOT_LOW] = false;
 
@@ -79,8 +79,6 @@ void Launcher::Output()
 	m_speed = Util::Clamp<double>(m_speed, 0, m_max_speed * 1.3);
 
 	m_action->launcher->speed = m_speeds[m_action->launcher->desiredTarget];
-	m_action->launcher->topTrajectory
-			= m_trajectories[m_action->launcher->desiredTarget];
 
 	if (m_p_conf != m_action->launcher->desiredTarget)
 	{
@@ -104,7 +102,7 @@ void Launcher::Output()
 		}
 		else
 		{
-//			AsyncPrinter::Printf("not at speed\n");
+			//			AsyncPrinter::Printf("not at speed\n");
 			atSpeedCounter = 0;
 		}
 
@@ -138,13 +136,13 @@ void Launcher::Output()
 		break;
 	}
 
-	if (m_action->launcher->topTrajectory)
+	if (m_trajectories[m_action->launcher->desiredTarget])
 	{
-		Pneumatics::getInstance()->setTrajectory(true);
+		Pneumatics::getInstance()->setTrajectory(true, true);
 	}
 	else
 	{
-		Pneumatics::getInstance()->setTrajectory(false);
+		Pneumatics::getInstance()->setTrajectory(false, true);
 	}
 
 	double max_output = m_speed / m_max_speed + m_duty_cycle_delta;
@@ -167,13 +165,16 @@ std::string Launcher::GetName()
 	return m_name;
 }
 
+#define ENABLE_PID_LOGGING 0
+
 void Launcher::log()
 {
+#if LOGGING_ENABLED
 	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	sdb->PutString(
 			"Launcher State",
 			(m_action->launcher->state == ACTION::LAUNCHER::RUNNING) ? "Running"
-					: "Disabled");
+			: "Disabled");
 
 	sdb->PutString(
 			"Launcher Target",
@@ -181,17 +182,17 @@ void Launcher::log()
 
 	sdb->PutDouble("Launcher Speed", m_speed);
 	sdb->PutDouble("Launcher Output", m_output);
-	sdb->PutDouble("Launcher Max speed", m_max_speed);
-
 	sdb->PutDouble("Launcher Setpoint", m_pid.getSetpoint());
+#if ENABLE_PID_LOGGING
+	sdb->PutDouble("Launcher Max speed", m_max_speed);
 	sdb->PutDouble("Launcher Error", m_pid.getError());
 	sdb->PutDouble("Launcher P", m_pid.getProportionalGain());
 	sdb->PutDouble("Launcher I", m_pid.getIntegralGain());
 	sdb->PutDouble("Launcher D", m_pid.getDerivativeGain());
-
+#endif // ENABLE_PID_LOGGING
 	sdb->PutString("Launcher Trajectory",
-			(m_action->launcher->topTrajectory) ? "High" : "Low");
+			(m_action->launcher->isFenderShot) ? "High" : "Low");
 
 	sdb->PutBoolean("Launcher at speed", (m_action->launcher->atSpeed));
-
+#endif
 }

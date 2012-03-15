@@ -98,8 +98,10 @@ string Shifter::GetName()
 
 void Shifter::log()
 {
+	/*
 	SmartDashboard::GetInstance()->PutString(
 			"Robot Gear",
 			(m_action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR) ? "High Gear"
 					: "Low Gear");
+					*/
 }

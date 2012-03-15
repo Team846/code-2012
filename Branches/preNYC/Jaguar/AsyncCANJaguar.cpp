@@ -20,8 +20,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 {
 	m_task_name = "JAG#" + Util::ToString<int>(channel);
 	m_comm_task = new Task(m_task_name.c_str(),
-			(FUNCPTR) AsyncCANJaguar::CommTaskWrapper,
-			Task::kDefaultPriority - 2);
+			(FUNCPTR) AsyncCANJaguar::CommTaskWrapper, Task::kDefaultPriority);
 	m_comm_semaphore = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 	m_channel = channel;
 	m_setpoint.setValue(0.0);
@@ -529,7 +528,9 @@ void AsyncCANJaguar::setCollectionFlags(uint32_t flags)
 
 void AsyncCANJaguar::log()
 {
+#if LOGGING_ENABLED
 	SmartDashboard *sdb = SmartDashboard::GetInstance();
+
 	std::string prefix(m_name);
 	std::string buf;
 	prefix += ": ";
@@ -541,16 +542,16 @@ void AsyncCANJaguar::log()
 		std::string out;
 		switch (GetSpeedReference())
 		{
-		case kSpeedRef_Encoder:
+			case kSpeedRef_Encoder:
 			out = "Encoder";
 			break;
-		case kSpeedRef_InvEncoder:
+			case kSpeedRef_InvEncoder:
 			out = "Indexing Encoder";
 			break;
-		case kSpeedRef_QuadEncoder:
+			case kSpeedRef_QuadEncoder:
 			out = "Quadrature Encoder";
 			break;
-		case kSpeedRef_None:
+			case kSpeedRef_None:
 			out = "None";
 			break;
 		}
@@ -563,13 +564,13 @@ void AsyncCANJaguar::log()
 		std::string out;
 		switch (GetPositionReference())
 		{
-		case kPosRef_Potentiometer:
+			case kPosRef_Potentiometer:
 			out = "Potentiometer";
 			break;
-		case kPosRef_QuadEncoder:
+			case kPosRef_QuadEncoder:
 			out = "Quadrature Encoder";
 			break;
-		case kPosRef_None:
+			case kPosRef_None:
 			out = "None";
 			break;
 		}
@@ -595,19 +596,19 @@ void AsyncCANJaguar::log()
 		std::string out;
 		switch (GetControlMode())
 		{
-		case kPercentVbus:
+			case kPercentVbus:
 			out = "Duty Cycle";
 			break;
-		case kVoltage:
+			case kVoltage:
 			out = "Voltage";
 			break;
-		case kSpeed:
+			case kSpeed:
 			out = "Speed";
 			break;
-		case kPosition:
+			case kPosition:
 			out = "Position";
 			break;
-		case kCurrent:
+			case kCurrent:
 			out = "Current";
 			break;
 		}
@@ -671,19 +672,19 @@ void AsyncCANJaguar::log()
 	std::string out;
 	switch (m_control_mode.peek())
 	{
-	case kPercentVbus:
+		case kPercentVbus:
 		out = "Duty Cycle";
 		break;
-	case kVoltage:
+		case kVoltage:
 		out = "Voltage";
 		break;
-	case kSpeed:
+		case kSpeed:
 		out = "Speed";
 		break;
-	case kPosition:
+		case kPosition:
 		out = "Position";
 		break;
-	case kCurrent:
+		case kCurrent:
 		out = "Current";
 		break;
 	}
@@ -695,4 +696,5 @@ void AsyncCANJaguar::log()
 	sdb->PutDouble(buf.c_str(), temp);
 	buf = prefix + "Enabled Collection Values";
 	sdb->PutString(buf, cv);
+#endif
 }
