@@ -475,6 +475,8 @@ bool AutonomousFunctions::bridgeBalance()
 	return false;
 }
 
+#define ALT_METHOD 1
+
 bool AutonomousFunctions::keyTrack()
 {
 	m_action->drivetrain->rate.drive_control = true;
@@ -487,18 +489,21 @@ bool AutonomousFunctions::keyTrack()
 	bool state = m_action->cam->key.higher >= m_keytrack_threshold;
 	m_hit_key_flag |= state;
 
-	if (m_hit_key_flag)
+#if ALT_METHOD
+	if (state)
 	{
-		if (!state)
-		{
-			m_hit_key_flag = false;
-			m_action->drivetrain->rate.desiredDriveRate = 0.0;
-			m_action ->drivetrain->rate.desiredTurnRate = 0.0;
-			AsyncPrinter::Printf("Done Keytrack Done\n");
-			return true;
-
-		}
+		//		if (!state)
+		//		{
+		m_hit_key_flag = false;
+		m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		m_action ->drivetrain->rate.desiredTurnRate = 0.0;
+		AsyncPrinter::Printf("Done Keytrack Done\n");
+		return true;
+		//
+		//		}
 	}
+#else
+#endif
 	return false;
 }
 
