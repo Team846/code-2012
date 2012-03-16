@@ -2,7 +2,7 @@
 
 Pneumatics* Pneumatics::m_instance = NULL;
 
-#define PNEUMATICS_DISABLED 1
+#define PNEUMATICS_DISABLED 0
 
 #define INIT_PULSED_SOLENOID(x, y) (x).solenoid = (y);\
 	(x).counter = (m_pulse_length); \
