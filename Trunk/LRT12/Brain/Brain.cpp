@@ -75,10 +75,10 @@ int Brain::taskEntryPoint(uint32_t brain)
 
 void Brain::process()
 {
+	static bool runonce = true;
 	//This heuristic may eventually have to change if brain is to do processing during disabled
-	if (m_ds->IsAutonomous())
+	if (m_ds->IsAutonomous() && m_ds->IsEnabled())
 	{
-		static bool runonce = true;
 		AutonomousAction * a = ActionData::GetInstance()->auton;
 		if (runonce)
 		{
@@ -89,10 +89,13 @@ void Brain::process()
 		{
 			a->state = ACTION::AUTONOMOUS::AUTON_MODE;
 		}
-		AsyncPrinter::Printf("Auton Mode!\r\n");
+		static int e = 0;
+		if (++e % 70 ==0 )
+			AsyncPrinter::Printf("Auton Mode!\r\n");
 	}
 	else if (m_ds->IsOperatorControl())
 	{
+		runonce = false;
 		m_inputs->ProcessInputs();
 	}
 }
