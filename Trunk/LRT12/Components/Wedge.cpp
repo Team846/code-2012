@@ -7,6 +7,7 @@ Wedge::Wedge() :
 	m_spike = new Relay(RobotConfig::RELAY_IO::WEDGE_SPIKE,
 			Relay::kBothDirections);
 
+	m_dither_down = m_dither_up = 0;
 	Configure();
 
 	m_ctr = 0;
@@ -25,7 +26,8 @@ void Wedge::Configure()
 	Config * config = Config::GetInstance();
 	m_pulse_down = config->Get<int> (m_name, "pulseDown", 70);
 	m_pulse_up = config->Get<int> (m_name, "pulseUp", 45);
-	m_dither = config->Get<int> (m_name, "dither", 5);
+	m_dither_down = config->Get<int> (m_name, "ditherDown", 4);
+	m_dither_up = config->Get<int> (m_name, "ditherUp", 5);
 }
 
 void Wedge::Disable()
@@ -59,7 +61,7 @@ void Wedge::Output()
 		}
 		else
 		{
-			if (m_ctr % m_dither <= 1)
+			if (m_ctr % m_dither_up <= 1)
 			{
 				m_spike->Set(Relay::kReverse);
 			}
@@ -84,7 +86,7 @@ void Wedge::Output()
 		{
 			m_action->wedge->completion_status = ACTION::IN_PROGRESS;
 
-			if (m_ctr % m_dither <= 1)
+			if (m_ctr % m_dither_down <= 1)
 			{
 				m_spike->Set(Relay::kForward);
 			}
