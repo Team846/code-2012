@@ -14,7 +14,7 @@ Pneumatics::Pneumatics() :
 {
 	Configure();
 
-#if PNEUMATICS_DISABLED
+#if PNEUMATICS_DISABLED		
 #warning pneumatics disabled
 #else
 	INIT_PULSED_SOLENOID(m_shared, new DoubleSolenoid(
