@@ -21,7 +21,7 @@ Launcher::Launcher() :
 	m_p_conf = ACTION::LAUNCHER::KEY_SHOT_HIGH;
 	m_is_changing_speed = true;
 
-	//	disableLog();
+	disableLog();
 }
 
 Launcher::~Launcher()

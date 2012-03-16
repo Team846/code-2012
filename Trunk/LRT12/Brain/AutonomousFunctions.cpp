@@ -558,7 +558,6 @@ bool AutonomousFunctions::autonomousMode()
 	switch (m_curr_auton_stage)
 	{
 	case INIT:
-#warning Set speed correctly and check trajectory 
 		m_action->launcher->desiredTarget = ACTION::LAUNCHER::KEY_SHOT_HIGH;
 		m_action->launcher->isFenderShot = false;
 		m_action->launcher->ballLaunchCounter = 0;
@@ -583,7 +582,7 @@ bool AutonomousFunctions::autonomousMode()
 		break;
 	case SHOOT:
 		if (/*autoAlign() && */m_action->launcher->ballLaunchCounter
-				< BALLS_TO_SHOOT) //bug wanted to shoot 3 balls
+				< BALLS_TO_SHOOT)
 		{
 			m_action->ballfeed->attemptToLoadRound = true;
 		}
@@ -601,7 +600,7 @@ bool AutonomousFunctions::autonomousMode()
 		m_action->drivetrain->position.drive_control = true;
 		m_action->drivetrain->position.turn_control = false;
 
-		m_action->drivetrain->position.desiredRelativeDrivePosition = -12; //TODO Check me
+		m_action->drivetrain->position.desiredRelativeDrivePosition = -2 * 12; //TODO Check me
 		//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
 		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
 		advanceQueue();
