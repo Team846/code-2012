@@ -3,9 +3,6 @@
 #include "ActionData/IMUData.h"
 #include "Sensors/DriveEncoders.h"
 
-//#include <signal.h>
-//#include "Config/joystickdg.h"
-
 LRTRobot12::LRTRobot12() :
 			firstMember_(
 					"\n\n\n---------------------------------------------------------\n"
