@@ -36,11 +36,12 @@ void Wedge::Disable()
 
 void Wedge::Output()
 {
-	if (m_lastState != m_action->wedge->state)
+	if (m_lastState != m_action->wedge->state || m_action->wedge->try_again)
 	{
 		if (m_action->wedge->state == ACTION::WEDGE::PRESET_TOP
 				|| m_action->wedge->state == ACTION::WEDGE::PRESET_BOTTOM)
 		{
+			m_action ->wedge->try_again = false;
 			m_ctr = 0;
 		}
 	}

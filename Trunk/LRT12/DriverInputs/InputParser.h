@@ -30,10 +30,10 @@ private:
 	//Operator Stick
 	static const int SHOOT		  		  = 1;
 	static const int COLLECT_BALLS        = 2;
-	static const int LOW_SPEED        	  = 3;
+	static const int LOWER_SHOT        	  = 3;
 	static const int HIGH_SPEED           = 4;
-	static const int TRAJECTORY_UP	 	  = 5;
-	static const int TRAJECTORY_DOWN	  = 6;
+	static const int FENDER_SHOT_SELECT	 	  = 5;
+	static const int KEY_SHOT_SELECT	  = 6;
 	static const int DECREMENT_SPEED      = 7;
 	static const int INCREMENT_SPEED 	  = 8;
 	static const int WEDGE_DOWN		  	  = 9;
