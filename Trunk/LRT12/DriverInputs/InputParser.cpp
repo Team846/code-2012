@@ -62,10 +62,9 @@ void InputParser::ProcessInputs()
 		}
 		hasBeenReleased = false;
 	}
-	else if (m_driver_stick->IsButtonDown(BALANCE_BRIDGE))
+	else if (m_driver_stick->IsButtonDown(POSITION_HOLD))
 	{
-//			m_action_ptr->auton->state = ACTION::AUTONOMOUS::AUTON_MODE;
-		m_action_ptr->auton->state = ACTION::AUTONOMOUS::BRIDGEBALANCE;
+		m_action_ptr->auton->state = ACTION::AUTONOMOUS::POSITION_HOLD;
 	}
 	else
 	{

@@ -193,6 +193,8 @@ private:
 	int m_direction;
 	int m_haf_cyc_delay;
 	int m_adj_cyc_delay, M_CYCLES_TO_DELAY;
+	
+	bool m_hasStartedHoldingPosition;
 
 	DISALLOW_COPY_AND_ASSIGN( AutonomousFunctions);
 };

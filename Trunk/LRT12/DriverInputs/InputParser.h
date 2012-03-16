@@ -24,7 +24,7 @@ private:
 	static const int LOAD_CONFIG    = 6;
 	static const int SAVE_CONFIG    = 7;
 	static const int SHIFT 		    = 8;
-	static const int BALANCE_BRIDGE	= 9;
+	static const int POSITION_HOLD	= 9;
 	static const int RESET_ZERO		= 10;
 	
 	//Operator Stick

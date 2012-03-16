@@ -34,6 +34,7 @@ AutonomousFunctions::AutonomousFunctions() :
 	m_align_setpoint = 0;
 	Configure();
 	m_action->imu->pitch = 0.0;
+	m_hasStartedHoldingPosition = false;
 }
 
 AutonomousFunctions::~AutonomousFunctions()
@@ -127,6 +128,7 @@ void AutonomousFunctions::task()
 		switch (m_action->auton->state)
 		{
 		case ACTION::AUTONOMOUS::TELEOP:
+			m_hasStartedHoldingPosition = false;
 			bridgeTipState = 0;
 			m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
 			m_adj_cyc_delay = M_CYCLES_TO_DELAY;
@@ -177,6 +179,18 @@ void AutonomousFunctions::task()
 			else
 			{
 				m_action->auton->completion_status = ACTION::IN_PROGRESS;
+			}
+			break;
+		case ACTION::AUTONOMOUS::POSITION_HOLD:
+			if (!m_hasStartedHoldingPosition)
+			{
+				m_hasStartedHoldingPosition = true;
+				m_action->drivetrain->position.drive_control = true;
+				m_action->drivetrain->position.absoluteTranslate = false;
+				m_action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
+				m_action->drivetrain->position.turn_control = false;
+				m_action->drivetrain->rate.turn_control = true;
+				m_action->drivetrain->rate.desiredTurnRate = 0.0;
 			}
 			break;
 		}
