@@ -203,7 +203,6 @@ void AutonomousFunctions::task()
 
 bool AutonomousFunctions::otherBridgeBalance()
 {
-
 	return true;
 }
 
@@ -554,18 +553,15 @@ bool AutonomousFunctions::autoAlign()
 #define DEBUG 1
 bool AutonomousFunctions::autonomousMode()
 {
-	AsyncPrinter::Printf("Auton'ning\n");
-#if DEBUG
-	static int e = 0;
-	if (++e % 40 == 0)
-		AsyncPrinter::Printf("Entering %s\r\n",
-				getAutonomousStageName(m_curr_auton_stage).c_str());
-#endif
+	AsyncPrinter::Printf("Entering %s\r\n",
+			getAutonomousStageName(m_curr_auton_stage).c_str());
 	switch (m_curr_auton_stage)
 	{
 	case INIT:
 #warning Set speed correctly and check trajectory 
 		m_action->launcher->desiredTarget = ACTION::LAUNCHER::KEY_SHOT_HIGH;
+		m_action->launcher->isFenderShot = false;
+		m_action->launcher->ballLaunchCounter = 0;
 		m_action->drivetrain->position.reset_turn_zero = true;
 		M_CYCLES_TO_DELAY
 				= static_cast<int> ((DriverStation::GetInstance()->GetAnalogIn(
@@ -586,18 +582,15 @@ bool AutonomousFunctions::autonomousMode()
 		}
 		break;
 	case SHOOT:
-		AsyncPrinter::Printf("Pretend Shooting\n");
-
-		advanceQueue();
-		break;
-		if (autoAlign() && m_action->launcher->ballLaunchCounter
-				<= BALLS_TO_SHOOT)
+		if (/*autoAlign() && */m_action->launcher->ballLaunchCounter
+				< BALLS_TO_SHOOT) //bug wanted to shoot 3 balls
 		{
 			m_action->ballfeed->attemptToLoadRound = true;
 		}
 		else
 		{
 			advanceQueue();
+			m_action->ballfeed->attemptToLoadRound = false;
 		}
 		break;
 	case MOVE_BACK_INIT:
@@ -713,7 +706,7 @@ const AutonomousFunctions::autonomousStage
 
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH] =
-		{ INIT, ADJUSTABLE_DELAY, KEY_TRACK, AIM, SHOOT, DROP_WEDGE,
+		{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, DROP_WEDGE,
 				MOVE_BACK_INIT, WAIT_FOR_POSITION, DONE };
 
 const AutonomousFunctions::autonomousStage
@@ -728,8 +721,8 @@ void AutonomousFunctions::loadQueue()
 
 	for (uint8_t i = 0;; ++i)
 	{
-		autonomousStage s = DRIVE_THEN_SHOOT[i];
-		//		autonomousStage s = SHOOT_THEN_BRIDGE[i];
+		//		autonomousStage s = DRIVE_THEN_SHOOT[i];
+		autonomousStage s = SHOOT_THEN_BRIDGE[i];
 		//		autonomousStage s = BRIDGE_THEN_SHOOT[i];
 		if (s == DONE)
 		{
@@ -789,6 +782,8 @@ std::string AutonomousFunctions::getAutonomousStageName(autonomousStage a)
 	return str;
 }
 
+#define PID_LOGGING_ENABLED 0
+
 void AutonomousFunctions::advanceQueue()
 {
 	if (!m_auton_sequence.empty())
@@ -835,6 +830,7 @@ void AutonomousFunctions::log()
 	}
 	sdb->PutString("Autonomous Mode", s.c_str());
 
+#if PID_LOGGING_ENABLED
 	sdb->PutDouble("BridgePIDError", m_bridgebalance_pid.getError());
 	sdb->PutDouble("BridgePID_Acc_error",
 			m_bridgebalance_pid.getAccumulatedError());
@@ -848,4 +844,5 @@ void AutonomousFunctions::log()
 	sdb->PutDouble("AutoAimPID_P", m_auto_aim_pid.getProportionalGain());
 	sdb->PutDouble("AutoAimPID_I", m_auto_aim_pid.getIntegralGain());
 	sdb->PutDouble("AutoAimPID_D", m_auto_aim_pid.getDerivativeGain());
+#endif // PID_LOGGING_ENABLED
 }

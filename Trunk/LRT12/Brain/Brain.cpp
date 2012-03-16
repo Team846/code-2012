@@ -89,9 +89,6 @@ void Brain::process()
 		{
 			a->state = ACTION::AUTONOMOUS::AUTON_MODE;
 		}
-		static int e = 0;
-		if (++e % 70 ==0 )
-			AsyncPrinter::Printf("Auton Mode!\r\n");
 	}
 	else if (m_ds->IsOperatorControl())
 	{

@@ -108,12 +108,12 @@ private:
 	 * Another attempt to balance the bridge
 	 */
 	bool anotherBridgeBalance();
-	
+
 	/*!
 	 * Raphael's PID attempt to balance the bridge
 	 */
 	bool otherBridgeBalance();
-	
+
 	/*!
 	 * Iterative method to track the key
 	 */
@@ -183,17 +183,16 @@ private:
 	double m_bridgebalance_threshold, m_keytrack_threshold, m_align_threshold;
 
 	//double m_align_turned;
-	
+
 	bool m_hit_key_flag;
 
-	
 	int bridgeTipState;
 	double firstPlace, secondPlace;
 	double lastPitch;
 	int m_direction;
 	int m_haf_cyc_delay;
 	int m_adj_cyc_delay, M_CYCLES_TO_DELAY;
-	
+
 	bool m_hasStartedHoldingPosition;
 
 	DISALLOW_COPY_AND_ASSIGN( AutonomousFunctions);
