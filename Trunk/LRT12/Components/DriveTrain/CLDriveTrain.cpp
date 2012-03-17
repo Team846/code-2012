@@ -32,7 +32,6 @@ ClosedLoopDrivetrain::ClosedLoopDrivetrain() :
 
 void ClosedLoopDrivetrain::Configure()
 {
-	AsyncPrinter::Printf("Configuring CLDrive\n");
 	const static string configSection = "CLDriveTrain";
 
 	double drive_rate_p_high = m_config->Get<double> (configSection,
@@ -460,88 +459,88 @@ void ClosedLoopDrivetrain::reset()
 
 void ClosedLoopDrivetrain::log()
 {
-	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	/*SmartDashboard * sdb = SmartDashboard::GetInstance();
 
-	std::string drivemode;
-	switch (getTranslateMode())
-	{
-	case ClosedLoopDrivetrain::CL_DISABLED:
-		drivemode = "Open Loop";
-		break;
-	case ClosedLoopDrivetrain::CL_RATE:
-		drivemode = "Rate";
-		break;
-	case ClosedLoopDrivetrain::CL_POSITION:
-		drivemode = "Position";
-		break;
-	}
-	sdb->PutString("Drive mode", drivemode);
-	sdb->PutDouble("FWD Pos Drive setpoint",
-			m_pos_control[TRANSLATE]->getSetpoint());
-#if ENABLE_PID_LOGGING
-	sdb->PutDouble("FWD Pos Drive P Gain",
-			m_pos_control[TRANSLATE]->getProportionalGain());
-	sdb->PutDouble("FWD Pos Drive I Gain",
-			m_pos_control[TRANSLATE]->getIntegralGain());
-	sdb->PutDouble("FWD Pos Drive D Gain",
-			m_pos_control[TRANSLATE]->getDerivativeGain());
-	sdb->PutDouble("FWD Pos Drive Error", m_pos_control[TRANSLATE]->getError());
-	sdb->PutDouble("FWD Pos Drive Accumulated Error",
-			m_pos_control[TRANSLATE]->getAccumulatedError());
-#endif // ENABLE_PID_LOGGING
-	sdb->PutDouble("TURN Pos Drive Setpoint",
-			m_pos_control[TURN]->getSetpoint());
+	 std::string drivemode;
+	 switch (getTranslateMode())
+	 {
+	 case ClosedLoopDrivetrain::CL_DISABLED:
+	 drivemode = "Open Loop";
+	 break;
+	 case ClosedLoopDrivetrain::CL_RATE:
+	 drivemode = "Rate";
+	 break;
+	 case ClosedLoopDrivetrain::CL_POSITION:
+	 drivemode = "Position";
+	 break;
+	 }
+	 sdb->PutString("Drive mode", drivemode);
+	 sdb->PutDouble("FWD Pos Drive setpoint",
+	 m_pos_control[TRANSLATE]->getSetpoint());
+	 #if ENABLE_PID_LOGGING
+	 sdb->PutDouble("FWD Pos Drive P Gain",
+	 m_pos_control[TRANSLATE]->getProportionalGain());
+	 sdb->PutDouble("FWD Pos Drive I Gain",
+	 m_pos_control[TRANSLATE]->getIntegralGain());
+	 sdb->PutDouble("FWD Pos Drive D Gain",
+	 m_pos_control[TRANSLATE]->getDerivativeGain());
+	 sdb->PutDouble("FWD Pos Drive Error", m_pos_control[TRANSLATE]->getError());
+	 sdb->PutDouble("FWD Pos Drive Accumulated Error",
+	 m_pos_control[TRANSLATE]->getAccumulatedError());
+	 #endif // ENABLE_PID_LOGGING
+	 sdb->PutDouble("TURN Pos Drive Setpoint",
+	 m_pos_control[TURN]->getSetpoint());
 
-#if ENABLE_PID_LOGGING
-	sdb->PutDouble("TURN Pos Drive P Gain",
-			m_pos_control[TURN]->getProportionalGain());
-	sdb->PutDouble("TURN Pos Drive I Gain",
-			m_pos_control[TURN]->getIntegralGain());
-	sdb->PutDouble("TURN Pos Drive D Gain",
-			m_pos_control[TURN]->getDerivativeGain());
-	sdb->PutDouble("TURN Pos Drive Error", m_pos_control[TURN]->getError());
-	sdb->PutDouble("TURN Pos Drive Accumulated Error",
-			m_pos_control[TURN]->getAccumulatedError());
-#endif // ENABLE_PID_LOGGING
-	std::string turnmode;
-	switch (getTurnMode())
-	{
-	case ClosedLoopDrivetrain::CL_DISABLED:
-		turnmode = "Open Loop";
-		break;
-	case ClosedLoopDrivetrain::CL_RATE:
-		turnmode = "Rate";
-		break;
-	case ClosedLoopDrivetrain::CL_POSITION:
-		turnmode = "Position";
-		break;
-	}
-	sdb->PutString("Turn mode", turnmode);
+	 #if ENABLE_PID_LOGGING
+	 sdb->PutDouble("TURN Pos Drive P Gain",
+	 m_pos_control[TURN]->getProportionalGain());
+	 sdb->PutDouble("TURN Pos Drive I Gain",
+	 m_pos_control[TURN]->getIntegralGain());
+	 sdb->PutDouble("TURN Pos Drive D Gain",
+	 m_pos_control[TURN]->getDerivativeGain());
+	 sdb->PutDouble("TURN Pos Drive Error", m_pos_control[TURN]->getError());
+	 sdb->PutDouble("TURN Pos Drive Accumulated Error",
+	 m_pos_control[TURN]->getAccumulatedError());
+	 #endif // ENABLE_PID_LOGGING
+	 std::string turnmode;
+	 switch (getTurnMode())
+	 {
+	 case ClosedLoopDrivetrain::CL_DISABLED:
+	 turnmode = "Open Loop";
+	 break;
+	 case ClosedLoopDrivetrain::CL_RATE:
+	 turnmode = "Rate";
+	 break;
+	 case ClosedLoopDrivetrain::CL_POSITION:
+	 turnmode = "Position";
+	 break;
+	 }
+	 sdb->PutString("Turn mode", turnmode);
 
-	sdb->PutDouble("FWD rate Drive Setpoint",
-			m_rate_control[TRANSLATE]->getSetpoint());
-#if ENABLE_PID_LOGGING
-	sdb->PutDouble("FWD rate Drive P Gain",
-			m_rate_control[TRANSLATE]->getProportionalGain());
-	sdb->PutDouble("FWD rate Drive I Gain",
-			m_rate_control[TRANSLATE]->getIntegralGain());
-	sdb->PutDouble("FWD rate Drive D Gain",
-			m_rate_control[TRANSLATE]->getDerivativeGain());
-	sdb->PutDouble("FWD rate Drive Error",
-			m_rate_control[TRANSLATE]->getError());
-	sdb->PutDouble("FWD rate Drive Accumulated Error",
-			m_rate_control[TRANSLATE]->getAccumulatedError());
-#endif // ENABLE_PID_LOGGING
-	sdb->PutDouble("TURN rate Setpoint", m_rate_control[TURN]->getSetpoint());
-#if ENABLE_PID_LOGGING
-	sdb->PutDouble("TURN rate Drive P Gain",
-			m_rate_control[TURN]->getProportionalGain());
-	sdb->PutDouble("TURN rate Drive I Gain",
-			m_rate_control[TURN]->getIntegralGain());
-	sdb->PutDouble("TURN rate Drive D Gain",
-			m_rate_control[TURN]->getDerivativeGain());
-	sdb->PutDouble("TURN rate Drive Error", m_rate_control[TURN]->getError());
-	sdb->PutDouble("TURN rate Drive Accumulated Error",
-			m_rate_control[TURN]->getAccumulatedError());
-#endif // ENABLE_PID_LOGGING
+	 sdb->PutDouble("FWD rate Drive Setpoint",
+	 m_rate_control[TRANSLATE]->getSetpoint());
+	 #if ENABLE_PID_LOGGING
+	 sdb->PutDouble("FWD rate Drive P Gain",
+	 m_rate_control[TRANSLATE]->getProportionalGain());
+	 sdb->PutDouble("FWD rate Drive I Gain",
+	 m_rate_control[TRANSLATE]->getIntegralGain());
+	 sdb->PutDouble("FWD rate Drive D Gain",
+	 m_rate_control[TRANSLATE]->getDerivativeGain());
+	 sdb->PutDouble("FWD rate Drive Error",
+	 m_rate_control[TRANSLATE]->getError());
+	 sdb->PutDouble("FWD rate Drive Accumulated Error",
+	 m_rate_control[TRANSLATE]->getAccumulatedError());
+	 #endif // ENABLE_PID_LOGGING
+	 sdb->PutDouble("TURN rate Setpoint", m_rate_control[TURN]->getSetpoint());
+	 #if ENABLE_PID_LOGGING
+	 sdb->PutDouble("TURN rate Drive P Gain",
+	 m_rate_control[TURN]->getProportionalGain());
+	 sdb->PutDouble("TURN rate Drive I Gain",
+	 m_rate_control[TURN]->getIntegralGain());
+	 sdb->PutDouble("TURN rate Drive D Gain",
+	 m_rate_control[TURN]->getDerivativeGain());
+	 sdb->PutDouble("TURN rate Drive Error", m_rate_control[TURN]->getError());
+	 sdb->PutDouble("TURN rate Drive Accumulated Error",
+	 m_rate_control[TURN]->getAccumulatedError());
+	 #endif // ENABLE_PID_LOGGING*/
 }

@@ -138,11 +138,11 @@ void Launcher::Output()
 
 	if (m_trajectories[m_action->launcher->desiredTarget])
 	{
-		Pneumatics::getInstance()->setTrajectory(true);
+		Pneumatics::getInstance()->setTrajectory(true, true);
 	}
 	else
 	{
-		Pneumatics::getInstance()->setTrajectory(false);
+		Pneumatics::getInstance()->setTrajectory(false, true);
 	}
 
 	double max_output = m_speed / m_max_speed + m_duty_cycle_delta;
@@ -169,7 +169,7 @@ std::string Launcher::GetName()
 
 void Launcher::log()
 {
-	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	/*SmartDashboard * sdb = SmartDashboard::GetInstance();
 	sdb->PutString(
 			"Launcher State",
 			(m_action->launcher->state == ACTION::LAUNCHER::RUNNING) ? "Running"
@@ -193,5 +193,5 @@ void Launcher::log()
 			(m_action->launcher->isFenderShot) ? "High" : "Low");
 
 	sdb->PutBoolean("Launcher at speed", (m_action->launcher->atSpeed));
-
+*/
 }

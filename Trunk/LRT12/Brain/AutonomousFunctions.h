@@ -182,6 +182,8 @@ private:
 	double m_bridgebalance_angular_rate_threshold;
 	double m_bridgebalance_threshold, m_keytrack_threshold, m_align_threshold;
 
+	double m_drive_back_distance;
+
 	//double m_align_turned;
 
 	bool m_hit_key_flag;

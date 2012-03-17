@@ -19,7 +19,7 @@ LRTRobotBase::LRTRobotBase()
 	printf("Creating LRTRobotbase\n");
 	loopSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 
-	m_imu = new IMU();
+	//	m_imu = new IMU();
 }
 
 /**
@@ -32,7 +32,7 @@ LRTRobotBase::~LRTRobotBase()
 
 	if (AsyncCANJaguar::jaguar_list_)
 	{
-		for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
+		for (AsyncCANJaguar* j = AsyncCANJaguar::jaguar_list_; j != NULL; j
 				= j->next_jaguar_)
 		{
 			j->StopBackgroundTask();
@@ -43,8 +43,8 @@ LRTRobotBase::~LRTRobotBase()
 	Pneumatics::getInstance()->stopBackgroundTask();
 	Log::getInstance()->stopTask();
 
-	m_imu->stopTask();
-	delete m_imu;
+	//	m_imu->stopTask();
+	//	delete m_imu;
 
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
 	AsyncPrinter::Quit();
@@ -72,7 +72,7 @@ void LRTRobotBase::StartCompetition()
 	Log::getInstance()->startTask();
 	AutonomousFunctions::getInstance()->startBackgroundTask();
 
-	m_imu->startTask();
+	//	m_imu->startTask();
 
 	AsyncPrinter::Printf("Starting Profiler\r\n");
 	Profiler& profiler = Profiler::GetInstance();
@@ -91,9 +91,9 @@ void LRTRobotBase::StartCompetition()
 
 		if (cycleCount % 2 == 0)
 		{
-			m_imu->releaseSemaphore();
+			//			m_imu->releaseSemaphore();
 		}
-		
+
 		AutonomousFunctions::getInstance()->releaseSemaphore();
 
 		profiler.StartNewCycle();
@@ -107,7 +107,7 @@ void LRTRobotBase::StartCompetition()
 		// NB: This loop must be quit *before* the Jaguars are deleted!
 		if (AsyncCANJaguar::jaguar_list_)
 		{
-			for (AsyncCANJaguar* j = j->jaguar_list_; j != NULL; j
+			for (AsyncCANJaguar* j = AsyncCANJaguar::jaguar_list_; j != NULL; j
 					= j->next_jaguar_)
 			{
 				j->ReleaseCommSemaphore();

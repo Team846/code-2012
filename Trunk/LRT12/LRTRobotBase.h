@@ -62,7 +62,7 @@ private:
 	Notifier * loopSynchronizer;
 	static void releaseLoop(void* param);
 
-	IMU *m_imu;
+	//	IMU *m_imu;
 };
 
 #endif

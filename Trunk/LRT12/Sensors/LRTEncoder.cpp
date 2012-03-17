@@ -37,8 +37,8 @@ INT32 LRTEncoder::Get()
 
 void LRTEncoder::log()
 {
-	SmartDashboard * sdb = SmartDashboard::GetInstance();
-	std::string prefix = m_name + ": ";
-	sdb->PutDouble((prefix + "Rate").c_str(), GetRate());
-	sdb->PutInt((prefix + "Count").c_str(), Get());
+	/*SmartDashboard * sdb = SmartDashboard::GetInstance();
+	 std::string prefix = m_name + ": ";
+	 sdb->PutDouble((prefix + "Rate").c_str(), GetRate());
+	 sdb->PutInt((prefix + "Count").c_str(), Get());*/
 }

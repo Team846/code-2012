@@ -30,13 +30,14 @@ void InputParser::ProcessInputs()
 	m_operator_stick->Update();
 
 	/***************** Shifter **********************/
-	if (m_driver_stick->IsButtonJustPressed(SHIFT)) //Shift gear
+	if (m_driver_stick->IsButtonDown(SHIFT)) //Shift gear
 	{
 		AsyncPrinter::Printf("Shift button\n");
-		if (m_action_ptr->shifter->gear == ACTION::GEARBOX::HIGH_GEAR)
-			m_action_ptr->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
-		else
-			m_action_ptr->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
+		m_action_ptr->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
+	}
+	else
+	{
+		m_action_ptr->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
 	}
 
 	/***************** Ball Feeder **********************/

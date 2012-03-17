@@ -83,7 +83,7 @@ void Log::logAll()
 
 		if (ptr->shouldLog())
 		{
-			ptr->log();
+//			ptr->log();
 		}
 	}
 }

@@ -529,170 +529,170 @@ void AsyncCANJaguar::setCollectionFlags(uint32_t flags)
 
 void AsyncCANJaguar::log()
 {
-	SmartDashboard *sdb = SmartDashboard::GetInstance();
-	std::string prefix(m_name);
-	std::string buf;
-	prefix += ": ";
+	/*SmartDashboard *sdb = SmartDashboard::GetInstance();
+	 std::string prefix(m_name);
+	 std::string buf;
+	 prefix += ": ";
 
-	std::string cv("None");
-	if (m_collection_flags & SPEEDREF)
-	{
-		cv += "Speed Reference, ";
-		std::string out;
-		switch (GetSpeedReference())
-		{
-		case kSpeedRef_Encoder:
-			out = "Encoder";
-			break;
-		case kSpeedRef_InvEncoder:
-			out = "Indexing Encoder";
-			break;
-		case kSpeedRef_QuadEncoder:
-			out = "Quadrature Encoder";
-			break;
-		case kSpeedRef_None:
-			out = "None";
-			break;
-		}
-		buf = prefix + "Speed Reference";
-		sdb->PutString(buf, out);
-	}
-	if (m_collection_flags & POSREF)
-	{
-		cv += "Position Reference, ";
-		std::string out;
-		switch (GetPositionReference())
-		{
-		case kPosRef_Potentiometer:
-			out = "Potentiometer";
-			break;
-		case kPosRef_QuadEncoder:
-			out = "Quadrature Encoder";
-			break;
-		case kPosRef_None:
-			out = "None";
-			break;
-		}
-		buf = prefix + "Position Reference";
-		sdb->PutString(buf, out);
-	}
-	if (m_collection_flags & PID)
-	{
-		cv += "PID, ";
-		double temp = GetP();
-		buf = prefix + "Proportional Gain";
-		sdb->PutDouble(buf.c_str(), temp);
-		temp = GetI();
-		buf = prefix + "Integral Gain";
-		sdb->PutDouble(buf.c_str(), temp);
-		temp = GetD();
-		buf = prefix + "Derivative Gain";
-		sdb->PutDouble(buf.c_str(), temp);
-	}
-	if (m_collection_flags & CTRLMODE)
-	{
-		cv += "Control Mode, ";
-		std::string out;
-		switch (GetControlMode())
-		{
-		case kPercentVbus:
-			out = "Duty Cycle";
-			break;
-		case kVoltage:
-			out = "Voltage";
-			break;
-		case kSpeed:
-			out = "Speed";
-			break;
-		case kPosition:
-			out = "Position";
-			break;
-		case kCurrent:
-			out = "Current";
-			break;
-		}
-		buf = prefix + "Control Mode (read)";
-		sdb->PutString(buf, out);
-	}
-	if (m_collection_flags & BUSVOLT)
-	{
-		cv += "Bus Voltage, ";
-		double temp = GetBusVoltage();
-		buf = prefix + "Bus Voltage";
-		sdb->PutDouble(buf.c_str(), temp);
-	}
-	if (m_collection_flags & OUTVOLT)
-	{
-		cv += "Output Voltage, ";
-		double temp = GetOutputVoltage();
-		buf = prefix + "Output Voltage";
-		sdb->PutDouble(buf.c_str(), temp);
-	}
-	if (m_collection_flags & OUTCURR)
-	{
-		cv += "Output Current, ";
-		double temp = GetOutputCurrent();
-		buf = prefix + "Output Current";
-		sdb->PutDouble(buf.c_str(), temp);
-	}
-	if (m_collection_flags & TEMP)
-	{
-		cv += "Temperature, ";
-		double temp = GetTemperature();
-		buf = prefix + "Temperature";
-		sdb->PutDouble(buf.c_str(), temp);
-	}
-	if (m_collection_flags & FWDLIMOK)
-	{
-		cv += "Forward Soft Limit OK, ";
-		buf = prefix + "Forward Limit OK";
-		sdb->PutBoolean(buf.c_str(), GetForwardLimitOK());
-	}
-	if (m_collection_flags & REVLIMOK)
-	{
-		cv += "Reverse Soft Limit OK, ";
-		buf = prefix + "Reverse Limit OK";
-		sdb->PutBoolean(buf.c_str(), GetReverseLimitOK());
-	}
-	if (m_collection_flags & PWRCYCLE)
-	{
-		cv += "Power Cycled, ";
-		buf = prefix + "Power Cycled";
-		sdb->PutBoolean(buf.c_str(), GetPowerCycled());
-	}
-	if (m_collection_flags & EXPIRE)
-	{
-		cv += "Expiration";
-		double temp = GetExpiration();
-		buf = prefix + "Expiration";
-		sdb->PutDouble(buf.c_str(), temp);
-	}
+	 std::string cv("None");
+	 if (m_collection_flags & SPEEDREF)
+	 {
+	 cv += "Speed Reference, ";
+	 std::string out;
+	 switch (GetSpeedReference())
+	 {
+	 case kSpeedRef_Encoder:
+	 out = "Encoder";
+	 break;
+	 case kSpeedRef_InvEncoder:
+	 out = "Indexing Encoder";
+	 break;
+	 case kSpeedRef_QuadEncoder:
+	 out = "Quadrature Encoder";
+	 break;
+	 case kSpeedRef_None:
+	 out = "None";
+	 break;
+	 }
+	 buf = prefix + "Speed Reference";
+	 sdb->PutString(buf, out);
+	 }
+	 if (m_collection_flags & POSREF)
+	 {
+	 cv += "Position Reference, ";
+	 std::string out;
+	 switch (GetPositionReference())
+	 {
+	 case kPosRef_Potentiometer:
+	 out = "Potentiometer";
+	 break;
+	 case kPosRef_QuadEncoder:
+	 out = "Quadrature Encoder";
+	 break;
+	 case kPosRef_None:
+	 out = "None";
+	 break;
+	 }
+	 buf = prefix + "Position Reference";
+	 sdb->PutString(buf, out);
+	 }
+	 if (m_collection_flags & PID)
+	 {
+	 cv += "PID, ";
+	 double temp = GetP();
+	 buf = prefix + "Proportional Gain";
+	 sdb->PutDouble(buf.c_str(), temp);
+	 temp = GetI();
+	 buf = prefix + "Integral Gain";
+	 sdb->PutDouble(buf.c_str(), temp);
+	 temp = GetD();
+	 buf = prefix + "Derivative Gain";
+	 sdb->PutDouble(buf.c_str(), temp);
+	 }
+	 if (m_collection_flags & CTRLMODE)
+	 {
+	 cv += "Control Mode, ";
+	 std::string out;
+	 switch (GetControlMode())
+	 {
+	 case kPercentVbus:
+	 out = "Duty Cycle";
+	 break;
+	 case kVoltage:
+	 out = "Voltage";
+	 break;
+	 case kSpeed:
+	 out = "Speed";
+	 break;
+	 case kPosition:
+	 out = "Position";
+	 break;
+	 case kCurrent:
+	 out = "Current";
+	 break;
+	 }
+	 buf = prefix + "Control Mode (read)";
+	 sdb->PutString(buf, out);
+	 }
+	 if (m_collection_flags & BUSVOLT)
+	 {
+	 cv += "Bus Voltage, ";
+	 double temp = GetBusVoltage();
+	 buf = prefix + "Bus Voltage";
+	 sdb->PutDouble(buf.c_str(), temp);
+	 }
+	 if (m_collection_flags & OUTVOLT)
+	 {
+	 cv += "Output Voltage, ";
+	 double temp = GetOutputVoltage();
+	 buf = prefix + "Output Voltage";
+	 sdb->PutDouble(buf.c_str(), temp);
+	 }
+	 if (m_collection_flags & OUTCURR)
+	 {
+	 cv += "Output Current, ";
+	 double temp = GetOutputCurrent();
+	 buf = prefix + "Output Current";
+	 sdb->PutDouble(buf.c_str(), temp);
+	 }
+	 if (m_collection_flags & TEMP)
+	 {
+	 cv += "Temperature, ";
+	 double temp = GetTemperature();
+	 buf = prefix + "Temperature";
+	 sdb->PutDouble(buf.c_str(), temp);
+	 }
+	 if (m_collection_flags & FWDLIMOK)
+	 {
+	 cv += "Forward Soft Limit OK, ";
+	 buf = prefix + "Forward Limit OK";
+	 sdb->PutBoolean(buf.c_str(), GetForwardLimitOK());
+	 }
+	 if (m_collection_flags & REVLIMOK)
+	 {
+	 cv += "Reverse Soft Limit OK, ";
+	 buf = prefix + "Reverse Limit OK";
+	 sdb->PutBoolean(buf.c_str(), GetReverseLimitOK());
+	 }
+	 if (m_collection_flags & PWRCYCLE)
+	 {
+	 cv += "Power Cycled, ";
+	 buf = prefix + "Power Cycled";
+	 sdb->PutBoolean(buf.c_str(), GetPowerCycled());
+	 }
+	 if (m_collection_flags & EXPIRE)
+	 {
+	 cv += "Expiration";
+	 double temp = GetExpiration();
+	 buf = prefix + "Expiration";
+	 sdb->PutDouble(buf.c_str(), temp);
+	 }
 
-	std::string out;
-	switch (m_control_mode.peek())
-	{
-	case kPercentVbus:
-		out = "Duty Cycle";
-		break;
-	case kVoltage:
-		out = "Voltage";
-		break;
-	case kSpeed:
-		out = "Speed";
-		break;
-	case kPosition:
-		out = "Position";
-		break;
-	case kCurrent:
-		out = "Current";
-		break;
-	}
+	 std::string out;
+	 switch (m_control_mode.peek())
+	 {
+	 case kPercentVbus:
+	 out = "Duty Cycle";
+	 break;
+	 case kVoltage:
+	 out = "Voltage";
+	 break;
+	 case kSpeed:
+	 out = "Speed";
+	 break;
+	 case kPosition:
+	 out = "Position";
+	 break;
+	 case kCurrent:
+	 out = "Current";
+	 break;
+	 }
 
-	buf = prefix + "Control Mode";
-	sdb->PutString(buf, out);
-	double temp = (double) m_setpoint.peek();
-	buf = prefix + "Setpoint";
-	sdb->PutDouble(buf.c_str(), temp);
-	buf = prefix + "Enabled Collection Values";
-	sdb->PutString(buf, cv);
+	 buf = prefix + "Control Mode";
+	 sdb->PutString(buf, out);
+	 double temp = (double) m_setpoint.peek();
+	 buf = prefix + "Setpoint";
+	 sdb->PutDouble(buf.c_str(), temp);
+	 buf = prefix + "Enabled Collection Values";
+	 sdb->PutString(buf, cv);*/
 }

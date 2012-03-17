@@ -36,8 +36,8 @@ private:
 	Brain brain;
 	ActionData *m_action;
 
-	Trackers *m_trackers;
-	
+	//	Trackers *m_trackers;
+
 	PrintInConstructor dc_CANBus_;
 
 	Config *config;

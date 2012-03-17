@@ -26,49 +26,49 @@ template<class PairT> struct SortBySecondValue
 void Profiler::StartNewCycle()
 {
 	++cycleIndex;
-	return;
-	//
-	//	if (cycleIndex >= reportPeriod)
-	//	{
-	//		double reportStart = Timer::GetFPGATimestamp();
-	//
-	//		AsyncPrinter::Printf("----------------------\n");
-	//		AsyncPrinter::Printf("PROFILER (%d cycles)\n", reportPeriod);
-	//
-	//		typedef map<string, double>::value_type paired;
-	//		typedef set<paired, SortBySecondValue<paired> > SetSortedBySecond;
-	//		SetSortedBySecond vals;
-	//
-	//		for (map<string, double>::iterator it = loggedMaxs.begin(); it
-	//				!= loggedMaxs.end(); ++it)
-	//		{
-	//			// vals.insert( paired(it->first, it->second/loggedCounts[it->first]) ); // to sort by means
-	//			vals.insert(paired(it->first, it->second));
-	//		}
-	//
-	//		int i = 0;
-	//		for (SetSortedBySecond::iterator it = vals.begin(); it != vals.end(); ++it)
-	//		{
-	//			double min = loggedMins[it->first];
-	//			double max = loggedMaxs[it->first];
-	//			int count = loggedCounts[it->first];
-	//			double mean = loggedSums[it->first] / count;
-	//
-	//			AsyncPrinter::Printf("| %-30s ~%.2f [%.2f-%.2f] x%d\n",
-	//					it->first.c_str(), mean, min, max, count);
-	//
-	//			++i;
-	//			if (i > reportLimit)
-	//				break;
-	//		}
-	//
-	//		double reportTime = (Timer::GetFPGATimestamp() - reportStart) * 1000;
-	//
-	//		cycleIndex = 0;
-	//		ClearLogBuffer();
-	//
-	//		AsyncPrinter::Printf("End report (%.2f ms)\n", reportTime);
-	//	}
+	//	return;
+
+	if (cycleIndex >= reportPeriod)
+	{
+		double reportStart = Timer::GetFPGATimestamp();
+
+		AsyncPrinter::Printf("----------------------\n");
+		AsyncPrinter::Printf("PROFILER (%d cycles)\n", reportPeriod);
+
+		typedef map<string, double>::value_type paired;
+		typedef set<paired, SortBySecondValue<paired> > SetSortedBySecond;
+		SetSortedBySecond vals;
+
+		for (map<string, double>::iterator it = loggedMaxs.begin(); it
+				!= loggedMaxs.end(); ++it)
+		{
+			// vals.insert( paired(it->first, it->second/loggedCounts[it->first]) ); // to sort by means
+			vals.insert(paired(it->first, it->second));
+		}
+
+		int i = 0;
+		for (SetSortedBySecond::iterator it = vals.begin(); it != vals.end(); ++it)
+		{
+			double min = loggedMins[it->first];
+			double max = loggedMaxs[it->first];
+			int count = loggedCounts[it->first];
+			double mean = loggedSums[it->first] / count;
+
+			AsyncPrinter::Printf("| %-30s ~%.2f [%.2f-%.2f] x%d\n",
+					it->first.c_str(), mean, min, max, count);
+
+			++i;
+			if (i > reportLimit)
+				break;
+		}
+
+		double reportTime = (Timer::GetFPGATimestamp() - reportStart) * 1000;
+
+		cycleIndex = 0;
+		ClearLogBuffer();
+
+		AsyncPrinter::Printf("End report (%.2f ms)\n", reportTime);
+	}
 }
 
 void Profiler::Log(std::string name, double timeTaken)

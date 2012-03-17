@@ -3,6 +3,8 @@
 #include "ActionData/IMUData.h"
 #include "Sensors/DriveEncoders.h"
 
+#include <fstream>
+
 LRTRobot12::LRTRobot12() :
 			firstMember_(
 					"\n\n\n---------------------------------------------------------\n"
@@ -11,6 +13,10 @@ LRTRobot12::LRTRobot12() :
 			dc_CANBus_("CANbus\n"), lastMember_("LRTRobot.LastMember\n") //trace constructor.
 
 {
+	//file to indicate startup
+	std::ofstream fout("start.txt", std::fstream::app);
+	fout << "started\n";
+	fout.close();
 	config = Config::GetInstance();
 	prevState = DISABLED;
 	ds = DriverStation::GetInstance();
@@ -27,7 +33,7 @@ LRTRobot12::LRTRobot12() :
 	//set priority above default so that we get higher priority than default
 	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority
 
-	m_trackers = new Trackers();
+//	m_trackers = new Trackers();
 
 	printf("---- Robot Initialized ----\n\n");
 }
@@ -38,7 +44,7 @@ LRTRobot12::~LRTRobot12()
 	m_compressor->Stop();
 	delete m_compressor;
 
-	delete m_trackers;
+//	delete m_trackers;
 
 	printf("\n\nBegin Deleting LRTRobot12\n");
 

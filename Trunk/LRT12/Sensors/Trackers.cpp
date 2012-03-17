@@ -105,9 +105,9 @@ void Trackers::listen()
 
 			key_lastPacketID = pid;
 
-//			static int e = 0;
-//			if (++e % 20 == 0)
-//				AsyncPrinter::Printf("%d: r: %d, b: %d\n", pid, m_key_value_r, m_key_value_b);
+			//			static int e = 0;
+			//			if (++e % 20 == 0)
+			//				AsyncPrinter::Printf("%d: r: %d, b: %d\n", pid, m_key_value_r, m_key_value_b);
 			break;
 		}
 
@@ -250,24 +250,24 @@ void Trackers::disconnect()
 
 void Trackers::log()
 {
-	SmartDashboard *sdb = SmartDashboard::GetInstance();
-	camera * c = ActionData::GetInstance()->cam;
-	sdb->PutInt("Key Blue", c->key.blue);
-	sdb->PutInt("Key Red", c->key.red);
-	sdb->PutInt("Key Higher", c->key.higher);
-	sdb->PutInt("Target Offset", c->align.arbitraryOffsetFromUDP);
-	string s;
-	switch (c->align.status)
-	{
-	case ACTION::CAMERA::NO_TARGET:
-		s = "None";
-		break;
-	case ACTION::CAMERA::TOP:
-		s = "Top";
-		break;
-	case ACTION::CAMERA::BOTTOM:
-		s = "Bottom";
-		break;
-	}
-	sdb->PutString("Target Selected", s.c_str());
+	/*SmartDashboard *sdb = SmartDashboard::GetInstance();
+	 camera * c = ActionData::GetInstance()->cam;
+	 sdb->PutInt("Key Blue", c->key.blue);
+	 sdb->PutInt("Key Red", c->key.red);
+	 sdb->PutInt("Key Higher", c->key.higher);
+	 sdb->PutInt("Target Offset", c->align.arbitraryOffsetFromUDP);
+	 string s;
+	 switch (c->align.status)
+	 {
+	 case ACTION::CAMERA::NO_TARGET:
+	 s = "None";
+	 break;
+	 case ACTION::CAMERA::TOP:
+	 s = "Top";
+	 break;
+	 case ACTION::CAMERA::BOTTOM:
+	 s = "Bottom";
+	 break;
+	 }
+	 sdb->PutString("Target Selected", s.c_str());*/
 }

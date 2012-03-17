@@ -58,7 +58,7 @@ std::string BallCollector::GetName()
 
 void BallCollector::log()
 {
-	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	/*SmartDashboard * sdb = SmartDashboard::GetInstance();
 	std::string s;
 	if (m_action->ballfeed->sweepArmOut)
 	{
@@ -68,5 +68,5 @@ void BallCollector::log()
 	{
 		s = "Up/Idle";
 	}
-	sdb->PutString("Ball Collector Status", s);
+	sdb->PutString("Ball Collector Status", s);*/
 }

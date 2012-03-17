@@ -34,31 +34,31 @@ public:
 	 * Sets the shifter solenoids
 	 * @param on
 	 */
-	void setShifter(bool on);
+	void setShifter(bool on, bool force = false);
 
 	/*!
 	 * Sets the ball collector arm
 	 */
-	void setBallCollector(bool on);
+	void setBallCollector(bool on, bool force = false);
 
 	/*!
 	 * Sets the trajectory selection
 	 */
-	void setTrajectory(bool on);
+	void setTrajectory(bool on, bool force = false);
 
 	/*!
 	 * Sets the m_status of the latch
 	 * interlocked with setPressurePlate
 	 * @param on
 	 */
-	void setLatch(bool on);
+	void setLatch(bool on, bool force = false);
 
 	/*!
 	 * Sets the m_status of the pressure plate
 	 * interlocked with setLatch
 	 * @param on
 	 */
-	void setPressurePlate(bool on);
+	void setPressurePlate(bool on, bool force = false);
 
 	/*!
 	 * Configures values

@@ -212,11 +212,11 @@ void Drivetrain::Output()
 
 void Drivetrain::log()
 {
-	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	/*SmartDashboard * sdb = SmartDashboard::GetInstance();
 	std::string prefix = m_name + ": ";
 
 	sdb->PutDouble((prefix + "Left Duty Cycle").c_str(),
 			m_action->drivetrain->raw.leftDutyCycle);
 	sdb->PutDouble((prefix + "Right Duty Cycle").c_str(),
-			m_action->drivetrain->raw.rightDutyCycle);
+			m_action->drivetrain->raw.rightDutyCycle);*/
 }
