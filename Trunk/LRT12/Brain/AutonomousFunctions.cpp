@@ -492,17 +492,26 @@ bool AutonomousFunctions::keyTrack()
 #if ALT_METHOD
 	if (state)
 	{
-		//		if (!state)
-		//		{
 		m_hit_key_flag = false;
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 		m_action ->drivetrain->rate.desiredTurnRate = 0.0;
-		AsyncPrinter::Printf("Done Keytrack Done\n");
+		AsyncPrinter::Printf("Keytrack Done\n");
+
 		return true;
-		//
-		//		}
 	}
 #else
+	if (m_hit_key_flag)
+	{
+		if (!state)
+		{
+			m_hit_key_flag = false;
+			m_action->drivetrain->rate.desiredDriveRate = 0.0;
+			m_action ->drivetrain->rate.desiredTurnRate = 0.0;
+			AsyncPrinter::Printf("Done Keytrack Done\n");
+
+			return true;
+		}
+	}
 #endif
 	return false;
 }
@@ -605,7 +614,8 @@ bool AutonomousFunctions::autonomousMode()
 		m_action->drivetrain->position.drive_control = true;
 		m_action->drivetrain->position.turn_control = false;
 
-		m_action->drivetrain->position.desiredRelativeDrivePosition = -2 * 12; //TODO Check me
+		//need to drive back 140 to have bumper on top of brdige
+		m_action->drivetrain->position.desiredRelativeDrivePosition = -133; //136 distance  - 3 in
 		//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
 		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
 		advanceQueue();

@@ -92,7 +92,7 @@ void Brain::process()
 	}
 	else if (m_ds->IsOperatorControl())
 	{
-		runonce = false;
+		runonce = true;
 		m_inputs->ProcessInputs();
 	}
 }
