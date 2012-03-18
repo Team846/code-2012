@@ -21,7 +21,7 @@ ESC::ESC(int channelA, int channelB, LRTEncoder* encoder, string name) :
 	nameb = name + "B";
 	m_jag1 = new AsyncCANJaguar(channelA, namea.c_str());
 	m_jag2 = new AsyncCANJaguar(channelB, nameb.c_str());
-	
+
 	m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 	m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 	m_cycle_count = 0;
@@ -87,23 +87,20 @@ ESC::brakeAndDutyCycle ESC::CalculateBrakeAndDutyCycle(float desired_speed,
 
 void ESC::SetDutyCycle(float dutyCycle)
 {
-//#warning DBS DISABLED
-//	m_jag1->SetDutyCycle(dutyCycle);
-//	m_jag2->SetDutyCycle(dutyCycle);
-//	return;
-#ifdef USE_DASHBOARD
-	//    SmartDashboard::Log(speed, name.c_str());
-#endif
+	//#warning DBS DISABLED
+	//	m_jag1->SetDutyCycle(dutyCycle);
+	//	m_jag2->SetDutyCycle(dutyCycle);
+	//	return;
 	DriveEncoders::GetInstance().setHighGear(true);
-	double speed = m_encoder->GetRate() / DriveEncoders::GetInstance().getMaxEncoderRate();
+	double speed = m_encoder->GetRate()
+			/ DriveEncoders::GetInstance().getMaxEncoderRate();
 	speed = Util::Clamp<double>(speed, -1, 1);
-	brakeAndDutyCycle command = CalculateBrakeAndDutyCycle(dutyCycle,
-			speed);
-	
-//	static int e = 0; 
-//	if ( ++e % 5 == 0)
-//		AsyncPrinter::Printf("\nDuty %.3f Speed %.3f\n", dutyCycle, speed);
-//	float origDutyCycle = dutyCycle;
+	brakeAndDutyCycle command = CalculateBrakeAndDutyCycle(dutyCycle, speed);
+
+	//	static int e = 0; 
+	//	if ( ++e % 5 == 0)
+	//		AsyncPrinter::Printf("\nDuty %.3f Speed %.3f\n", dutyCycle, speed);
+	//	float origDutyCycle = dutyCycle;
 
 	if (fabs(command.dutyCycle) < 1E-4) //brake only when duty cycle = 0
 	{
@@ -143,15 +140,15 @@ void ESC::SetDutyCycle(float dutyCycle)
 			m_jag1->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 			m_jag2->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 		}
-//		AsyncPrinter::Printf("Braking\n");
+		//		AsyncPrinter::Printf("Braking\n");
 	}
 
 	dutyCycle = Util::Clamp<float>(dutyCycle, -1.0, 1.0);
 
-//	static int e = 0;
-//	if ((e++)%21 == 0)
-//		AsyncPrinter::Printf("In: %.3f out %.3f speed %.3f origspeed %.3f braking %.3f, %.3f max speed\n", origDutyCycle, command.dutyCycle, speed, (m_encoder->GetRate() / DriveEncoders::GetInstance().getMaxEncoderRate()) , command.braking, DriveEncoders::GetInstance().getMaxEncoderRate());
-	
+	//	static int e = 0;
+	//	if ((e++)%21 == 0)
+	//		AsyncPrinter::Printf("In: %.3f out %.3f speed %.3f origspeed %.3f braking %.3f, %.3f max speed\n", origDutyCycle, command.dutyCycle, speed, (m_encoder->GetRate() / DriveEncoders::GetInstance().getMaxEncoderRate()) , command.braking, DriveEncoders::GetInstance().getMaxEncoderRate());
+
 #define LINEARIZE 1
 #if LINEARIZE
 	m_jag1->SetDutyCycle(command.dutyCycle);

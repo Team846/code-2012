@@ -54,9 +54,10 @@ string PneumaticShifter::GetName()
 
 void PneumaticShifter::log()
 {
-	/*SmartDashboard::GetInstance()->PutString(
-	 "Robot Gear",
-	 (m_action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR) ? "High Gear"
-	 : "Low Gear");
-	 */
+#if LOGGING_ENABLED
+	SmartDashboard::GetInstance()->PutString(
+			"Robot Gear",
+			(m_action->shifter->gear == ACTION::GEARBOX::HIGH_GEAR) ? "High Gear"
+			: "Low Gear");
+#endif
 }

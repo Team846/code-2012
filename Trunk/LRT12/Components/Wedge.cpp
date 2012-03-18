@@ -116,41 +116,43 @@ string Wedge::GetName()
 
 void Wedge::log()
 {
-	/*SmartDashboard * sdb = SmartDashboard::GetInstance();
+#if LOGGING_ENABLED
+	SmartDashboard * sdb = SmartDashboard::GetInstance();
 
-	 std::string pos;
-	 switch (m_action->wedge->state)
-	 {
-	 case ACTION::WEDGE::IDLE:
-	 pos = "Idle";
-	 break;
-	 case ACTION::WEDGE::PRESET_BOTTOM:
-	 pos = "Down";
-	 break;
-	 case ACTION::WEDGE::PRESET_TOP:
-	 pos = "Up";
-	 break;
-	 }
-	 sdb->PutString("Wedge Position Status", pos);
+	std::string pos;
+	switch (m_action->wedge->state)
+	{
+		case ACTION::WEDGE::IDLE:
+		pos = "Idle";
+		break;
+		case ACTION::WEDGE::PRESET_BOTTOM:
+		pos = "Down";
+		break;
+		case ACTION::WEDGE::PRESET_TOP:
+		pos = "Up";
+		break;
+	}
+	sdb->PutString("Wedge Position Status", pos);
 
-	 std::string stat;
-	 switch (m_action->wedge->completion_status)
-	 {
-	 case ACTION::IN_PROGRESS:
-	 stat = "In Progress";
-	 break;
-	 case ACTION::ABORTED:
-	 stat = "Aborted";
-	 break;
-	 case ACTION::FAILURE:
-	 stat = "Failed";
-	 break;
-	 case ACTION::SUCCESS:
-	 stat = "Success";
-	 break;
-	 case ACTION::UNSET:
-	 stat = "Unset";
-	 break;
-	 }
-	 sdb->PutString("Wedge Completion Status", stat);*/
+	std::string stat;
+	switch (m_action->wedge->completion_status)
+	{
+		case ACTION::IN_PROGRESS:
+		stat = "In Progress";
+		break;
+		case ACTION::ABORTED:
+		stat = "Aborted";
+		break;
+		case ACTION::FAILURE:
+		stat = "Failed";
+		break;
+		case ACTION::SUCCESS:
+		stat = "Success";
+		break;
+		case ACTION::UNSET:
+		stat = "Unset";
+		break;
+	}
+	sdb->PutString("Wedge Completion Status", stat);
+#endif
 }

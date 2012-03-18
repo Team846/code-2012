@@ -1,4 +1,5 @@
 #include "LRTRobotBase.h"
+#include "LRTRobot12.h"
 #include "Jaguar/AsyncCANJaguar.h"
 #include "Components/Pneumatic/Pneumatics.h"
 #include "Brain/AutonomousFunctions.h"
@@ -19,7 +20,9 @@ LRTRobotBase::LRTRobotBase()
 	printf("Creating LRTRobotbase\n");
 	loopSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 
-	//	m_imu = new IMU();
+#if FANCY_SHIT_ENABLED
+	m_imu = new IMU();
+#endif
 }
 
 /**
@@ -43,8 +46,10 @@ LRTRobotBase::~LRTRobotBase()
 	Pneumatics::getInstance()->stopBackgroundTask();
 	Log::getInstance()->stopTask();
 
-	//	m_imu->stopTask();
-	//	delete m_imu;
+#if FANCY_SHIT_ENABLED
+	m_imu->stopTask();
+	delete m_imu;
+#endif
 
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
 	AsyncPrinter::Quit();
@@ -72,7 +77,9 @@ void LRTRobotBase::StartCompetition()
 	Log::getInstance()->startTask();
 	AutonomousFunctions::getInstance()->startBackgroundTask();
 
-	//	m_imu->startTask();
+#if FANCY_SHIT_ENABLED
+	m_imu->startTask();
+#endif
 
 	AsyncPrinter::Printf("Starting Profiler\r\n");
 	Profiler& profiler = Profiler::GetInstance();
@@ -89,10 +96,12 @@ void LRTRobotBase::StartCompetition()
 			break;
 		}
 
+#if FANCY_SHIT_ENABLED
 		if (cycleCount % 2 == 0)
 		{
-			//			m_imu->releaseSemaphore();
+			m_imu->releaseSemaphore();
 		}
+#endif
 
 		AutonomousFunctions::getInstance()->releaseSemaphore();
 
@@ -121,10 +130,12 @@ void LRTRobotBase::StartCompetition()
 			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-3);
 		}
 
+#if LOGGING_ENABLED
 		if (cycleCount % 10 == 0)
 		{
 			Log::getInstance()->releaseSemaphore();
 		}
+#endif
 	}
 }
 

@@ -128,7 +128,8 @@ void BallFeeder::Configure()
 
 void BallFeeder::log()
 {
-	/*SmartDashboard * sdb = SmartDashboard::GetInstance();
+#if LOGGING_ENABLED
+	SmartDashboard * sdb = SmartDashboard::GetInstance();
 	sdb->PutBoolean("Round status", m_action->ballfeed->attemptToLoadRound);
 	std::string s;
 	switch (m_action->ballfeed->feeder_state)
@@ -146,7 +147,8 @@ void BallFeeder::log()
 		s = "Freezing";
 		break;
 	}
-	sdb->PutBoolean("Ball Feeder Status", s.c_str());*/
+	sdb->PutBoolean("Ball Feeder Status", s.c_str());
+#endif
 }
 
 std::string BallFeeder::GetName()

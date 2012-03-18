@@ -34,10 +34,12 @@ void ConfigLoader::Output()
 		m_config->ConfigureAll();
 		m_action->config->apply = false;
 	}
-	
-	static int e = 0; 
+
+#if 0
+	static int e = 0;
 	if (++e % 50 == 0 )
-		m_config->CheckForFileUpdates();
+	m_config->CheckForFileUpdates();
+#endif
 }
 
 string ConfigLoader::GetName()

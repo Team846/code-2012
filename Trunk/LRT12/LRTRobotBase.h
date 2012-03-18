@@ -62,7 +62,9 @@ private:
 	Notifier * loopSynchronizer;
 	static void releaseLoop(void* param);
 
-	//	IMU *m_imu;
+#if FANCY_SHIT_ENABLED
+	IMU *m_imu;
+#endif
 };
 
 #endif

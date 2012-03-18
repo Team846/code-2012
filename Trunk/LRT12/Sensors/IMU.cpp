@@ -159,7 +159,8 @@ void IMU::update(ActionData * action)
 
 void IMU::log()
 {
-	/*SmartDashboard * sdb = SmartDashboard::GetInstance();
+#if LOGGING_ENABLED
+	SmartDashboard * sdb = SmartDashboard::GetInstance();
 
 	sdb->PutDouble("IMU Roll", getRoll());
 	sdb->PutDouble("IMU Pitch", getPitch());
@@ -173,7 +174,8 @@ void IMU::log()
 	sdb->PutDouble("IMU Gyro Y", getGyroY());
 	sdb->PutDouble("IMU Gyro Z", getGyroZ());
 
-	sdb->PutDouble("IMU Gyro y delta", getGyroYDelta());*/
+	sdb->PutDouble("IMU Gyro y delta", getGyroYDelta());
+#endif
 }
 
 int IMU::getPacket()

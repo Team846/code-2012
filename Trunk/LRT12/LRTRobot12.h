@@ -12,12 +12,19 @@
 #include "Log/Log.h"
 
 #include "Compressor.h"
-#include "Sensors/Trackers.h"
 
 #include "Util/AsyncPrinter.h"
 #include "Util/PrintInConstructor.h"
 #include "Jaguar/AsyncCANJaguar.h"
 #include "Jaguar/JaguarTester.h"
+
+#define FANCY_SHIT_ENABLED 0
+
+#define PRINT_TO_FILE_ON_STARTUP 1
+
+#if FANCY_SHIT_ENABLED
+#include "Sensors/Trackers.h"
+#endif
 
 class LRTRobot12: public LRTRobotBase
 {
@@ -30,13 +37,15 @@ public:
 	virtual void MainLoop();
 
 private:
-	JaguarTester jagTest;
+	//	JaguarTester jagTest;
 	Compressor *m_compressor;
 	DigitalInput *m_pressureSwitch;
 	Brain brain;
 	ActionData *m_action;
 
-	//	Trackers *m_trackers;
+#if FANCY_SHIT_ENABLED
+	Trackers *m_trackers;
+#endif
 
 	PrintInConstructor dc_CANBus_;
 

@@ -184,8 +184,8 @@ void InputParser::ProcessInputs()
 	if (m_operator_stick->IsButtonDown(PURGE))
 	{
 		m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::PURGING;
-		m_action_ptr->launcher->desiredTarget
-				= ACTION::LAUNCHER::FENDER_SHOT_HIGH;
+		//		m_action_ptr->launcher->desiredTarget
+		//				= ACTION::LAUNCHER::FENDER_SHOT_HIGH;
 	}
 
 	/***************** Config **********************/

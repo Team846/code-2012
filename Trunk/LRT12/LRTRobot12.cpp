@@ -9,14 +9,17 @@ LRTRobot12::LRTRobot12() :
 			firstMember_(
 					"\n\n\n---------------------------------------------------------\n"
 						"Begin LRTRobot Constructor\n",
-					"LRTRobot Destroyed\n\n"), jagTest(2, 10),
-			dc_CANBus_("CANbus\n"), lastMember_("LRTRobot.LastMember\n") //trace constructor.
-
+					"LRTRobot Destroyed\n\n"), dc_CANBus_("CANbus\n"),
+			lastMember_("LRTRobot.LastMember\n") //trace constructor.
 {
-	//file to indicate startup
+
+#if PRINT_TO_FILE_ON_STARTUP
 	std::ofstream fout("start.txt", std::fstream::app);
 	fout << "started\n";
 	fout.close();
+#else
+	cout << "started" << endl;
+#endif
 	config = Config::GetInstance();
 	prevState = DISABLED;
 	ds = DriverStation::GetInstance();
@@ -33,7 +36,9 @@ LRTRobot12::LRTRobot12() :
 	//set priority above default so that we get higher priority than default
 	m_task->SetPriority(Task::kDefaultPriority);//lower priority number = higher priority
 
-	//	m_trackers = new Trackers();
+#if FANCY_SHIT_ENABLED
+	m_trackers = new Trackers();
+#endif
 
 	printf("---- Robot Initialized ----\n\n");
 }
@@ -44,7 +49,9 @@ LRTRobot12::~LRTRobot12()
 	m_compressor->Stop();
 	delete m_compressor;
 
-	//	delete m_trackers;
+#if FANCY_SHIT_ENABLED
+	delete m_trackers;
+#endif
 
 	printf("\n\nBegin Deleting LRTRobot12\n");
 
@@ -57,13 +64,6 @@ LRTRobot12::~LRTRobot12()
 void LRTRobot12::RobotInit()
 {
 	config->ConfigureAll();
-
-	//	const char* build =
-	//			(Util::ToString<int>(config->Get<int> ("Build", "BuildNumber", 1))
-	//					+ "-" + Util::ToString<int>(
-	//					config->Get<int> ("Build", "RunNumber", 0))).c_str();
-	//
-	//	AsyncPrinter::Printf(build);
 	brain.Start();
 }
 
@@ -80,7 +80,6 @@ void LRTRobot12::MainLoop()
 	wdStart(mainLoopWatchDog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			ExecutionNotify, 0);
 
-	// /*
 	GameState gameState = DetermineState();
 	m_action->wasDisabled = (prevState == DISABLED);
 

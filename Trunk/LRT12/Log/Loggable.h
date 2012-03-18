@@ -2,7 +2,12 @@
 #define LOGGABLE_H_
 
 #include "Log.h"
+
+#define LOGGING_ENABLED 0
+
+#if LOGGING_ENABLED
 #include "WPILib/SmartDashboard/SmartDashboard.h"
+#endif
 
 /*!
  * @brief The base class for all classes that log values

@@ -83,7 +83,9 @@ void Log::logAll()
 
 		if (ptr->shouldLog())
 		{
-//			ptr->log();
+#if LOGGING_ENABLED
+			ptr->log();
+#endif
 		}
 	}
 }

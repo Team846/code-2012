@@ -820,48 +820,50 @@ void AutonomousFunctions::advanceQueue()
 
 void AutonomousFunctions::log()
 {
-	/*SmartDashboard * sdb = SmartDashboard::GetInstance();
-	 sdb->PutInt("Autonomous Counter", m_counter);
-	 sdb->PutString("Autonomous Completion State",
-	 ACTION::status_string[m_action->auton->completion_status]);
+#if LOGGING_ENABLED
+	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	sdb->PutInt("Autonomous Counter", m_counter);
+	sdb->PutString("Autonomous Completion State",
+			ACTION::status_string[m_action->auton->completion_status]);
 
-	 std::string s;
-	 switch (m_action->auton->state)
-	 {
-	 case ACTION::AUTONOMOUS::AUTOALIGN:
-	 s = "Auto Align";
-	 break;
-	 case ACTION::AUTONOMOUS::BRIDGEBALANCE:
-	 s = "Bridge Balance";
-	 break;
-	 case ACTION::AUTONOMOUS::KEYTRACK:
-	 s = "Key Track";
-	 break;
-	 case ACTION::AUTONOMOUS::AUTON_MODE:
-	 s = "Auton";
-	 break;
-	 case ACTION::AUTONOMOUS::TELEOP:
-	 s = "Teleop";
-	 break;
-	 case ACTION::AUTONOMOUS::POSITION_HOLD:
-	 s = "Position Hold";
-	 break;
-	 }
-	 sdb->PutString("Autonomous Mode", s.c_str());
+	std::string s;
+	switch (m_action->auton->state)
+	{
+		case ACTION::AUTONOMOUS::AUTOALIGN:
+		s = "Auto Align";
+		break;
+		case ACTION::AUTONOMOUS::BRIDGEBALANCE:
+		s = "Bridge Balance";
+		break;
+		case ACTION::AUTONOMOUS::KEYTRACK:
+		s = "Key Track";
+		break;
+		case ACTION::AUTONOMOUS::AUTON_MODE:
+		s = "Auton";
+		break;
+		case ACTION::AUTONOMOUS::TELEOP:
+		s = "Teleop";
+		break;
+		case ACTION::AUTONOMOUS::POSITION_HOLD:
+		s = "Position Hold";
+		break;
+	}
+	sdb->PutString("Autonomous Mode", s.c_str());
 
-	 #if PID_LOGGING_ENABLED
-	 sdb->PutDouble("BridgePIDError", m_bridgebalance_pid.getError());
-	 sdb->PutDouble("BridgePID_Acc_error",
-	 m_bridgebalance_pid.getAccumulatedError());
-	 sdb->PutDouble("BridgePIDOutput", m_bridgebalance_pid.getOutput());
-	 sdb->PutDouble("BridgePID_P", m_bridgebalance_pid.getProportionalGain());
-	 sdb->PutDouble("BridgePID_I", m_bridgebalance_pid.getIntegralGain());
-	 sdb->PutDouble("BridgePID_D", m_bridgebalance_pid.getDerivativeGain());
-	 sdb->PutDouble("AutoAimPID Error", m_auto_aim_pid.getError());
-	 sdb->PutDouble("AutoAimPID_Acc_error", m_auto_aim_pid.getAccumulatedError());
-	 sdb->PutDouble("AutoAimPID_Output", m_auto_aim_pid.getOutput());
-	 sdb->PutDouble("AutoAimPID_P", m_auto_aim_pid.getProportionalGain());
-	 sdb->PutDouble("AutoAimPID_I", m_auto_aim_pid.getIntegralGain());
-	 sdb->PutDouble("AutoAimPID_D", m_auto_aim_pid.getDerivativeGain());
-	 #endif // PID_LOGGING_ENABLED*/
+#if PID_LOGGING_ENABLED
+	sdb->PutDouble("BridgePIDError", m_bridgebalance_pid.getError());
+	sdb->PutDouble("BridgePID_Acc_error",
+			m_bridgebalance_pid.getAccumulatedError());
+	sdb->PutDouble("BridgePIDOutput", m_bridgebalance_pid.getOutput());
+	sdb->PutDouble("BridgePID_P", m_bridgebalance_pid.getProportionalGain());
+	sdb->PutDouble("BridgePID_I", m_bridgebalance_pid.getIntegralGain());
+	sdb->PutDouble("BridgePID_D", m_bridgebalance_pid.getDerivativeGain());
+	sdb->PutDouble("AutoAimPID Error", m_auto_aim_pid.getError());
+	sdb->PutDouble("AutoAimPID_Acc_error", m_auto_aim_pid.getAccumulatedError());
+	sdb->PutDouble("AutoAimPID_Output", m_auto_aim_pid.getOutput());
+	sdb->PutDouble("AutoAimPID_P", m_auto_aim_pid.getProportionalGain());
+	sdb->PutDouble("AutoAimPID_I", m_auto_aim_pid.getIntegralGain());
+	sdb->PutDouble("AutoAimPID_D", m_auto_aim_pid.getDerivativeGain());
+#endif // PID_LOGGING_ENABLED*/
+#endif // LOGGING_ENABLED
 }

@@ -250,24 +250,26 @@ void Trackers::disconnect()
 
 void Trackers::log()
 {
-	/*SmartDashboard *sdb = SmartDashboard::GetInstance();
-	 camera * c = ActionData::GetInstance()->cam;
-	 sdb->PutInt("Key Blue", c->key.blue);
-	 sdb->PutInt("Key Red", c->key.red);
-	 sdb->PutInt("Key Higher", c->key.higher);
-	 sdb->PutInt("Target Offset", c->align.arbitraryOffsetFromUDP);
-	 string s;
-	 switch (c->align.status)
-	 {
-	 case ACTION::CAMERA::NO_TARGET:
-	 s = "None";
-	 break;
-	 case ACTION::CAMERA::TOP:
-	 s = "Top";
-	 break;
-	 case ACTION::CAMERA::BOTTOM:
-	 s = "Bottom";
-	 break;
-	 }
-	 sdb->PutString("Target Selected", s.c_str());*/
+#if LOGGING_ENABLED
+	SmartDashboard *sdb = SmartDashboard::GetInstance();
+	camera * c = ActionData::GetInstance()->cam;
+	sdb->PutInt("Key Blue", c->key.blue);
+	sdb->PutInt("Key Red", c->key.red);
+	sdb->PutInt("Key Higher", c->key.higher);
+	sdb->PutInt("Target Offset", c->align.arbitraryOffsetFromUDP);
+	string s;
+	switch (c->align.status)
+	{
+		case ACTION::CAMERA::NO_TARGET:
+		s = "None";
+		break;
+		case ACTION::CAMERA::TOP:
+		s = "Top";
+		break;
+		case ACTION::CAMERA::BOTTOM:
+		s = "Bottom";
+		break;
+	}
+	sdb->PutString("Target Selected", s.c_str());
+#endif
 }
