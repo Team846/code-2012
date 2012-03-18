@@ -17,6 +17,7 @@ Drivetrain::Drivetrain() :
 			"right");
 	m_delta_power_limit = m_forward_accel_limit = m_reverse_accel_limit
 			= NUM_CYCLES_TO_SYNC = 0;
+	m_action->drivetrain->synchronizedCyclesRemaining = 0;
 	Configure();
 }
 

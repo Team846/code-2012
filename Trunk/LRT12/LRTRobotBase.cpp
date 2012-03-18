@@ -55,6 +55,8 @@ LRTRobotBase::~LRTRobotBase()
 	AsyncPrinter::Quit();
 }
 
+#define USE_NOTIFIER 0
+
 /**
  * Used to continuously call the MainLoop method while printing diagnostics.
  */
@@ -64,13 +66,16 @@ void LRTRobotBase::StartCompetition()
 	//m_teleop_task is available only after robot is initialized -dg
 	printf("vxWorks task: %s\n", m_task->GetName());
 
-	GetWatchdog().SetEnabled(false);
+	GetWatchdog().SetEnabled(true);
 
 	// first and one-time initialization
 	RobotInit();
 
 	AsyncPrinter::Printf("starting synchronizer\r\n");
+
+#if USE_NOTIFIER
 	loopSynchronizer->StartPeriodic(1.0 / RobotConfig::LOOP_RATE); //arg is period in seconds
+#endif
 
 	AsyncPrinter::Printf("Starting Pneumatics\r\n");
 	Pneumatics::getInstance()->startBackgroundTask();
@@ -85,11 +90,17 @@ void LRTRobotBase::StartCompetition()
 	Profiler& profiler = Profiler::GetInstance();
 	// loop until we are quitting -- must be set by the destructor of the derived class.
 
+	double last = GetFPGATime() * 1.0e-6; //ms
+
 	while (!quitting_)
 	{
 		// block the loop and allow other tasks to run until the notifier
 		// releases our semaphore
+#if USE_NOTIFIER
 		semTake(loopSemaphore, WAIT_FOREVER);
+#else
+		last = GetFPGATime() * 1.0e-6;
+#endif
 		cycleCount++;
 		if (quitting_)
 		{
@@ -109,6 +120,7 @@ void LRTRobotBase::StartCompetition()
 
 		{
 			ProfiledSection ps("Main Loop");
+			GetWatchdog().Feed();
 			MainLoop();
 		}
 
@@ -127,7 +139,7 @@ void LRTRobotBase::StartCompetition()
 
 		if (cycleCount % 500 == 0)
 		{
-			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-3);
+			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-6);
 		}
 
 #if LOGGING_ENABLED
@@ -136,6 +148,12 @@ void LRTRobotBase::StartCompetition()
 			Log::getInstance()->releaseSemaphore();
 		}
 #endif
+		double time_left_s =
+				(20.0 * 1.0e-3 - ((GetFPGATime() * 1.0e-6) - last));
+		if (time_left_s > 0.0)
+			Wait(time_left_s);
+		else
+			AsyncPrinter::Printf("%.02f overflow\r\n", time_left_s);
 	}
 }
 
