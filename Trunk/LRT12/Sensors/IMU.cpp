@@ -14,7 +14,7 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 	Loggable()
 {
 	m_task = new Task("IMU_TASK", (FUNCPTR) taskEntryPoint,
-			Task::kDefaultPriority - 1);
+			Task::kDefaultPriority);
 	DigitalModule *module = DigitalModule::GetInstance(module_num);
 	if (module)
 	{

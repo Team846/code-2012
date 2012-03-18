@@ -40,7 +40,7 @@ Pneumatics::Pneumatics() :
 	disableLog();
 
 	m_task = new Task("PneumaticsTask", (FUNCPTR) Pneumatics::taskEntryPoint,
-			Task::kDefaultPriority - 2);
+			Task::kDefaultPriority);
 	m_task_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 
 	m_is_running = false;

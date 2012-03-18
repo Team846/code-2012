@@ -31,9 +31,9 @@ LRTRobot12::LRTRobot12() :
 	mainLoopWatchDog = wdCreate();
 
 	//set priority above default so that we get higher priority than default
-	m_task->SetPriority(Task::kDefaultPriority - 1);//lower priority number = higher priority
+	m_task->SetPriority(Task::kDefaultPriority);//lower priority number = higher priority
 
-//	m_trackers = new Trackers();
+	//	m_trackers = new Trackers();
 
 	printf("---- Robot Initialized ----\n\n");
 }
@@ -44,7 +44,7 @@ LRTRobot12::~LRTRobot12()
 	m_compressor->Stop();
 	delete m_compressor;
 
-//	delete m_trackers;
+	//	delete m_trackers;
 
 	printf("\n\nBegin Deleting LRTRobot12\n");
 

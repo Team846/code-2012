@@ -21,7 +21,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	m_task_name = "JAG#" + Util::ToString<int>(channel);
 	m_comm_task = new Task(m_task_name.c_str(),
 			(FUNCPTR) AsyncCANJaguar::CommTaskWrapper,
-			Task::kDefaultPriority - 2);
+			Task::kDefaultPriority);
 	m_comm_semaphore = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 	m_channel = channel;
 	m_setpoint.setValue(0.0);

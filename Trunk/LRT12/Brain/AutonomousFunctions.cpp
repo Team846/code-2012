@@ -23,7 +23,7 @@ AutonomousFunctions::AutonomousFunctions() :
 {
 	m_task = new Task("AutonFuncTask",
 			(FUNCPTR) AutonomousFunctions::taskEntryPoint,
-			Task::kDefaultPriority - 1);
+			Task::kDefaultPriority);
 	m_task_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 	m_is_running = false;
 	m_action = ActionData::GetInstance();
