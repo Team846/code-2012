@@ -13,7 +13,9 @@
  */
 LRTRobotBase::LRTRobotBase()
 {
+#if USE_NOTIFIER
 	loopSynchronizer = new Notifier(&releaseLoop, this);
+#endif
 	quitting_ = false;
 	cycleCount = 0;
 
@@ -30,8 +32,10 @@ LRTRobotBase::LRTRobotBase()
  */
 LRTRobotBase::~LRTRobotBase()
 {
+#if USE_NOTIFIER
 	loopSynchronizer->Stop();
 	delete loopSynchronizer;
+#endif
 
 	if (AsyncCANJaguar::jaguar_list_)
 	{
@@ -54,8 +58,6 @@ LRTRobotBase::~LRTRobotBase()
 	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
 	AsyncPrinter::Quit();
 }
-
-#define USE_NOTIFIER 0
 
 /**
  * Used to continuously call the MainLoop method while printing diagnostics.
@@ -90,7 +92,9 @@ void LRTRobotBase::StartCompetition()
 	Profiler& profiler = Profiler::GetInstance();
 	// loop until we are quitting -- must be set by the destructor of the derived class.
 
+#if not USE_NOTIFIER
 	double last = GetFPGATime() * 1.0e-6; //ms
+#endif
 
 	while (!quitting_)
 	{
@@ -148,12 +152,15 @@ void LRTRobotBase::StartCompetition()
 			Log::getInstance()->releaseSemaphore();
 		}
 #endif
+
+#if not NOTIFIER_ENABLED
 		double time_left_s =
 				(20.0 * 1.0e-3 - ((GetFPGATime() * 1.0e-6) - last));
 		if (time_left_s > 0.0)
 			Wait(time_left_s);
 		else
 			AsyncPrinter::Printf("%.02f overflow\r\n", time_left_s);
+#endif
 	}
 }
 

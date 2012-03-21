@@ -725,8 +725,8 @@ const AutonomousFunctions::autonomousStage
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH] =
 		{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, DELAY_HALF_SEC,
-				DROP_WEDGE, MOVE_BACK_INIT, WAIT_FOR_POSITION, DELAY_HALF_SEC,
-				RAISE_WEDGE, DONE };
+				DELAY_HALF_SEC, DELAY_HALF_SEC, DROP_WEDGE, MOVE_BACK_INIT,
+				WAIT_FOR_POSITION, DELAY_HALF_SEC, RAISE_WEDGE, DONE };
 
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::BRIDGE_THEN_SHOOT[BRIDGE_THEN_SHOOT_LENGTH] =

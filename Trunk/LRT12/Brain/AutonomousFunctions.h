@@ -149,7 +149,7 @@ private:
 	const static int DRIVE_THEN_SHOOT_LENGTH = 10;
 	const static autonomousStage DRIVE_THEN_SHOOT[DRIVE_THEN_SHOOT_LENGTH];
 
-	const static int SHOOT_THEN_BRIDGE_LENGTH = 10;
+	const static int SHOOT_THEN_BRIDGE_LENGTH = 12;
 	const static autonomousStage SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH];
 
 	const static int BRIDGE_THEN_SHOOT_LENGTH = 10;
