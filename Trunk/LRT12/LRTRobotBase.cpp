@@ -35,6 +35,16 @@ LRTRobotBase::~LRTRobotBase()
 #if USE_NOTIFIER
 	loopSynchronizer->Stop();
 	delete loopSynchronizer;
+	loopSynchronizer = NULL;
+	int error = semDelete(loopSemaphore);
+	if (error)
+	{
+		printf("SemDelete Error=%d\r\n", error);
+	}
+	else
+	{
+		loopSemaphore = NULL;
+	}
 #endif
 
 	if (AsyncCANJaguar::jaguar_list_)
@@ -42,16 +52,16 @@ LRTRobotBase::~LRTRobotBase()
 		for (AsyncCANJaguar* j = AsyncCANJaguar::jaguar_list_; j != NULL; j
 				= j->next_jaguar_)
 		{
-			j->StopBackgroundTask();
+			j->deinit();
 		}
 	}
 
-	AutonomousFunctions::getInstance()->stopBackgroundTask();
-	Pneumatics::getInstance()->stopBackgroundTask();
-	Log::getInstance()->stopTask();
+	AutonomousFunctions::getInstance()->deinit();
+	Pneumatics::getInstance()->deinit();
+	Log::getInstance()->deinit();
 
 #if FANCY_SHIT_ENABLED
-	m_imu->stopTask();
+	m_imu->deinit();
 	delete m_imu;
 #endif
 
@@ -65,27 +75,40 @@ LRTRobotBase::~LRTRobotBase()
 void LRTRobotBase::StartCompetition()
 {
 	//Diagnostic: Print the task name.
-	//m_teleop_task is available only after robot is initialized -dg
 	printf("vxWorks task: %s\n", m_task->GetName());
 
-	GetWatchdog().SetEnabled(true);
+	GetWatchdog().SetEnabled(false);
 
 	// first and one-time initialization
 	RobotInit();
 
-	AsyncPrinter::Printf("starting synchronizer\r\n");
-
 #if USE_NOTIFIER
+	AsyncPrinter::Printf("starting synchronizer\r\n");
 	loopSynchronizer->StartPeriodic(1.0 / RobotConfig::LOOP_RATE); //arg is period in seconds
 #endif
 
 	AsyncPrinter::Printf("Starting Pneumatics\r\n");
-	Pneumatics::getInstance()->startBackgroundTask();
-	Log::getInstance()->startTask();
-	AutonomousFunctions::getInstance()->startBackgroundTask();
+	Pneumatics::getInstance()->init();
+
+	AsyncPrinter::Printf("Starting Logger\r\n");
+	Log::getInstance()->init();
+
+	AsyncPrinter::Printf("Starting Autonomous Functions\r\n");
+	AutonomousFunctions::getInstance()->init();
+
+	AsyncPrinter::Printf("Starting Jaguar tasks\r\n");
+
+	if (AsyncCANJaguar::jaguar_list_)
+	{
+		for (AsyncCANJaguar* j = AsyncCANJaguar::jaguar_list_; j != NULL; j
+				= j->next_jaguar_)
+		{
+			j->init();
+		}
+	}
 
 #if FANCY_SHIT_ENABLED
-	m_imu->startTask();
+	m_imu->init();
 #endif
 
 	AsyncPrinter::Printf("Starting Profiler\r\n");
@@ -101,7 +124,10 @@ void LRTRobotBase::StartCompetition()
 		// block the loop and allow other tasks to run until the notifier
 		// releases our semaphore
 #if USE_NOTIFIER
-		semTake(loopSemaphore, WAIT_FOREVER);
+		if (loopSemaphore)
+		{
+			semTake(loopSemaphore, WAIT_FOREVER);
+		}
 #else
 		last = GetFPGATime() * 1.0e-6;
 #endif
@@ -111,20 +137,19 @@ void LRTRobotBase::StartCompetition()
 			break;
 		}
 
+		profiler.StartNewCycle();
+
 #if FANCY_SHIT_ENABLED
 		if (cycleCount % 2 == 0)
 		{
-			m_imu->releaseSemaphore();
+			m_imu->startNewProcessCycle();
 		}
 #endif
 
-		AutonomousFunctions::getInstance()->releaseSemaphore();
-
-		profiler.StartNewCycle();
+		AutonomousFunctions::getInstance()->startNewProcessCycle();
 
 		{
 			ProfiledSection ps("Main Loop");
-			GetWatchdog().Feed();
 			MainLoop();
 		}
 
@@ -135,36 +160,31 @@ void LRTRobotBase::StartCompetition()
 			for (AsyncCANJaguar* j = AsyncCANJaguar::jaguar_list_; j != NULL; j
 					= j->next_jaguar_)
 			{
-				j->ReleaseCommSemaphore();
+				j->startNewProcessCycle();
 			}
 		}
 
-		Pneumatics::getInstance()->releaseSemaphore();
-
-		if (cycleCount % 500 == 0)
-		{
-			printf("Time: %.4fms\n", GetFPGATime() * 1.0e-6);
-		}
+		Pneumatics::getInstance()->startNewProcessCycle();
 
 #if LOGGING_ENABLED
 		if (cycleCount % 10 == 0)
 		{
-			Log::getInstance()->releaseSemaphore();
+			Log::getInstance()->startNewProcessCycle();
 		}
 #endif
 
-#if not NOTIFIER_ENABLED
+#if not USE_NOTIFIER
 		double time_left_s =
-				(20.0 * 1.0e-3 - ((GetFPGATime() * 1.0e-6) - last));
+		(20.0 * 1.0e-3 - ((GetFPGATime() * 1.0e-6) - last));
 		if (time_left_s > 0.0)
-			Wait(time_left_s);
+		Wait(time_left_s);
 		else
-			AsyncPrinter::Printf("%.02f overflow\r\n", time_left_s);
+		AsyncPrinter::Printf("%.02f overflow\r\n", time_left_s);
 #endif
 	}
 }
 
-//called by interupt on timer. This structure with the semaphores is to avoid the restrictions of m_is_running an ISR.
+//called by interupt on timer. This structure with the semaphores is to avoid the restrictions of running an ISR.
 void LRTRobotBase::releaseLoop(void* param)
 {
 	semGive(((LRTRobotBase*) param)->loopSemaphore);

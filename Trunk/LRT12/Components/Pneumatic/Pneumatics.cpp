@@ -2,7 +2,7 @@
 
 Pneumatics* Pneumatics::m_instance = NULL;
 
-#define PNEUMATICS_DISABLED 0
+#define PNEUMATICS_DISABLED 1
 
 #define INIT_PULSED_SOLENOID(x, y) (x).solenoid = (y);\
 	(x).counter = (m_pulse_length); \
@@ -10,12 +10,14 @@ Pneumatics* Pneumatics::m_instance = NULL;
 	(x).pulsed = true;
 
 Pneumatics::Pneumatics() :
-	Configurable(), Loggable(), m_name("Pneumatics")
+	AsyncProcess("Pneumatics"), Configurable(), Loggable(),
+			m_name("Pneumatics")
 {
 	Configure();
 
-#if PNEUMATICS_DISABLED		
+#if PNEUMATICS_DISABLED
 #warning pneumatics disabled
+	printf("Pneumatics disabled\r\n");
 #else
 	INIT_PULSED_SOLENOID(m_shared, new DoubleSolenoid(
 					RobotConfig::SOLENOID_IO::WEDGE_LATCH,
@@ -38,12 +40,6 @@ Pneumatics::Pneumatics() :
 	m_mutex = false;
 
 	disableLog();
-
-	m_task = new Task("PneumaticsTask", (FUNCPTR) Pneumatics::taskEntryPoint,
-			Task::kDefaultPriority);
-	m_task_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
-
-	m_is_running = false;
 }
 
 #undef INIT_PULSED_SOLENOID
@@ -55,23 +51,6 @@ Pneumatics * Pneumatics::getInstance()
 		m_instance = new Pneumatics();
 	}
 	return m_instance;
-}
-
-void Pneumatics::startBackgroundTask()
-{
-	m_is_running = true;
-	m_task->Start();
-}
-
-void Pneumatics::stopBackgroundTask()
-{
-	if (m_is_running)
-	{
-		m_is_running = false;
-		UINT32 task_id = m_task->GetID();
-		m_task->Stop();
-		printf("Task 0x%x killed for Pneumatics\n", task_id);
-	}
 }
 
 void Pneumatics::setShifter(bool on, bool force)
@@ -133,32 +112,28 @@ void Pneumatics::Configure()
 
 void Pneumatics::log()
 {
-	/*	SmartDashboard * sdb = SmartDashboard::GetInstance();
-	 sdb->PutString("Shared Solenoid State",
-	 (m_shared.state) ? "Forward" : "Reverse");
-	 sdb->PutInt("Shared Solenoid Counter", m_shared.counter);
-	 sdb->PutBoolean("Shared Solenoid Pulsing Enabled", m_shared.pulsed);
+#if LOGGING_ENABLED
+	SmartDashboard * sdb = SmartDashboard::GetInstance();
+	sdb->PutString("Shared Solenoid State",
+			(m_shared.state) ? "Forward" : "Reverse");
+	sdb->PutInt("Shared Solenoid Counter", m_shared.counter);
+	sdb->PutBoolean("Shared Solenoid Pulsing Enabled", m_shared.pulsed);
 
-	 sdb->PutString("BC Solenoid State",
-	 (m_ballcollector.state) ? "Forward" : "Reverse");
-	 sdb->PutInt("BC Solenoid Counter", m_ballcollector.counter);
-	 sdb->PutBoolean("BC Solenoid Pulsing Enabled", m_ballcollector.pulsed);
+	sdb->PutString("BC Solenoid State",
+			(m_ballcollector.state) ? "Forward" : "Reverse");
+	sdb->PutInt("BC Solenoid Counter", m_ballcollector.counter);
+	sdb->PutBoolean("BC Solenoid Pulsing Enabled", m_ballcollector.pulsed);
 
-	 sdb->PutString("Trajectory Solenoid State",
-	 (m_trajectory.state) ? "Forward" : "Reverse");
-	 sdb->PutInt("Trajectory Solenoid Counter", m_trajectory.counter);
-	 sdb->PutBoolean("Trajectory Solenoid Pulsing Enabled", m_trajectory.pulsed);
+	sdb->PutString("Trajectory Solenoid State",
+			(m_trajectory.state) ? "Forward" : "Reverse");
+	sdb->PutInt("Trajectory Solenoid Counter", m_trajectory.counter);
+	sdb->PutBoolean("Trajectory Solenoid Pulsing Enabled", m_trajectory.pulsed);
 
-	 sdb->PutString("Shifter Solenoid State",
-	 (m_shifter.state) ? "Forward" : "Reverse");
-	 sdb->PutInt("Shifter Solenoid Counter", m_shifter.counter);
-	 sdb->PutBoolean("Shifter Solenoid Pulsing Enabled", m_shifter.pulsed);
-	 */}
-
-void Pneumatics::releaseSemaphore()
-{
-	if (m_task_sem)
-		semGive(m_task_sem);
+	sdb->PutString("Shifter Solenoid State",
+			(m_shifter.state) ? "Forward" : "Reverse");
+	sdb->PutInt("Shifter Solenoid Counter", m_shifter.counter);
+	sdb->PutBoolean("Shifter Solenoid Pulsing Enabled", m_shifter.pulsed);
+#endif
 }
 
 void Pneumatics::pulse(PulsedSolenoid * ptr)
@@ -208,15 +183,7 @@ void Pneumatics::pulse(PulsedSolenoid * ptr)
 
 Pneumatics::~Pneumatics()
 {
-	stopBackgroundTask();
-	delete m_task;
-
-	int error = semDelete(m_task_sem);
-	if (error)
-	{
-		printf("SemDelete Error=%d\n", error);
-	}
-
+	deinit();
 #if not PNEUMATICS_DISABLED
 	delete m_shared.solenoid;
 	delete m_trajectory.solenoid;
@@ -225,24 +192,10 @@ Pneumatics::~Pneumatics()
 #endif
 }
 
-void Pneumatics::taskEntryPoint()
+void Pneumatics::work()
 {
-	Pneumatics * p = Pneumatics::getInstance();
-	p->task();
-}
-
-void Pneumatics::task()
-{
-	while (m_is_running)
-	{
-		semTake(m_task_sem, WAIT_FOREVER);
-		if (!m_is_running)
-		{
-			break;
-		}
-		pulse(&m_shifter);
-		pulse(&m_ballcollector);
-		pulse(&m_trajectory);
-		pulse(&m_shared);
-	}
+	pulse(&m_shifter);
+	pulse(&m_ballcollector);
+	pulse(&m_trajectory);
+	pulse(&m_shared);
 }

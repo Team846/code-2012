@@ -5,7 +5,15 @@ Profiler* Profiler::instance = NULL;
 Profiler& Profiler::GetInstance()
 {
 	if (instance == NULL)
+	{
 		instance = new Profiler();
+		FILE * fp = fopen(PROFILER_FILE_NAME, "a");
+		if (fp)
+		{
+			fprintf(fp, "\r\n\r\nRobot started!\r\n\r\n");
+			fclose(fp);
+		}
+	}
 	return *instance;
 }
 
@@ -23,40 +31,85 @@ template<class PairT> struct SortBySecondValue
 	}
 };
 
-void Profiler::StartNewCycle()
+void Profiler::PrintProfiledData(ProfiledData * p)
 {
-	++cycleIndex;
-	//	return;
+	double reportStart = Timer::GetFPGATimestamp();
+	AsyncPrinter::Printf("----------------------\n");
+	AsyncPrinter::Printf("PROFILER (%d cycles)\n", reportPeriod);
+	AsyncPrinter::Printf("%s\r\n", p->enabled ? "Enabled" : "Disabled");
 
-	if (cycleIndex >= reportPeriod)
+	typedef map<string, double>::value_type paired;
+	typedef set<paired, SortBySecondValue<paired> > SetSortedBySecond;
+	SetSortedBySecond vals;
+
+	for (map<string, double>::iterator it = p->loggedMaxs.begin(); it
+			!= p->loggedMaxs.end(); ++it)
 	{
-		double reportStart = Timer::GetFPGATimestamp();
+		vals.insert(paired(it->first, it->second / p->loggedCounts[it->first])); // to sort by means
+		//		vals.insert(paired(it->first, it->second));
+	}
 
-		AsyncPrinter::Printf("----------------------\n");
-		AsyncPrinter::Printf("PROFILER (%d cycles)\n", reportPeriod);
+	int i = 0;
+	for (SetSortedBySecond::iterator it = vals.begin(); it != vals.end(); ++it)
+	{
+		double min = p->loggedMins[it->first];
+		double max = p->loggedMaxs[it->first];
+		int count = p->loggedCounts[it->first];
+		double mean = p->loggedSums[it->first] / count;
+
+		AsyncPrinter::Printf("| %-30s ~%.2f [%.2f-%.2f] x%d\n",
+				it->first.c_str(), mean, min, max, count);
+
+		++i;
+		if (i > reportLimit)
+			break;
+	}
+
+	double reportTime = (Timer::GetFPGATimestamp() - reportStart) * 1000;
+
+	AsyncPrinter::Printf("End report (%.2f ms)\n", reportTime);
+}
+
+void Profiler::PrintProfiledDataToFile(const char * filename, ProfiledData * p,
+		bool console)
+{
+	double reportStart = Timer::GetFPGATimestamp();
+	AsyncPrinter::Printf("----------------------\n");
+	AsyncPrinter::Printf("PROFILER to FILE (%d cycles)\n", reportPeriod);
+
+	FILE * fp = fopen(filename, "a");
+	if (fp)
+	{
+		fprintf(fp, "----------------------\r\n");
+		fprintf(fp, "PROFILER to FILE (%d cycles)\r\n", reportPeriod);
+		fprintf(fp, "%s\r\n", p->enabled ? "Enabled" : "Disabled");
 
 		typedef map<string, double>::value_type paired;
 		typedef set<paired, SortBySecondValue<paired> > SetSortedBySecond;
 		SetSortedBySecond vals;
 
-		for (map<string, double>::iterator it = loggedMaxs.begin(); it
-				!= loggedMaxs.end(); ++it)
+		for (map<string, double>::iterator it = p->loggedMaxs.begin(); it
+				!= p->loggedMaxs.end(); ++it)
 		{
-			// vals.insert( paired(it->first, it->second/loggedCounts[it->first]) ); // to sort by means
-			vals.insert(paired(it->first, it->second));
+			vals.insert(
+					paired(it->first, it->second / p->loggedCounts[it->first])); // to sort by means
+			//		vals.insert(paired(it->first, it->second));
 		}
 
 		int i = 0;
 		for (SetSortedBySecond::iterator it = vals.begin(); it != vals.end(); ++it)
 		{
-			double min = loggedMins[it->first];
-			double max = loggedMaxs[it->first];
-			int count = loggedCounts[it->first];
-			double mean = loggedSums[it->first] / count;
-
-			AsyncPrinter::Printf("| %-30s ~%.2f [%.2f-%.2f] x%d\n",
-					it->first.c_str(), mean, min, max, count);
-
+			double min = p->loggedMins[it->first];
+			double max = p->loggedMaxs[it->first];
+			int count = p->loggedCounts[it->first];
+			double mean = p->loggedSums[it->first] / count;
+			if (console)
+			{
+				fprintf(fp, "| %-30s ~%.2f [%.2f-%.2f] x%d\n",
+						it->first.c_str(), mean, min, max, count);
+				AsyncPrinter::Printf("| %-30s ~%.2f [%.2f-%.2f] x%d\n",
+						it->first.c_str(), mean, min, max, count);
+			}
 			++i;
 			if (i > reportLimit)
 				break;
@@ -64,35 +117,61 @@ void Profiler::StartNewCycle()
 
 		double reportTime = (Timer::GetFPGATimestamp() - reportStart) * 1000;
 
+		AsyncPrinter::Printf("End report (%.2f ms)\n", reportTime);
+		fprintf(fp, "End report (%.2f ms)\n", reportTime);
+		fclose(fp);
+	}
+	else
+	{
+		AsyncPrinter::Printf("Could not open file %s\r\n", filename);
+	}
+}
+
+void Profiler::StartNewCycle()
+{
+	++cycleIndex;
+
+	current.enabled = current.enabled
+			|| DriverStation::GetInstance()->IsEnabled();
+	if (cycleIndex >= reportPeriod)
+	{
+		if (current.enabled)
+		{
+			PrintProfiledDataToFile(PROFILER_FILE_NAME, &current, true);
+		}
+		else
+		{
+			PrintProfiledData(&current);
+		}
 		cycleIndex = 0;
 		ClearLogBuffer();
-
-		AsyncPrinter::Printf("End report (%.2f ms)\n", reportTime);
 	}
 }
 
 void Profiler::Log(std::string name, double timeTaken)
 {
-	if (loggedCounts.find(name) == loggedCounts.end())
+	if (current.loggedCounts.find(name) == current.loggedCounts.end())
 	{
-		loggedCounts[name] = 1;
-		loggedMins[name] = loggedMaxs[name] = loggedSums[name] = timeTaken;
+		current.loggedCounts[name] = 1;
+		current.loggedMins[name] = current.loggedMaxs[name]
+				= current.loggedSums[name] = timeTaken;
 	}
 	else
 	{
-		++loggedCounts[name];
-		if (timeTaken < loggedMins[name])
-			loggedMins[name] = timeTaken;
-		if (timeTaken > loggedMaxs[name])
-			loggedMaxs[name] = timeTaken;
-		loggedSums[name] += timeTaken;
+		++current.loggedCounts[name];
+		if (timeTaken < current.loggedMins[name])
+			current.loggedMins[name] = timeTaken;
+		if (timeTaken > current.loggedMaxs[name])
+			current.loggedMaxs[name] = timeTaken;
+		current.loggedSums[name] += timeTaken;
 	}
 }
 
 void Profiler::ClearLogBuffer()
 {
-	loggedCounts.clear();
-	loggedMins.clear();
-	loggedMaxs.clear();
-	loggedSums.clear();
+	current.loggedCounts.clear();
+	current.loggedMins.clear();
+	current.loggedMaxs.clear();
+	current.loggedSums.clear();
+	current.enabled = false;
 }

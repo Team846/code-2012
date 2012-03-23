@@ -33,9 +33,6 @@ LRTRobot12::LRTRobot12() :
 
 	mainLoopWatchDog = wdCreate();
 
-	//set priority above default so that we get higher priority than default
-	m_task->SetPriority(Task::kDefaultPriority);//lower priority number = higher priority
-
 #if FANCY_SHIT_ENABLED
 	m_trackers = new Trackers();
 #endif
@@ -45,6 +42,7 @@ LRTRobot12::LRTRobot12() :
 
 LRTRobot12::~LRTRobot12()
 {
+	brain.deinit();
 
 	m_compressor->Stop();
 	delete m_compressor;
@@ -64,7 +62,7 @@ LRTRobot12::~LRTRobot12()
 void LRTRobot12::RobotInit()
 {
 	config->ConfigureAll();
-	brain.Start();
+	brain.init();
 }
 
 static int ExecutionNotify(...)
@@ -80,6 +78,8 @@ void LRTRobot12::MainLoop()
 	wdStart(mainLoopWatchDog, sysClkRateGet() / RobotConfig::LOOP_RATE,
 			ExecutionNotify, 0);
 
+	brain.startNewProcessCycle();
+
 	GameState gameState = DetermineState();
 	m_action->wasDisabled = (prevState == DISABLED);
 
@@ -91,7 +91,7 @@ void LRTRobot12::MainLoop()
 			components->begin(); iter != components->end(); iter++)
 	{
 		// if we are enabled or the Component does not require the enabled state
-		if (gameState != DISABLED || !((*iter).second.RequiresEnabledState))
+		if (IsEnabled() || !((*iter).second.RequiresEnabledState))
 		{
 			int DIO = (*iter).second.DS_DIOToDisableComponent;
 			if (DIO == Component::ComponentData::NO_DS_DISABLE_DIO

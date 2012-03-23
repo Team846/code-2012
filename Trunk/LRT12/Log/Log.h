@@ -4,13 +4,15 @@
 #include <vector>
 #include <WPILib.h>
 
+#include "../Util/AsyncProcess.h"
+
 class Loggable;
 
 /*!
  * Class to simplify logging
  * @author Robert Ying
  */
-class Log
+class Log: public AsyncProcess
 {
 public:
 	virtual ~Log();
@@ -33,29 +35,9 @@ public:
 	void logAll();
 
 	/*!
-	 * entry point for task
-	 */
-	static int taskEntryPoint();
-
-	/*!
 	 * actual task
 	 */
-	void task();
-
-	/*!
-	 * Starts the task
-	 */
-	void startTask();
-
-	/*!
-	 * Stops the task
-	 */
-	void stopTask();
-
-	/*!
-	 * releases semaphore
-	 */
-	void releaseSemaphore();
+	void work();
 
 private:
 	Log();
@@ -64,10 +46,6 @@ private:
 
 	static Log* m_instance;
 	static std::vector<Loggable*> m_loggables;
-
-	bool m_is_running;
-	Task * m_task;
-	SEM_ID m_sem;
 };
 
 #endif

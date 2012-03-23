@@ -5,6 +5,7 @@
 #include "../ActionData/ActionData.h"
 #include "../DriverInputs/DebouncedJoystick.h"
 #include "../DriverInputs/InputParser.h"
+#include "../Util/SyncProcess.h"
 
 /**
  * @brief Processes inputs from {Autonomous|Joystick} and sets appropriate values in ActionData
@@ -13,7 +14,7 @@
  * @author Robert Ying
  */
 
-class Brain
+class Brain: public SyncProcess
 {
 public:
 	/*!
@@ -26,54 +27,15 @@ public:
 	 */
 	~Brain();
 
-	/*!
-	 * @brief starts teleop task
-	 */
-	void startTeleop();
-
-	/*!
-	 * @brief gets the m_action_ptr semaphore
-	 */
-	void takeActionSem();
-
-	/*!
-	 * @brief releases the m_action_ptr semaphore
-	 */
-	void giveActionSem();
-
-	/*!
-	 * Starts the brain tasks
-	 */
-	void Start();
+	void work();
 
 private:
-	/*!
-	 * @brief processes the input
-	 */
-	void process();
-
-	/*!
-	 * @brief the teleop task
-	 */
-	void teleopTask();
-
-	/*!
-	 * 
-	 * @param BrainPtr
-	 * @return 0
-	 */
-	static int taskEntryPoint(uint32_t autonTaskPtr);
-
-	Task* m_teleop_task;
-	SEM_ID actionSemaphore;
-
 	ActionData *action;
 	InputParser *m_inputs;
 
 	DriverStation *m_ds;
 
 	uint32_t missedPackets;
-	bool isTeleop;
 };
 
 #endif // BRAIN_H_

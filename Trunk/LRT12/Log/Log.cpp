@@ -4,66 +4,20 @@
 Log* Log::m_instance = NULL;
 std::vector<Loggable*> Log::m_loggables;
 
-Log::Log()
+Log::Log() :
+	AsyncProcess("LogTask")
 {
-	m_task = new Task("LogTask", (FUNCPTR) Log::taskEntryPoint,
-			Task::kDefaultPriority);
-	m_is_running = false;
-	m_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
 }
 
 Log::~Log()
 {
-	getInstance()->stopTask();
-	delete m_task;
+	getInstance()->deinit();
 	m_instance = NULL;
-
-	int error = semDelete(m_sem);
-	if (error)
-	{
-		printf("SemDelete Error=%d\n", error);
-	}
 }
 
-void Log::startTask()
+void Log::work()
 {
-	m_is_running = true;
-	m_task->Start();
-}
-
-void Log::stopTask()
-{
-	if (m_is_running)
-	{
-		UINT32 task_id = m_task->GetID();
-		m_task->Stop();
-		printf("Task 0x%x killed for Log\r\n", task_id);
-		m_is_running = false;
-	}
-}
-
-void Log::task()
-{
-	while (m_is_running)
-	{
-		semTake(m_sem, WAIT_FOREVER);
-		if (!m_is_running)
-		{
-			break;
-		}
-		getInstance()->logAll();
-	}
-}
-
-void Log::releaseSemaphore()
-{
-	semGive(m_sem);
-}
-
-int Log::taskEntryPoint()
-{
-	getInstance()->task();
-	return 0;
+	getInstance()->logAll();
 }
 
 Log * Log::getInstance()

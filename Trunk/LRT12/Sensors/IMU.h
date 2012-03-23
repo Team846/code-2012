@@ -2,6 +2,7 @@
 #define IMU_H_
 
 #include "../Log/Loggable.h"
+#include "../Util/AsyncProcess.h"
 
 class I2C;
 class ActionData;
@@ -12,7 +13,7 @@ class ActionData;
  * @author Brian Axelrod
  * @author Alexander Kanaris
  */
-class IMU: public Loggable
+class IMU: public AsyncProcess, public Loggable
 {
 public:
 	/*!
@@ -108,21 +109,6 @@ public:
 	 */
 	virtual void log();
 
-	/*!
-	 * Starts the task
-	 */
-	void releaseSemaphore();
-
-	/*!
-	 * 
-	 */
-	void startTask();
-
-	/*!
-	 * 
-	 */
-	void stopTask();
-
 private:
 	/*!
 	 * Helper method to get kNumPackets of data and fill m_i2c_buf
@@ -131,15 +117,9 @@ private:
 	int getPacket();
 
 	/*!
-	 * starts the task
-	 * @param ptr to the IMU
-	 */
-	static void taskEntryPoint(int ptr);
-
-	/*!
 	 * Is the task
 	 */
-	void task();
+	void work();
 
 	const static uint8_t kAddress = (0x29); // 7-bit default address
 	const static uint8_t kNumPackets = 4; // number of 7-byte packets to concatenate
@@ -175,10 +155,6 @@ private:
 	double m_last_gyro_y, m_gyro_y_delta;
 	double m_roll, m_pitch, m_yaw;
 	int m_time;
-
-	SEM_ID m_sem;
-	Task *m_task;
-	bool m_is_running;
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include "../../Config/Configurable.h"
 #include "../../Config/Config.h"
 #include "../../Log/Loggable.h"
+#include "../../Util/AsyncProcess.h"
 
 typedef struct
 {
@@ -16,7 +17,7 @@ typedef struct
 	bool pulsed;
 } PulsedSolenoid;
 
-class Pneumatics: public Configurable, public Loggable
+class Pneumatics: public AsyncProcess, public Configurable, public Loggable
 {
 public:
 	/*!
@@ -71,36 +72,15 @@ public:
 	virtual void log();
 
 	/*!
-	 * Releases semaphore
+	 * Actual work
 	 */
-	void releaseSemaphore();
-
-	/*!
-	 * Starts background task
-	 */
-	void startBackgroundTask();
-
-	/*!
-	 * Stops background task
-	 */
-	void stopBackgroundTask();
+	void work();
 
 private:
 	/*!
 	 * Constructor
 	 */
 	Pneumatics();
-
-	/*!
-	 * Entry point for task
-	 * @param ptr
-	 */
-	static void taskEntryPoint();
-
-	/*!
-	 * Actual task
-	 */
-	void task();
 
 	/*!
 	 * Pulses a solenoid
@@ -116,10 +96,6 @@ private:
 
 	int m_pulse_length;
 	bool m_mutex;
-
-	bool m_is_running;
-	SEM_ID m_task_sem;
-	Task * m_task;
 
 	DISALLOW_COPY_AND_ASSIGN(Pneumatics);
 

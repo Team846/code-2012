@@ -18,6 +18,8 @@ Component::ComponentData Component::createComponentData(
 	return ret;
 }
 
+#define ROBOT_2012 0
+
 list<Component::ComponentWithData>* Component::CreateComponents()
 {
 	list<ComponentWithData>* components = new list<ComponentWithData> ();
@@ -31,6 +33,7 @@ list<Component::ComponentWithData>* Component::CreateComponents()
 					new Drivetrain(),
 					createComponentData(true,
 							RobotConfig::DRIVER_STATION::DRIVETRAIN)));
+#if ROBOT_2012
 	components->push_back(
 			ComponentWithData(
 					new PneumaticShifter(),
@@ -56,6 +59,10 @@ list<Component::ComponentWithData>* Component::CreateComponents()
 					new BallFeeder(),
 					createComponentData(true,
 							RobotConfig::DRIVER_STATION::BALLFEEDER)));
+#else
+#warning 2012 specific components disabled
+	printf("2012 specific components disabled\r\n");
+#endif
 
 	//sample initialization of components
 	//    components->push_back(ComponentWithData(new Shifter(), createComponentData(true, 5)));

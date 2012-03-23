@@ -7,6 +7,8 @@
 
 #include "../LRTRobotBase.h"
 
+#include "../Util/AsyncProcess.h"
+
 #include "../Util/Util.h"
 #include "../Util/PrintInConstructor.h"
 #include "../Util/CachedValue.h"
@@ -23,7 +25,7 @@
  * @author Karthik Viswanathan
  * @author David Giandomenico
  */
-class AsyncCANJaguar: public CANJaguar, public Loggable
+class AsyncCANJaguar: public AsyncProcess, public CANJaguar, public Loggable
 {
 public:
 	// collection flags
@@ -92,11 +94,6 @@ private:
 	GameState m_last_game_state;
 
 	int m_index;
-	Task * m_comm_task;
-
-	SEM_ID m_comm_semaphore;
-	bool m_is_running; //implementation in progress - controlled termination of task -dg
-	bool m_is_quitting; // ditto
 
 	void println(const char * str);
 
@@ -112,11 +109,6 @@ public:
 	 * @briefDestroys the Jaguar object and stops the thread
 	 */
 	~AsyncCANJaguar();
-
-	/*!
-	 * @brief Stops the background thread
-	 */
-	void StopBackgroundTask();
 
 	/*!
 	 * @brief LinkedList of all of the constructed CAN Jaguars
@@ -406,26 +398,9 @@ public:
 	}
 
 	/*!
-	 * @brief Wraps the communication task for threading
-	 * @param proxiedCANJaguarPointer
-	 * @return 0
-	 */
-	static int CommTaskWrapper(UINT32 proxiedCANJaguarPointer);
-
-	/*!
-	 * @brief Synchronizes the Jaguar with the cRIO m_status
-	 */
-	void CommTask();
-
-	/*!
 	 * @brief Does the actual CommTask communication, not including timing
 	 */
-	void update();
-
-	/*!
-	 * @brief Initializes communications
-	 */
-	void ReleaseCommSemaphore();
+	void work();
 
 	/*!
 	 * Simple wrapper for GetFaults() == 0

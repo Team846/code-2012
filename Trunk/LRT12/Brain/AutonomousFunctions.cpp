@@ -19,12 +19,9 @@
 AutonomousFunctions* AutonomousFunctions::m_instance = NULL;
 
 AutonomousFunctions::AutonomousFunctions() :
-	Configurable(), Loggable(), m_name("AutonomousFunctions")
+	SyncProcess("AutonomousFunctions"), Configurable(), Loggable()
 {
-	m_task = new Task("AutonFuncTask",
-			(FUNCPTR) AutonomousFunctions::taskEntryPoint,
-			Task::kDefaultPriority);
-	m_task_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
+	m_name = "AutonomousFunctions";
 	m_is_running = false;
 	m_action = ActionData::GetInstance();
 
@@ -39,165 +36,120 @@ AutonomousFunctions::AutonomousFunctions() :
 
 AutonomousFunctions::~AutonomousFunctions()
 {
-	stopBackgroundTask();
+	deinit();
+}
 
-	delete m_task;
-
-	int error = semDelete(m_task_sem);
-	if (error)
+void AutonomousFunctions::work()
+{
+	if (m_action->auton->state != m_last_state)
 	{
-		printf("SemDelete Error=%d\n", error);
-	}
-}
-
-void AutonomousFunctions::taskEntryPoint()
-{
-	getInstance()->task();
-}
-
-void AutonomousFunctions::startBackgroundTask()
-{
-	m_is_running = true;
-	m_task->Start();
-}
-
-void AutonomousFunctions::stopBackgroundTask()
-{
-	if (m_is_running)
-	{
-		m_is_running = false;
-		UINT32 task_id = m_task->GetID();
-		m_task->Stop();
-		printf("Task 0x%x killed for AutonomousFunctions\n", task_id);
-	}
-}
-
-void AutonomousFunctions::releaseSemaphore()
-{
-	semGive(m_task_sem);
-}
-
-void AutonomousFunctions::task()
-{
-	while (m_is_running)
-	{
-		semTake(m_task_sem, WAIT_FOREVER);
-		if (!m_is_running)
+		if (m_action->auton->state != ACTION::AUTONOMOUS::TELEOP)
 		{
-			break;
+			m_action->auton->completion_status = ACTION::IN_PROGRESS;
+			m_action->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
 		}
-
-		if (m_action->auton->state != m_last_state)
-		{
-			if (m_action->auton->state != ACTION::AUTONOMOUS::TELEOP)
-			{
-				m_action->auton->completion_status = ACTION::IN_PROGRESS;
-				m_action->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
-			}
-			switch (m_action->auton->state)
-			{
-			case ACTION::AUTONOMOUS::TELEOP:
-				m_hit_key_flag = false;
-				break;
-			case ACTION::AUTONOMOUS::BRIDGEBALANCE:
-				m_counter = m_timeout_bridgebalance;
-				m_bridgebalance_pid.reset();
-				break;
-			case ACTION::AUTONOMOUS::KEYTRACK:
-				m_counter = m_timeout_keytrack;
-				break;
-			case ACTION::AUTONOMOUS::AUTOALIGN:
-				m_counter = m_timeout_autoalign;
-				break;
-			case ACTION::AUTONOMOUS::AUTON_MODE:
-				loadQueue();
-				break;
-			case ACTION::AUTONOMOUS::POSITION_HOLD:
-				break;
-
-			}
-		}
-		m_last_state = m_action->auton->state;
-
-		// timeout
-#if TIMEOUT_ENABLED
-		if (--m_counter <= 0)
-		{
-			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
-			m_action->auton->completion_status = ACTION::FAILURE;
-		}
-#endif
-
 		switch (m_action->auton->state)
 		{
 		case ACTION::AUTONOMOUS::TELEOP:
-			m_hasStartedHoldingPosition = false;
-			bridgeTipState = 0;
-			m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
-			m_adj_cyc_delay = M_CYCLES_TO_DELAY;
-#define CLOSED_LOOP 1
-#if CLOSED_LOOP
-			m_action->drivetrain->rate.drive_control = true; //If driver control use velocity control
-			m_action->drivetrain->rate.turn_control = true;
-#else
-			m_action->drivetrain->rate.drive_control = false; //If driver control use velocity control
-			m_action->drivetrain->rate.turn_control = false;
-#endif 
-			m_action->drivetrain->position.drive_control = false;
-			m_action->drivetrain->position.turn_control = false;
+			m_hit_key_flag = false;
 			break;
 		case ACTION::AUTONOMOUS::BRIDGEBALANCE:
-			if (bridgeBalance())
-			{
-				m_action->auton->completion_status = ACTION::SUCCESS;
-				//				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
-			}
-			else
-				m_action->auton->completion_status = ACTION::IN_PROGRESS;
+			m_counter = m_timeout_bridgebalance;
+			m_bridgebalance_pid.reset();
 			break;
 		case ACTION::AUTONOMOUS::KEYTRACK:
-			if (keyTrack())
-			{
-				m_action->auton->completion_status = ACTION::SUCCESS;
-				m_action->auton->state = ACTION::AUTONOMOUS::AUTOALIGN;
-			}
-			else
-				m_action->auton->completion_status = ACTION::IN_PROGRESS;
+			m_counter = m_timeout_keytrack;
 			break;
 		case ACTION::AUTONOMOUS::AUTOALIGN:
-			if (autoAlign())
-			{
-				m_action->auton->completion_status = ACTION::SUCCESS;
-				//				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
-			}
-			else
-				m_action->auton->completion_status = ACTION::IN_PROGRESS;
+			m_counter = m_timeout_autoalign;
 			break;
 		case ACTION::AUTONOMOUS::AUTON_MODE:
-			if (autonomousMode())
-			{
-				m_action->auton->completion_status = ACTION::SUCCESS;
-				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
-			}
-			else
-			{
-				m_action->auton->completion_status = ACTION::IN_PROGRESS;
-			}
+			loadQueue();
 			break;
 		case ACTION::AUTONOMOUS::POSITION_HOLD:
-			if (!m_hasStartedHoldingPosition)
-			{
-				m_hasStartedHoldingPosition = true;
-				m_action->drivetrain->position.drive_control = true;
-				m_action->drivetrain->position.absoluteTranslate = false;
-				m_action->drivetrain->position.desiredRelativeDrivePosition
-						= 0.0;
-				m_action->drivetrain->position.turn_control = false;
-				m_action->drivetrain->rate.turn_control = true;
-				m_action->drivetrain->rate.desiredTurnRate = 0.0;
-			}
 			break;
+
 		}
+	}
+	m_last_state = m_action->auton->state;
+
+	// timeout
+#if TIMEOUT_ENABLED
+	if (--m_counter <= 0)
+	{
+		m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+		m_action->auton->completion_status = ACTION::FAILURE;
+	}
+#endif
+
+	switch (m_action->auton->state)
+	{
+	case ACTION::AUTONOMOUS::TELEOP:
+		m_hasStartedHoldingPosition = false;
+		bridgeTipState = 0;
+		m_haf_cyc_delay = RobotConfig::LOOP_RATE / 2;
+		m_adj_cyc_delay = M_CYCLES_TO_DELAY;
+#define CLOSED_LOOP 1
+#if CLOSED_LOOP
+		m_action->drivetrain->rate.drive_control = true; //If driver control use velocity control
+		m_action->drivetrain->rate.turn_control = true;
+#else
+		m_action->drivetrain->rate.drive_control = false; //If driver control use velocity control
+		m_action->drivetrain->rate.turn_control = false;
+#endif 
+		m_action->drivetrain->position.drive_control = false;
+		m_action->drivetrain->position.turn_control = false;
+		break;
+	case ACTION::AUTONOMOUS::BRIDGEBALANCE:
+		if (bridgeBalance())
+		{
+			m_action->auton->completion_status = ACTION::SUCCESS;
+			//				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+		}
+		else
+			m_action->auton->completion_status = ACTION::IN_PROGRESS;
+		break;
+	case ACTION::AUTONOMOUS::KEYTRACK:
+		if (keyTrack())
+		{
+			m_action->auton->completion_status = ACTION::SUCCESS;
+			m_action->auton->state = ACTION::AUTONOMOUS::AUTOALIGN;
+		}
+		else
+			m_action->auton->completion_status = ACTION::IN_PROGRESS;
+		break;
+	case ACTION::AUTONOMOUS::AUTOALIGN:
+		if (autoAlign())
+		{
+			m_action->auton->completion_status = ACTION::SUCCESS;
+			//				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+		}
+		else
+			m_action->auton->completion_status = ACTION::IN_PROGRESS;
+		break;
+	case ACTION::AUTONOMOUS::AUTON_MODE:
+		if (autonomousMode())
+		{
+			m_action->auton->completion_status = ACTION::SUCCESS;
+			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
+		}
+		else
+		{
+			m_action->auton->completion_status = ACTION::IN_PROGRESS;
+		}
+		break;
+	case ACTION::AUTONOMOUS::POSITION_HOLD:
+		if (!m_hasStartedHoldingPosition)
+		{
+			m_hasStartedHoldingPosition = true;
+			m_action->drivetrain->position.drive_control = true;
+			m_action->drivetrain->position.absoluteTranslate = false;
+			m_action->drivetrain->position.desiredRelativeDrivePosition = 0.0;
+			m_action->drivetrain->position.turn_control = false;
+			m_action->drivetrain->rate.turn_control = true;
+			m_action->drivetrain->rate.desiredTurnRate = 0.0;
+		}
+		break;
 	}
 }
 

@@ -11,10 +11,8 @@
 const UINT8 IMU::kAddress;
 
 IMU::IMU(uint8_t address, uint8_t module_num) :
-	Loggable()
+	AsyncProcess("IMU"), Loggable()
 {
-	m_task = new Task("IMU_TASK", (FUNCPTR) taskEntryPoint,
-			Task::kDefaultPriority);
 	DigitalModule *module = DigitalModule::GetInstance(module_num);
 	if (module)
 	{
@@ -26,8 +24,6 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 	m_accel_x = m_accel_y = m_accel_z = 0;
 	m_gyro_x = m_gyro_y = m_gyro_z = 0;
 	m_roll = m_pitch = m_yaw = 0.0;
-	m_sem = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY);
-	m_is_running = false;
 	//m_dio = new DigitalOutput(RobotConfig::DIGITAL_IO::IMU_CALIBRATE);
 	memset(m_i2c_buf, 0, kNumPackets * 6 + 1);
 	m_time = 0;
@@ -35,59 +31,23 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 
 IMU::~IMU()
 {
-	stopTask();
-	delete m_task;
-	int error = semDelete(m_sem);
-	if (error)
-	{
-		printf("SemDelete Error=%d\n", error);
-	}
+	deinit();
 	delete m_i2c;
 	//delete m_dio;
 	m_i2c = NULL;
 }
 
-void IMU::startTask()
+void IMU::work()
 {
-	m_is_running = true;
-	m_task->Start((UINT32) this);
-}
-
-void IMU::stopTask()
-{
-	if (m_is_running)
+	update(ActionData::GetInstance());
+	static int lastUpdate = 0;
+	static int counter = 0;
+	counter++;
+	if (GetFPGATime() - lastUpdate > 1000000)
 	{
-		UINT32 task_id = m_task->GetID();
-		m_task->Stop();
-		printf("Task 0x%x killed for Pneumatics\n", task_id);
-	}
-}
-
-void IMU::taskEntryPoint(int ptr)
-{
-	IMU* imu = (IMU*) ptr;
-	imu->task();
-}
-
-void IMU::task()
-{
-	while (m_is_running)
-	{
-		semTake(m_sem, WAIT_FOREVER);
-		if (!m_is_running)
-		{
-			break;
-		}
-		update(ActionData::GetInstance());
-		static int lastUpdate = 0;
-		static int counter = 0;
-		counter++;
-		if (GetFPGATime() - lastUpdate > 1000000)
-		{
-			AsyncPrinter::Printf("%d packets in 1s\n", counter);
-			counter = 0;
-			lastUpdate = GetFPGATime();
-		}
+		AsyncPrinter::Printf("%d packets in 1s\n", counter);
+		counter = 0;
+		lastUpdate = GetFPGATime();
 	}
 }
 
@@ -120,11 +80,6 @@ void IMU::update()
 	m_last_gyro_y = getGyroY();
 
 	m_time = GetFPGATime() - m_time;
-}
-
-void IMU::releaseSemaphore()
-{
-	semGive(m_sem); // update I2C data
 }
 
 void IMU::update(ActionData * action)

@@ -37,13 +37,14 @@ void Trackers::listen()
 
 	int iResult = -1;
 
+	/* TODO: Change loop to only bind, not setup. */
 	while (iResult != 0)
 	{
 		iResult = setup();
 
 		if (iResult != 0)
 		{
-			AsyncPrinter::Printf("!!! KeyTracker: Retrying setup...\n");
+			AsyncPrinter::Printf("!!! KeyTracker: Retrying bind...\n");
 			Wait(0.5);
 		}
 	}
@@ -235,7 +236,7 @@ int Trackers::setup()
 		return retcode;
 	}
 
-	AsyncPrinter::Printf("KeyTracker: Socket successfully bound.\n");
+	AsyncPrinter::Printf("KeyTracker: Socket successfully binded.\n");
 
 	AsyncPrinter::Printf("Socket successfully initialized.\n");
 

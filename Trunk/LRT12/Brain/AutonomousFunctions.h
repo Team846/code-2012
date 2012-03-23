@@ -5,6 +5,7 @@
 #include "../Config/Configurable.h"
 #include "../Config/Config.h"
 #include "../Util/PID.h"
+#include "../Util/SyncProcess.h"
 #include "../Log/Loggable.h"
 #include "../Config/RobotConfig.h"
 #include "../ActionData/ActionData.h"
@@ -19,7 +20,9 @@
  * Contains assist functions for autonomous and teleoperated usage
  * @author Robert Ying
  */
-class AutonomousFunctions: public Configurable, public Loggable
+class AutonomousFunctions: public SyncProcess,
+		public Configurable,
+		public Loggable
 {
 public:
 	/*!
@@ -63,21 +66,8 @@ public:
 	 */
 	virtual void log();
 
-	/*!
-	 * Releases semaphore
-	 */
-	void releaseSemaphore();
-
-	/*!
-	 * Starts background task
-	 */
-	void startBackgroundTask();
-
-	/*!
-	 * Stops background task
-	 */
-	void stopBackgroundTask();
-
+	void AutonomousFunctions::work();
+	
 private:
 	/*!
 	 * Constructs an AutonomousFunctions object
@@ -85,14 +75,8 @@ private:
 	AutonomousFunctions();
 
 	/*!
-	 * Entry point for the task
+	 * Work function called iteratively
 	 */
-	static void taskEntryPoint();
-
-	/*!
-	 * Actual task
-	 */
-	void task();
 
 	/*!
 	 * Iterative method to balance the bridge
@@ -160,9 +144,6 @@ private:
 	autonomousStage m_curr_auton_stage;
 
 	static AutonomousFunctions * m_instance;
-
-	SEM_ID m_task_sem;
-	Task * m_task;
 
 	ACTION::AUTONOMOUS::state m_last_state;
 

@@ -23,6 +23,8 @@ void _GLOBAL__I__ZN11InputParserC2Ev();
 
 void _GLOBAL__I__ZN12AsyncPrinter8InstanceEv();
 
+void _GLOBAL__I__ZN12AsyncProcessC2EPKcm();
+
 void _GLOBAL__I__ZN12ConfigLoaderC2Ev();
 
 void _GLOBAL__I__ZN12ConfigurableC2Ev();
@@ -106,6 +108,7 @@ void (*_ctors[])() =
     _GLOBAL__I__ZN10Pneumatics10m_instanceE,
     _GLOBAL__I__ZN11InputParserC2Ev,
     _GLOBAL__I__ZN12AsyncPrinter8InstanceEv,
+    _GLOBAL__I__ZN12AsyncProcessC2EPKcm,
     _GLOBAL__I__ZN12ConfigLoaderC2Ev,
     _GLOBAL__I__ZN12ConfigurableC2Ev,
     _GLOBAL__I__ZN12LRTRobotBaseC2Ev,
@@ -160,6 +163,8 @@ void _GLOBAL__D__ZN10Pneumatics10m_instanceE();
 void _GLOBAL__D__ZN11InputParserC2Ev();
 
 void _GLOBAL__D__ZN12AsyncPrinter8InstanceEv();
+
+void _GLOBAL__D__ZN12AsyncProcessC2EPKcm();
 
 void _GLOBAL__D__ZN12ConfigLoaderC2Ev();
 
@@ -240,6 +245,7 @@ void (*_dtors[])() =
     _GLOBAL__D__ZN10Pneumatics10m_instanceE,
     _GLOBAL__D__ZN11InputParserC2Ev,
     _GLOBAL__D__ZN12AsyncPrinter8InstanceEv,
+    _GLOBAL__D__ZN12AsyncProcessC2EPKcm,
     _GLOBAL__D__ZN12ConfigLoaderC2Ev,
     _GLOBAL__D__ZN12ConfigurableC2Ev,
     _GLOBAL__D__ZN12LRTRobotBaseC2Ev,
