@@ -33,7 +33,10 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	disableLog();
 
 	if (name == NULL)
-		m_name = "?";
+	{
+		m_name = (char*) malloc((1 + 1) * sizeof(char)); // this is a hack. -ry
+		strcpy(m_name, "?");
+	}
 	else
 	{
 		m_name = (char*) malloc(strlen(name) * sizeof(char));
@@ -55,6 +58,7 @@ AsyncCANJaguar::~AsyncCANJaguar()
 	//   JaguarReader::GetInstance().StopTask(); //kill the jag reader that accesses this object.
 	deinit();
 	free((void*) m_name);
+	m_name = NULL;
 }
 
 void AsyncCANJaguar::work()
