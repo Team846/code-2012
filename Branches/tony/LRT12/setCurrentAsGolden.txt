@@ -1,1 +1,0 @@
-copy PPC603gnu/LRT12/Debug/LRT12.out LRT12Golden.out
