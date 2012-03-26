@@ -122,7 +122,7 @@ void Trackers::listen()
 
 void Trackers::update()
 {
-	camera * c = ActionData::GetInstance()->cam;
+	CameraData * c = ActionData::GetInstance()->cam;
 	c->key.blue = getKeyValue(BLUE);
 	c->key.red = getKeyValue(RED);
 	c->key.higher = getKeyValue(HIGHER);
@@ -252,7 +252,7 @@ void Trackers::log()
 {
 #if LOGGING_ENABLED
 	SmartDashboard *sdb = SmartDashboard::GetInstance();
-	camera * c = ActionData::GetInstance()->cam;
+	CameraData * c = ActionData::GetInstance()->cam;
 	sdb->PutInt("Key Blue", c->key.blue);
 	sdb->PutInt("Key Red", c->key.red);
 	sdb->PutInt("Key Higher", c->key.higher);

@@ -35,9 +35,12 @@ Pneumatics::Pneumatics() :
 	INIT_PULSED_SOLENOID(m_ballcollector, new DoubleSolenoid(
 					RobotConfig::SOLENOID_IO::BALL_COLLECTOR_A,
 					RobotConfig::SOLENOID_IO::BALL_COLLECTOR_B));
-#endif
 
-	m_mutex = false;
+	m_compressor = new Compressor(
+			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
+			RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
+	m_compressor->Start();
+#endif
 
 	disableLog();
 }
@@ -181,6 +184,20 @@ void Pneumatics::pulse(PulsedSolenoid * ptr)
 #endif
 }
 
+void Pneumatics::setCompressor(bool on)
+{
+#if not PNEUMATICS_DISABLED
+	if (on)
+	{
+		m_compressor->Start();
+	}
+	else
+	{
+		m_compressor->Stop();
+	}
+#endif
+}
+
 Pneumatics::~Pneumatics()
 {
 	deinit();
@@ -189,6 +206,8 @@ Pneumatics::~Pneumatics()
 	delete m_trajectory.solenoid;
 	delete m_shifter.solenoid;
 	delete m_ballcollector.solenoid;
+	m_compressor->Stop();
+	delete m_compressor;
 #endif
 }
 

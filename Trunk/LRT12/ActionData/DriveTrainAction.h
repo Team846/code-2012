@@ -23,10 +23,10 @@ struct DriveTrainAction
 
 		double desiredAbsoluteDrivePosition;
 		double desiredAbsoluteTurnPosition;
-		
+
 		bool reset_translate_zero;
 		bool reset_turn_zero;
-		
+
 		bool absoluteTurn;
 		bool absoluteTranslate;
 	} position;
@@ -34,9 +34,9 @@ struct DriveTrainAction
 	struct
 	{
 		double leftDutyCycle;
-//		double leftBrakingDutyCycle;
+		//		double leftBrakingDutyCycle;
 		double rightDutyCycle;
-//		double rightBrakingDutyCycle;
+		//		double rightBrakingDutyCycle;
 	} raw;
 
 	bool previousDriveOperationComplete;
@@ -48,17 +48,38 @@ struct DriveTrainAction
 	bool overrideOperationChecks;
 
 	int synchronizedCyclesRemaining;
-	
+
 	double robotTranslateSpeed;
 	double robotRotateSpeed;
+
+	DriveTrainAction()
+	{
+		previousDriveOperationComplete = true;
+		previousTurnOperationComplete = true;
+		setDriveOperation = false;
+		setTurnOperation = false;
+		overrideOperationChecks = false;
+		synchronizedCyclesRemaining = 0;
+		robotTranslateSpeed = 0;
+		robotRotateSpeed = 0;
+
+		rate.drive_control = true;
+		rate.turn_control = true;
+		rate.desiredDriveRate = 0;
+		rate.desiredTurnRate = 0;
+
+		memset(&position, 0, sizeof(position));
+		memset(&rate, 0, sizeof(rate));
+		memset(&raw, 0, sizeof(raw));
+	}
 };
 
 namespace ACTION
 {
-	namespace DRIVETRAIN
-	{
-		const static double UNSET_POS = 6564E16;
-	}
+namespace DRIVETRAIN
+{
+const static double UNSET_POS = 6564E16;
+}
 }
 
 #endif

@@ -137,7 +137,7 @@ void LRTRobotBase::StartCompetition()
 			break;
 		}
 
-		profiler.StartNewCycle();
+		profiler.startNewProcessCycle();
 
 #if FANCY_SHIT_ENABLED
 		if (cycleCount % 2 == 0)

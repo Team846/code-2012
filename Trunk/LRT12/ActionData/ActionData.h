@@ -16,7 +16,7 @@ struct LauncherAction;
 struct BallFeedAction;
 struct AutonomousAction;
 struct IMU_Data;
-struct camera;
+struct CameraData;
 
 class ActionData
 {
@@ -77,9 +77,9 @@ public:
 	IMU_Data * imu;
 
 	/*!
-	 * @brief contains the camera data
+	 * @brief contains the CameraData data
 	 */
-	camera * cam;
+	CameraData * cam;
 
 	/*!
 	 * @brief enables motors across the robot

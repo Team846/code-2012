@@ -38,6 +38,15 @@ struct LauncherAction
 	ACTION::LAUNCHER::launcherConfiguration desiredTarget;
 	bool isFenderShot;
 	int ballLaunchCounter;
+	LauncherAction()
+	{
+		state = ACTION::LAUNCHER::RUNNING;
+		atSpeed = false;
+		speed = 1500;
+		desiredTarget = ACTION::LAUNCHER::KEY_SHOT_HIGH;
+		isFenderShot = false;
+		ballLaunchCounter = 0;
+	}
 };
 
 #endif

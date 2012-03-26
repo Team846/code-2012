@@ -60,9 +60,14 @@ public:
 	static Profiler& GetInstance();
 
 	/*!
-	 * Starts a new cycle of profiled data
+	 * Starts a new process cycle
 	 */
-	void StartNewCycle();
+	void startNewProcessCycle();
+
+	/*!
+	 * Does the actual logic / filewriting IO
+	 */
+	void work();
 
 	/*!
 	 * Prints a set of data to console
@@ -103,6 +108,8 @@ private:
 	ProfiledData current;
 
 	int cycleIndex;
+	
+	bool justEnabled;
 };
 
 /*!

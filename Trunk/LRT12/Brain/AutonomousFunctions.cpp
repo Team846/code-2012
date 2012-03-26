@@ -670,18 +670,18 @@ void AutonomousFunctions::Configure()
 }
 
 const AutonomousFunctions::autonomousStage
-		AutonomousFunctions::DRIVE_THEN_SHOOT[DRIVE_THEN_SHOOT_LENGTH] =
+		AutonomousFunctions::DRIVE_THEN_SHOOT[] =
 		{ INIT, ADJUSTABLE_DELAY, MOVE_TO_FENDER_INIT, WAIT_FOR_POSITION,
 				SHOOT, DONE };
 
 const AutonomousFunctions::autonomousStage
-		AutonomousFunctions::SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH] =
+		AutonomousFunctions::SHOOT_THEN_BRIDGE[] =
 		{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, DELAY_HALF_SEC,
 				DELAY_HALF_SEC, DELAY_HALF_SEC, DROP_WEDGE, MOVE_BACK_INIT,
 				WAIT_FOR_POSITION, DELAY_HALF_SEC, RAISE_WEDGE, DONE };
 
 const AutonomousFunctions::autonomousStage
-		AutonomousFunctions::BRIDGE_THEN_SHOOT[BRIDGE_THEN_SHOOT_LENGTH] =
+		AutonomousFunctions::BRIDGE_THEN_SHOOT[] =
 		{ INIT, ADJUSTABLE_DELAY, MOVE_BACK_INIT, DROP_WEDGE,
 				WAIT_FOR_POSITION, RAISE_WEDGE, KEY_TRACK, AIM, SHOOT, DONE };
 
@@ -708,9 +708,9 @@ void AutonomousFunctions::loadQueue()
 	m_curr_auton_stage = INIT;
 }
 
-std::string AutonomousFunctions::getAutonomousStageName(autonomousStage a)
+char* AutonomousFunctions::getAutonomousStageName(autonomousStage a)
 {
-	std::string str;
+	char* str = "?";
 	switch (a)
 	{
 	case INIT:
@@ -767,7 +767,7 @@ void AutonomousFunctions::advanceQueue()
 		m_curr_auton_stage = DONE;
 	}
 	AsyncPrinter::Printf("Entering %s\r\n",
-			getAutonomousStageName(m_curr_auton_stage).c_str());
+			getAutonomousStageName(m_curr_auton_stage));
 }
 
 void AutonomousFunctions::log()
@@ -781,22 +781,22 @@ void AutonomousFunctions::log()
 	std::string s;
 	switch (m_action->auton->state)
 	{
-		case ACTION::AUTONOMOUS::AUTOALIGN:
+	case ACTION::AUTONOMOUS::AUTOALIGN:
 		s = "Auto Align";
 		break;
-		case ACTION::AUTONOMOUS::BRIDGEBALANCE:
+	case ACTION::AUTONOMOUS::BRIDGEBALANCE:
 		s = "Bridge Balance";
 		break;
-		case ACTION::AUTONOMOUS::KEYTRACK:
+	case ACTION::AUTONOMOUS::KEYTRACK:
 		s = "Key Track";
 		break;
-		case ACTION::AUTONOMOUS::AUTON_MODE:
+	case ACTION::AUTONOMOUS::AUTON_MODE:
 		s = "Auton";
 		break;
-		case ACTION::AUTONOMOUS::TELEOP:
+	case ACTION::AUTONOMOUS::TELEOP:
 		s = "Teleop";
 		break;
-		case ACTION::AUTONOMOUS::POSITION_HOLD:
+	case ACTION::AUTONOMOUS::POSITION_HOLD:
 		s = "Position Hold";
 		break;
 	}

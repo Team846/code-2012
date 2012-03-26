@@ -3,6 +3,7 @@
 
 #include "WPILib.h"
 #include "DoubleSolenoid.h"
+#include "Compressor.h"
 #include "../../Config/RobotConfig.h"
 #include "../../Config/Configurable.h"
 #include "../../Config/Config.h"
@@ -48,18 +49,24 @@ public:
 	void setTrajectory(bool on, bool force = false);
 
 	/*!
-	 * Sets the m_status of the latch
+	 * Sets the status of the latch
 	 * interlocked with setPressurePlate
 	 * @param on
 	 */
 	void setLatch(bool on, bool force = false);
 
 	/*!
-	 * Sets the m_status of the pressure plate
+	 * Sets the status of the pressure plate
 	 * interlocked with setLatch
 	 * @param on
 	 */
 	void setPressurePlate(bool on, bool force = false);
+	
+	/*!
+	 * Sets the state of the compressor
+	 * @param on
+	 */
+	void setCompressor(bool on);
 
 	/*!
 	 * Configures values
@@ -96,6 +103,8 @@ private:
 
 	int m_pulse_length;
 	bool m_mutex;
+
+	Compressor *m_compressor;
 
 	DISALLOW_COPY_AND_ASSIGN(Pneumatics);
 

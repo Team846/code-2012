@@ -23,5 +23,12 @@ struct BallFeedAction
 	ACTION::BALLFEED::feeder_state feeder_state;
 	bool sweepArmOut;
 	bool attemptToLoadRound;
+
+	BallFeedAction()
+	{
+		feeder_state = ACTION::BALLFEED::HOLDING;
+		sweepArmOut = false;
+		attemptToLoadRound = false;
+	}
 };
 #endif

@@ -18,6 +18,12 @@ struct AutonomousAction
 {
 	ACTION::AUTONOMOUS::state state;
 	ACTION::completionStatus completion_status;
+
+	AutonomousAction()
+	{
+		state = ACTION::AUTONOMOUS::TELEOP;
+		completion_status = ACTION::UNSET;
+	}
 };
 
 #endif

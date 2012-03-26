@@ -21,6 +21,11 @@ struct ShifterAction
 {
 	ACTION::GEARBOX::eGearboxState gear;
 	bool force;
+	ShifterAction()
+	{
+		gear = ACTION::GEARBOX::LOW_GEAR;
+		force = false;
+	}
 };
 
 #endif

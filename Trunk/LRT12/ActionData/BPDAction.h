@@ -28,5 +28,12 @@ struct BPDAction
 	ACTION::WEDGE::state state;
 	ACTION::completionStatus completion_status;
 	bool try_again;
+
+	BPDAction()
+	{
+		state = ACTION::WEDGE::IDLE;
+		completion_status = ACTION::UNSET;
+		try_again = false;
+	}
 };
 #endif //BPDACTION_H

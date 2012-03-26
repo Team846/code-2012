@@ -67,7 +67,7 @@ public:
 	virtual void log();
 
 	void AutonomousFunctions::work();
-	
+
 private:
 	/*!
 	 * Constructs an AutonomousFunctions object
@@ -128,7 +128,7 @@ private:
 	 * @param a the autonomous stage
 	 * @return pointer to string
 	 */
-	std::string getAutonomousStageName(autonomousStage a);
+	char* getAutonomousStageName(autonomousStage a);
 
 	const static int DRIVE_THEN_SHOOT_LENGTH = 10;
 	const static autonomousStage DRIVE_THEN_SHOOT[DRIVE_THEN_SHOOT_LENGTH];

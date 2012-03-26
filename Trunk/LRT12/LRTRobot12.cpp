@@ -2,6 +2,7 @@
 #include "Util/PrintInConstructor.h"
 #include "ActionData/IMUData.h"
 #include "Sensors/DriveEncoders.h"
+#include "Components/Pneumatic/Pneumatics.h"
 
 #include <fstream>
 
@@ -26,11 +27,6 @@ LRTRobot12::LRTRobot12() :
 	components = Component::CreateComponents();
 	m_action = ActionData::GetInstance();
 
-	m_compressor = new Compressor(
-			RobotConfig::DIGITAL_IO::COMPRESSOR_PRESSURE_SENSOR_PIN,
-			RobotConfig::RELAY_IO::COMPRESSOR_RELAY);
-	m_compressor->Start();
-
 	mainLoopWatchDog = wdCreate();
 
 #if FANCY_SHIT_ENABLED
@@ -43,9 +39,6 @@ LRTRobot12::LRTRobot12() :
 LRTRobot12::~LRTRobot12()
 {
 	brain.deinit();
-
-	m_compressor->Stop();
-	delete m_compressor;
 
 #if FANCY_SHIT_ENABLED
 	delete m_trackers;
@@ -110,11 +103,11 @@ void LRTRobot12::MainLoop()
 
 	if (ds->GetDigitalIn(RobotConfig::DRIVER_STATION::COMPRESSOR))
 	{
-		m_compressor->Start();
+		Pneumatics::getInstance()->setCompressor(true);
 	}
 	else
 	{
-		m_compressor->Stop();
+		Pneumatics::getInstance()->setCompressor(false);
 	}
 
 	prevState = gameState;

@@ -7,5 +7,10 @@ struct ConfigAction
 	bool load;
 	bool save;
 	bool apply;
+
+	ConfigAction()
+	{
+		load = save = apply = false;
+	}
 };
 #endif //CONFIG_ACTION_H

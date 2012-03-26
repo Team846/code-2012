@@ -27,10 +27,17 @@ struct AlignmentData
 	ACTION::CAMERA::targetStatus status;
 };
 
-struct camera
+struct CameraData
 {
 	KeyTrackerData key;
 	AlignmentData align;
+
+	CameraData()
+	{
+		key.red = key.blue = key.higher = 0;
+		align.status = ACTION::CAMERA::NO_TARGET;
+		align.arbitraryOffsetFromUDP = 0;
+	}
 };
 
 #endif

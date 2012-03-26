@@ -17,9 +17,9 @@ Profiler& Profiler::GetInstance()
 	return *instance;
 }
 
-Profiler::Profiler() :
-	cycleIndex(0)
+Profiler::Profiler()
 {
+	cycleIndex = 0;
 	AddToSingletonList();
 }
 
@@ -74,12 +74,23 @@ void Profiler::PrintProfiledDataToFile(const char * filename, ProfiledData * p,
 		bool console)
 {
 	double reportStart = Timer::GetFPGATimestamp();
+
+	if (justEnabled)
+	{
+		AsyncPrinter::Printf("\r\nJust Enabled\r\n\r\n");
+	}
+
 	AsyncPrinter::Printf("----------------------\n");
 	AsyncPrinter::Printf("PROFILER to FILE (%d cycles)\n", reportPeriod);
+	AsyncPrinter::Printf("%s\r\n", p->enabled ? "Enabled" : "Disabled");
 
 	FILE * fp = fopen(filename, "a");
 	if (fp)
 	{
+		if (justEnabled)
+		{
+			fprintf(fp, "\r\nJust Enabled\r\n\r\n");
+		}
 		fprintf(fp, "----------------------\r\n");
 		fprintf(fp, "PROFILER to FILE (%d cycles)\r\n", reportPeriod);
 		fprintf(fp, "%s\r\n", p->enabled ? "Enabled" : "Disabled");
@@ -127,12 +138,22 @@ void Profiler::PrintProfiledDataToFile(const char * filename, ProfiledData * p,
 	}
 }
 
-void Profiler::StartNewCycle()
+void Profiler::startNewProcessCycle()
 {
 	++cycleIndex;
 
-	current.enabled = current.enabled
-			|| DriverStation::GetInstance()->IsEnabled();
+	bool dsEnabled = DriverStation::GetInstance()->IsEnabled();
+	if (!current.enabled && dsEnabled && cycleIndex != 1)
+	{
+		justEnabled = true;
+	}
+	current.enabled = current.enabled || dsEnabled;
+
+	work();
+}
+
+void Profiler::work()
+{
 	if (cycleIndex >= reportPeriod)
 	{
 		if (current.enabled)
@@ -143,6 +164,7 @@ void Profiler::StartNewCycle()
 		{
 			PrintProfiledData(&current);
 		}
+		justEnabled = false;
 		cycleIndex = 0;
 		ClearLogBuffer();
 	}
