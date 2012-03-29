@@ -18,7 +18,7 @@ Component::ComponentData Component::createComponentData(
 	return ret;
 }
 
-#define ROBOT_2012 0
+#define ROBOT_2012 1
 
 list<Component::ComponentWithData>* Component::CreateComponents()
 {

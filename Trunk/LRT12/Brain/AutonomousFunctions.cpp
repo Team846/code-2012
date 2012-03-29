@@ -559,7 +559,6 @@ bool AutonomousFunctions::autonomousMode()
 		}
 		break;
 	case MOVE_BACK_INIT:
-#warning Verify amount to drive back
 		m_action->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
 		m_action->drivetrain->position.absoluteTranslate = false;
 		m_action->drivetrain->position.absoluteTurn = false;
