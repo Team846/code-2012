@@ -40,15 +40,6 @@ IMU::~IMU()
 void IMU::work()
 {
 	update(ActionData::GetInstance());
-	static int lastUpdate = 0;
-	static int counter = 0;
-	counter++;
-	if (GetFPGATime() - lastUpdate > 1000000)
-	{
-		AsyncPrinter::Printf("%d packets in 1s\n", counter);
-		counter = 0;
-		lastUpdate = GetFPGATime();
-	}
 }
 
 void IMU::update()

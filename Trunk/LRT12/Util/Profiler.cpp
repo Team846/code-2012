@@ -156,14 +156,18 @@ void Profiler::work()
 {
 	if (cycleIndex >= reportPeriod)
 	{
+#if PROFILE_TO_FILE
 		if (current.enabled)
 		{
 			PrintProfiledDataToFile(PROFILER_FILE_NAME, &current, true);
 		}
 		else
 		{
+#endif
 			PrintProfiledData(&current);
+#if PROFILE_TO_FILE
 		}
+#endif
 		justEnabled = false;
 		cycleIndex = 0;
 		ClearLogBuffer();

@@ -519,8 +519,6 @@ bool AutonomousFunctions::autoAlign()
 #define DEBUG 1
 bool AutonomousFunctions::autonomousMode()
 {
-	//	AsyncPrinter::Printf("Entering %s\r\n",
-	//			getAutonomousStageName(m_curr_auton_stage).c_str());
 	switch (m_curr_auton_stage)
 	{
 	case INIT:

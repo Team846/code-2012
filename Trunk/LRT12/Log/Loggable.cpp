@@ -1,7 +1,7 @@
 #include "Loggable.h"
 #include "Log.h"
 
-#define ENABLE_LOG 0
+#define ENABLE_LOG 1
 Loggable::Loggable()
 {
 	Log::registerLoggable(this);

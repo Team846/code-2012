@@ -34,13 +34,11 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 
 	if (name == NULL)
 	{
-		m_name = (char*) malloc((1 + 1) * sizeof(char)); // this is a hack. -ry
-		strcpy(m_name, "?");
+		m_name = strdup("?");
 	}
 	else
 	{
-		m_name = (char*) malloc(strlen(name) * sizeof(char));
-		strcpy(m_name, name);
+		m_name = strdup(name);
 	}
 
 	//	m_enable_control.disableCaching();
@@ -497,16 +495,16 @@ void AsyncCANJaguar::log()
 		std::string out;
 		switch (GetSpeedReference())
 		{
-			case kSpeedRef_Encoder:
+		case kSpeedRef_Encoder:
 			out = "Encoder";
 			break;
-			case kSpeedRef_InvEncoder:
+		case kSpeedRef_InvEncoder:
 			out = "Indexing Encoder";
 			break;
-			case kSpeedRef_QuadEncoder:
+		case kSpeedRef_QuadEncoder:
 			out = "Quadrature Encoder";
 			break;
-			case kSpeedRef_None:
+		case kSpeedRef_None:
 			out = "None";
 			break;
 		}
@@ -519,13 +517,13 @@ void AsyncCANJaguar::log()
 		std::string out;
 		switch (GetPositionReference())
 		{
-			case kPosRef_Potentiometer:
+		case kPosRef_Potentiometer:
 			out = "Potentiometer";
 			break;
-			case kPosRef_QuadEncoder:
+		case kPosRef_QuadEncoder:
 			out = "Quadrature Encoder";
 			break;
-			case kPosRef_None:
+		case kPosRef_None:
 			out = "None";
 			break;
 		}
@@ -551,19 +549,19 @@ void AsyncCANJaguar::log()
 		std::string out;
 		switch (GetControlMode())
 		{
-			case kPercentVbus:
+		case kPercentVbus:
 			out = "Duty Cycle";
 			break;
-			case kVoltage:
+		case kVoltage:
 			out = "Voltage";
 			break;
-			case kSpeed:
+		case kSpeed:
 			out = "Speed";
 			break;
-			case kPosition:
+		case kPosition:
 			out = "Position";
 			break;
-			case kCurrent:
+		case kCurrent:
 			out = "Current";
 			break;
 		}
@@ -627,19 +625,19 @@ void AsyncCANJaguar::log()
 	std::string out;
 	switch (m_control_mode.peek())
 	{
-		case kPercentVbus:
+	case kPercentVbus:
 		out = "Duty Cycle";
 		break;
-		case kVoltage:
+	case kVoltage:
 		out = "Voltage";
 		break;
-		case kSpeed:
+	case kSpeed:
 		out = "Speed";
 		break;
-		case kPosition:
+	case kPosition:
 		out = "Position";
 		break;
-		case kCurrent:
+	case kCurrent:
 		out = "Current";
 		break;
 	}

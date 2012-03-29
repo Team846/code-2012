@@ -18,7 +18,7 @@
 #include "Jaguar/AsyncCANJaguar.h"
 #include "Jaguar/JaguarTester.h"
 
-#define FANCY_SHIT_ENABLED 0
+#define FANCY_SHIT_ENABLED 1
 
 #define PRINT_TO_FILE_ON_STARTUP 1
 

@@ -23,7 +23,7 @@ struct ShifterAction
 	bool force;
 	ShifterAction()
 	{
-		gear = ACTION::GEARBOX::LOW_GEAR;
+		gear = ACTION::GEARBOX::HIGH_GEAR;
 		force = false;
 	}
 };

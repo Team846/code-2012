@@ -8,6 +8,8 @@
 #include "AsyncPrinter.h"
 #include "../Config/RobotConfig.h"
 
+#define PROFILE_TO_FILE 0
+
 const char * const PROFILER_FILE_NAME = "profiler.txt";
 
 /*!
@@ -108,7 +110,7 @@ private:
 	ProfiledData current;
 
 	int cycleIndex;
-	
+
 	bool justEnabled;
 };
 

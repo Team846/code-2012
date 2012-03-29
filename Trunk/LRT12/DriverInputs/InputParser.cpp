@@ -32,12 +32,11 @@ void InputParser::ProcessInputs()
 	/***************** Shifter **********************/
 	if (m_driver_stick->IsButtonDown(SHIFT)) //Shift gear
 	{
-		AsyncPrinter::Printf("Shift button\n");
-		m_action_ptr->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
+		m_action_ptr->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
 	}
 	else
 	{
-		m_action_ptr->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
+		m_action_ptr->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
 	}
 
 	/***************** Ball Feeder **********************/
@@ -55,7 +54,15 @@ void InputParser::ProcessInputs()
 	}
 	static bool hasBeenReleased = true;
 	/***************** Drive assistance ****************/
-	if (m_driver_stick->IsButtonDown(KEYTRACK))
+	if (m_driver_stick->IsButtonDown(AUTOAIM))
+	{
+		if (hasBeenReleased)
+		{
+			m_action_ptr->auton->state = ACTION::AUTONOMOUS::AUTOALIGN;
+		}
+		hasBeenReleased = false;
+	}
+	else if (m_driver_stick->IsButtonDown(KEYTRACK))
 	{
 		if (hasBeenReleased)
 		{
