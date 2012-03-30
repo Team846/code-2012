@@ -596,16 +596,14 @@ bool AutonomousFunctions::autonomousMode()
 		}
 
 		break;
-	case BACKUP_FOR_BALLS_INIT:
+	case STEP_FWD_INIT:
 		m_action->drivetrain->position.absoluteTranslate = false;
 		m_action->drivetrain->position.absoluteTurn = false;
 		m_action->drivetrain->position.drive_control = true;
 		m_action->drivetrain->position.turn_control = false;
 
-		//need to drive back 140 to have bumper on top of brdige
 		m_action->drivetrain->position.desiredRelativeDrivePosition
-				= -36; //3 ft, why because of fudge!
-		//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
+				= m_step_fwd_distance; //3 ft, why because of fudge!
 		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
 		advanceQueue();
 		break;
@@ -615,7 +613,7 @@ bool AutonomousFunctions::autonomousMode()
 		m_action->drivetrain->position.turn_control = true;
 		m_action->drivetrain->position.drive_control = false;
 
-		m_action->drivetrain->position.desiredRelativeTurnPosition = 180.0; 
+		m_action->drivetrain->position.desiredRelativeTurnPosition = 180.0;
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 		advanceQueue();
 		break;
@@ -683,6 +681,7 @@ void AutonomousFunctions::Configure()
 
 	m_drive_back_distance
 			= c->Get<double> (m_name, "driveBackDistance", -136.0);
+	m_step_fwd_distance = c->Get<double> (m_name, "stepFwdDistance", 36);
 }
 
 const AutonomousFunctions::autonomousStage
@@ -697,12 +696,16 @@ const AutonomousFunctions::autonomousStage
 				DELAY_HALF_SEC, DELAY_HALF_SEC, DELAY_HALF_SEC, RAISE_WEDGE,
 				DONE };
 
+const AutonomousFunctions::autonomousStage AutonomousFunctions::SHOOT_ONLY[] =
+{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, SHOOT, SHOOT, SHOOT, DONE };
+
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::SHOOT_THEN_BRIDGE_THEN_SHOOT[] =
 		{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, DELAY_HALF_SEC,
 				DELAY_HALF_SEC, DROP_WEDGE, MOVE_BACK_INIT, WAIT_FOR_POSITION,
 				DELAY_HALF_SEC, DELAY_HALF_SEC, DELAY_HALF_SEC, RAISE_WEDGE,
-				BACKUP_FOR_BALLS_INIT, WAIT_FOR_POSITION, HALF_TURN_INIT, WAIT_FOR_TURN, STOP, LOWER_COLLECTOR, //now we move forward a bit, do a 180 lower ball collector
+				STEP_FWD_INIT, WAIT_FOR_POSITION, HALF_TURN_INIT,
+				WAIT_FOR_TURN, STOP, LOWER_COLLECTOR, //now we move forward a bit, do a 180 lower ball collector
 				DELAY_HALF_SEC, DELAY_HALF_SEC, DELAY_HALF_SEC, DELAY_HALF_SEC, //delay 2 seconds 
 				RAISE_COLLECTOR, HALF_TURN_INIT, WAIT_FOR_TURN, //do another 180
 				KEY_TRACK, AIM, SHOOT, SHOOT, SHOOT,//keytrack, aim shoot all balls. 
@@ -718,11 +721,34 @@ void AutonomousFunctions::loadQueue()
 	while (!m_auton_sequence.empty())
 		m_auton_sequence.pop();
 
+	uint8_t sequenceSelector =
+			(uint8_t) DriverStation::GetInstance()->GetAnalogIn(
+					RobotConfig::DRIVER_STATION::ANALOG::AUTONOMOUS_SELECTOR); // floored function
+
+	const autonomousStage * sequence = SHOOT_THEN_BRIDGE;
+	switch (sequenceSelector)
+	{
+	default:
+	case 0:
+	case 1:
+		sequence = SHOOT_THEN_BRIDGE;
+		AsyncPrinter::Printf("Shoot then bridge\r\n");
+		break;
+	case 2:
+	case 3:
+		sequence = SHOOT_ONLY;
+		AsyncPrinter::Printf("Shoot only\r\n");
+		break;
+	case 4:
+	case 5:
+		sequence = SHOOT_THEN_BRIDGE_THEN_SHOOT;
+		AsyncPrinter::Printf("Shoot then bridge then shoot\r\n");
+		break;
+	}
+
 	for (uint8_t i = 0;; ++i)
 	{
-		//		autonomousStage s = DRIVE_THEN_SHOOT[i];
-		autonomousStage s = SHOOT_THEN_BRIDGE[i];
-		//		autonomousStage s = BRIDGE_THEN_SHOOT[i];
+		autonomousStage s = sequence[i];
 		if (s == DONE)
 		{
 			break;
@@ -777,23 +803,23 @@ char* AutonomousFunctions::getAutonomousStageName(autonomousStage a)
 	case DONE:
 		str = "Done";
 		break;
-	case BACKUP_FOR_BALLS_INIT:
-		str = "BACKUP_FOR_BALLS_INIT";
+	case STEP_FWD_INIT:
+		str = "Step Fwd Init";
 		break;
-	case HALF_TURN_INIT: 
-		str = "HALF_TURN_INIT";
+	case HALF_TURN_INIT:
+		str = "Half Turn Init";
 		break;
 	case LOWER_COLLECTOR:
-		str = "LOWER_COLLECTOR";
+		str = "Lower Collector";
 		break;
 	case RAISE_COLLECTOR:
-		str = "RAISE_COLLECTOR";
+		str = "Raise Collector";
 		break;
 	case WAIT_FOR_TURN:
-		str = "WAIT_FOR_TURN";
+		str = "Wait For Turn";
 		break;
 	case STOP:
-		str = "STOP";
+		str = "Stop";
 		break;
 	}
 	return str;

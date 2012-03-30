@@ -41,7 +41,7 @@ public:
 		WAIT_FOR_POSITION = 9, //!< MOVE_BACK
 		DELAY_HALF_SEC = 10,
 		ADJUSTABLE_DELAY = 11,
-		BACKUP_FOR_BALLS_INIT = 12, //Begin changes on this line
+		STEP_FWD_INIT = 12, //Begin changes on this line
 		HALF_TURN_INIT = 13,
 		LOWER_COLLECTOR = 14,
 		RAISE_COLLECTOR = 15,
@@ -142,8 +142,12 @@ private:
 	const static int SHOOT_THEN_BRIDGE_LENGTH = 14;
 	const static autonomousStage SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH];
 
+	const static int SHOOT_ONLY_LENGTH = 14;
+	const static autonomousStage SHOOT_ONLY[SHOOT_ONLY_LENGTH];
+
 	const static int SHOOT_THEN_BRIDGE_THEN_SHOOT_LENGTH = 32;
-	const static autonomousStage SHOOT_THEN_BRIDGE_THEN_SHOOT[SHOOT_THEN_BRIDGE_THEN_SHOOT_LENGTH];
+	const static autonomousStage
+			SHOOT_THEN_BRIDGE_THEN_SHOOT[SHOOT_THEN_BRIDGE_THEN_SHOOT_LENGTH];
 
 	const static int BRIDGE_THEN_SHOOT_LENGTH = 10;
 	const static autonomousStage BRIDGE_THEN_SHOOT[BRIDGE_THEN_SHOOT_LENGTH];
@@ -172,9 +176,7 @@ private:
 	double m_bridgebalance_angular_rate_threshold;
 	double m_bridgebalance_threshold, m_keytrack_threshold, m_align_threshold;
 
-	double m_drive_back_distance;
-
-	//double m_align_turned;
+	double m_drive_back_distance, m_step_fwd_distance;
 
 	bool m_hit_key_flag;
 

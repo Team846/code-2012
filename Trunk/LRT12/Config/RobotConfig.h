@@ -77,6 +77,7 @@ namespace ANALOG
 {
 const uint32_t AUTON_DELAY = 1;
 const uint32_t BALLS_TO_SHOOT = 2;
+const uint32_t AUTONOMOUS_SELECTOR = 3;
 }
 }
 
