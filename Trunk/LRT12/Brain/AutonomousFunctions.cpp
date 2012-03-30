@@ -515,7 +515,6 @@ bool AutonomousFunctions::autoAlign()
 	return false;
 }
 
-#define BALLS_TO_SHOOT 2
 #define DEBUG 1
 bool AutonomousFunctions::autonomousMode()
 {
@@ -528,7 +527,7 @@ bool AutonomousFunctions::autonomousMode()
 		m_action->drivetrain->position.reset_turn_zero = true;
 		M_CYCLES_TO_DELAY
 				= static_cast<int> ((DriverStation::GetInstance()->GetAnalogIn(
-						1) / 5.0) * 10 * RobotConfig::LOOP_RATE);
+						RobotConfig::DRIVER_STATION::ANALOG::AUTON_DELAY) / 5.0) * 10 * RobotConfig::LOOP_RATE);
 		m_adj_cyc_delay = M_CYCLES_TO_DELAY;
 		advanceQueue();
 		break;
@@ -546,7 +545,7 @@ bool AutonomousFunctions::autonomousMode()
 		break;
 	case SHOOT:
 		if (/*autoAlign() && */m_action->launcher->ballLaunchCounter
-				< BALLS_TO_SHOOT)
+				< (DriverStation::GetInstance()->GetAnalogIn(RobotConfig::DRIVER_STATION::ANALOG::BALLS_TO_SHOOT) + 0.5)) //0.5 is easy way to round
 		{
 			m_action->ballfeed->attemptToLoadRound = true;
 		}

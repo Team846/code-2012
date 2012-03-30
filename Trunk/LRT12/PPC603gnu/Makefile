@@ -298,6 +298,10 @@ LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.o : $(PRJ_ROOT_DIR)/Util/L
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates -mno-strict-align -fvolatile $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
 
+LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/NetworkHelper.o : $(PRJ_ROOT_DIR)/Util/NetworkHelper.cpp $(FORCE_FILE_BUILD)
+	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates -mno-strict-align -fvolatile $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
+
+
 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PID.o : $(PRJ_ROOT_DIR)/Util/PID.cpp $(FORCE_FILE_BUILD)
 	$(TRACE_FLAG)if [ ! -d "`dirname "$@"`" ]; then mkdir -p "`dirname "$@"`"; fi;echo "building $@"; $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall -MD -MP -mlongcall -frtti -Wunused -fimplicit-templates -mno-strict-align -fvolatile $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL   $(DEFINES) -o "$@" -c "$<"
 
@@ -348,6 +352,7 @@ OBJECTS_LRT12_partialImage = LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Action
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsyncProcess.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.o \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/NetworkHelper.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PID.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.o \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.o \
@@ -376,8 +381,8 @@ DEP_FILES := LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/ActionData/ActionData.
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Log.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Log/Loggable.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/DriveEncoders.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/IMU.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/LRTEncoder.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Sensors/Trackers.d \
 	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsyncPrinter.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/AsyncProcess.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Console.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PID.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.d \
-	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.d
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/LCD.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/NetworkHelper.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PID.d \
+	 LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/PrintInConstructor.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Profiler.d LRT12_partialImage/$(MODE_DIR)/Objects/LRT12/Util/Util.d
 -include $(DEP_FILES)
 
 
