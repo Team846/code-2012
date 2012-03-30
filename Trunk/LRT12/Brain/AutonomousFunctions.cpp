@@ -386,38 +386,6 @@ bool AutonomousFunctions::bridgeBalance()
 		}
 		m_action->drivetrain->rate.desiredTurnRate = 0.0;
 		break;
-		//	case 1:
-		//		m_action->drivetrain->position.drive_control = false;
-		//		m_action->drivetrain->position.turn_control = false;
-		//		m_action->drivetrain->rate.drive_control = true;
-		//		m_action->drivetrain->rate.turn_control = true;
-		//
-		//		m_action->drivetrain->rate.desiredDriveRate = -0.11 * m_direction;
-		//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-		//		if (fabs(m_action->imu->pitch) < 0.5 || fabs(m_action->imu->pitch) > fabs(lastPitch))
-		//		{
-		//			AsyncPrinter::Printf("Detected\n");
-		//			bridgeTipState++;
-		//			secondPlace = DriveEncoders::GetInstance().getRobotDist();
-		//		}
-		//		break;
-		//	case 2:
-		//		m_action->drivetrain->position.absoluteTranslate = false;
-		//		m_action->drivetrain->position.absoluteTurn = false;
-		//
-		//		m_action->drivetrain->position.drive_control = true;
-		//		m_action->drivetrain->position.turn_control = false;
-		//		m_action->drivetrain->rate.drive_control = true;
-		//		m_action->drivetrain->rate.turn_control = true;
-		//		
-		//		double diff = fabs(firstPlace - secondPlace);
-		//		AsyncPrinter::Printf("Diff %.2f\n", diff);
-		//		m_action->drivetrain->position.desiredRelativeDrivePosition = (diff + 2.0) * m_direction;
-		//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-		//		bridgeTipState++;
-		//		break;
-		//	case 3:
-		//		break;
 	default:
 		bridgeTipState = 0;
 		break;
@@ -527,7 +495,12 @@ bool AutonomousFunctions::autonomousMode()
 		m_action->drivetrain->position.reset_turn_zero = true;
 		M_CYCLES_TO_DELAY
 				= static_cast<int> ((DriverStation::GetInstance()->GetAnalogIn(
-						RobotConfig::DRIVER_STATION::ANALOG::AUTON_DELAY) / 5.0) * 10 * RobotConfig::LOOP_RATE);
+						RobotConfig::DRIVER_STATION::ANALOG::AUTON_DELAY) / 5.0)
+						* 10 * RobotConfig::LOOP_RATE);
+		M_BALLS_TO_SHOOT
+				= ((int) (DriverStation::GetInstance()->GetAnalogIn(
+						RobotConfig::DRIVER_STATION::ANALOG::BALLS_TO_SHOOT)
+						+ 0.5) + 1);
 		m_adj_cyc_delay = M_CYCLES_TO_DELAY;
 		advanceQueue();
 		break;
@@ -545,9 +518,11 @@ bool AutonomousFunctions::autonomousMode()
 		break;
 	case SHOOT:
 		if (/*autoAlign() && */m_action->launcher->ballLaunchCounter
-				< (DriverStation::GetInstance()->GetAnalogIn(RobotConfig::DRIVER_STATION::ANALOG::BALLS_TO_SHOOT) + 0.5)) //0.5 is easy way to round
+				< M_BALLS_TO_SHOOT)
 		{
 			m_action->ballfeed->attemptToLoadRound = true;
+			AsyncPrinter::Printf("Balls shot: %d, Balls to Shoot: %d\r\n",
+					m_action->launcher->ballLaunchCounter, M_BALLS_TO_SHOOT);
 		}
 		else
 		{
@@ -673,8 +648,9 @@ const AutonomousFunctions::autonomousStage
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::SHOOT_THEN_BRIDGE[] =
 		{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, DELAY_HALF_SEC,
-				DELAY_HALF_SEC, DELAY_HALF_SEC, DROP_WEDGE, MOVE_BACK_INIT,
-				WAIT_FOR_POSITION, DELAY_HALF_SEC, RAISE_WEDGE, DONE };
+				DELAY_HALF_SEC, DROP_WEDGE, MOVE_BACK_INIT, WAIT_FOR_POSITION,
+				DELAY_HALF_SEC, DELAY_HALF_SEC, DELAY_HALF_SEC, RAISE_WEDGE,
+				DONE };
 
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::BRIDGE_THEN_SHOOT[] =

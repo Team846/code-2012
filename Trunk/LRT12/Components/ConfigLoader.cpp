@@ -35,10 +35,10 @@ void ConfigLoader::Output()
 		m_action->config->apply = false;
 	}
 
-#if 0
-	static int e = 0;
-	if (++e % 50 == 0 )
-	m_config->CheckForFileUpdates();
+#if 1
+	static int cycleCount = 0;
+	if (++cycleCount % 50 == 0)
+		m_config->CheckForFileUpdates();
 #endif
 }
 

@@ -118,12 +118,10 @@ void Launcher::Output()
 
 		static bool wasAtSpeed = false;
 		// catch falling edge
-		if (wasAtSpeed && !m_action->launcher->atSpeed)
+		if (wasAtSpeed && !m_action->launcher->atSpeed && !m_is_changing_speed
+				&& m_pid.getError() > 0)
 		{
-			if (!m_is_changing_speed)
-			{
-				m_action->launcher->ballLaunchCounter++;
-			}
+			m_action->launcher->ballLaunchCounter++;
 		}
 		wasAtSpeed = m_action->launcher->atSpeed;
 
@@ -174,7 +172,7 @@ void Launcher::log()
 	sdb->PutString(
 			"Launcher State",
 			(m_action->launcher->state == ACTION::LAUNCHER::RUNNING) ? "Running"
-			: "Disabled");
+					: "Disabled");
 
 	sdb->PutString(
 			"Launcher Target",

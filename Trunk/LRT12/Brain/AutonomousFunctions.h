@@ -133,7 +133,7 @@ private:
 	const static int DRIVE_THEN_SHOOT_LENGTH = 10;
 	const static autonomousStage DRIVE_THEN_SHOOT[DRIVE_THEN_SHOOT_LENGTH];
 
-	const static int SHOOT_THEN_BRIDGE_LENGTH = 12;
+	const static int SHOOT_THEN_BRIDGE_LENGTH = 14;
 	const static autonomousStage SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH];
 
 	const static int BRIDGE_THEN_SHOOT_LENGTH = 10;
@@ -175,6 +175,8 @@ private:
 	int m_direction;
 	int m_haf_cyc_delay;
 	int m_adj_cyc_delay, M_CYCLES_TO_DELAY;
+
+	int M_BALLS_TO_SHOOT;
 
 	bool m_hasStartedHoldingPosition;
 
