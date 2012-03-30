@@ -41,6 +41,12 @@ public:
 		WAIT_FOR_POSITION = 9, //!< MOVE_BACK
 		DELAY_HALF_SEC = 10,
 		ADJUSTABLE_DELAY = 11,
+		BACKUP_FOR_BALLS_INIT = 12, //Begin changes on this line
+		HALF_TURN_INIT = 13,
+		LOWER_COLLECTOR = 14,
+		RAISE_COLLECTOR = 15,
+		WAIT_FOR_TURN = 16,
+		STOP = 17,
 		DONE = 0
 	//!< Finished
 	};
@@ -135,6 +141,9 @@ private:
 
 	const static int SHOOT_THEN_BRIDGE_LENGTH = 14;
 	const static autonomousStage SHOOT_THEN_BRIDGE[SHOOT_THEN_BRIDGE_LENGTH];
+
+	const static int SHOOT_THEN_BRIDGE_THEN_SHOOT_LENGTH = 32;
+	const static autonomousStage SHOOT_THEN_BRIDGE_THEN_SHOOT[SHOOT_THEN_BRIDGE_THEN_SHOOT_LENGTH];
 
 	const static int BRIDGE_THEN_SHOOT_LENGTH = 10;
 	const static autonomousStage BRIDGE_THEN_SHOOT[BRIDGE_THEN_SHOOT_LENGTH];

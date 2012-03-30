@@ -588,6 +588,51 @@ bool AutonomousFunctions::autonomousMode()
 		}
 
 		break;
+	case WAIT_FOR_TURN:
+
+		if (m_action->drivetrain->previousTurnOperationComplete)
+		{
+			advanceQueue();
+		}
+
+		break;
+	case BACKUP_FOR_BALLS_INIT:
+		m_action->drivetrain->position.absoluteTranslate = false;
+		m_action->drivetrain->position.absoluteTurn = false;
+		m_action->drivetrain->position.drive_control = true;
+		m_action->drivetrain->position.turn_control = false;
+
+		//need to drive back 140 to have bumper on top of brdige
+		m_action->drivetrain->position.desiredRelativeDrivePosition
+				= -36; //3 ft, why because of fudge!
+		//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
+		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
+		advanceQueue();
+		break;
+	case HALF_TURN_INIT:
+		m_action->drivetrain->position.absoluteTurn = false;
+		m_action->drivetrain->position.absoluteTranslate = false;
+		m_action->drivetrain->position.turn_control = true;
+		m_action->drivetrain->position.drive_control = false;
+
+		m_action->drivetrain->position.desiredRelativeTurnPosition = 180.0; 
+		m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		advanceQueue();
+		break;
+	case LOWER_COLLECTOR:
+		m_action->ballfeed->sweepArmOut = true;
+		advanceQueue();
+		break;
+	case RAISE_COLLECTOR:
+		m_action->ballfeed->sweepArmOut = false;
+		advanceQueue();
+		break;
+	case STOP:
+		m_action->drivetrain->position.turn_control = false;
+		m_action->drivetrain->position.drive_control = false;
+		m_action->drivetrain->rate.drive_control = true;
+		m_action->drivetrain->rate.turn_control = true;
+		break;
 	case DONE:
 #if DEBUG
 		AsyncPrinter::Printf("Finished\r\n");
@@ -650,6 +695,17 @@ const AutonomousFunctions::autonomousStage
 		{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, DELAY_HALF_SEC,
 				DELAY_HALF_SEC, DROP_WEDGE, MOVE_BACK_INIT, WAIT_FOR_POSITION,
 				DELAY_HALF_SEC, DELAY_HALF_SEC, DELAY_HALF_SEC, RAISE_WEDGE,
+				DONE };
+
+const AutonomousFunctions::autonomousStage
+		AutonomousFunctions::SHOOT_THEN_BRIDGE_THEN_SHOOT[] =
+		{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, DELAY_HALF_SEC,
+				DELAY_HALF_SEC, DROP_WEDGE, MOVE_BACK_INIT, WAIT_FOR_POSITION,
+				DELAY_HALF_SEC, DELAY_HALF_SEC, DELAY_HALF_SEC, RAISE_WEDGE,
+				BACKUP_FOR_BALLS_INIT, WAIT_FOR_POSITION, HALF_TURN_INIT, WAIT_FOR_TURN, STOP, LOWER_COLLECTOR, //now we move forward a bit, do a 180 lower ball collector
+				DELAY_HALF_SEC, DELAY_HALF_SEC, DELAY_HALF_SEC, DELAY_HALF_SEC, //delay 2 seconds 
+				RAISE_COLLECTOR, HALF_TURN_INIT, WAIT_FOR_TURN, //do another 180
+				KEY_TRACK, AIM, SHOOT, SHOOT, SHOOT,//keytrack, aim shoot all balls. 
 				DONE };
 
 const AutonomousFunctions::autonomousStage
@@ -720,6 +776,24 @@ char* AutonomousFunctions::getAutonomousStageName(autonomousStage a)
 		break;
 	case DONE:
 		str = "Done";
+		break;
+	case BACKUP_FOR_BALLS_INIT:
+		str = "BACKUP_FOR_BALLS_INIT";
+		break;
+	case HALF_TURN_INIT: 
+		str = "HALF_TURN_INIT";
+		break;
+	case LOWER_COLLECTOR:
+		str = "LOWER_COLLECTOR";
+		break;
+	case RAISE_COLLECTOR:
+		str = "RAISE_COLLECTOR";
+		break;
+	case WAIT_FOR_TURN:
+		str = "WAIT_FOR_TURN";
+		break;
+	case STOP:
+		str = "STOP";
 		break;
 	}
 	return str;
