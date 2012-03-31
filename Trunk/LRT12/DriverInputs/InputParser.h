@@ -18,6 +18,7 @@ private:
 	
 	//Driver stick
 	static const int LOWER_COLLECTOR = 1;
+	static const int AUTO_AIM_DIR   = 2;
 	static const int KEYTRACK 		= 3;
 	static const int AUTOAIM    	= 4;
 	static const int APPLY_CONFIG   = 5;
@@ -32,7 +33,7 @@ private:
 	static const int COLLECT_BALLS        = 2;
 	static const int LOWER_SHOT        	  = 3;
 	static const int HIGH_SPEED           = 4;
-	static const int FENDER_SHOT_SELECT	 	  = 5;
+	static const int FENDER_SHOT_SELECT	  = 5;
 	static const int KEY_SHOT_SELECT	  = 6;
 	static const int DECREMENT_SPEED      = 7;
 	static const int INCREMENT_SPEED 	  = 8;

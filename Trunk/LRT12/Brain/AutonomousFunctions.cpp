@@ -32,6 +32,8 @@ AutonomousFunctions::AutonomousFunctions() :
 	Configure();
 	m_action->imu->pitch = 0.0;
 	m_hasStartedHoldingPosition = false;
+
+	enableLog();
 }
 
 AutonomousFunctions::~AutonomousFunctions()
@@ -439,7 +441,7 @@ bool AutonomousFunctions::keyTrack()
 bool AutonomousFunctions::autoAlign()
 {
 	m_auto_aim_pid.setSetpoint(m_align_setpoint);
-	if (m_action->cam->align.status != ACTION::CAMERA::NO_TARGET)
+	if (m_action->cam->align.status == ACTION::CAMERA::TOP)
 	{
 		double input = m_action->cam->align.arbitraryOffsetFromUDP;
 		m_auto_aim_pid.setInput(input / 127.0);
@@ -479,6 +481,17 @@ bool AutonomousFunctions::autoAlign()
 			}
 			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 		}
+	}
+	else
+	{
+		m_action->drivetrain->rate.drive_control = true;
+		m_action->drivetrain->rate.turn_control = true;
+		m_action->drivetrain->position.drive_control = false;
+		m_action->drivetrain->position.turn_control = false;
+
+		m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		m_action->drivetrain->rate.desiredTurnRate = m_action->auton->turnDir
+				* m_max_align_turn_rate;
 	}
 	return false;
 }
@@ -692,9 +705,9 @@ const AutonomousFunctions::autonomousStage
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::SHOOT_THEN_BRIDGE[] =
 		{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, DELAY_HALF_SEC,
-				DELAY_HALF_SEC, DROP_WEDGE, MOVE_BACK_INIT, WAIT_FOR_POSITION,
-				DELAY_HALF_SEC, DELAY_HALF_SEC, DELAY_HALF_SEC, RAISE_WEDGE,
-				DONE };
+				DELAY_HALF_SEC, DELAY_HALF_SEC, DROP_WEDGE, MOVE_BACK_INIT,
+				WAIT_FOR_POSITION, DELAY_HALF_SEC, DELAY_HALF_SEC,
+				DELAY_HALF_SEC, DONE };
 
 const AutonomousFunctions::autonomousStage AutonomousFunctions::SHOOT_ONLY[] =
 { INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, SHOOT, SHOOT, SHOOT, DONE };

@@ -45,7 +45,6 @@ ESC::brakeAndDutyCycle ESC::CalculateBrakeAndDutyCycle(float desired_speed,
 	brakeAndDutyCycle command;
 
 	command.dutyCycle = 0.0;
-	command.dutyCycle = 0.0;
 
 	if (current_speed < 0)
 	{
@@ -87,6 +86,12 @@ ESC::brakeAndDutyCycle ESC::CalculateBrakeAndDutyCycle(float desired_speed,
 
 void ESC::SetDutyCycle(float dutyCycle)
 {
+	/* Temporarily disable dithered-brake steering */
+//	m_jag1->SetDutyCycle(dutyCycle);
+//	m_jag2->SetDutyCycle(dutyCycle);
+//	return;
+	/* End disable dithered-brake steering */
+
 	//#warning DBS DISABLED
 	//	m_jag1->SetDutyCycle(dutyCycle);
 	//	m_jag2->SetDutyCycle(dutyCycle);

@@ -11,7 +11,9 @@ Launcher::Launcher() :
 
 	m_enc->Start();
 	m_enc->SetMaxPeriod(0.1); // consider stopped if slower than 10rpm
-	Configure();
+
+	m_ball_launch_threshold = 0;
+	m_ball_launch_atspeed = false;
 
 	m_output = 0.0;
 	m_duty_cycle_delta = 0.55;
@@ -21,7 +23,8 @@ Launcher::Launcher() :
 	m_p_conf = ACTION::LAUNCHER::KEY_SHOT_HIGH;
 	m_is_changing_speed = true;
 
-	disableLog();
+	//	disableLog();
+	Configure();
 }
 
 Launcher::~Launcher()
@@ -39,10 +42,12 @@ void Launcher::Configure()
 	double ff = c->Get<double> (m_name, "rollerFF", 1);
 
 	m_speed_threshold = c->Get<double> (m_name, "speedThreshold", 10);
+	m_ball_launch_threshold
+			= c->Get<double> (m_name, "ballSpeedThreshold", 100);
 	m_max_speed = c->Get<double> (m_name, "maxSpeed", 5180);
 	m_action->launcher->speed = c->Get<double> (m_name,
 			"m_action->launcher->speed", 3000);
-	m_atSpeedCycles = c->Get<int> (m_name, "cyclesAtSpeed", 1);
+	m_atSpeedCycles = c->Get<int> (m_name, "cyclesAtSpeed", 10);
 
 	m_speeds[ACTION::LAUNCHER::FAR_FENDER_SHOT_HIGH] = c->Get<double> (m_name,
 			"farFenderHigh", 2000);
@@ -96,14 +101,34 @@ void Launcher::Output()
 		m_output = m_pid.getOutput() / m_max_speed;
 
 		static int atSpeedCounter = 0;
+		static int atBallSpeedCounter = 0;
 		if (fabs(m_pid.getError()) < m_speed_threshold)
 		{
 			atSpeedCounter++;
+			m_pid.setIIREnabled(true);
 		}
 		else
 		{
-			//			AsyncPrinter::Printf("not at speed\n");
 			atSpeedCounter = 0;
+			m_pid.setIIREnabled(false);
+		}
+
+		if (fabs(m_pid.getError() < m_ball_launch_threshold))
+		{
+			atBallSpeedCounter++;
+		}
+		else
+		{
+			atBallSpeedCounter = 0;
+		}
+
+		if (atBallSpeedCounter > m_atSpeedCycles)
+		{
+			m_ball_launch_atspeed = true;
+		}
+		else
+		{
+			m_ball_launch_atspeed = false;
 		}
 
 		if (atSpeedCounter > m_atSpeedCycles)
@@ -118,12 +143,12 @@ void Launcher::Output()
 
 		static bool wasAtSpeed = false;
 		// catch falling edge
-		if (wasAtSpeed && !m_action->launcher->atSpeed && !m_is_changing_speed
+		if (wasAtSpeed && !m_ball_launch_atspeed && !m_is_changing_speed
 				&& m_pid.getError() > 0)
 		{
 			m_action->launcher->ballLaunchCounter++;
 		}
-		wasAtSpeed = m_action->launcher->atSpeed;
+		wasAtSpeed = m_ball_launch_atspeed;
 
 		break;
 	case ACTION::LAUNCHER::DISABLED:
@@ -190,6 +215,8 @@ void Launcher::log()
 #endif // ENABLE_PID_LOGGING
 	sdb->PutString("Launcher Trajectory",
 			(m_action->launcher->isFenderShot) ? "High" : "Low");
+
+	sdb->PutInt("Ballcount", m_action->launcher->ballLaunchCounter);
 
 	sdb->PutBoolean("Launcher at speed", (m_action->launcher->atSpeed));
 #endif

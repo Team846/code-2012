@@ -51,6 +51,8 @@ private:
 	double m_duty_cycle_delta;
 	double m_speed;
 	double m_speed_threshold;
+	double m_ball_launch_threshold;
+	bool m_ball_launch_atspeed;
 	int m_atSpeedCycles;
 
 	double m_speeds[6];

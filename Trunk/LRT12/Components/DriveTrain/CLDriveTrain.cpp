@@ -193,7 +193,10 @@ void ClosedLoopDrivetrain::update()
 	switch (m_turn_control_type)
 	{
 	case CL_POSITION:
-		m_pos_control[TURN]->setInput(ActionData::GetInstance()->imu->yaw); //from -180 to + 180
+		//		m_pos_control[TURN]->setInput(ActionData::GetInstance()->imu->yaw); //from -180 to + 180
+		m_pos_control[TURN]->setInput(
+				fmod(DriveEncoders::GetInstance().getTurnAngle(), 360.0)
+						- 180.0); //from -180 to + 180
 
 		//below code ensures fastest path is chosen. 
 		static int lastState = 0, count = 0;
@@ -465,13 +468,13 @@ void ClosedLoopDrivetrain::log()
 	std::string drivemode;
 	switch (getTranslateMode())
 	{
-		case ClosedLoopDrivetrain::CL_DISABLED:
+	case ClosedLoopDrivetrain::CL_DISABLED:
 		drivemode = "Open Loop";
 		break;
-		case ClosedLoopDrivetrain::CL_RATE:
+	case ClosedLoopDrivetrain::CL_RATE:
 		drivemode = "Rate";
 		break;
-		case ClosedLoopDrivetrain::CL_POSITION:
+	case ClosedLoopDrivetrain::CL_POSITION:
 		drivemode = "Position";
 		break;
 	}
@@ -506,13 +509,13 @@ void ClosedLoopDrivetrain::log()
 	std::string turnmode;
 	switch (getTurnMode())
 	{
-		case ClosedLoopDrivetrain::CL_DISABLED:
+	case ClosedLoopDrivetrain::CL_DISABLED:
 		turnmode = "Open Loop";
 		break;
-		case ClosedLoopDrivetrain::CL_RATE:
+	case ClosedLoopDrivetrain::CL_RATE:
 		turnmode = "Rate";
 		break;
-		case ClosedLoopDrivetrain::CL_POSITION:
+	case ClosedLoopDrivetrain::CL_POSITION:
 		turnmode = "Position";
 		break;
 	}

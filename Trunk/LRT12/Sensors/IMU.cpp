@@ -27,6 +27,7 @@ IMU::IMU(uint8_t address, uint8_t module_num) :
 	//m_dio = new DigitalOutput(RobotConfig::DIGITAL_IO::IMU_CALIBRATE);
 	memset(m_i2c_buf, 0, kNumPackets * 6 + 1);
 	m_time = 0;
+	disableLog();
 }
 
 IMU::~IMU()

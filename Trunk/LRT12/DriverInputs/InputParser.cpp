@@ -80,6 +80,15 @@ void InputParser::ProcessInputs()
 		m_action_ptr->auton->state = ACTION::AUTONOMOUS::TELEOP;
 	}
 
+	if (m_driver_stick->IsButtonDown(AUTO_AIM_DIR))
+	{
+		m_action_ptr->auton->turnDir = ACTION::AUTONOMOUS::COUNTER_CLOCKWISE;
+	}
+	else
+	{
+		m_action_ptr->auton->turnDir = ACTION::AUTONOMOUS::CLOCKWISE;
+	}
+
 	/***************** Drivetrain **********************/
 	if (m_action_ptr->auton->state == ACTION::AUTONOMOUS::TELEOP)
 	{

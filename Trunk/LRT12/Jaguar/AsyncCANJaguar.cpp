@@ -31,6 +31,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	jaguar_list_ = this;
 
 	disableLog();
+	//	enableLog();
 
 	if (name == NULL)
 	{
@@ -42,6 +43,7 @@ AsyncCANJaguar::AsyncCANJaguar(UINT8 channel, const char* name) :
 	}
 
 	//	m_enable_control.disableCaching();
+	//	m_control_mode.disableCaching();
 	//	m_setpoint.disableCaching();
 
 	printf("Created Jaguar %2d: %s\n", channel, m_name);

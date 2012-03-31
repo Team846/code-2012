@@ -20,7 +20,7 @@
 
 #define FANCY_SHIT_ENABLED 1
 
-#define PRINT_TO_FILE_ON_STARTUP 1
+#define PRINT_TO_FILE_ON_STARTUP 0
 
 #if FANCY_SHIT_ENABLED
 #include "Sensors/Trackers.h"
