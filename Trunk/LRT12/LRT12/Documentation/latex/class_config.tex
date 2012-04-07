@@ -1,0 +1,60 @@
+\hypertarget{class_config}{\section{\-Config \-Class \-Reference}
+\label{class_config}\index{\-Config@{\-Config}}
+}
+
+
+\-A \-Singleton that stores and retrieves configuration values from a file.  
+
+
+
+
+{\ttfamily \#include $<$\-Config.\-h$>$}
+
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_config_a99b19da81af9603ca95103b375d5bd90}{void \hyperlink{class_config_a99b19da81af9603ca95103b375d5bd90}{\-Load} ()}\label{class_config_a99b19da81af9603ca95103b375d5bd90}
+
+\begin{DoxyCompactList}\small\item\em \-Updates all the values from the configuration file. \-This may overwrites changes you made. \end{DoxyCompactList}\item 
+\hypertarget{class_config_ab04c51d227c1457404ae9dadc1c576e1}{void \hyperlink{class_config_ab04c51d227c1457404ae9dadc1c576e1}{\-Save} ()}\label{class_config_ab04c51d227c1457404ae9dadc1c576e1}
+
+\begin{DoxyCompactList}\small\item\em \-Saves all the values to the configuration file. \end{DoxyCompactList}\item 
+\hypertarget{class_config_a2064e621e224d1f6053ef7fabe4d4045}{void \hyperlink{class_config_a2064e621e224d1f6053ef7fabe4d4045}{\-Update\-Assignable\-Dials} ()}\label{class_config_a2064e621e224d1f6053ef7fabe4d4045}
+
+\begin{DoxyCompactList}\small\item\em \-Updates the values of the values linked to assignable dials. \end{DoxyCompactList}\item 
+\hypertarget{class_config_ae2af4140fa3482e07978c8f8f023b42d}{{\footnotesize template$<$typename T $>$ }\\\-T \hyperlink{class_config_ae2af4140fa3482e07978c8f8f023b42d}{\-Get} (string section, string key, \-T default\-Value)}\label{class_config_ae2af4140fa3482e07978c8f8f023b42d}
+
+\begin{DoxyCompactList}\small\item\em \-Retreives the value of the given config value. \-You {\bfseries must} specify a default value. \end{DoxyCompactList}\item 
+\hypertarget{class_config_a5d9210c988409c7a95c1c9d0c293daa3}{{\footnotesize template$<$typename T $>$ }\\void \hyperlink{class_config_a5d9210c988409c7a95c1c9d0c293daa3}{\-Set} (string section, string key, \-T val)}\label{class_config_a5d9210c988409c7a95c1c9d0c293daa3}
+
+\begin{DoxyCompactList}\small\item\em \-Sets the value of the given config value. \-This does not save it to the file until you call \hyperlink{class_config_ab04c51d227c1457404ae9dadc1c576e1}{\-Save()}. \end{DoxyCompactList}\item 
+\hypertarget{class_config_a2535a12fc99acdf6d389311955ba8af9}{void \hyperlink{class_config_a2535a12fc99acdf6d389311955ba8af9}{\-Check\-For\-File\-Updates} ()}\label{class_config_a2535a12fc99acdf6d389311955ba8af9}
+
+\begin{DoxyCompactList}\small\item\em updates the file if it has been changed since the last time it has been loaded. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Static \-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_config_a8d16346252818f578e1232bab86cdaef}{static \hyperlink{class_config}{\-Config} \& \hyperlink{class_config_a8d16346252818f578e1232bab86cdaef}{\-Get\-Instance} ()}\label{class_config_a8d16346252818f578e1232bab86cdaef}
+
+\begin{DoxyCompactList}\small\item\em \-The accessor method for the global instance of this class. \end{DoxyCompactList}\item 
+\hypertarget{class_config_ac9bb425d0132c84317e9e3528dbf97fb}{static void \hyperlink{class_config_ac9bb425d0132c84317e9e3528dbf97fb}{\-Register\-Configurable} (\hyperlink{class_configurable}{\-Configurable} $\ast$configurable)}\label{class_config_ac9bb425d0132c84317e9e3528dbf97fb}
+
+\begin{DoxyCompactList}\small\item\em register a listener that is notified when configure all is called. \end{DoxyCompactList}\item 
+\hypertarget{class_config_a93caf01e5a4e8adaef68802ce13161be}{static void \hyperlink{class_config_a93caf01e5a4e8adaef68802ce13161be}{\-Configure\-All} ()}\label{class_config_a93caf01e5a4e8adaef68802ce13161be}
+
+\begin{DoxyCompactList}\small\item\em \-Call the \-Configure() methods of all the registered configurables. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Static \-Public \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_config_a1b3d97e9d23cfbd209a171302eb8bc82}{static const int \hyperlink{class_config_a1b3d97e9d23cfbd209a171302eb8bc82}{k\-Num\-Analog\-Assignable} = 4}\label{class_config_a1b3d97e9d23cfbd209a171302eb8bc82}
+
+\begin{DoxyCompactList}\small\item\em number of analog dials available to the programmer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{\-Detailed \-Description}
+\-A \-Singleton that stores and retrieves configuration values from a file. 
+
+\-The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+\-Config/\-Config.\-h\item 
+\-Config/\-Config.\-cpp\end{DoxyCompactItemize}

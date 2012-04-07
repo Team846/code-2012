@@ -1,0 +1,50 @@
+\hypertarget{class_component}{\section{\-Component \-Class \-Reference}
+\label{class_component}\index{\-Component@{\-Component}}
+}
+\subsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_component_a7d4181cf107d1aee4128dc1c3670d120}{virtual void \hyperlink{class_component_a7d4181cf107d1aee4128dc1c3670d120}{\-Output} ()=0}\label{class_component_a7d4181cf107d1aee4128dc1c3670d120}
+
+\begin{DoxyCompactList}\small\item\em called every time the main loop iterates. \end{DoxyCompactList}\item 
+\hypertarget{class_component_a66794e7955105c819bb50c0cf0073192}{virtual string \hyperlink{class_component_a66794e7955105c819bb50c0cf0073192}{\-Get\-Name} ()=0}\label{class_component_a66794e7955105c819bb50c0cf0073192}
+
+\begin{DoxyCompactList}\small\item\em returns the name of the component which is helpful for debugging and profiling. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Static \-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+static list$<$ \-Component\-With\-Data $>$ $\ast$ \hyperlink{class_component_ab6f5ceb93adde86d8f93beb42cccb832}{\-Create\-Components} ()
+\begin{DoxyCompactList}\small\item\em the \-Factory method that constructs all the components. \-This makes it so that the main loop does not have to know about the individual components. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{\-Protected \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_action_data}{\-Action\-Data} $\ast$ \hyperlink{class_component_a16168a59f8d8e139632df65c2eb90dd4}{action}
+\end{DoxyCompactItemize}
+
+
+\subsection{\-Member \-Function \-Documentation}
+\hypertarget{class_component_ab6f5ceb93adde86d8f93beb42cccb832}{\index{\-Component@{\-Component}!\-Create\-Components@{\-Create\-Components}}
+\index{\-Create\-Components@{\-Create\-Components}!Component@{\-Component}}
+\subsubsection[{\-Create\-Components}]{\setlength{\rightskip}{0pt plus 5cm}static list$<$\-Component\-With\-Data$>$$\ast$ {\bf \-Component\-::\-Create\-Components} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}static\mbox{]}}}}\label{class_component_ab6f5ceb93adde86d8f93beb42cccb832}
+
+
+the \-Factory method that constructs all the components. \-This makes it so that the main loop does not have to know about the individual components. 
+
+\begin{DoxyReturn}{\-Returns}
+a list structs with components and information about the components. \-The information about the component includes whether the output method should be called if the robot is disabled as well as which digital io on the driverstation should disable this component. 
+\end{DoxyReturn}
+
+
+\subsection{\-Member \-Data \-Documentation}
+\hypertarget{class_component_a16168a59f8d8e139632df65c2eb90dd4}{\index{\-Component@{\-Component}!action@{action}}
+\index{action@{action}!Component@{\-Component}}
+\subsubsection[{action}]{\setlength{\rightskip}{0pt plus 5cm}{\bf \-Action\-Data}$\ast$ {\bf \-Component\-::action}\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}\label{class_component_a16168a59f8d8e139632df65c2eb90dd4}
+a reference to the \hyperlink{class_action_data}{\-Action\-Data} class which contains the commands for all the components. 
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\-Components/\-Component.\-h\end{DoxyCompactItemize}
