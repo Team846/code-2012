@@ -45,8 +45,6 @@ void Launcher::Configure()
 	m_ball_launch_threshold
 			= c->Get<double> (m_name, "ballSpeedThreshold", 100);
 	m_max_speed = c->Get<double> (m_name, "maxSpeed", 5180);
-	m_action->launcher->speed = c->Get<double> (m_name,
-			"m_action->launcher->speed", 3000);
 	m_atSpeedCycles = c->Get<int> (m_name, "cyclesAtSpeed", 10);
 
 	m_speeds[ACTION::LAUNCHER::FAR_FENDER_SHOT_HIGH] = c->Get<double> (m_name,

@@ -491,7 +491,7 @@ bool AutonomousFunctions::autoAlign()
 
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 		m_action->drivetrain->rate.desiredTurnRate = m_action->auton->turnDir
-				* m_max_align_turn_rate;
+				* m_min_align_turn_rate;
 	}
 	return false;
 }
@@ -712,6 +712,9 @@ const AutonomousFunctions::autonomousStage
 const AutonomousFunctions::autonomousStage AutonomousFunctions::SHOOT_ONLY[] =
 { INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, SHOOT, SHOOT, SHOOT, DONE };
 
+const AutonomousFunctions::autonomousStage AutonomousFunctions::BRIDGE_ONLY[] =
+{ INIT, ADJUSTABLE_DELAY, DROP_WEDGE, MOVE_BACK_INIT, WAIT_FOR_POSITION, DONE };
+
 const AutonomousFunctions::autonomousStage
 		AutonomousFunctions::SHOOT_THEN_BRIDGE_THEN_SHOOT[] =
 		{ INIT, ADJUSTABLE_DELAY, /*KEY_TRACK, AIM,*/SHOOT, DELAY_HALF_SEC,
@@ -753,6 +756,9 @@ void AutonomousFunctions::loadQueue()
 		AsyncPrinter::Printf("Shoot only\r\n");
 		break;
 	case 4:
+		sequence = BRIDGE_ONLY;
+		AsyncPrinter::Printf("Bridge only\r\n");
+		break;
 	case 5:
 		sequence = SHOOT_THEN_BRIDGE_THEN_SHOOT;
 		AsyncPrinter::Printf("Shoot then bridge then shoot\r\n");

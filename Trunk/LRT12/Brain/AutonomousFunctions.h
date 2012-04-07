@@ -145,6 +145,9 @@ private:
 	const static int SHOOT_ONLY_LENGTH = 14;
 	const static autonomousStage SHOOT_ONLY[SHOOT_ONLY_LENGTH];
 
+	const static int BRIDGE_ONLY_LENGTH = 14;
+	const static autonomousStage BRIDGE_ONLY[BRIDGE_ONLY_LENGTH];
+
 	const static int SHOOT_THEN_BRIDGE_THEN_SHOOT_LENGTH = 32;
 	const static autonomousStage
 			SHOOT_THEN_BRIDGE_THEN_SHOOT[SHOOT_THEN_BRIDGE_THEN_SHOOT_LENGTH];

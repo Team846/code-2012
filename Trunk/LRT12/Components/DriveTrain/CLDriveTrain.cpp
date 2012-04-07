@@ -193,10 +193,13 @@ void ClosedLoopDrivetrain::update()
 	switch (m_turn_control_type)
 	{
 	case CL_POSITION:
-		//		m_pos_control[TURN]->setInput(ActionData::GetInstance()->imu->yaw); //from -180 to + 180
+#if USE_IMU_FOR_TURN_CONTROL
+		m_pos_control[TURN]->setInput(ActionData::GetInstance()->imu->yaw); //from -180 to + 180
+#else
 		m_pos_control[TURN]->setInput(
 				fmod(DriveEncoders::GetInstance().getTurnAngle(), 360.0)
 						- 180.0); //from -180 to + 180
+#endif
 
 		//below code ensures fastest path is chosen. 
 		static int lastState = 0, count = 0;

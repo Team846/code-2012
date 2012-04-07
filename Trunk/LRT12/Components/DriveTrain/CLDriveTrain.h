@@ -7,6 +7,8 @@
 #include "../../Util/PID.h"
 #include "../../Log/Loggable.h"
 
+#define USE_IMU_FOR_TURN_CONTROL 0
+
 /*!
  * @brief implements a closed-loop drivetrain
  * @brief DOES implement absolute position control

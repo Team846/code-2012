@@ -81,8 +81,8 @@ void BallFeeder::Output()
 		if (m_action->launcher->atSpeed)
 		{
 			Pneumatics::getInstance()->setPressurePlate(true);
-			front = (m_fwd_duty[FRONT]);
-			back = (m_fwd_duty[BACK]);
+			front = (m_feeding_duty[FRONT]);
+			back = (m_feeding_duty[BACK]);
 		}
 		else
 		{
@@ -110,10 +110,18 @@ void BallFeeder::Output()
 void BallFeeder::Configure()
 {
 	Config * c = Config::GetInstance();
-	m_fwd_duty[FRONT] = c->Get<double> (m_configsection, "front_fwd_duty", 0.3);
-	m_fwd_duty[BACK] = c->Get<double> (m_configsection, "back_fwd_duty", 0.3);
+	m_fwd_duty[FRONT] = c->Get<double> (m_configsection, "front_fwd_duty", 0.6);
+	m_fwd_duty[BACK] = c->Get<double> (m_configsection, "back_fwd_duty", 0.6);
 	m_fwd_duty[INTAKE] = c->Get<double> (m_configsection, "intake_fwd_duty",
 			1.0);
+
+	m_feeding_duty[FRONT] = c->Get<double> (m_configsection, "front_feed_duty",
+			1.0);
+	m_feeding_duty[BACK] = c->Get<double> (m_configsection, "back_feed_duty",
+			1.0);
+	m_feeding_duty[INTAKE] = c->Get<double> (m_configsection,
+			"intake_feed_duty", 0.0);
+
 	m_rev_duty[FRONT]
 			= c->Get<double> (m_configsection, "front_rev_duty", -0.3);
 	m_rev_duty[BACK] = c->Get<double> (m_configsection, "back_rev_duty", -0.3);

@@ -134,7 +134,7 @@ void InputParser::ProcessInputs()
 		if (m_action_ptr->launcher->isFenderShot)
 		{
 			m_action_ptr->launcher->desiredTarget
-					= ACTION::LAUNCHER::FENDER_SHOT_HIGH;
+					= ACTION::LAUNCHER::FAR_FENDER_SHOT_HIGH;
 		}
 		else
 		{
