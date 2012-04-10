@@ -23,14 +23,8 @@ AsyncPrinter::AsyncPrinter()
 
 AsyncPrinter::~AsyncPrinter()
 {
-	if (running_)
-		printerTask->Stop();
-
-	semDelete(semaphore_);
-
-	//For some reason, this destructor isn't getting called when the robot task is killed -dg
-	// I never see this line printed.  Hence the call to Aysync...Quit() in the rebot dtor
-	printf("Async Printer deleted");
+	// Printer is static, so we can't delete it...
+	// task killed upon quitting
 }
 
 int AsyncPrinter::Printf(const char* format, ...)
@@ -79,6 +73,22 @@ int AsyncPrinter::Printf(const char* format, ...)
 void AsyncPrinter::Quit()
 {
 	Instance().quitting_ = true;
+	
+//	while(Instance().running_) ;
+	Wait(0.010); // wait for task to finish
+	
+	// kill if the task is still running
+	if (Instance().running_)
+	{
+		Instance().printerTask->Stop();
+		printf("[WARNING] AsyncPrinter task killed.\n");
+	}
+	
+	semDelete(Instance().semaphore_);
+
+	//For some reason, this destructor isn't getting called when the robot task is killed -dg
+	// I never see this line printed.  Hence the call to Aysync...Quit() in the rebot dtor
+	printf("Async Printer deleted\n\n");
 }
 
 int AsyncPrinter::PrinterTaskWrapper()
@@ -89,8 +99,9 @@ int AsyncPrinter::PrinterTaskWrapper()
 #endif
 	Instance().running_ = true;
 	int status = Instance().PrinterTask();
+	printf("AsyncPrinter: Stopping Async Printing\n");
 	Instance().running_ = false;
-	printf("Stopping Async Printing\n");
+	
 	return status;
 }
 

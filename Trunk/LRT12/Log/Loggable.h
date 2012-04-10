@@ -3,7 +3,7 @@
 
 #include "Log.h"
 
-#define LOGGING_ENABLED 0
+#define LOGGING_ENABLED 1
 
 #if LOGGING_ENABLED
 #include "WPILib/SmartDashboard/SmartDashboard.h"

@@ -164,7 +164,9 @@ void Profiler::work()
 		else
 		{
 #endif
+#if PROFILE_DO_PRINT
 			PrintProfiledData(&current);
+#endif
 #if PROFILE_TO_FILE
 		}
 #endif

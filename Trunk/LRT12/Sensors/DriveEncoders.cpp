@@ -82,6 +82,14 @@ double DriveEncoders::getNormalizedLowGearTurningSpeed()
 double DriveEncoders::getTurningSpeed()
 {
 	// WPILib GetRate error still exists with LRTEncoder?
+
+	/* testing purposes */
+	//double d = m_encoder_right->GetRate() - m_encoder_left->GetRate();
+	
+	//AsyncPrinter::Printf("turn: blah");
+	
+	//return d;
+	
 	return m_encoder_right->GetRate() - m_encoder_left->GetRate();
 }
 

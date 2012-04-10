@@ -13,7 +13,6 @@ LRTRobot12::LRTRobot12() :
 					"LRTRobot Destroyed\n\n"), dc_CANBus_("CANbus\n"),
 			lastMember_("LRTRobot.LastMember\n") //trace constructor.
 {
-
 #if PRINT_TO_FILE_ON_STARTUP
 	std::ofstream fout("start.txt", std::fstream::app);
 	fout << "started\n";

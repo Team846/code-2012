@@ -547,8 +547,9 @@ bool AutonomousFunctions::autonomousMode()
 		m_action->wedge->state = ACTION::WEDGE::PRESET_BOTTOM;
 		m_action->drivetrain->position.absoluteTranslate = false;
 		m_action->drivetrain->position.absoluteTurn = false;
+		
 		m_action->drivetrain->position.drive_control = true;
-		m_action->drivetrain->position.turn_control = false;
+		m_action->drivetrain->position.turn_control = true;
 
 		//need to drive back 140 to have bumper on top of brdige
 		m_action->drivetrain->position.desiredRelativeDrivePosition

@@ -8,6 +8,7 @@
 #include "AsyncPrinter.h"
 #include "../Config/RobotConfig.h"
 
+#define PROFILE_DO_PRINT 0
 #define PROFILE_TO_FILE 0
 
 const char * const PROFILER_FILE_NAME = "profiler.txt";

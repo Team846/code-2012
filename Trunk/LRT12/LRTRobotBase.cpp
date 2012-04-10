@@ -65,8 +65,9 @@ LRTRobotBase::~LRTRobotBase()
 	delete m_imu;
 #endif
 
-	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
 	AsyncPrinter::Quit();
+	
+	printf("Deleting LRTRobotBase\n\n"); //should be our last access to the program.
 }
 
 /**
