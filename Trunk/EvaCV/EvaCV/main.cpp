@@ -5,6 +5,11 @@
 using namespace std;
 
 
+typedef struct targetInfo
+{
+	double x, y, d;
+};
+
 int main()
 {
 	//doodle();
@@ -34,13 +39,20 @@ int main()
 	cvCreateTrackbar("threshold (not used)", "binary", &binaryThreshold, 255, NULL);
 
 	int areaThreshold = 115;
-	cvCreateTrackbar("area threshold", "de-dotted", &areaThreshold, 200, NULL);
+	cvCreateTrackbar("area", "final", &areaThreshold, 200, NULL);
 
 	int cornerThreshold = 50;
 	cvCreateTrackbar("corner", "final", &cornerThreshold, 500, NULL);
 
+	int topThreshold = 200;
+	cvCreateTrackbar("top", "final", &topThreshold, 500, NULL);
+
 	CvMemStorage* blob_storage = cvCreateMemStorage( 0 );    // container of retrieved contours
 
+	CvSeq* contours         = NULL;
+	CvScalar black          = CV_RGB( 0, 0, 0 ); // black color
+	CvScalar white          = CV_RGB( 255, 255, 255);   // white color
+	CvScalar gray           = CV_RGB( 124, 124, 124);   // white color
 
 	int key = -1;
 	while(key==-1)
@@ -55,14 +67,12 @@ int main()
 
 		/********************** Remove small blobs *********************************/
 		
-		CvSeq* contours         = NULL;
-		CvScalar black          = CV_RGB( 0, 0, 0 ); // black color
-		CvScalar white          = CV_RGB( 255, 255, 255);   // white color
-		CvScalar gray           = CV_RGB( 124, 124, 124);   // white color
+		
 		double area;
 
 		cvFindContours( binary, blob_storage, &contours, sizeof( CvContour ), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE );
 		//contours = cvApproxPoly(contours, sizeof(CvContour), blob_storage, CV_POLY_APPROX_DP, 3, 1);
+		vector<targetInfo> targets;
 		while( contours )   // loop over all the contours
 		{
 			area = cvContourArea( contours, CV_WHOLE_SEQ );
@@ -115,20 +125,25 @@ int main()
 				cvCircle(binary, points[topLeft], 10, white);
 				cvCircle(binary, points[topRight], 10, white);
 
-				double x_mid = points[bottomLeft].x + points[bottomRight].x + points[topLeft].x + points[topRight].x;
-				x_mid /= 4;
+				targetInfo result;
+				result.x = points[bottomLeft].x + points[bottomRight].x + points[topLeft].x + points[topRight].x;
+				result.x /= 4;
+
+				result.y = points[bottomLeft].y + points[bottomRight].y + points[topLeft].y + points[topRight].y;
+				result.y /= 4;
 
 				//distance is sorta proportional to the real distance. It should be close enough.
-				double distance = points[topLeft].y - points[bottomLeft].y + points[topRight].y - points[topLeft].y;
-				
+				result.y = points[topLeft].y - points[bottomLeft].y + points[topRight].y - points[topLeft].y;
+
+				targets.push_back(result);
 
 				//cout << "Done" << endl;	
 				cvFillConvexPoly(binary, points, hull->total, white);
 				
 				CvPoint a, b;
-				a.x = x_mid;
+				a.x = result.x;
 				a.y = points[topRight].y;
-				b.x = x_mid;
+				b.x = result.x;
 				b.y = points[bottomLeft].y;
 				cvLine(binary, a, b, black, 1);
 				
@@ -139,6 +154,26 @@ int main()
 			}
 			contours = contours->h_next;    // jump to the next contour
 		}
+
+		//process the targets vector
+		int maxIndex = 0;
+		for (int i = 0; i < targets.size(); i++)
+		{
+			if (targets[i].y > targets[maxIndex].y)
+				maxIndex = i;
+		}
+		if (targets[maxIndex].y > topThreshold)//Or less than distance threshold if we need close up shooting
+		{
+			//Be happy! And send this back to the cRio of course. 
+		}
+
+
+		CvPoint a, b;
+		a.x = cvGetSize(binary).width;
+		a.y = topThreshold;
+		b.x = 0;
+		b.y = topThreshold;
+		cvLine(binary, a, b, gray, 1);
 		cvShowImage("final", binary);
 		
 		key = cvWaitKey(20);

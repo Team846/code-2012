@@ -1,0 +1,48 @@
+#include <opencv.hpp>
+#include <stdio.h>
+using namespace std;
+
+#define CALC_POS(y, x, width) (y*width + x) 
+
+/* get reference to pixel at (col,row),
+for multi-channel images (col) should be multiplied by number of channels */
+#undef CV_IMAGE_ELEM
+#define CV_IMAGE_ELEM( image, color, row, col ) \
+	(*((image)->imageData + (image)->widthStep*(row)+(col)*((image)->widthStep/(image)->width)+(color)))
+	
+#define BLUE_CHANNEL 0
+#define GREEN_CHANNEL 1
+#define RED_CHANNEL 2
+
+
+int main()
+{
+    // Open the file.
+	CvCapture * pCapture; //new OpenCV capture stream
+	IplImage * pVideoFrame; //new OpenCV image
+	
+	pCapture = cvCaptureFromCAM(0); 
+
+	cvNamedWindow( "video", CV_WINDOW_AUTOSIZE );
+	cvNamedWindow( "grey", CV_WINDOW_AUTOSIZE );
+
+	int key = -1;
+	while(key==-1)
+	{
+		pVideoFrame = cvQueryFrame(pCapture);
+		
+		IplImage * grayscale_img = cvCreateImage(cvSize(pVideoFrame->width, pVideoFrame->height), IPL_DEPTH_8U, 1);
+		cvCvtColor(pVideoFrame, grayscale_img, CV_RGB2GRAY);
+		
+		cvShowImage( "video", pVideoFrame);
+		cvShowImage( "grey", grayscale_img);
+
+		key = cvWaitKey(20);
+	}
+
+	/*cvReleaseImage( &pVideoFrame );
+	cvReleaseCapture ( &pCapture );
+	cvDestroyWindow( "video" );*/
+        
+        return 0;
+}

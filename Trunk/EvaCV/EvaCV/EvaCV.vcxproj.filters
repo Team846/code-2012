@@ -18,5 +18,19 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tony.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="back.txt">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\..\..\..\AppData\Local\Temp\qd5kx6tb.bmp">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\..\..\..\..\Downloads\exposure_on-4.png">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
