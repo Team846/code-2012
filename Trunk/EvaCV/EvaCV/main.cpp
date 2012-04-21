@@ -7,103 +7,111 @@ using namespace std;
 
 typedef struct targetInfo
 {
-	double x, y, d;
+	double x, y;
+	double height, width;
 };
+
+#define DEBUG 1
 
 int main()
 {
-	//doodle();
-
-    // Open the file.
 	CvCapture * pCapture; //new OpenCV capture stream
 	IplImage * pVideoFrame; //new OpenCV image
 	
 	pCapture = cvCaptureFromCAM(0); 
-	//pCapture = cvCaptureFromFile("C:\\Users\\Name\\Documents\\Visual Studio 2010\\Projects\\EvaCV\\EvaCV\\exposure_on-4.png");
 	
-	//pVideoFrame = cvLoadImage("C:\\Users\\Name\\Documents\\Visual Studio 2010\\Projects\\EvaCV\\EvaCV\\exposure_on-4.bmp");
+#if DEBUG
 	pVideoFrame = cvLoadImage("C:\\Users\\Name\\Documents\\Visual Studio 2010\\Projects\\EvaCV\\EvaCV\\exposure_on-4 - Copy.png");
+#else
+	pVideoFrame = cvQueryFrame(pCapture);
+#endif
 	IplImage* grayscale = cvCreateImage( cvGetSize(pVideoFrame), 8, 1 );
-	
 	IplImage* binary = cvCreateImage(cvGetSize(pVideoFrame), IPL_DEPTH_8U, 1);
 
-	IplImage* dst = cvCreateImage( cvGetSize(pVideoFrame), 8, 1 );
-    IplImage* color_dst = cvCreateImage( cvGetSize(pVideoFrame), 8, 3 );
-	IplImage* harris_dst = cvCreateImage( cvGetSize(pVideoFrame), 8, 3 );
 
+	int binaryThreshold = 40;
+	int areaThreshold = 115;
+	int cornerThreshold = 50;
+	int topThreshold = 200;
+
+#if DEBUG
 	cvNamedWindow("original");
 	cvNamedWindow("binary");
 	cvNamedWindow("final");
-	
-	int binaryThreshold = 40;
+
 	cvCreateTrackbar("threshold (not used)", "binary", &binaryThreshold, 255, NULL);
-
-	int areaThreshold = 115;
 	cvCreateTrackbar("area", "final", &areaThreshold, 200, NULL);
-
-	int cornerThreshold = 50;
 	cvCreateTrackbar("corner", "final", &cornerThreshold, 500, NULL);
-
-	int topThreshold = 200;
 	cvCreateTrackbar("top", "final", &topThreshold, 500, NULL);
+#endif
 
-	CvMemStorage* blob_storage = cvCreateMemStorage( 0 );    // container of retrieved contours
+	CvMemStorage* storage = cvCreateMemStorage( 0 );  
 
 	CvSeq* contours         = NULL;
-	CvScalar black          = CV_RGB( 0, 0, 0 ); // black color
-	CvScalar white          = CV_RGB( 255, 255, 255);   // white color
-	CvScalar gray           = CV_RGB( 124, 124, 124);   // white color
+	CvScalar black          = CV_RGB( 0, 0, 0 ); 
+	CvScalar white          = CV_RGB( 255, 255, 255);   
+	CvScalar gray           = CV_RGB( 124, 124, 124);   
 
 	int key = -1;
 	while(key==-1)
 	{
+
+#if DEBUG
 		cvShowImage("original", pVideoFrame);
+#else
+		pVideoFrame = cvQueryFrame(pCapture);
+#endif
 		
 		//Convert to a binary image
 		cvCvtColor(pVideoFrame, grayscale, CV_BGR2GRAY);
 		cvThreshold(grayscale, binary, binaryThreshold, 255, CV_THRESH_BINARY | CV_THRESH_OTSU); //chooses best threshold automagically
 		cvDilate(binary, binary);
+#if DEBUG
 		cvShowImage("binary", binary);
-
-		/********************** Remove small blobs *********************************/
+#endif
 		
 		
 		double area;
 
-		cvFindContours( binary, blob_storage, &contours, sizeof( CvContour ), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE );
-		//contours = cvApproxPoly(contours, sizeof(CvContour), blob_storage, CV_POLY_APPROX_DP, 3, 1);
+		//Find all the blobs
+		cvFindContours( binary, storage, &contours, sizeof( CvContour ), CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE );
+		
 		vector<targetInfo> targets;
-		while( contours )   // loop over all the contours
+		while( contours )   // loop over all the blobs
 		{
 			area = cvContourArea( contours, CV_WHOLE_SEQ );
-			if( fabs( area ) <= areaThreshold)  // if the area of the contour is less than threshold remove it
+#if DEBUG
+			if( fabs( area ) <= areaThreshold)  // if the area of the contour is less than threshold, count it as noise
 			{
 				// draws the contours into a new image
-				cvDrawContours( binary, contours, black, black, -1, CV_FILLED, 8 ); // removes white dots
+				cvDrawContours( binary, contours, black, black, -1, CV_FILLED, 8 ); // removes white dots, on image, only needed for debug
 			}
 	        else
+#endif
 			{
+#if DEBUG
 				cvDrawContours( binary, contours, white, white, -1, CV_FILLED, 8 ); // fills in holes
+#endif				
 				CvSeq* hull;
 				hull = cvConvexHull2( contours,0,  
                              CV_COUNTER_CLOCKWISE,  
-                             0);
+                             0); //find a convex hull around this blob
 				
-				CvPoint* points = new CvPoint[hull->total];
-				CvPoint pt0 = **CV_GET_SEQ_ELEM( CvPoint*, hull, hull->total - 1 );
-				//points[hull->total - 1] = pt0;
+				CvPoint* points = new CvPoint[hull->total]; //this is going to store all the points that define the convex hull
+				
 				for( int i = 0; i < hull->total; i++ )
 				{
 					CvPoint pt = **CV_GET_SEQ_ELEM( CvPoint*, hull, i );
 					points[i] = pt;
 				}
-				//int * scores = icvFast9Score((unsigned char * )(binary->imageData), cvGetSize(pVideoFrame).width, points, hull->total, cornerThreshold);
+				
 				int bottomLeft = 0;
 				int bottomRight = 0;
 				int topLeft = 0;
 				int topRight = 0;
 
-				for( int i = 0; i < hull->total; i++ )
+				//iterate through the hull points, and find the ones that are the best corners for the target
+				for( int i = 1; i < hull->total; i++ )
 				{	
 					if ( points[i].x + points[i].y > points[topRight].x + points[topRight].y)
 						topRight = i;
@@ -113,17 +121,13 @@ int main()
 						topLeft = i;
 					if (points[i].y - points[i].x < points[bottomRight].y - points[bottomRight].x)
 						bottomRight = i;
-					//cout << scores[i] << endl;
-					//if (scores[i] > 253)//detected as a corner
-					{ //is a candidate point
-						//cout << scores[i] << endl;
-						//cvCircle(binary, points[i], 10, white);
-					}
 				}
+#if DEBUG
 				cvCircle(binary, points[bottomLeft], 10, white);
 				cvCircle(binary, points[bottomRight], 10, white);
 				cvCircle(binary, points[topLeft], 10, white);
 				cvCircle(binary, points[topRight], 10, white);
+#endif
 
 				targetInfo result;
 				result.x = points[bottomLeft].x + points[bottomRight].x + points[topLeft].x + points[topRight].x;
@@ -133,24 +137,21 @@ int main()
 				result.y /= 4;
 
 				//distance is sorta proportional to the real distance. It should be close enough.
-				result.y = points[topLeft].y - points[bottomLeft].y + points[topRight].y - points[topLeft].y;
+				result.height = points[topLeft].y - points[bottomLeft].y + points[topRight].y - points[topLeft].y;
+				result.width  = points[topRight].x - points[topLeft].x + points[bottomRight].x - points[bottomLeft].x;
 
 				targets.push_back(result);
 
-				//cout << "Done" << endl;	
+#if DEBUG
 				cvFillConvexPoly(binary, points, hull->total, white);
-				
+		
 				CvPoint a, b;
 				a.x = result.x;
 				a.y = points[topRight].y;
 				b.x = result.x;
 				b.y = points[bottomLeft].y;
 				cvLine(binary, a, b, black, 1);
-				
-				//cvDrawContours( binary, contours, gray, gray , -1, CV_FILLED, 8 );
-				
-				//CvSeq* poly = 
-				//cvFillConvexPoly(binary, poly->first, poly->total, gray);
+#endif
 			}
 			contours = contours->h_next;    // jump to the next contour
 		}
@@ -167,7 +168,7 @@ int main()
 			//Be happy! And send this back to the cRio of course. 
 		}
 
-
+#if DEBUG
 		CvPoint a, b;
 		a.x = cvGetSize(binary).width;
 		a.y = topThreshold;
@@ -175,14 +176,15 @@ int main()
 		b.y = topThreshold;
 		cvLine(binary, a, b, gray, 1);
 		cvShowImage("final", binary);
-		
+#endif		
 		key = cvWaitKey(20);
 		
 	}
 
 	cvReleaseImage( &pVideoFrame );
 	cvReleaseCapture ( &pCapture );
+#if DEBUG
 	cvDestroyWindow( "video" );
-
-        return 0;
+#endif
+    return 0;
 }
