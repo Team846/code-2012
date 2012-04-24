@@ -555,7 +555,8 @@ bool AutonomousFunctions::autonomousMode()
 		m_action->drivetrain->position.desiredRelativeDrivePosition
 				= m_drive_back_distance; //136 distance  - 3 in
 		//		m_action->drivetrain->position.desiredRelativeDrivePosition = -120; //TODO Check me
-		m_action->drivetrain->position.desiredRelativeTurnPosition = 0;
+		m_action->drivetrain->position.desiredRelativeTurnPosition = 0.0;
+		m_action->drivetrain->rate.desiredTurnRate = 0.0;
 		advanceQueue();
 		break;
 	case MOVE_TO_FENDER_INIT:
