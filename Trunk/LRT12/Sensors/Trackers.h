@@ -105,7 +105,7 @@ private:
 	struct sockaddr_in m_server_address;
 	struct sockaddr_in m_client_address;
 	int m_address_length;
-	char m_input_buffer[7];
+	char m_input_buffer[200];
 
 	bool m_task_is_done;
 	bool m_is_running;
@@ -113,12 +113,17 @@ private:
 	uint8_t m_key_value_r;
 	uint8_t m_key_value_b;
 
-	int8_t m_target_slop;
+	int8_t m_target_slop; 
+	double m_target_x;
 	bool m_target_top;
 
 	int m_key_missed_packets;
 	int m_target_missed_packets;
 
+	typedef struct {
+		uint32_t x, y, distance;
+	} TargetInfo;
+	
 	DISALLOW_COPY_AND_ASSIGN(Trackers);
 };
 #endif // TRACKERS_H_

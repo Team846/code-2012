@@ -1,4 +1,5 @@
 #include "Trackers.h"
+#include <math.h>
 
 #define DEBUG 0
 
@@ -73,21 +74,49 @@ void Trackers::listen()
 		uint8_t header = m_input_buffer[0];
 
 		int pid = -1;
-
+		int lowestYIndex = 0;
+		
 		switch (header)
 		{
 		case 0:
-			pid = ((m_input_buffer[1] << 24) | (m_input_buffer[2] << 16)
-					| (m_input_buffer[3] << 8) | (m_input_buffer[4] << 0));
+			pid = m_input_buffer[1];
 
 			if (pid - 1 != target_lastPacketID)
 			{
 				m_target_missed_packets = pid - target_lastPacketID - 1;
 			}
+			int numTargets = m_input_buffer[2];
+			int ms_to_process = m_input_buffer[3];
+			
+			TargetInfo *targets = new TargetInfo[numTargets];
+			
+			if (numTargets == 0)
+				break;
+			uint32_t *tmp = (uint32_t *) &m_input_buffer[4];
+			for (int i = 0; i < numTargets; i++)
+			{
+				targets[i].x = ntohl(*tmp);
+				tmp++;
+				targets[i].y = ntohl(*tmp);
+				tmp++;
 
-			m_target_slop = (int8_t) m_input_buffer[5];
-			m_target_top = m_input_buffer[6];
-
+				targets[i].distance = ntohl(*tmp);
+				tmp++;
+			}
+			//take the highest square (lowest y)
+			for (int i = 1; i < numTargets; i++)
+			{
+				if (targets[i].y < targets[lowestYIndex].y)
+					lowestYIndex = i;																					
+			}
+			m_target_x = targets[lowestYIndex].x;
+			
+			static int e = 0;
+			if (e++%10 == 0)
+			{
+				AsyncPrinter::Printf("num Targets: %d Time to execute : %d ms\n", numTargets, ms_to_process);
+				AsyncPrinter::Printf("x: %d y: %d dist:%d \n", targets[lowestYIndex].x, targets[lowestYIndex].y, targets[lowestYIndex].y);
+			}
 			target_lastPacketID = pid;
 
 			break;
@@ -126,6 +155,7 @@ void Trackers::update()
 	c->key.blue = getKeyValue(BLUE);
 	c->key.red = getKeyValue(RED);
 	c->key.higher = getKeyValue(HIGHER);
+	
 	c->align.arbitraryOffsetFromUDP = getTargetOffset();
 	if (c->align.arbitraryOffsetFromUDP == ACTION::CAMERA::INVALID_DATA)
 	{
