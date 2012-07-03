@@ -64,11 +64,10 @@ void InputParser::ProcessInputs()
 	}
 	else if (m_driver_stick->IsButtonDown(KEYTRACK))
 	{
-		if (hasBeenReleased)
-		{
+			m_action_ptr->ballfeed->feeder_state = ACTION::BALLFEED::FEEDING;
 			m_action_ptr->auton->state = ACTION::AUTONOMOUS::KEYTRACK;
-		}
-		hasBeenReleased = false;
+			m_action_ptr->drivetrain->rate.desiredDriveRate = pow(
+					-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
 	}
 	else if (m_driver_stick->IsButtonDown(POSITION_HOLD))
 	{

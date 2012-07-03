@@ -123,7 +123,7 @@ private:
 	typedef struct {
 		uint32_t x, y, distance;
 	} TargetInfo;
-	
+
 	DISALLOW_COPY_AND_ASSIGN(Trackers);
 };
 #endif // TRACKERS_H_

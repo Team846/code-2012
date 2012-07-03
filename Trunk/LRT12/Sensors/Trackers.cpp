@@ -75,6 +75,8 @@ void Trackers::listen()
 
 		int pid = -1;
 		int lowestYIndex = 0;
+		int ms_to_process = 0;
+		uint32_t *tmp = 0;
 		
 		switch (header)
 		{
@@ -86,13 +88,13 @@ void Trackers::listen()
 				m_target_missed_packets = pid - target_lastPacketID - 1;
 			}
 			int numTargets = m_input_buffer[2];
-			int ms_to_process = m_input_buffer[3];
+			ms_to_process = m_input_buffer[3];
 			
 			TargetInfo *targets = new TargetInfo[numTargets];
 			
 			if (numTargets == 0)
 				break;
-			uint32_t *tmp = (uint32_t *) &m_input_buffer[4];
+			tmp = (uint32_t *) &m_input_buffer[4];
 			for (int i = 0; i < numTargets; i++)
 			{
 				targets[i].x = ntohl(*tmp);
@@ -111,32 +113,55 @@ void Trackers::listen()
 			}
 			m_target_x = targets[lowestYIndex].x;
 			
-			static int e = 0;
-			if (e++%10 == 0)
-			{
-				AsyncPrinter::Printf("num Targets: %d Time to execute : %d ms\n", numTargets, ms_to_process);
-				AsyncPrinter::Printf("x: %d y: %d dist:%d \n", targets[lowestYIndex].x, targets[lowestYIndex].y, targets[lowestYIndex].y);
-			}
+			AsyncPrinter::Printf("num Targets: %d Time to execute : %d ms\n", numTargets, ms_to_process);
+			AsyncPrinter::Printf("x: %d y: %d dist:%d \n", targets[lowestYIndex].x, targets[lowestYIndex].y, targets[lowestYIndex].y);
 			target_lastPacketID = pid;
 
 			break;
 		case 1:
-			pid = ((m_input_buffer[1] << 24) | (m_input_buffer[2] << 16)
-					| (m_input_buffer[3] << 8) | (m_input_buffer[4] << 0));
+			pid = m_input_buffer[1];
 
-			if (pid - 1 != key_lastPacketID)
+			if (pid - 1 != target_lastPacketID)
 			{
-				m_key_missed_packets = pid - key_lastPacketID - 1;
+				m_target_missed_packets = pid - target_lastPacketID - 1;
 			}
+			int numBalls = m_input_buffer[2];
+			int ms_to_process = m_input_buffer[3];
+			
+			BallInfo *balls = new BallInfo[numBalls];
+			
+			if (numTargets == 0)
+				break;
+			
+			uint32_t *tmp = (uint32_t *) &m_input_buffer[4];
+			for (int i = 0; i < numBalls; i++)
+			{
+				balls[i].x = ntohl(*tmp);
+				tmp++;
+				balls[i].y = ntohl(*tmp);
+				tmp++;
 
-			m_key_value_r = m_input_buffer[5];
-			m_key_value_b = m_input_buffer[6];
-
-			key_lastPacketID = pid;
-
-			//			static int e = 0;
-			//			if (++e % 20 == 0)
-			//				AsyncPrinter::Printf("%d: r: %d, b: %d\n", pid, m_key_value_r, m_key_value_b);
+				balls[i].radius = ntohl(*tmp);
+				tmp++;
+			}
+			
+			//For now just print out the output
+//			AsyncPrinter::Printf("num Balls: %d Time to execute : %d ms\n", numBalls, ms_to_process);
+//			for (int i = 0; i < numBalls; i++)
+//			{
+//				AsyncPrinter::Printf("index %d: x: %d y: %d radius:%d \n", i, balls[i].x, balls[i].y, balls[i].radius);
+//			}
+			target_lastPacketID = pid;
+			
+			{
+				Synchronized s(ActionData::GetInstance()->cam->ballSem);
+				ActionData::GetInstance()->cam->numDetectedBalls = numBalls;
+				for (int i = 0; i < numBalls; i++)
+				{
+					ActionData::GetInstance()->cam->balls[i] = balls[i];
+				}
+				ActionData::GetInstance()->cam->hasBeenUpdated = true;;
+			}
 			break;
 		}
 

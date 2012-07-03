@@ -27,16 +27,29 @@ struct AlignmentData
 	ACTION::CAMERA::targetStatus status;
 };
 
+typedef struct 
+{
+	uint32_t x, y, radius;
+} BallInfo;
+#define MAX_NUM_BALLS 32
+
 struct CameraData
 {
 	KeyTrackerData key;
 	AlignmentData align;
-
+	
+	SEM_ID ballSem;
+	BallInfo balls[MAX_NUM_BALLS];
+	int numDetectedBalls;
+	bool hasBeenUpdated;
 	CameraData()
 	{
 		key.red = key.blue = key.higher = 0;
 		align.status = ACTION::CAMERA::NO_TARGET;
 		align.arbitraryOffsetFromUDP = 0;
+		ballSem = semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE);
+		numDetectedBalls = 0;
+		hasBeenUpdated = false;
 	}
 };
 

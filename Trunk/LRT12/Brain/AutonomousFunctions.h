@@ -110,6 +110,11 @@ private:
 	bool keyTrack();
 
 	/*!
+	 * Iterative method to asssist ball collection
+	 */
+	bool ballTrack();
+
+	/*!
 	 * Iterative method to align the shooter
 	 */
 	bool autoAlign();
@@ -128,6 +133,18 @@ private:
 	 * Advance autonomous queue
 	 */
 	void advanceQueue();
+
+	/*!
+	 * Calculates a distance with our own special weighted argument.
+	 * It is more likely to chose a ball in front of us than to the 
+	 * side of us.
+	 */
+	double weightedDistance(int x1, int y1, int x2, int y2);
+
+	/*!
+	 * Calculates distance squared
+	 */
+	int DistanceSquared(int x1, int y1, int x2, int y2);
 
 	/*!
 	 * Gets name of autonomous stage

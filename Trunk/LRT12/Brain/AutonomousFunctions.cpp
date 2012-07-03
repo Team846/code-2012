@@ -112,10 +112,10 @@ void AutonomousFunctions::work()
 			m_action->auton->completion_status = ACTION::IN_PROGRESS;
 		break;
 	case ACTION::AUTONOMOUS::KEYTRACK:
-		if (keyTrack())
+		if (ballTrack())
 		{
 			m_action->auton->completion_status = ACTION::SUCCESS;
-			m_action->auton->state = ACTION::AUTONOMOUS::AUTOALIGN;
+			m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
 		}
 		else
 			m_action->auton->completion_status = ACTION::IN_PROGRESS;
@@ -435,6 +435,89 @@ bool AutonomousFunctions::keyTrack()
 		}
 	}
 #endif
+	return false;
+}
+
+#define CAMERA_X_INTAKE 325
+#define CAMERA_Y_MIN    70
+bool AutonomousFunctions::ballTrack()
+{
+	static int lastX, lastY;
+	static bool wasTracking = false;
+	if (m_action->cam->numDetectedBalls > 0)
+	{
+		int trackingIndex;
+		Synchronized s(m_action->cam->ballSem);
+		if (m_action->cam->hasBeenUpdated)
+		{
+			if (wasTracking)//choose the ball closest to the ball we last followed
+			{
+				int minIndex = 0;
+				double minDistance = DistanceSquared(lastX, lastY, m_action->cam->balls[0].x, m_action->cam->balls[0].y);
+				for (int i = 1; i < m_action->cam->numDetectedBalls; i++)
+				{
+					double dist = DistanceSquared(lastX, lastY, m_action->cam->balls[i].x, m_action->cam->balls[i].y);
+					if (dist < minDistance)
+					{
+						minDistance = dist;
+						minDistance = i;
+					}
+				}
+				
+				trackingIndex = minIndex;
+				
+			}
+			else //choose the ball "closest" to us. By closest I mean a fancy function that weighs the angle and distance
+			{
+				int minIndex = 0;
+				double minDistance = weightedDistance(CAMERA_X_INTAKE, CAMERA_Y_MIN, m_action->cam->balls[0].x, m_action->cam->balls[0].y);
+				for (int i = 1; i < m_action->cam->numDetectedBalls; i++)
+				{
+					double dist = weightedDistance(CAMERA_X_INTAKE, CAMERA_Y_MIN, m_action->cam->balls[i].x, m_action->cam->balls[i].y);
+					if (dist < minDistance)
+					{
+						minDistance = dist;
+						minDistance = i;
+					}
+				}
+				
+				trackingIndex = minIndex;
+			}
+			//we're tracking ball trackingIndex
+			//The turning rate should be inversely proportional to the distance
+			//and directly proportional to the reciprocal of the slope 
+			wasTracking = true;
+			lastX = m_action->cam->balls[trackingIndex ].x;
+			lastY = m_action->cam->balls[trackingIndex ].y;
+			
+			int dx = abs(CAMERA_X_INTAKE - lastX);
+			int dy = abs(CAMERA_Y_MIN - lastY);
+			
+			double slopeReciprocal = ((double) dx) / dy;
+			
+			//remove the below division by distance
+			double turn = slopeReciprocal 
+					/ sqrt(sqrt((double) DistanceSquared(CAMERA_X_INTAKE, CAMERA_Y_MIN, lastX, lastY))) * 20;
+			
+			//ONLY Do below line in the case of a min drive speed so to not zero
+			turn *= m_action->drivetrain->rate.desiredDriveRate;
+			
+			AsyncPrinter::Printf("dx %d, turn: %.2f\n", (CAMERA_X_INTAKE - lastX), turn * turn / 4);
+			turn = Util::Clamp<double>(turn * turn / 4, -0.2, 0.2);
+			turn *= -Util::Sign<double>(CAMERA_X_INTAKE - lastX);
+
+			
+			m_action->drivetrain->rate.turn_control = true;
+			m_action->drivetrain->rate.desiredTurnRate = turn;
+			m_action->cam->hasBeenUpdated = false;
+		}
+		else
+			m_action->drivetrain->rate.desiredTurnRate /= 1.05;
+			
+	}
+	else
+		wasTracking = false;
+
 	return false;
 }
 
@@ -860,6 +943,27 @@ void AutonomousFunctions::advanceQueue()
 	}
 	AsyncPrinter::Printf("Entering %s\r\n",
 			getAutonomousStageName(m_curr_auton_stage));
+}
+
+double AutonomousFunctions::weightedDistance(int x1, int y1, int x2, int y2)
+{
+	int dx = abs(x1 -x2);
+	int dy = abs(y1 - y2);
+	
+	double slopeReciprocal = ((double) dx) / dy;
+	if (y1 > y2)
+		slopeReciprocal = 0;
+	double dist = sqrt((float) DistanceSquared(x1, y1, x2, y2));//distance in pixels
+	//400 is max istance
+	//we'll see how this works
+	return max(min(slopeReciprocal, 2.5), 0.2) * dist;
+}
+
+int AutonomousFunctions::DistanceSquared(int x1, int y1, int x2, int y2)
+{
+	int dx = x1 -x2;
+	int dy = y1 - y2;
+	return dx * dx + dy * dy;
 }
 
 void AutonomousFunctions::log()
