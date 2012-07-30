@@ -14,6 +14,7 @@
 #include "../Util/PID.h"
 #include <string>
 
+#define PI 3.1415926535 
 #define TIMEOUT_ENABLED 0
 
 AutonomousFunctions* AutonomousFunctions::m_instance = NULL;
@@ -438,8 +439,10 @@ bool AutonomousFunctions::keyTrack()
 	return false;
 }
 
-#define CAMERA_X_INTAKE 325
-#define CAMERA_Y_MIN    70
+
+#define LENGTH_DIVIDER 4
+const static int CAMERA_X_INTAKE = 325 / LENGTH_DIVIDER;
+const static int CAMERA_Y_MIN = 70 / LENGTH_DIVIDER;
 bool AutonomousFunctions::ballTrack()
 {
 	static int lastX, lastY;
@@ -454,8 +457,12 @@ bool AutonomousFunctions::ballTrack()
 			{
 				int minIndex = 0;
 				double minDistance = DistanceSquared(lastX, lastY, m_action->cam->balls[0].x, m_action->cam->balls[0].y);
-				for (int i = 1; i < m_action->cam->numDetectedBalls; i++)
+				for (int i = 0; i < m_action->cam->numDetectedBalls; i++)
 				{
+//					AsyncPrinter::Printf("%d (%d, %d)\n",
+//							i, 
+//							m_action->cam->balls[i].x, 
+//							m_action->cam->balls[i].y);
 					double dist = DistanceSquared(lastX, lastY, m_action->cam->balls[i].x, m_action->cam->balls[i].y);
 					if (dist < minDistance)
 					{
@@ -493,15 +500,18 @@ bool AutonomousFunctions::ballTrack()
 			int dx = abs(CAMERA_X_INTAKE - lastX);
 			int dy = abs(CAMERA_Y_MIN - lastY);
 			
-			double slopeReciprocal = ((double) dx) / dy;
+//			double theta = atan2(dy, dx) - PI / 2;
+//			AsyncPrinter::Printf("Theta %.4f, dx %d, dy %d\n", theta, dx, dy);
+			double slopeReciprocal = ((double) dx*dx) / dy;
 			
 			//remove the below division by distance
 			double turn = slopeReciprocal;// 					/ sqrt(((double) DistanceSquared(CAMERA_X_INTAKE, CAMERA_Y_MIN, lastX, lastY))) * 20;
-			AsyncPrinter::Printf("Turn %.4f, spr %.4f, desire rate %.4f\n", turn, slopeReciprocal, m_action->drivetrain->rate.desiredDriveRate);
+//			double turn = -theta;// 					/ sqrt(((double) DistanceSquared(CAMERA_X_INTAKE, CAMERA_Y_MIN, lastX, lastY))) * 20;
+//			AsyncPrinter::Printf("Turn %.4f, spr %.4f, desire rate %.4f\n", turn, slopeReciprocal, m_action->drivetrain->rate.desiredDriveRate);
 			//ONLY Do below line in the case of a min drive speed so to not zero
 			turn *= m_action->drivetrain->rate.desiredDriveRate;
 			
-			turn = Util::Clamp<double>(turn / 1.5, -0.4, 0.4);
+			turn = Util::Clamp<double>(turn / (5 * LENGTH_DIVIDER), -0.6, 0.6);
 			turn *= -Util::Sign<double>(CAMERA_X_INTAKE - lastX);
 			AsyncPrinter::Printf("dx %d, turn: %.2f\n", (CAMERA_X_INTAKE - lastX), turn * turn / 4);
 

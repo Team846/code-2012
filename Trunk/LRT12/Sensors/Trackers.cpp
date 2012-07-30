@@ -146,10 +146,9 @@ void Trackers::listen()
 			}
 			
 			//For now just print out the output
-//			AsyncPrinter::Printf("num Balls: %d Time to execute : %d ms\n", numBalls, ms_to_process);
 //			for (int i = 0; i < numBalls; i++)
 //			{
-//				AsyncPrinter::Printf("index %d: x: %d y: %d radius:%d \n", i, balls[i].x, balls[i].y, balls[i].radius);
+//					AsyncPrinter::Printf("index %d: x: %d y: %d radius:%d \n", i, balls[i].x, balls[i].y, balls[i].radius);
 //			}
 			target_lastPacketID = pid;
 			
@@ -159,6 +158,11 @@ void Trackers::listen()
 				for (int i = 0; i < numBalls; i++)
 				{
 					ActionData::GetInstance()->cam->balls[i] = balls[i];
+//					AsyncPrinter::Printf("index %d: x: %d y: %d radius:%d \n", i, balls[i].x, balls[i].y, balls[i].radius);
+//					AsyncPrinter::Printf("index %d: x: %d y: %d radius:%d \n", i, 
+//							ActionData::GetInstance()->cam->balls[i].x, 
+//							ActionData::GetInstance()->cam->balls[i].y,
+//							ActionData::GetInstance()->cam->balls[i].radius);
 				}
 				ActionData::GetInstance()->cam->hasBeenUpdated = true;;
 			}
