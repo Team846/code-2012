@@ -525,7 +525,10 @@ bool AutonomousFunctions::ballTrack()
 			
 	}
 	else
+	{
 		wasTracking = false;
+		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+	}
 
 	return false;
 }
