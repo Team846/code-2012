@@ -457,7 +457,7 @@ bool AutonomousFunctions::ballTrack()
 			{
 				int minIndex = 0;
 				double minDistance = DistanceSquared(lastX, lastY, m_action->cam->balls[0].x, m_action->cam->balls[0].y);
-				for (int i = 0; i < m_action->cam->numDetectedBalls; i++)
+				for (int i = 1; i < m_action->cam->numDetectedBalls; i++)
 				{
 //					AsyncPrinter::Printf("%d (%d, %d)\n",
 //							i, 
@@ -467,7 +467,7 @@ bool AutonomousFunctions::ballTrack()
 					if (dist < minDistance)
 					{
 						minDistance = dist;
-						minDistance = i;
+						minIndex = i;
 					}
 				}
 				
@@ -484,7 +484,7 @@ bool AutonomousFunctions::ballTrack()
 					if (dist < minDistance)
 					{
 						minDistance = dist;
-						minDistance = i;
+						minIndex = i;
 					}
 				}
 				
@@ -507,13 +507,13 @@ bool AutonomousFunctions::ballTrack()
 			//remove the below division by distance
 			double turn = slopeReciprocal;// 					/ sqrt(((double) DistanceSquared(CAMERA_X_INTAKE, CAMERA_Y_MIN, lastX, lastY))) * 20;
 //			double turn = -theta;// 					/ sqrt(((double) DistanceSquared(CAMERA_X_INTAKE, CAMERA_Y_MIN, lastX, lastY))) * 20;
-//			AsyncPrinter::Printf("Turn %.4f, spr %.4f, desire rate %.4f\n", turn, slopeReciprocal, m_action->drivetrain->rate.desiredDriveRate);
+//			AsyncPrinter::Printf("Turn %.4f, numBalls %d, desire rate %.4f\n", turn, m_action->cam->numDetectedBalls, m_action->drivetrain->rate.desiredDriveRate);
 			//ONLY Do below line in the case of a min drive speed so to not zero
 			turn *= m_action->drivetrain->rate.desiredDriveRate;
 			
 			turn = Util::Clamp<double>(turn / (5 * LENGTH_DIVIDER), -0.6, 0.6);
 			turn *= -Util::Sign<double>(CAMERA_X_INTAKE - lastX);
-			AsyncPrinter::Printf("dx %d, turn: %.2f\n", (CAMERA_X_INTAKE - lastX), turn * turn / 4);
+			AsyncPrinter::Printf("dx %d, turn: %.2f balls: %d\n", (CAMERA_X_INTAKE - lastX), turn, m_action->cam->numDetectedBalls);
 
 			
 			m_action->drivetrain->rate.turn_control = true;
