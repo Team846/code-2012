@@ -441,8 +441,8 @@ bool AutonomousFunctions::keyTrack()
 
 
 #define LENGTH_DIVIDER 4
-const static int CAMERA_X_INTAKE = 325 / LENGTH_DIVIDER;
-const static int CAMERA_Y_MIN = 70 / LENGTH_DIVIDER;
+const static int CAMERA_X_INTAKE = 276 / LENGTH_DIVIDER;
+const static int CAMERA_Y_MIN = 0 / LENGTH_DIVIDER;
 bool AutonomousFunctions::ballTrack()
 {
 	static int lastX, lastY;
@@ -451,6 +451,13 @@ bool AutonomousFunctions::ballTrack()
 	{
 		int trackingIndex;
 		Synchronized s(m_action->cam->ballSem);
+		
+		for (int i = 1; i < m_action->cam->numDetectedBalls; i++)
+					AsyncPrinter::Printf("%d (%d, %d)\n",
+							i, 
+							m_action->cam->balls[i].x, 
+							m_action->cam->balls[i].y);
+		
 		if (m_action->cam->hasBeenUpdated)
 		{
 			if (wasTracking)//choose the ball closest to the ball we last followed
@@ -459,10 +466,10 @@ bool AutonomousFunctions::ballTrack()
 				double minDistance = DistanceSquared(lastX, lastY, m_action->cam->balls[0].x, m_action->cam->balls[0].y);
 				for (int i = 1; i < m_action->cam->numDetectedBalls; i++)
 				{
-//					AsyncPrinter::Printf("%d (%d, %d)\n",
-//							i, 
-//							m_action->cam->balls[i].x, 
-//							m_action->cam->balls[i].y);
+					AsyncPrinter::Printf("%d (%d, %d)\n",
+							i, 
+							m_action->cam->balls[i].x, 
+							m_action->cam->balls[i].y);
 					double dist = DistanceSquared(lastX, lastY, m_action->cam->balls[i].x, m_action->cam->balls[i].y);
 					if (dist < minDistance)
 					{
