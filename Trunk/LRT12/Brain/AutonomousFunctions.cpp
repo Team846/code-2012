@@ -440,8 +440,9 @@ bool AutonomousFunctions::keyTrack()
 }
 
 
+#define DEBUG_BALL_PICKUP 0
 #define LENGTH_DIVIDER 4
-const static int CAMERA_X_INTAKE = 276 / LENGTH_DIVIDER;
+const static int CAMERA_X_INTAKE = 325 / LENGTH_DIVIDER;
 const static int CAMERA_Y_MIN = 0 / LENGTH_DIVIDER;
 bool AutonomousFunctions::ballTrack()
 {
@@ -451,25 +452,26 @@ bool AutonomousFunctions::ballTrack()
 	{
 		int trackingIndex;
 		Synchronized s(m_action->cam->ballSem);
-		
-		for (int i = 1; i < m_action->cam->numDetectedBalls; i++)
-					AsyncPrinter::Printf("%d (%d, %d)\n",
-							i, 
-							m_action->cam->balls[i].x, 
-							m_action->cam->balls[i].y);
-		
 		if (m_action->cam->hasBeenUpdated)
 		{
 			if (wasTracking)//choose the ball closest to the ball we last followed
 			{
 				int minIndex = 0;
 				double minDistance = DistanceSquared(lastX, lastY, m_action->cam->balls[0].x, m_action->cam->balls[0].y);
+#if DEBUG_BALL_PICKUP
+				AsyncPrinter::Printf("%d (%d, %d)\n",
+						0, 
+						m_action->cam->balls[0].x, 
+						m_action->cam->balls[0].y);
+#endif //DEBUG_BALL_PICKUP
 				for (int i = 1; i < m_action->cam->numDetectedBalls; i++)
 				{
+#if DEBUG_BALL_PICKUP
 					AsyncPrinter::Printf("%d (%d, %d)\n",
 							i, 
 							m_action->cam->balls[i].x, 
 							m_action->cam->balls[i].y);
+#endif //DEBUG_BALL_PICKUP
 					double dist = DistanceSquared(lastX, lastY, m_action->cam->balls[i].x, m_action->cam->balls[i].y);
 					if (dist < minDistance)
 					{
@@ -518,7 +520,7 @@ bool AutonomousFunctions::ballTrack()
 			//ONLY Do below line in the case of a min drive speed so to not zero
 			turn *= m_action->drivetrain->rate.desiredDriveRate;
 			
-			turn = Util::Clamp<double>(turn / (5 * LENGTH_DIVIDER), -0.6, 0.6);
+			turn = Util::Clamp<double>(turn / (6 * LENGTH_DIVIDER), -0.6, 0.6);
 			turn *= -Util::Sign<double>(CAMERA_X_INTAKE - lastX);
 			AsyncPrinter::Printf("dx %d, turn: %.2f balls: %d\n", (CAMERA_X_INTAKE - lastX), turn, m_action->cam->numDetectedBalls);
 
@@ -533,6 +535,9 @@ bool AutonomousFunctions::ballTrack()
 	}
 	else
 	{
+#if DEBUG_BALL_PICKUP
+		AsyncPrinter::Printf("No ball");
+#endif //DEBUG_BALL_PICKUP
 		wasTracking = false;
 		m_action->drivetrain->rate.desiredTurnRate = 0.0;
 	}
@@ -543,57 +548,51 @@ bool AutonomousFunctions::ballTrack()
 bool AutonomousFunctions::autoAlign()
 {
 	m_auto_aim_pid.setSetpoint(m_align_setpoint);
-	if (m_action->cam->align.status == ACTION::CAMERA::TOP)
+	double input = m_action->cam->align.arbitraryOffsetFromUDP;
+	double error = m_align_setpoint - input;
+	double correction = m_auto_aim_pid.getProportionalGain() * error;
+	
+	m_auto_aim_pid.setInput(input);
+	m_auto_aim_pid.update(1.0 / RobotConfig::LOOP_RATE);
+//	AsyncPrinter::Printf("P: %.4f, I: %.4f, Setpoint: %.4f, in %.4f, Out: %.4f\n",m_auto_aim_pid.getProportionalGain(), m_auto_aim_pid.getIntegralGain() ,m_auto_aim_pid.getSetpoint(), m_auto_aim_pid.getInput(), m_auto_aim_pid.getOutput());
+	double out = m_auto_aim_pid.getOutput();
+	out = correction;
+//	AsyncPrinter::Printf("Out %.4f\n", out);
+	if (fabs(out) > m_max_align_turn_rate)
 	{
-		double input = m_action->cam->align.arbitraryOffsetFromUDP;
-		m_auto_aim_pid.setInput(input / 127.0);
-		m_auto_aim_pid.update(1.0 / RobotConfig::LOOP_RATE);
-		double out = m_auto_aim_pid.getOutput();
-		if (fabs(out) > m_max_align_turn_rate)
-		{
-			out = Util::Sign<double>(out) * m_max_align_turn_rate;
-		}
+		out = Util::Sign<double>(out) * m_max_align_turn_rate;
+	}
 
-		m_action->drivetrain->rate.drive_control = true;
-		m_action->drivetrain->rate.turn_control = true;
-		m_action->drivetrain->position.drive_control = false;
-		m_action->drivetrain->position.turn_control = false;
+	m_action->drivetrain->rate.drive_control = true;
+	m_action->drivetrain->rate.turn_control = true;
+	m_action->drivetrain->position.drive_control = false;
+	m_action->drivetrain->position.turn_control = false;
 
-		// switch directions depending on error
+	// switch directions depending on error
 
-		if (fabs(m_auto_aim_pid.getError()) <= m_align_threshold)
-		{
-			//			m_align_turned = out;
+	if (fabs(m_auto_aim_pid.getError()) <= m_align_threshold)
+	{
+		//			m_align_turned = out;
 
-			m_action->drivetrain->rate.desiredTurnRate = 0.0;
-			m_action->drivetrain->rate.desiredDriveRate = 0.0;
-			AsyncPrinter::Printf("Aiming done\n");
-			return true;
-		}
-		else
-		{
-			if (fabs(out) <= m_min_align_turn_rate)
-			{
-				m_action->drivetrain->rate.desiredTurnRate
-						= Util::Sign<double>(out) * m_min_align_turn_rate;
-			}
-			else
-			{
-				m_action->drivetrain->rate.desiredTurnRate = out;
-			}
-			m_action->drivetrain->rate.desiredDriveRate = 0.0;
-		}
+		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+		m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		AsyncPrinter::Printf("Aiming done\n");
+		return true;
 	}
 	else
 	{
-		m_action->drivetrain->rate.drive_control = true;
-		m_action->drivetrain->rate.turn_control = true;
-		m_action->drivetrain->position.drive_control = false;
-		m_action->drivetrain->position.turn_control = false;
-
+		if (fabs(out) <= m_min_align_turn_rate)
+		{
+			m_action->drivetrain->rate.desiredTurnRate
+					= Util::Sign<double>(out) * m_min_align_turn_rate;
+		}
+		else
+		{
+			m_action->drivetrain->rate.desiredTurnRate = out;
+		}
+		
+//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
 		m_action->drivetrain->rate.desiredDriveRate = 0.0;
-		m_action->drivetrain->rate.desiredTurnRate = m_action->auton->turnDir
-				* m_min_align_turn_rate;
 	}
 	return false;
 }

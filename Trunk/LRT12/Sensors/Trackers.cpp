@@ -95,6 +95,7 @@ void Trackers::listen()
 			if (numTargets == 0)
 				break;
 			tmp = (uint32_t *) &m_input_buffer[4];
+			AsyncPrinter::Printf("num Targets: %d Time to execute : %d ms\n", numTargets, ms_to_process);
 			for (int i = 0; i < numTargets; i++)
 			{
 				targets[i].x = ntohl(*tmp);
@@ -104,6 +105,8 @@ void Trackers::listen()
 
 				targets[i].distance = ntohl(*tmp);
 				tmp++;
+				
+				AsyncPrinter::Printf("%d: x: %d y: %d dist:%d \n", i, targets[i].x, targets[i].y, targets[i].y);
 			}
 			//take the highest square (lowest y)
 			for (int i = 1; i < numTargets; i++)
@@ -111,10 +114,9 @@ void Trackers::listen()
 				if (targets[i].y < targets[lowestYIndex].y)
 					lowestYIndex = i;																					
 			}
+			AsyncPrinter::Printf("target: %d\n", lowestYIndex);
 			m_target_x = targets[lowestYIndex].x;
 			
-			AsyncPrinter::Printf("num Targets: %d Time to execute : %d ms\n", numTargets, ms_to_process);
-			AsyncPrinter::Printf("x: %d y: %d dist:%d \n", targets[lowestYIndex].x, targets[lowestYIndex].y, targets[lowestYIndex].y);
 			target_lastPacketID = pid;
 
 			break;
@@ -243,9 +245,9 @@ uint8_t Trackers::getKeyValue(KeyValue v)
 	return m_key_value_r;
 }
 
-int8_t Trackers::getTargetOffset()
+uint32_t Trackers::getTargetOffset()
 {
-	return m_target_slop;
+	return m_target_x;
 }
 
 bool Trackers::getSelectedTarget()

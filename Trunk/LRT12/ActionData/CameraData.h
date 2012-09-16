@@ -23,7 +23,7 @@ struct KeyTrackerData
 
 struct AlignmentData
 {
-	int8_t arbitraryOffsetFromUDP;
+	int32_t arbitraryOffsetFromUDP;
 	ACTION::CAMERA::targetStatus status;
 };
 

@@ -68,9 +68,9 @@ public:
 	uint8_t getKeyValue(KeyValue v);
 
 	/*! 
-	 * @brief Gets the target offset from center of frame 
+	 * @brief Gets the target offset from side of frame 
 	 */
-	int8_t getTargetOffset();
+	uint32_t getTargetOffset();
 
 	/*! 
 	 * @brief Gets the target that is being tracked
@@ -114,7 +114,7 @@ private:
 	uint8_t m_key_value_b;
 
 	int8_t m_target_slop; 
-	double m_target_x;
+	uint32_t m_target_x;
 	bool m_target_top;
 
 	int m_key_missed_packets;
