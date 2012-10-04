@@ -125,11 +125,13 @@ void AutonomousFunctions::work()
 		if (autoAlign())
 		{
 			m_action->auton->completion_status = ACTION::SUCCESS;
+			fireEstimatedDistance();
 			//				m_action->auton->state = ACTION::AUTONOMOUS::TELEOP;
 		}
 		else
 			m_action->auton->completion_status = ACTION::IN_PROGRESS;
 		break;
+	
 	case ACTION::AUTONOMOUS::AUTON_MODE:
 		if (autonomousMode())
 		{
@@ -545,55 +547,204 @@ bool AutonomousFunctions::ballTrack()
 	return false;
 }
 
+void AutonomousFunctions::fireEstimatedDistance()
+{
+	m_action->ballfeed->attemptToLoadRound = true;
+	m_action->launcher->speed = getInterpolatedShooterSpeedValue(m_action->cam->align.distance);
+}
+
+int LUTdistances[] = {
+	1,
+	5,
+	10
+};
+
+int LUTSpeeds[] = 
+{
+	2,
+	30,
+	90
+};
+
+
+double AutonomousFunctions::getInterpolatedShooterSpeedValue(uint32_t dist)
+{
+	int numSamples = sizeof(LUTdistances) / sizeof(LUTdistances[0]);//there is no array.size in c++, this is how you compute it for a statically defined array
+	//first find the closest distance less than or equal to dist using a binary search 
+	int minIndex = 0;
+	int maxIndex = numSamples - 1	;//start at halfway point
+	while (minIndex < maxIndex)
+	{
+		int midIndex = (minIndex + maxIndex) / 2; //integer division
+		if (LUTdistances[midIndex] == dist)
+			return LUTSpeeds[midIndex];
+
+		if (midIndex == minIndex)//this means our min and max indices are right next to each other
+			break; 
+		if (LUTdistances[midIndex] < dist)
+			minIndex = midIndex;
+		else if (LUTdistances[midIndex] > dist)
+			maxIndex = midIndex;
+	}
+	
+	//cout << "interpolating " << dist << " from " << LUTdistances[minIndex] << " to " << LUTdistances[maxIndex] << endl;
+	int dy = LUTSpeeds[maxIndex] - LUTSpeeds[minIndex];
+	int dx = LUTdistances[maxIndex] - LUTdistances[minIndex];
+	double slope = ((double) dy)/ dx;
+
+	dx = dist - LUTdistances[minIndex];
+	double result = LUTSpeeds[minIndex] + slope * dx;
+	return result;
+}
+
 bool AutonomousFunctions::autoAlign()
 {
 	m_auto_aim_pid.setSetpoint(m_align_setpoint);
 	double input = m_action->cam->align.arbitraryOffsetFromUDP;
+	bool newDate = m_action->cam->align.hasNewData;
+	m_action->cam->align.hasNewData = false;
 	double error = m_align_setpoint - input;
 	double correction = m_auto_aim_pid.getProportionalGain() * error;
 	
-	m_auto_aim_pid.setInput(input);
-	m_auto_aim_pid.update(1.0 / RobotConfig::LOOP_RATE);
-//	AsyncPrinter::Printf("P: %.4f, I: %.4f, Setpoint: %.4f, in %.4f, Out: %.4f\n",m_auto_aim_pid.getProportionalGain(), m_auto_aim_pid.getIntegralGain() ,m_auto_aim_pid.getSetpoint(), m_auto_aim_pid.getInput(), m_auto_aim_pid.getOutput());
-	double out = m_auto_aim_pid.getOutput();
-	out = correction;
-//	AsyncPrinter::Printf("Out %.4f\n", out);
-	if (fabs(out) > m_max_align_turn_rate)
+	m_auto_aim_pid.setIIREnabled(false);
+#define WAIT_CYCLES 10	
+	static int e = Util::Sign<double>(error);
+	static int e_2 = 0;
+	static int state = 0;
+	static int last_inner_state = state;
+	if (m_last_state != ACTION::AUTONOMOUS::AUTOALIGN)
+		state = 2;
+	if (last_inner_state != state)
+		AsyncPrinter::Printf("state: %d\n", state);
+	last_inner_state = state;
+	
+	state = 0;
+	if (state == 0)
 	{
-		out = Util::Sign<double>(out) * m_max_align_turn_rate;
-	}
-
-	m_action->drivetrain->rate.drive_control = true;
-	m_action->drivetrain->rate.turn_control = true;
-	m_action->drivetrain->position.drive_control = false;
-	m_action->drivetrain->position.turn_control = false;
-
-	// switch directions depending on error
-
-	if (fabs(m_auto_aim_pid.getError()) <= m_align_threshold)
-	{
-		//			m_align_turned = out;
-
-		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-		m_action->drivetrain->rate.desiredDriveRate = 0.0;
-		AsyncPrinter::Printf("Aiming done\n");
-		return true;
-	}
-	else
-	{
-		if (fabs(out) <= m_min_align_turn_rate)
+//		if (e < 0)
+//		{
+//			m_action->drivetrain->rate.desiredTurnRate = 0.0;
+//			m_action->drivetrain->rate.desiredDriveRate = 0.0;
+//			m_action->drivetrain->rate.drive_control = false;
+//			m_action->drivetrain->rate.turn_control = false;
+//			e = Util::Sign<double>(error);
+//			return false;
+//		}
+//		if (e != Util::Sign<double>(error))
+//		{
+//			AsyncPrinter::Printf("Pre Pausing Yay\n");
+//			e = Util::Sign<double>(error);
+//			//we want to take care of the slop
+//			e_2 = WAIT_CYCLES;
+//			state = 1;
+//		}
+//		else
 		{
-			m_action->drivetrain->rate.desiredTurnRate
-					= Util::Sign<double>(out) * m_min_align_turn_rate;
+			m_auto_aim_pid.setInput(input);
+			double outo = m_auto_aim_pid.update(1.0 / RobotConfig::LOOP_RATE);
+			AsyncPrinter::Printf("P: %.4f, I: %.4f, Setpoint: %.4f, in %.4f, error %.4f, Out: %.4f o2: %.4f t: %.4f\n",
+					m_auto_aim_pid.getProportionalGain()//P
+					, m_auto_aim_pid.getIntegralGain() // I
+					,m_auto_aim_pid.getSetpoint() //set
+					, m_auto_aim_pid.getInput()//in
+					, m_auto_aim_pid.getError()//err
+					, correction //out
+					, outo//o2
+					, DriveEncoders::GetInstance().getTurnAngle()
+					);
+			double out = m_auto_aim_pid.getOutput();
+		//	out = correction;
+		//	AsyncPrinter::Printf("Out %.4f\n", out);
+			if (fabs(out) > m_max_align_turn_rate)
+			{
+				out = Util::Sign<double>(out) * m_max_align_turn_rate;
+			}
+
+			m_action->drivetrain->rate.drive_control = true;
+			m_action->drivetrain->rate.turn_control = true;
+			m_action->drivetrain->position.drive_control = false;
+			m_action->drivetrain->position.turn_control = false;
+
+			// switch directions depending on error
+
+			if (fabs(m_auto_aim_pid.getError()) <= m_align_threshold)
+			{
+				//			m_align_turned = out;
+
+				m_action->drivetrain->rate.desiredTurnRate = 0.0;
+				m_action->drivetrain->rate.desiredDriveRate = 0.0;
+				m_action->drivetrain->rate.drive_control = false;
+				m_action->drivetrain->rate.turn_control = false;
+				AsyncPrinter::Printf("Aiming done\n");
+				return true;
+			}
+			else
+			{
+				if (fabs(out) <= m_min_align_turn_rate)
+				{
+					m_action->drivetrain->rate.desiredTurnRate
+							= Util::Sign<double>(out) * m_min_align_turn_rate;
+				}
+				else
+				{
+					m_action->drivetrain->rate.desiredTurnRate = out;
+				}
+				
+		//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
+				m_action->drivetrain->rate.desiredDriveRate = -0.03;
+			}
+	
+		}
+		
+	}
+	if (state == 1)
+	{
+		if (e_2 > 0)
+		{
+			e_2--;
+			m_action->drivetrain->rate.drive_control = false;
+			m_action->drivetrain->rate.turn_control = false;
+			m_action->drivetrain->rate.desiredDriveRate = 0.0;
 		}
 		else
 		{
-			m_action->drivetrain->rate.desiredTurnRate = out;
+			state = 2;
+			e_2 = WAIT_CYCLES;
 		}
-		
-//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-		m_action->drivetrain->rate.desiredDriveRate = 0.0;
 	}
+	if (state == 2)
+	{
+		if (e_2 > 0)
+		{
+			e_2--;
+			m_action->drivetrain->rate.drive_control = false;
+			m_action->drivetrain->rate.turn_control = false;
+			m_action->drivetrain->rate.desiredDriveRate = m_min_align_turn_rate * e *2.0;
+			return false;
+		}
+		else
+		{
+			state = 3;
+			e_2 = WAIT_CYCLES;
+		}
+	}
+	if (state == 3)
+	{
+		if (e_2 > 0)
+		{
+			e_2--;
+			m_action->drivetrain->rate.drive_control = false;
+			m_action->drivetrain->rate.turn_control = false;
+			m_action->drivetrain->rate.desiredDriveRate = 0.0;
+		}
+		else
+		{
+			state = 0;
+			e_2 = 0;
+		}
+	}
+			
+	
 	return false;
 }
 
@@ -786,9 +937,11 @@ void AutonomousFunctions::Configure()
 	m_keytrack_threshold = c->Get<double> (m_name, "keyThreshold", 127);
 
 	p = c->Get<double> (m_name, "autoAlignP", 32.0);
-	i = c->Get<double> (m_name, "autoAlignI", 12.7);
+	i = c->Get<double> (m_name, "autoAlignI", 0.0);
 	d = c->Get<double> (m_name, "autoAlignD", 0.0);
-	m_auto_aim_pid.setParameters(p, i, d, 0.1, false);
+	m_auto_aim_pid.setParameters(p, i, d, 0.0, 0.5, false);
+	m_auto_aim_pid.setIIREnabled(true);
+	m_auto_aim_pid.setIIRDecay(c->Get<double> (m_name, "autoAlignIIRDecay", 1.0));
 	m_max_align_turn_rate = c->Get<double> (m_name, "alignMaxTurnRate", 0.15);
 	m_min_align_turn_rate = c->Get<double> (m_name, "alignMinTurnRate", 0.05);
 	m_align_threshold = c->Get<double> (m_name, "alignThreshold", 20);

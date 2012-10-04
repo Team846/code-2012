@@ -100,8 +100,9 @@ void InputParser::ProcessInputs()
 		{
 			m_action_ptr->drivetrain->rate.desiredDriveRate = pow(
 					-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
+#define INPUT_POWER 3
 			m_action_ptr->drivetrain->rate.desiredTurnRate = pow(
-					-m_driver_stick->GetAxis(Joystick::kZAxis), 3);
+					-m_driver_stick->GetAxis(Joystick::kZAxis), INPUT_POWER);
 		}
 	}
 

@@ -118,6 +118,16 @@ private:
 	 * Iterative method to align the shooter
 	 */
 	bool autoAlign();
+	
+	/*!
+	 * Fires the distance read in from the camera
+	 */
+	void fireEstimatedDistance();
+
+	/*!
+	 * Gets the estimated correct shooter speed
+	 */
+	double getInterpolatedShooterSpeedValue( uint32_t dist);
 
 	/*!
 	 * Our basic autonomous mode

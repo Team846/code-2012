@@ -73,6 +73,11 @@ public:
 	uint32_t getTargetOffset();
 
 	/*! 
+	 * @brief Gets the target distance
+	 */
+	uint32_t getTargetDistance();
+
+	/*! 
 	 * @brief Gets the target that is being tracked
 	 */
 	bool getSelectedTarget();
@@ -115,6 +120,7 @@ private:
 
 	int8_t m_target_slop; 
 	uint32_t m_target_x;
+	uint32_t m_target_dist;
 	bool m_target_top;
 
 	int m_key_missed_packets;

@@ -168,17 +168,25 @@ void Launcher::Output()
 
 	double max_output = m_speed / m_max_speed + m_duty_cycle_delta;
 	m_output = min(max_output, m_output);
-	m_output = Util::Clamp<double>(m_output, 0, 1.0);
+	m_output = Util::Clamp<double>(m_output, -1.0, 1.0);
 
 	if (m_action->motorsEnabled)
 	{
-		m_roller->SetDutyCycle(m_output);
+		if (m_output > 0.0)
+		{
+			m_roller->SetDutyCycle(m_output);
+			m_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+		}
+		else
+		{
+			m_roller->SetDutyCycle(0.0);
+			m_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
+		}
 	}
 	else
 	{
 		m_roller->SetDutyCycle(0.0);
 	}
-	m_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
 }
 
 std::string Launcher::GetName()

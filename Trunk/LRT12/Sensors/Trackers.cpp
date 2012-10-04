@@ -95,7 +95,7 @@ void Trackers::listen()
 			if (numTargets == 0)
 				break;
 			tmp = (uint32_t *) &m_input_buffer[4];
-			AsyncPrinter::Printf("num Targets: %d Time to execute : %d ms\n", numTargets, ms_to_process);
+//			AsyncPrinter::Printf("num Targets: %d Time to execute : %d ms\n", numTargets, ms_to_process);
 			for (int i = 0; i < numTargets; i++)
 			{
 				targets[i].x = ntohl(*tmp);
@@ -106,7 +106,7 @@ void Trackers::listen()
 				targets[i].distance = ntohl(*tmp);
 				tmp++;
 				
-				AsyncPrinter::Printf("%d: x: %d y: %d dist:%d \n", i, targets[i].x, targets[i].y, targets[i].y);
+//				AsyncPrinter::Printf("%d: x: %d y: %d dist:%d \n", i, targets[i].x, targets[i].y, targets[i].y);
 			}
 			//take the highest square (lowest y)
 			for (int i = 1; i < numTargets; i++)
@@ -114,9 +114,10 @@ void Trackers::listen()
 				if (targets[i].y < targets[lowestYIndex].y)
 					lowestYIndex = i;																					
 			}
-			AsyncPrinter::Printf("target: %d\n", lowestYIndex);
+//			AsyncPrinter::Printf("target: %d\n", lowestYIndex);
 			m_target_x = targets[lowestYIndex].x;
-			
+			m_target_dist = targets[lowestYIndex].distance;
+			ActionData::GetInstance()->cam->align.hasNewData = true;
 			target_lastPacketID = pid;
 
 			break;
@@ -148,10 +149,10 @@ void Trackers::listen()
 			}
 			
 			//For now just print out the output
-//			for (int i = 0; i < numBalls; i++)
-//			{
-//					AsyncPrinter::Printf("index %d: x: %d y: %d radius:%d \n", i, balls[i].x, balls[i].y, balls[i].radius);
-//			}
+			for (int i = 0; i < numBalls; i++)
+			{
+					AsyncPrinter::Printf("index %d: x: %d y: %d radius:%d \n", i, balls[i].x, balls[i].y, balls[i].radius);
+			}
 			target_lastPacketID = pid;
 			
 			{
@@ -188,6 +189,7 @@ void Trackers::update()
 	c->key.higher = getKeyValue(HIGHER);
 	
 	c->align.arbitraryOffsetFromUDP = getTargetOffset();
+	c->align.distance = getTargetDistance();
 	if (c->align.arbitraryOffsetFromUDP == ACTION::CAMERA::INVALID_DATA)
 	{
 		c->align.status = ACTION::CAMERA::NO_TARGET;
@@ -249,6 +251,12 @@ uint32_t Trackers::getTargetOffset()
 {
 	return m_target_x;
 }
+
+uint32_t Trackers::getTargetDistance()
+{
+	return m_target_dist;
+}
+
 
 bool Trackers::getSelectedTarget()
 {

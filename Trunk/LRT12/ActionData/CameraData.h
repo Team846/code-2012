@@ -24,6 +24,8 @@ struct KeyTrackerData
 struct AlignmentData
 {
 	int32_t arbitraryOffsetFromUDP;
+	bool hasNewData;
+	uint32_t distance;
 	ACTION::CAMERA::targetStatus status;
 };
 
