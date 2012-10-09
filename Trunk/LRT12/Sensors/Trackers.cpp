@@ -99,8 +99,12 @@ void Trackers::listen()
 			
 			TargetInfo *targets = new TargetInfo[numTargets];
 			
-			if (numTargets == 0)
+			if (numTargets == 0){
+				m_indicator_r.Set(0);
 				break;
+			}
+			m_indicator_r.Set(1);
+			
 			tmp = (uint32_t *) &m_input_buffer[4];
 //			AsyncPrinter::Printf("num Targets: %d Time to execute : %d ms\n", numTargets, ms_to_process);
 			for (int i = 0; i < numTargets; i++)
@@ -121,6 +125,7 @@ void Trackers::listen()
 				if (targets[i].y < targets[lowestYIndex].y)
 					lowestYIndex = i;																					
 			}
+			
 //			AsyncPrinter::Printf("target: %d\n", lowestYIndex);
 			m_target_x = targets[lowestYIndex].x;
 			m_target_dist = targets[lowestYIndex].distance;
