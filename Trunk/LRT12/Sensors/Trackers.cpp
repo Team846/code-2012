@@ -4,13 +4,20 @@
 #define DEBUG 0
 
 Trackers::Trackers(int task_priority) :
-	Loggable()
+	Loggable(),
+	m_indicator_r(5),
+	m_indicator_g(6),
+	m_indicator_b(7)
 {
 	m_key_missed_packets = 0;
 	m_target_missed_packets = 0;
 
 	m_key_value_r = 0;
 	m_key_value_b = 0;
+
+	m_indicator_r.Set(0);
+	m_indicator_g.Set(0);
+	m_indicator_b.Set(0);
 
 	m_is_running = false;
 	disconnect();
@@ -148,11 +155,17 @@ void Trackers::listen()
 				tmp++;
 			}
 			
+			if(numBalls > 0)
+				m_indicator_b.Set(1);
+			else
+				m_indicator_b.Set(0);
+			
+			
 			//For now just print out the output
-			for (int i = 0; i < numBalls; i++)
-			{
-					AsyncPrinter::Printf("index %d: x: %d y: %d radius:%d \n", i, balls[i].x, balls[i].y, balls[i].radius);
-			}
+//			for (int i = 0; i < numBalls; i++)
+//			{
+//					AsyncPrinter::Printf("index %d: x: %d y: %d radius:%d \n", i, balls[i].x, balls[i].y, balls[i].radius);
+//			}
 			target_lastPacketID = pid;
 			
 			{

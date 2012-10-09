@@ -125,7 +125,12 @@ private:
 
 	int m_key_missed_packets;
 	int m_target_missed_packets;
-
+	
+	DigitalOutput m_indicator_r;
+	DigitalOutput m_indicator_g;
+	DigitalOutput m_indicator_b;
+		
+	
 	typedef struct {
 		uint32_t x, y, distance;
 	} TargetInfo;

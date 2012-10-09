@@ -111,7 +111,7 @@ void Launcher::Output()
 			m_pid.setIIREnabled(false);
 		}
 
-		if (fabs(m_pid.getError() < m_ball_launch_threshold))
+		if (fabs(m_pid.getError()) < m_ball_launch_threshold)
 		{
 			atBallSpeedCounter++;
 		}
@@ -141,10 +141,25 @@ void Launcher::Output()
 
 		static bool wasAtSpeed = false;
 		// catch falling edge
+		static bool shouldPrintNextTime = false;
+		static float lastError = 0;
+		if (shouldPrintNextTime)
+		{
+			if (lastError > fabs(m_pid.getError()))
+			{
+				shouldPrintNextTime = false;
+				AsyncPrinter::Printf("Shot a ball with a drop of %.4f\n", lastError );
+			}
+			lastError = fabs(m_pid.getError());
+		}
+		
 		if (wasAtSpeed && !m_ball_launch_atspeed && !m_is_changing_speed
 				&& m_pid.getError() > 0)
 		{
+			lastError = fabs(m_pid.getError());
+//			AsyncPrinter::Printf("Shot a ball with a drop of %.4f\n", m_pid.getError() );
 			m_action->launcher->ballLaunchCounter++;
+			shouldPrintNextTime = true;
 		}
 		wasAtSpeed = m_ball_launch_atspeed;
 
@@ -176,9 +191,11 @@ void Launcher::Output()
 		{
 			m_roller->SetDutyCycle(m_output);
 			m_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Coast);
+			m_roller->SetVoltageRampRate(0.0);
 		}
 		else
 		{
+			m_roller->SetVoltageRampRate(0.0);
 			m_roller->SetDutyCycle(0.0);
 			m_roller->ConfigNeutralMode(AsyncCANJaguar::kNeutralMode_Brake);
 		}
