@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include <WPILib.h>
+#include "..\Config\Configurable.h"
 #include "../Log/Loggable.h"
 #include "../Util/AsyncPrinter.h"
 #include "../ActionData/ActionData.h"
@@ -24,7 +25,7 @@
  * @author Tony Peng
  */
 
-class Trackers: public Loggable
+class Trackers: public Loggable, public Configurable
 {
 public:
 	/*!
@@ -86,6 +87,11 @@ public:
 	 * logs data
 	 */
 	virtual void log();
+	
+	/*! 
+	 * Loads the values for targetting
+	 */
+	virtual void Configure();
 
 private:
 
@@ -120,6 +126,9 @@ private:
 
 	int8_t m_target_slop; 
 	uint32_t m_target_x;
+	uint32_t m_align_setpoint;
+	uint32_t m_align_threshold;
+	
 	uint32_t m_target_dist;
 	bool m_target_top;
 

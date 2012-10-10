@@ -690,8 +690,8 @@ bool AutonomousFunctions::autoAlign()
 					m_action->drivetrain->rate.desiredTurnRate = out;
 				}
 				
-		//		m_action->drivetrain->rate.desiredTurnRate = 0.0;
-				m_action->drivetrain->rate.desiredDriveRate = -0.03;
+				m_action->drivetrain->rate.desiredTurnRate = 0.0;
+//				m_action->drivetrain->rate.desiredDriveRate = -0.03;
 			}
 	
 		}

@@ -1,10 +1,13 @@
 #include "Trackers.h"
+#include "..\Config\Config.h"
+
 #include <math.h>
 
 #define DEBUG 0
 
 Trackers::Trackers(int task_priority) :
 	Loggable(),
+	Configurable(),
 	m_indicator_r(5),
 	m_indicator_g(6),
 	m_indicator_b(7)
@@ -19,6 +22,7 @@ Trackers::Trackers(int task_priority) :
 	m_indicator_g.Set(0);
 	m_indicator_b.Set(0);
 
+	Configure();
 	m_is_running = false;
 	disconnect();
 	m_task = new Task("KeyTracker::listen", (FUNCPTR) Trackers::listenTask,
@@ -36,6 +40,14 @@ Trackers::~Trackers()
 	disconnect();
 }
 
+
+void Trackers::Configure()
+{
+	static string m_name = "AutonomousFunctions";
+	Config * c = Config::GetInstance();
+	m_align_threshold = c->Get<int> (m_name, "alignThreshold", 0);
+	m_align_setpoint = c->Get<int> (m_name, "alignSetpoint", 0);
+}
 void Trackers::listen()
 {
 	m_is_running = true;
@@ -85,6 +97,7 @@ void Trackers::listen()
 		int ms_to_process = 0;
 		uint32_t *tmp = 0;
 		
+		
 		switch (header)
 		{
 		case 0:
@@ -99,11 +112,14 @@ void Trackers::listen()
 			
 			TargetInfo *targets = new TargetInfo[numTargets];
 			
-			if (numTargets == 0){
+//			AsyncPrinter::Printf("%d targets\n", numTargets);
+			if (numTargets < 1){
 				m_indicator_r.Set(0);
+				m_indicator_g.Set(0);
 				break;
 			}
 			m_indicator_r.Set(1);
+			
 			
 			tmp = (uint32_t *) &m_input_buffer[4];
 //			AsyncPrinter::Printf("num Targets: %d Time to execute : %d ms\n", numTargets, ms_to_process);
@@ -128,6 +144,11 @@ void Trackers::listen()
 			
 //			AsyncPrinter::Printf("target: %d\n", lowestYIndex);
 			m_target_x = targets[lowestYIndex].x;
+			if (fabs(m_target_x - m_align_setpoint) <= m_align_threshold)
+				m_indicator_g.Set(1);
+			else
+				m_indicator_g.Set(0);
+				
 			m_target_dist = targets[lowestYIndex].distance;
 			ActionData::GetInstance()->cam->align.hasNewData = true;
 			target_lastPacketID = pid;
