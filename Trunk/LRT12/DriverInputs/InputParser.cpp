@@ -2,7 +2,8 @@
 #include "DebouncedJoystick.h"
 #include "../Config/DriverStationConfig.h"
 #include "../Util/AsyncPrinter.h"
-#include "math.h"
+//#include "math.h"
+#include <cmath>
 
 #include "../ActionData/ActionData.h"
 #include "../ActionData/AutonomousAction.h"
@@ -98,11 +99,27 @@ void InputParser::ProcessInputs()
 		}
 		else
 		{
-			m_action_ptr->drivetrain->rate.desiredDriveRate = pow(
-					-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
-#define INPUT_POWER 3
-			m_action_ptr->drivetrain->rate.desiredTurnRate = pow(
-					-m_driver_stick->GetAxis(Joystick::kZAxis), INPUT_POWER);
+#define TURN_EXPONENT 1		//3	(Anurag 10/18/12)
+			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
+			double turn = pow(-m_driver_stick->GetAxis(Joystick::kZAxis), TURN_EXPONENT);
+#define BLENDED 1
+#if BLENDED		
+			double absForward = abs(forward);
+			double blend = (1-absForward);
+			blend *= blend;
+			blend *= blend;			
+			turn /= 2.0; //reduce turn rate TODO
+
+			const double turnInPlace = turn;
+			const double turnConstantRadius = turn * absForward;
+			const double turnComposite = turnInPlace * (blend) + turnConstantRadius * (1-blend);
+			
+#else //BLENDED
+			const double turnComposite = turn * turn * turn;
+#endif //BLENDED	
+			
+			m_action_ptr->drivetrain->rate.desiredDriveRate = forward;
+			m_action_ptr->drivetrain->rate.desiredTurnRate = turnComposite;
 		}
 	}
 
