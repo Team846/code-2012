@@ -17,8 +17,12 @@ private:
 	//button assignments shorted by button number
 	
 	//Driver stick
+#define DUMMY_BUTTON 11
 	static const int LOWER_COLLECTOR = 1;
-	static const int AUTO_AIM_DIR   = 2;
+//	static const int AUTO_AIM_DIR   = 2;
+	static const int AUTO_AIM_DIR   = DUMMY_BUTTON; //FIXME anurag
+	static const int TURN_IN_PLACE = 2; //FIXME anurag
+
 	static const int KEYTRACK 		= 3;
 	static const int AUTOAIM    	= 4;
 	static const int APPLY_CONFIG   = 5;

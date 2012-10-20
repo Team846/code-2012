@@ -102,21 +102,25 @@ void InputParser::ProcessInputs()
 #define TURN_EXPONENT 1		//3	(Anurag 10/18/12)
 			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
 			double turn = pow(-m_driver_stick->GetAxis(Joystick::kZAxis), TURN_EXPONENT);
-#define BLENDED 1
-#if BLENDED		
-			double absForward = abs(forward);
-			double blend = (1-absForward);
-			blend *= blend;
-			blend *= blend;			
-			turn /= 2.0; //reduce turn rate TODO
 
-			const double turnInPlace = turn;
-			const double turnConstantRadius = turn * absForward;
-			const double turnComposite = turnInPlace * (blend) + turnConstantRadius * (1-blend);
-			
-#else //BLENDED
-			const double turnComposite = turn * turn * turn;
-#endif //BLENDED	
+			double turnComposite = 0.0;
+			if (m_driver_stick->IsButtonDown(TURN_IN_PLACE)) //FIXME "1 ||" makes it always turn in place - Anurag
+			{
+				turnComposite = turn;
+			}
+			else
+			{
+				double absForward = abs(forward);
+				double blend = (1-absForward);
+				blend *= blend;
+				blend *= blend;
+blend = 0;	 //FIXME remove later - anurag
+				turn /= 2.0; //reduce turn rate TODO
+
+				const double turnInPlace = turn;
+				const double turnConstantRadius = turn * absForward;
+				turnComposite = turnInPlace * (blend) + turnConstantRadius * (1-blend);
+			}
 			
 			m_action_ptr->drivetrain->rate.desiredDriveRate = forward;
 			m_action_ptr->drivetrain->rate.desiredTurnRate = turnComposite;
