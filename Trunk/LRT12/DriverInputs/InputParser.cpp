@@ -114,8 +114,8 @@ void InputParser::ProcessInputs()
 				double blend = (1-absForward);
 				blend *= blend;
 				blend *= blend;
-blend = 0;	 //FIXME remove later - anurag
-				turn /= 2.0; //reduce turn rate TODO
+//blend = 0;	 //FIXME remove later - anurag
+				turn *= (0.75); //reduce turn rate TODO
 
 				const double turnInPlace = turn;
 				const double turnConstantRadius = turn * absForward;
