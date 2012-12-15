@@ -14,15 +14,19 @@
 #include "../ActionData/BallFeedAction.h"
 #include "../ActionData/BPDAction.h"
 
+#define WHEEL 1
+
 InputParser::InputParser()
 {
 	m_action_ptr = ActionData::GetInstance();
 	m_driver_stick = new DebouncedJoystick(1,
 			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
 			DriverStationConfig::NUM_JOYSTICK_AXES);
-	m_operator_stick = new DebouncedJoystick(2,
+	m_operator_stick = new DebouncedJoystick(3,
 			DriverStationConfig::NUM_JOYSTICK_BUTTONS,
 			DriverStationConfig::NUM_JOYSTICK_AXES);
+	m_driver_steering_wheel = new DebouncedJoystick(2, 12, 2);
+	m_use_steering_wheel = 0;
 }
 
 void InputParser::ProcessInputs()
@@ -92,6 +96,9 @@ void InputParser::ProcessInputs()
 	/***************** Drivetrain **********************/
 	if (m_action_ptr->auton->state == ACTION::AUTONOMOUS::TELEOP)
 	{
+		if (m_driver_stick->IsButtonJustPressed(WHEEL_TOGGLE))
+			m_use_steering_wheel = !m_use_steering_wheel;
+
 		if (m_driver_stick->IsButtonDown(RESET_ZERO))
 		{
 			m_action_ptr->drivetrain->position.reset_translate_zero = true;
@@ -99,29 +106,29 @@ void InputParser::ProcessInputs()
 		}
 		else
 		{
-#define TURN_EXPONENT 1		//3	(Anurag 10/18/12)
+#define TURN_EXPONENT 3		//3	(Anurag 10/18/12)
+			double turn = 0.0;
+			if (m_use_steering_wheel)
+				turn = -m_driver_steering_wheel->GetAxis(Joystick::kXAxis);
+			else //no wheel
+				turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
+			turn = pow(turn, TURN_EXPONENT);
+			
 			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
-			double turn = pow(-m_driver_stick->GetAxis(Joystick::kZAxis), TURN_EXPONENT);
 
 			double turnComposite = 0.0;
-			if (m_driver_stick->IsButtonDown(TURN_IN_PLACE)) //FIXME "1 ||" makes it always turn in place - Anurag
-			{
-				turnComposite = turn;
-			}
-			else
-			{
-				double absForward = abs(forward);
-				double blend = (1-absForward);
-				blend *= blend;
-				blend *= blend;
-//blend = 0;	 //FIXME remove later - anurag
-				turn *= (0.75); //reduce turn rate TODO
 
-				const double turnInPlace = turn;
-				const double turnConstantRadius = turn * absForward;
-				turnComposite = turnInPlace * (blend) + turnConstantRadius * (1-blend);
-			}
-			
+			double absForward = abs(forward);
+			double blend = (1 - absForward); // always between 0 and 1
+			blend = pow(blend, 2);
+
+			turn *= (1); //scale turn rate
+
+			const double turnInPlace = turn;
+			const double turnConstantRadius = turn * absForward;
+			turnComposite = turnInPlace * (blend) + turnConstantRadius * (1
+					- blend);
+
 			m_action_ptr->drivetrain->rate.desiredDriveRate = forward;
 			m_action_ptr->drivetrain->rate.desiredTurnRate = turnComposite;
 		}

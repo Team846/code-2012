@@ -13,6 +13,8 @@ private:
 	ActionData *m_action_ptr;
 	DebouncedJoystick * m_driver_stick;
 	DebouncedJoystick * m_operator_stick;
+	DebouncedJoystick * m_driver_steering_wheel;
+	int m_use_steering_wheel;
 	
 	//button assignments shorted by button number
 	
@@ -21,7 +23,7 @@ private:
 	static const int LOWER_COLLECTOR = 1;
 //	static const int AUTO_AIM_DIR   = 2;
 	static const int AUTO_AIM_DIR   = DUMMY_BUTTON; //FIXME anurag
-	static const int TURN_IN_PLACE = 2; //FIXME anurag
+	static const int WHEEL_TOGGLE = 2; 
 
 	static const int KEYTRACK 		= 3;
 	static const int AUTOAIM    	= 4;
@@ -34,7 +36,7 @@ private:
 	
 	//Operator Stick
 	static const int SHOOT		  		  = 1;
-	static const int COLLECT_BALLS        = 2;
+	static const int COLLECT_BALLS        = 2; 
 	static const int LOWER_SHOT        	  = 3;
 	static const int HIGH_SPEED           = 4;
 	static const int FENDER_SHOT_SELECT	  = 5;
