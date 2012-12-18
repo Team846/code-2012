@@ -14,7 +14,7 @@
 #include "../ActionData/BallFeedAction.h"
 #include "../ActionData/BPDAction.h"
 
-#define WHEEL 1
+#define WHEEL 0
 
 InputParser::InputParser()
 {
@@ -33,16 +33,21 @@ void InputParser::ProcessInputs()
 {
 	m_driver_stick->Update();
 	m_operator_stick->Update();
+	m_driver_steering_wheel->Update();
+
+	if (m_driver_stick->IsButtonJustPressed(WHEEL_TOGGLE))
+		m_use_steering_wheel = !m_use_steering_wheel;
 
 	/***************** Shifter **********************/
-	if (m_driver_stick->IsButtonDown(SHIFT)) //Shift gear
-	{
-		m_action_ptr->shifter->gear = ACTION::GEARBOX::LOW_GEAR;
-	}
+	int gearButton;
+	if (m_use_steering_wheel)
+		gearButton = m_driver_steering_wheel->GetAxis(Joystick::kYAxis) > 0.25;
 	else
-	{
-		m_action_ptr->shifter->gear = ACTION::GEARBOX::HIGH_GEAR;
-	}
+		gearButton = m_driver_stick->IsButtonDown(SHIFT);
+
+
+	m_action_ptr->shifter->gear = gearButton ? ACTION::GEARBOX::LOW_GEAR
+			: ACTION::GEARBOX::HIGH_GEAR;
 
 	/***************** Ball Feeder **********************/
 	if (m_operator_stick->IsButtonDown(COLLECT_BALLS))
@@ -84,20 +89,13 @@ void InputParser::ProcessInputs()
 		m_action_ptr->auton->state = ACTION::AUTONOMOUS::TELEOP;
 	}
 
-	if (m_driver_stick->IsButtonDown(AUTO_AIM_DIR))
-	{
-		m_action_ptr->auton->turnDir = ACTION::AUTONOMOUS::COUNTER_CLOCKWISE;
-	}
-	else
-	{
-		m_action_ptr->auton->turnDir = ACTION::AUTONOMOUS::CLOCKWISE;
-	}
+	m_action_ptr->auton->turnDir
+			= m_driver_stick->IsButtonDown(AUTO_AIM_DIR) ? ACTION::AUTONOMOUS::COUNTER_CLOCKWISE
+					: ACTION::AUTONOMOUS::CLOCKWISE;
 
 	/***************** Drivetrain **********************/
 	if (m_action_ptr->auton->state == ACTION::AUTONOMOUS::TELEOP)
 	{
-		if (m_driver_stick->IsButtonJustPressed(WHEEL_TOGGLE))
-			m_use_steering_wheel = !m_use_steering_wheel;
 
 		if (m_driver_stick->IsButtonDown(RESET_ZERO))
 		{
@@ -110,10 +108,11 @@ void InputParser::ProcessInputs()
 			double turn = 0.0;
 			if (m_use_steering_wheel)
 				turn = -m_driver_steering_wheel->GetAxis(Joystick::kXAxis);
-			else //no wheel
+			else
+				//no wheel
 				turn = -m_driver_stick->GetAxis(Joystick::kZAxis);
 			turn = pow(turn, TURN_EXPONENT);
-			
+
 			double forward = pow(-m_driver_stick->GetAxis(Joystick::kYAxis), 1);
 
 			double turnComposite = 0.0;
